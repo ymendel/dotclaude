@@ -11,3 +11,10 @@
 # and skills
 !/skills
 !/skills/**/*
+
+# and rules
+!/rules
+!/rules/**/*
+
+# and of course, CLAUDE.md
+!CLAUDE.md
