@@ -1,0 +1,6 @@
+# Just ignore everything by default
+#
+# There are many auto-generated and -updated files used by this tool,
+# and I don't want to deal with them.
+# Either explicitly add files to be tracked, or update this gitignore to unignore them.
+*
