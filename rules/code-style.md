@@ -33,4 +33,5 @@
 - `app/` is for business domain. `lib/` is for generic, non-business-specific code that could theoretically be upstreamed or extracted to a gem.
 
 ### Testing
+
 - Avoid fixtures at all costs. Use factories instead, with factory_bot_rails. (exception: interacting with very specific data, like files and network-call responses. vcr is a good choice for the latter.)

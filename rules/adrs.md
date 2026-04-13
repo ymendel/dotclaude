@@ -71,4 +71,3 @@ All consequences must be clearly marked as positive, negative, or neutral.
     - **Status**: Accepted — broadcast mechanism superseded by ADR 0021
 - Especially if an ADR has been only partially superseded, more references to the later ADR can be made in the body.
 - Never make any changes other than these status updates and reference additions.
-
