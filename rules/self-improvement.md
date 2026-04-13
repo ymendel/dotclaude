@@ -18,3 +18,8 @@ If a skill was involved, find that skill's canonical path (Glob for the skill's 
 If the issue can be traced back to a rule or CLAUDE.md, make the correction there. If no appropriate rule can be found, add to `rules/misc.md`.
 
 ~/.claude is under version control, so I can see a detailed diff on my own. You only need to tell me that an edit was made and a summary of the change.
+
+
+## Feedback
+
+Whenever feedback is given and you would write down a memory, first consider whether this truly is specific to the project or if it's a more-general concern. Only use the project-level memory directory if the feedback applies specifically to the project. Otherwise, find a place in ~/.claude to add the feedback. If no appropriate place can be found, add it to `rules/feedback.md`.
