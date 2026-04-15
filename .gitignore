@@ -8,9 +8,17 @@
 # want to keep track of settings
 !/settings.json
 
+# and agents
+!/agents
+!/agents/**/*
+
 # and skills
 !/skills
 !/skills/**/*
+
+# and commands, at least temporarily (they are deprecated in favor of skills)
+!/commands
+!/commands/**/*
 
 # and rules
 !/rules
