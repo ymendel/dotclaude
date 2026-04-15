@@ -1,6 +1,8 @@
 ---
 name: explain-changes-mental-model
 description: Build a mental model of code changes by splitting them into smaller logical chunks ordered by dependency. Use when the user wants to understand a commit, branch, diff, or working changes — e.g. "explain these changes", "walk me through this PR", "help me understand this diff". Accepts an optional target: a commit hash, branch name, git range, or "custom" to paste changes manually.
+argument-hint: "[commit|branch|range|custom]"
+allowed-tools: Bash(git *)
 ---
 
 # Mental Model Builder

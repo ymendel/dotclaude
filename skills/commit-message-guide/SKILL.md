@@ -1,6 +1,7 @@
 ---
 name: commit-message-guide
 description: Guide for creating well-structured conventional commits. Use when creating git commits, drafting commit messages, or reviewing commit message quality.
+allowed-tools: Bash(git *)
 ---
 
 # Commit Message Guide

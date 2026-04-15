@@ -1,6 +1,10 @@
 ---
 name: explain-pr-changes
 description: Generate a comprehensive PR summary and open or update the pull request on GitHub. Use when the user asks to create a PR, summarize changes for a PR, or open a pull request for the current branch. Optionally accepts issue references to close (e.g. "close #123").
+argument-hint: "[issue-ref]"
+disable-model-invocation: true
+allowed-tools: Bash(git *) Bash(gh *)
+context: fork
 ---
 
 # PR workflow
