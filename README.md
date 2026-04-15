@@ -26,6 +26,10 @@ See [the Makefile](Makefile) for the specific steps. In short, it symlinks the r
 
 ## Appreciation
 
-- [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) — several subagents and skills adapted from here
+- [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) — several agents and skills adapted from here
+- [VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — source for many of the agents
+- [terrylica/cc-skills](https://github.com/terrylica/cc-skills) — ascii-diagram-validator and skill-architecture skills
+- [robzolkos/skill-rails-upgrade](https://github.com/robzolkos/skill-rails-upgrade) — rails-upgrade skill
+- [supabase/agent-skills](https://github.com/supabase/agent-skills) — supabase-postgres-best-practices skill
 - [fredrik-hansen](https://github.com/fredrik-hansen/fredrik-hansen/blob/main/HONESTY_RULES.md) — the honesty rules started here
 - Strunk & White's *The Elements of Style* — the writing skill is built around it
