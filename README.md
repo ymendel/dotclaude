@@ -23,3 +23,9 @@ There's a Makefile to make this simple. Just clone and go.
     $ make
 
 See [the Makefile](Makefile) for the specific steps. In short, it symlinks the repo to `~/.claude`.
+
+## Appreciation
+
+- [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) — several subagents and skills adapted from here
+- [fredrik-hansen](https://github.com/fredrik-hansen/fredrik-hansen/blob/main/HONESTY_RULES.md) — the honesty rules started here
+- Strunk & White's *The Elements of Style* — the writing skill is built around it
