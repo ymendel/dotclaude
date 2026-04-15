@@ -3,6 +3,7 @@ name: mermaid-diagram-specialist
 description: "Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, and architecture visualizations. Use when creating technical documentation, visualizing workflows, documenting architecture, or explaining system design."
 tools: Read, Glob, Grep
 model: sonnet
+skills: mermaid-diagrams
 ---
 
 # Mermaid Diagram Specialist
