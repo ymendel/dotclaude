@@ -93,6 +93,10 @@ What did you decide? State it plainly and specifically. Name the thing.
 If it's a technical choice, name the version, the library, the pattern.
 Avoid hedging language — "we will use X" not "we might consider X".
 
+Unless the decision is very clear with no significant trade-offs, include
+an `### Options` subsection listing the alternatives considered, with pros
+and cons for each. No more than 3 options.
+
 ## Consequences
 
 What does this make easier, harder, or impossible? Separate positive,
