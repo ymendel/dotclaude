@@ -131,6 +131,8 @@ When invoked:
 
 ## Writing quality
 
+Write the ADR as a conversation with a future developer. Use full sentences organized into paragraphs. Bullets are acceptable for visual style — or when explicitly called for, such as pros/cons or consequences — not as an excuse for writing sentence fragments.
+
 The ADR's job is to help a future reader who has *only* the code and the ADR. Write accordingly:
 
 - **Context should survive the decision.** Describe the world as it was, not as it will be. If you write "we use Rails 8" in context, it'll read wrong in five years when Rails 12 is current. Write "at the time we were choosing a framework, we wanted..."
