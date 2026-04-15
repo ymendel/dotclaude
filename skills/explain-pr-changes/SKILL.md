@@ -1,3 +1,8 @@
+---
+name: explain-pr-changes
+description: Generate a comprehensive PR summary and open or update the pull request on GitHub. Use when the user asks to create a PR, summarize changes for a PR, or open a pull request for the current branch. Optionally accepts issue references to close (e.g. "close #123").
+---
+
 # PR workflow
 
 ## 1. The Persona
@@ -30,7 +35,7 @@ Begin by thoroughly analyzing the diff. Understand the _intent_ behind the chang
 
 Draft a concise, high-level summary of the PR's purpose and key changes (maximum 150 words). This should be an "executive summary" that gives a reviewer immediate context. Place this at the very top of your output.
 
-If some $ARGUMENTS are given, add to the summary "Close $ARGUMENTS".
+If issue references were provided (e.g. "close #123"), add them to the summary.
 
 ### Step 3: Visualizing the Architecture (Mermaid Diagrams) - Optional
 

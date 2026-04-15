@@ -1,13 +1,13 @@
 ---
-description: Build a mental model of changes by splitting them into smaller logical chunks
-argument-hint: [commit|branch|range|custom]
+name: explain-changes-mental-model
+description: Build a mental model of code changes by splitting them into smaller logical chunks ordered by dependency. Use when the user wants to understand a commit, branch, diff, or working changes — e.g. "explain these changes", "walk me through this PR", "help me understand this diff". Accepts an optional target: a commit hash, branch name, git range, or "custom" to paste changes manually.
 ---
 
 # Mental Model Builder
 
 Analyze code changes and present them as a coherent mental model - breaking large diffs into logical chunks ordered by dependency so they can be understood incrementally.
 
-## What This Command Does
+## What This Skill Does
 
 1. **Gather changes** from the specified source (commit, branch, range, or custom input)
 2. **Analyze and categorize** changes into logical groups by theme/purpose
@@ -37,7 +37,7 @@ Analyze code changes and present them as a coherent mental model - breaking larg
 
 ## Implementation Steps
 
-When this command is invoked:
+When this skill is invoked:
 
 ### 1. Determine Change Source
 
