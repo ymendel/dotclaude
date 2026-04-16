@@ -19,7 +19,7 @@
 ## Version Control
 
 - git is the version-control tool of choice, and GitHub is the preferred hosting provider
-- Keep the 'commit_message_guide' skill in mind when committing
+- Invoke the `commit-message-guide` skill before committing
 - Keep commits to small, logical changes. Do not make one big commit at the end.
 - When refining a change that just happened, amend the previous commit instead of creating a new one.
 - Use the `gh` command-line tool when interacting with GitHub
