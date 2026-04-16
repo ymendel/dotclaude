@@ -1,6 +1,6 @@
 ---
 name: commit-message-guide
-description: Guide for creating well-structured conventional commits. TRIGGER when: about to run `git commit`, user asks to commit or save changes to git, or drafting/reviewing a commit message. Enforces conventional commit format, forbids AI attribution and Co-Authored-By trailers.
+description: "Guide for creating well-structured conventional commits. TRIGGER when: about to run `git commit`, user asks to commit or save changes to git, or drafting/reviewing a commit message. Use for single logical changes. Enforces conventional commit format, forbids AI attribution and Co-Authored-By trailers."
 allowed-tools: Bash(git *)
 ---
 
@@ -172,6 +172,8 @@ This was a quick fix, only took about an hour.
 None of this information adds value.
 
 ## When Creating Commits
+
+If the work spans multiple concerns, use `purposeful-commits` first to structure the commits, then apply this guide to each individual message.
 
 1. **Draft the commit message** following this guide
 2. **Show the draft** to the user before committing

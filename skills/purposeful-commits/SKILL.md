@@ -1,12 +1,6 @@
 ---
 name: purposeful-commits
-description: Structure staged and unstaged changes into purposeful, logical commits
-  that tell a clear story. Use when the user says "commit", "structure my commits",
-  "organize these changes", "help me commit", "break this into commits", "purposeful
-  commits", or asks to commit work that spans multiple concerns. Also use when the
-  user has a mix of refactoring, feature, and supporting changes ready to commit.
-  DO NOT trigger when the work is a single logical change — use commit-message-guide
-  alone in that case.
+description: "Structure staged and unstaged changes into purposeful, logical commits. TRIGGER when: working tree contains changes spanning multiple concerns, or user asks to commit, structure commits, or organize changes. DO NOT trigger when the work is a single logical change — use commit-message-guide alone in that case."
 ---
 
 # Purposeful Commits
@@ -20,6 +14,8 @@ This skill implements the approach described in Chris Arcand's "Purposeful Commi
 - The user asks to commit, structure commits, or organize changes
 - The user has completed work that spans multiple concerns (refactoring + feature + config, etc.)
 - The user says "purposeful commits" or asks to break changes into logical commits
+
+If `commit-message-guide` is also active, this skill runs first to structure the work into logical commits; `commit-message-guide` then applies to each individual commit message.
 
 ## The commit taxonomy
 
