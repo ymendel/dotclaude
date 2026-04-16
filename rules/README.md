@@ -8,7 +8,7 @@ Rule files are always loaded into context — unlike skills, they don't need to 
 
 **`code-style.md`** — General code style (trailing newlines, simplicity, parser libraries over regex) plus Ruby- and Rails-specific conventions. Aesthetic preferences, naming rules, and testing guidance (factories, not fixtures).
 
-**`development-workflow.md`** — How work should be approached: planning vs. spikes, ADRs over proprietary plan modes, git discipline (small commits, amend recent changes, draft PRs), refactoring policy, and commenting conventions.
+**`development-workflow.md`** — How work should be approached: planning vs. spikes, ADRs over proprietary plan modes, git discipline (small commits, specific staging, amend recent changes, draft PRs), refactoring policy, and commenting conventions.
 
 **`honesty.md`** — Rules about quantitative claims: never present estimates as measurements, source every number, separate verified facts from assumptions, don't optimize for looking helpful over being accurate. Applies extra scrutiny to any external-facing content.
 
@@ -17,3 +17,5 @@ Rule files are always loaded into context — unlike skills, they don't need to 
 **`feedback.md`** — Overflow for feedback that doesn't fit an existing rule file.
 
 **`misc.md`** — Overflow for rules that don't fit elsewhere.
+
+**`RTK.md`** — Usage guide for RTK (Rust Token Killer), a token-optimized CLI proxy. Covers the hook scope limitation (Bash only, not built-in tools), the override for file/search operations, and command reference by workflow.

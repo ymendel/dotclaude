@@ -8,7 +8,9 @@ Invoke manually with `/skill-name [args]`.
 
 ## Git & code changes
 
-**`commit-message-guide`** — Conventional commit format, command tense, when to include a body and what to leave out. Also pre-approves git tool calls.
+**`commit-message-guide`** — Conventional commit format, command tense, when to include a body and what to leave out. For single logical changes. Pairs with `purposeful-commits` for multi-concern work.
+
+**`purposeful-commits`** — Structures a working tree with mixed concerns into logical, ordered commits (refactoring → feature → supporting). Proposes a commit plan before executing. For single logical changes, defers to `commit-message-guide`.
 
 **`explain-changes-mental-model`** `[commit|branch|range|custom]` — Breaks a diff into logical groups ordered by dependency so changes can be understood incrementally. Accepts a commit hash, branch name, git range, or "custom" to paste a diff manually.
 
