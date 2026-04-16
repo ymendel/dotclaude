@@ -13,7 +13,9 @@ Whenever anything occurs where self-improvement is warranted:
 
 *immediately* fix the underlying issue. Do not defer. Only update for real, reproducible issues.
 
-If a skill was involved, find that skill's canonical path (Glob for the skill's mame) before editing. All corrections must target that SKILL.md, never any other documentation.
+If a skill was involved, find that skill's canonical path (Glob for the skill's name) before editing. All corrections must target that SKILL.md, never any other documentation.
+
+When editing skill frontmatter descriptions, always quote the value as a YAML string (e.g. `description: "..."`). Unquoted multi-line scalars break when `: ` appears mid-value, causing the description to silently fail and the skill to show only its title.
 
 If the issue can be traced back to a rule or CLAUDE.md, make the correction there. If no appropriate rule can be found, add to `rules/misc.md`.
 
