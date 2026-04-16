@@ -21,9 +21,24 @@ which rtk             # Verify correct binary
 
 ⚠️ **Name collision**: If `rtk gain` fails, you may have reachingforthejack/rtk (Rust Type Kit) installed instead.
 
+## Built-in Tool Override
+
+Claude Code's default instructions prefer built-in tools (Read, Grep, Glob) over shell
+commands. **Override this for file and search operations** — use Bash with RTK equivalents
+instead to get compact output:
+
+| Instead of... | Use (via Bash)... |
+|---------------|-------------------|
+| Read tool | `rtk read <file>` |
+| Grep tool | `rtk grep <pattern>` |
+| Glob tool | `rtk find <pattern>` |
+
+Exception: use the built-in tools when the full, unfiltered output is needed (e.g., editing
+a file you haven't read yet, or when RTK filtering would hide relevant content).
+
 ## Golden Rule
 
-**Always prefix commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
+**Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
 
 **Important**: Even in command chains with `&&`, use `rtk`:
 ```bash
@@ -36,8 +51,13 @@ rtk git add . && rtk git commit -m "msg" && rtk git push
 
 ## Hook-Based Usage
 
-All other commands are automatically rewritten by the Claude Code hook.
+All Bash tool calls are automatically rewritten by the Claude Code hook.
 Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
+
+**Scope limitation**: The hook only intercepts Bash tool calls. Claude Code built-in tools
+(Read, Grep, Glob) bypass the hook entirely. To get RTK's compact output for file/search
+workflows, use shell commands via Bash instead: `cat`/`head`/`tail`, `rg`/`grep`, `find` —
+or call `rtk read`, `rtk grep`, `rtk find` directly.
 
 <!-- rtk-instructions v2 -->
 ## RTK Commands by Workflow
@@ -105,6 +125,10 @@ rtk read <file>         # Code reading with filtering (60%)
 rtk grep <pattern>      # Search grouped by file (75%)
 rtk find <pattern>      # Find grouped by directory (70%)
 ```
+
+> **Note**: These savings only apply when run as Bash commands. The built-in Read, Grep,
+> and Glob tools bypass RTK entirely — use `rtk read`, `rtk grep`, `rtk find` (or their
+> unfiltered shell equivalents) via the Bash tool to get compact output.
 
 ### Analysis & Debug (70-90% savings)
 ```bash
