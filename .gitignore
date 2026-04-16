@@ -24,6 +24,10 @@
 !/rules
 !/rules/**/*
 
+# and hooks
+!/hooks
+!/hooks/**/*
+
 # and of course, CLAUDE.md
 !CLAUDE.md
 
