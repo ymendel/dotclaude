@@ -19,7 +19,8 @@
 ## Version Control
 
 - git is the version-control tool of choice, and GitHub is the preferred hosting provider
-- Invoke the `commit-message-guide` skill before committing
+- Commit structuring and message format are governed by the `purposeful-commits` and `commit-message-guide` skills. When both are active, `purposeful-commits` runs first to structure the work into logical commits, then `commit-message-guide` applies to each individual commit message.
+- Never use `git add -A` or `git add .` — always stage specific files by name.
 - Keep commits to small, logical changes. Do not make one big commit at the end.
 - When refining a change that just happened, amend the previous commit instead of creating a new one.
 - Use the `gh` command-line tool when interacting with GitHub
