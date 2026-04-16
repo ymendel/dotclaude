@@ -23,6 +23,7 @@
 - Never use `git add -A` or `git add .` — always stage specific files by name.
 - Keep commits to small, logical changes. Do not make one big commit at the end.
 - When refining a change that just happened, amend the previous commit instead of creating a new one.
+- To reword a non-HEAD commit, ask the user to run `git rebase -i` interactively. Scripted workarounds (GIT_EDITOR overrides, chained amends) are unreliable and cause cascading message corruption.
 - Use the `gh` command-line tool when interacting with GitHub
 
 ## Pull Requests
