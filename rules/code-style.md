@@ -33,6 +33,11 @@
 - Principle of least power: prefer HTML over CSS, CSS over JS, backend over frontend.
 - `app/` is for business domain. `lib/` is for generic, non-business-specific code that could theoretically be upstreamed or extracted to a gem.
 
+### Rake Tasks
+
+- Rake task arguments use bracket syntax, not space-separated: `task[arg]` not `task arg`.
+  When passing args via `bin/rails`, this means e.g. `bin/rails tailwindcss:watch[always]`.
+
 ### Testing
 
 - Avoid fixtures at all costs. Use factories instead, with factory_bot_rails. (exception: interacting with very specific data, like files and network-call responses. vcr is a good choice for the latter.)
