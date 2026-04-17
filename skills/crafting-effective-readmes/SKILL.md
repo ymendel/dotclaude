@@ -73,6 +73,6 @@ Every README needs at minimum:
 
 ## References
 
-- `section-checklist.md` - Which sections to include by project type
-- `style-guide.md` - Common README mistakes and prose guidance
-- `using-references.md` - Guide to deeper reference materials
+- `references/section-checklist.md` - Which sections to include by project type
+- `references/style-guide.md` - Common README mistakes and prose guidance
+- `references/using-references.md` - Guide to deeper reference materials
