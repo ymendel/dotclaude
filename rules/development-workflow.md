@@ -46,3 +46,8 @@
 
 - Refactor correctively (to fix a real problem) or when there's a clear benefit — not as routine hygiene or speculation about future needs.
 - Keep refactoring separate from behavior changes: add any necessary tests first, ensure they pass, then refactor, then change behavior.
+
+## Context Continuity
+
+- After any substantial work block — multiple file edits, debugging, architecture decisions — proactively write or update project memories for facts that would matter in a future session. Don't wait to be asked.
+- At natural stopping points in substantial sessions (user signals wrapping up, or significant in-progress work exists that would be disorienting to resume cold), suggest `/session-handoff`.
