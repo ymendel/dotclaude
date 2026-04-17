@@ -1,12 +1,14 @@
 # Rules
 
-Rule files are always loaded into context — unlike skills, they don't need to be invoked. They govern how Claude should behave across all projects, not just in specific tasks.
+Rule files govern how Claude should behave across all projects, not just in specific tasks. Most load unconditionally at session start; files with `paths` frontmatter load only when Claude reads a matching file.
 
 ---
 
 **`adrs.md`** — Format, writing style, and lifecycle for Architecture Decision Records. Covers the required sections (Context, Decision, Consequences), immutability rules, and how to reference superseding ADRs. Pairs with the `adr` skill, which handles actually writing them.
 
-**`code-style.md`** — General code style (trailing newlines, simplicity, parser libraries over regex) plus Ruby- and Rails-specific conventions. Aesthetic preferences, naming rules, and testing guidance (factories, not fixtures).
+**`code-style.md`** — General code style: trailing newlines, simplicity, parser libraries over regex, naming, consistency.
+
+**`code-style-ruby.md`** — Ruby and Rails conventions: instance-oriented design, no metaprogramming, Symbol#to_proc, aesthetic preferences, Rake task syntax, and testing (factories, not fixtures). Path-scoped to `*.rb`, `*.rake`, `*.erb`, `Gemfile`, and `Rakefile`.
 
 **`development-workflow.md`** — How work should be approached: planning vs. spikes, ADRs over proprietary plan modes, git discipline (small commits, specific staging, amend recent changes, draft PRs), refactoring policy, and commenting conventions.
 
