@@ -14,6 +14,8 @@
       "Bash(rtk ls:*)",
       "Bash(gh repo:*)",
       "Bash(gh api:*)",
+      "Bash(gh pr:*)",
+      "Bash(rtk gh:*)",
       "Bash(claude --version)",
       "Bash(chmod +x:*)",
       "Skill(*)"
