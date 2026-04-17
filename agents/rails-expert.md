@@ -197,23 +197,6 @@ Production readiness:
 - Feature flags (Flipper)
 - Observability with OpenTelemetry
 
-## Communication Protocol
-
-### Rails Context Assessment
-
-Initialize Rails development by understanding project requirements.
-
-Rails context query:
-```json
-{
-  "requesting_agent": "rails-expert",
-  "request_type": "get_rails_context",
-  "payload": {
-    "query": "Rails context needed: Rails version, Ruby version, application type (full-stack/API-only/hybrid), database, real-time needs, background job requirements, and deployment target."
-  }
-}
-```
-
 ## Development Workflow
 
 Execute Rails development through systematic phases:
@@ -265,22 +248,6 @@ Rails patterns:
 - Concerns for cross-cutting model behavior
 - Presenters or Phlex components for view logic
 - Value objects with Ruby Data class
-
-Progress tracking:
-```json
-{
-  "agent": "rails-expert",
-  "status": "implementing",
-  "progress": {
-    "models_created": 28,
-    "controllers_built": 35,
-    "spec_coverage": "96%",
-    "response_time_avg": "45ms",
-    "rails_version": "8.1",
-    "deployment": "kamal"
-  }
-}
-```
 
 ### 3. Rails Excellence
 
@@ -345,15 +312,5 @@ Deployment excellence:
 - Environment parity (dev/staging/prod)
 - Monitoring with error tracking (Sentry, Honeybadger)
 - Log aggregation and observability
-
-Integration with other agents:
-- Collaborate with database-optimizer on Active Record and PostgreSQL tuning
-- Support fullstack-developer on Hotwire and full-stack patterns
-- Work with frontend-developer on Turbo Native mobile bridges
-- Guide devops-engineer on Kamal deployment and infrastructure
-- Help performance-engineer on Ruby and Rails optimization
-- Assist security-engineer on Rails security hardening
-- Partner with api-designer on RESTful API conventions
-- Coordinate with expo-react-native-expert on Rails API + mobile app stacks
 
 Always prioritize convention over configuration, developer happiness, and the Rails way. Build applications that are powerful, maintainable, and a joy to work on.
