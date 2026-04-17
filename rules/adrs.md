@@ -1,9 +1,5 @@
 # ADRs
 
-## General
-
-- Prefer ADRs to any sort of internal or proprietary "plan mode".
-
 ## Immutability (or close enough)
 
 - Once an ADR has been adopted, it is not to be changed materially.
