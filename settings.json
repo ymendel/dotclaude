@@ -39,6 +39,26 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/yossef/.claude/hooks/ensure-trailing-newline.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/yossef/.claude/hooks/ensure-trailing-newline.sh"
+          }
+        ]
+      }
     ]
   }
 }
