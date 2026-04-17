@@ -2,12 +2,15 @@
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.92",
   "claudeMdExcludes": [
-    "**/rules/README.md"
+    "**/rules/README.md",
+    "**/rules/rtk-commands.md"
   ],
   "permissions": {
     "allow": [
       "Bash(rtk git:*)",
       "Bash(rtk read:*)",
+      "Bash(rtk grep:*)",
+      "Bash(rtk find:*)",
       "Bash(rtk ls:*)",
       "Bash(gh repo:*)",
       "Bash(gh api:*)",
