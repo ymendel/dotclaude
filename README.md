@@ -14,6 +14,13 @@ This is personal config, and it's going to reflect my preferences, workflows, an
 - **[agents/](agents/README.md)** — custom subagent configurations
 - **settings.json** — Claude Code settings
 
+## Prerequisites
+
+- **[Claude Code](https://claude.ai/code)** — obviously
+- **[RTK](https://github.com/rtk-ai/rtk)** — the hooks and rules assume RTK is installed. Without it, the rewrite hook degrades gracefully (commands pass through unchanged), but you'll lose the token savings it provides and the RTK rules won't apply meaningfully.
+- **[jq](https://jqlang.github.io/jq/)** — required by the hooks. Both hooks exit silently without it.
+- **[gh](https://cli.github.com/)** — used in development workflow rules and expected for GitHub interactions.
+
 ## Installation
 
 There's a Makefile to make this simple. Just clone and go.
