@@ -1,9 +1,33 @@
 {
   "autoUpdatesChannel": "stable",
-  "minimumVersion": "2.1.85",
+  "minimumVersion": "2.1.92",
   "claudeMdExcludes": [
     "**/rules/README.md"
   ],
+  "permissions": {
+    "allow": [
+      "Bash(rtk git:*)",
+      "Bash(rtk read:*)",
+      "Bash(rtk ls:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(claude --version)",
+      "Bash(chmod +x:*)",
+      "Skill(*)"
+    ],
+    "deny": [
+      "Bash(*rm -rf*)",
+      "Bash(*rm -fr*)",
+      "Bash(*git push --force*)",
+      "Bash(*git push -f *)",
+      "Bash(*git push -f)",
+      "Bash(*git reset --hard*)",
+      "Bash(git checkout .)",
+      "Bash(git restore .)",
+      "Bash(*git clean -f*)",
+      "Bash(*git branch -D *)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
