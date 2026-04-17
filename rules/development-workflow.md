@@ -44,8 +44,5 @@
 
 ## Refactoring
 
-- Refactoring is an important tool, but it is not a goal in and of itself — it is in service of the project as a whole.
-- Do not proactively refactor without a reason for it — that is, refactoring should be corrective rather than preventative.
-- If a problem comes up — whether that's a major structural issue, an anti-pattern, or merely a code smell — that is a good time for refactoring if it would help solve the problem.
-- Preventative refactoring is acceptable when it would provide a clear benefit, such as making the code more robust, easier to understand, or easier to test.
-- Refactoring should be fully supported by tests and done independent of behavior changes — add tests if necessary, ensure tests continue to pass after the refactoring, then update tests and change the behavior.
+- Refactor correctively (to fix a real problem) or when there's a clear benefit — not as routine hygiene or speculation about future needs.
+- Keep refactoring separate from behavior changes: add any necessary tests first, ensure they pass, then refactor, then change behavior.
