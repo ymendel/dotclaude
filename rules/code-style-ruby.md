@@ -31,6 +31,11 @@ paths:
 - Principle of least power: prefer HTML over CSS, CSS over JS, backend over frontend.
 - `app/` is for business domain. `lib/` is for generic, non-business-specific code that could theoretically be upstreamed or extracted to a gem.
 
+### Gemfile
+
+- Gems used in all environments go above the group blocks; gems scoped to specific environments go inside the appropriate `group` block — never use the `groups:` kwarg.
+- Always specify version constraints with the `~>` operator when adding a gem.
+
 ### Rake Tasks
 
 - Rake task arguments use bracket syntax, not space-separated: `task[arg]` not `task arg`.
