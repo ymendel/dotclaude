@@ -33,8 +33,11 @@ instead to get compact output:
 | Grep tool | `rtk grep <pattern>` |
 | Glob tool | `rtk find <pattern>` |
 
-Exception: use the built-in tools when the full, unfiltered output is needed (e.g., editing
-a file you haven't read yet, or when RTK filtering would hide relevant content).
+The Edit tool is **not** overridden by RTK — always use Edit (not `sed` via Bash) for
+in-file replacements. `sed -i` is error-prone on macOS and unnecessary when Edit exists.
+
+Exception: use the built-in Read/Grep/Glob tools when the full, unfiltered output is needed
+(e.g., editing a file you haven't read yet, or when RTK filtering would hide relevant content).
 
 ## Golden Rule
 
