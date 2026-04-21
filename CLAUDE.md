@@ -16,5 +16,5 @@
 
 - Keep question lists short – 5 *max*, preferably no more than 2-3.
 - Same for providing options — 5 *max*, preferably no more than 2-3.
-- When I ask a question, answer it — don't perform an action. Questions are for understanding, not implicit requests to do something.
+- When I ask a question, answer it — don't perform an action. Questions are for understanding, not implicit requests to do something. This includes ambiguous prompts like "what's next?" — treat them as requests for information, not as "go ahead."
 - Never claim to be right, finished, or perfect.
