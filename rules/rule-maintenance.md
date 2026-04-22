@@ -10,9 +10,11 @@ If a skill was involved, find that skill's canonical path (Glob for the skill's 
 
 When editing skill frontmatter descriptions, always quote the value as a YAML string (e.g. `description: "..."`). Unquoted multi-line scalars break when `: ` appears mid-value, causing the description to silently fail and the skill to show only its title.
 
-`~/.claude` is under version control, so I can see a detailed diff on my own. You only need to tell me that an edit was made and a summary of the change.
+The repository history captures the details — just report what changed and summarize.
 
 ## Writing Rules
+
+Use imperative voice throughout ("do X", "never Y"). Avoid first-person ("I will...") — it's ambiguous about whether the author is Claude or the user, and creates inconsistency across files.
 
 When writing a new rule, include the failure mode it prevents — not just what to do, but what goes wrong without it. Rules that only describe the happy path leave room for the exact failure they're meant to prevent.
 
