@@ -14,6 +14,7 @@
       "Bash(rtk grep:*)",
       "Bash(rtk find:*)",
       "Bash(rtk ls:*)",
+      "Bash(rtk wc:*)",
       "Bash(rtk curl:*)",
       "Bash(gh api:*)",
       "Bash(gh issue:*)",
