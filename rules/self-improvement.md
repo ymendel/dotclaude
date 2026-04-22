@@ -11,6 +11,7 @@ Concrete triggers — act on these without waiting to be asked:
 - The user corrects my approach ("no, don't do that", "stop doing X", "that's wrong")
 - I needed a workaround to complete a task (e.g., fell back to a less-correct method)
 - A command failed and I had to diagnose and adjust before it worked
+- I issued the same command (or minor variants) multiple times without diagnosing why the output was unexpected
 - I violated a rule I should have followed (discovered mid-task or after the fact)
 - A conflict or inconsistency between two rules or instructions was noticed
 
@@ -43,3 +44,5 @@ When feedback is given:
 1. If it corrects a rule or skill: fix the source file directly (see General above).
 2. If it's a general behavioral lesson with no existing rule: add it to `rules/feedback.md`.
 3. Only use project-level memory if the feedback is genuinely specific to that project and would not apply elsewhere.
+
+Observations about how global tools behave (e.g., RTK filtering output unexpectedly) count as corrections to the relevant rule file — go there directly, not project memory.
