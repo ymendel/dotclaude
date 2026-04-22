@@ -4,6 +4,8 @@ Rule files govern how Claude should behave across all projects, not just in spec
 
 ---
 
+**`agents.md`** — When to use each available agent type. Covers the distinction between `Explore` and `codebase-pattern-finder`, when to reach for `Plan`, when specialized agents beat `general-purpose`, and when to parallelize.
+
 **`adrs.md`** — Format, writing style, and lifecycle for Architecture Decision Records. Covers the required sections (Context, Decision, Consequences), immutability rules, and how to reference superseding ADRs. Pairs with the `adr` skill, which handles actually writing them.
 
 **`code-style.md`** — General code style: trailing newlines, simplicity, parser libraries over regex, naming, consistency.
