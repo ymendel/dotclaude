@@ -22,6 +22,10 @@ If the issue can be traced back to a rule or CLAUDE.md, make the correction ther
 
 ~/.claude is under version control, so I can see a detailed diff on my own. You only need to tell me that an edit was made and a summary of the change.
 
+## Permissions Allow List
+
+When the user approves a Bash permission prompt, ask whether it was a one-time command or should be added to the allow list in `settings.json`. If they want it added, do so immediately.
+
 ## Skill and Rule Review Criteria
 
 When reviewing skills, rules, or their interactions, evaluate against these four concerns:
