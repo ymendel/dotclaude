@@ -25,7 +25,7 @@ If the issue can be traced back to a rule or CLAUDE.md, make the correction ther
 
 ## Permissions Allow List
 
-When the user approves a Bash permission prompt, ask whether it was a one-time command or should be added to the allow list in `settings.json`. If they want it added, do so immediately.
+When the user approves a Bash permission prompt, ask whether it was a one-time command or should be added to the allow list in `settings.json`. If they want it added, do so immediately — do not let other work cause this follow-up to be skipped or deferred.
 
 ## Skill and Rule Review Criteria
 
