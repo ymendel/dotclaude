@@ -12,6 +12,10 @@ When editing skill frontmatter descriptions, always quote the value as a YAML st
 
 `~/.claude` is under version control, so I can see a detailed diff on my own. You only need to tell me that an edit was made and a summary of the change.
 
+## Writing Rules
+
+When writing a new rule, include the failure mode it prevents — not just what to do, but what goes wrong without it. Rules that only describe the happy path leave room for the exact failure they're meant to prevent.
+
 ## Rule File Index
 
 When adding a new rule file, update `rules/README.md` with a description before committing.
