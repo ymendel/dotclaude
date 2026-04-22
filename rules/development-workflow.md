@@ -50,5 +50,6 @@
 ## Context Continuity
 
 - After any substantial work block — multiple file edits, debugging, architecture decisions — proactively write or update project memories for facts that would matter in a future session. Don't wait to be asked.
+- After a work block, proactively check whether `lesson-learned` or `self-improvement` applies. Don't wait to be asked.
 - In sessions where multiple commits have been made and work is ongoing, suggest `/session-handoff` after each major phase completes (e.g., after a logical group of commits). Do not wait for the user to signal they are wrapping up — by then the context may already be near its limit.
 - Also suggest `/session-handoff` when the user signals wrapping up, or when significant in-progress work exists that would be disorienting to resume cold.
