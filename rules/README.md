@@ -16,8 +16,6 @@ Rule files govern how Claude should behave across all projects, not just in spec
 
 **`self-improvement.md`** — When and how to fix the config itself. Errors, drifted parameters, and workarounds should be corrected immediately in the canonical location (the relevant SKILL.md, rule file, or CLAUDE.md). Feedback that isn't project-specific lives in `~/.claude`.
 
-**`feedback.md`** — Overflow for feedback that doesn't fit an existing rule file.
-
-**`misc.md`** — Overflow for rules that don't fit elsewhere.
+**`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
 
 **`RTK.md`** — Usage guide for RTK (Rust Token Killer), a token-optimized CLI proxy. Covers the hook scope limitation (Bash only, not built-in tools), the override for file/search operations, and command reference by workflow.

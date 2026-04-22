@@ -18,7 +18,7 @@ If a skill was involved, find that skill's canonical path (Glob for the skill's 
 
 When editing skill frontmatter descriptions, always quote the value as a YAML string (e.g. `description: "..."`). Unquoted multi-line scalars break when `: ` appears mid-value, causing the description to silently fail and the skill to show only its title.
 
-If the issue can be traced back to a rule or CLAUDE.md, make the correction there. If no appropriate rule can be found, add to `rules/misc.md`.
+If the issue can be traced back to a rule or CLAUDE.md, make the correction there. If no appropriate rule can be found, add to `rules/feedback.md`.
 
 ~/.claude is under version control, so I can see a detailed diff on my own. You only need to tell me that an edit was made and a summary of the change.
 
