@@ -30,7 +30,7 @@
 
 - Always create PRs as 'drafts'.
 - Keep PR descriptions up to date with changes – e.g. TODO lists, deferred work, references to ADRs, &c.
-- Never push to GitHub on your own. If the only unpushed changes are things that only make sense to be pushed — things involving CI/CD, GitHub Actions, &c. — then let me know. I will handle the pushing.
+- Never push to GitHub on your own — not after commits, not as a prerequisite for creating a PR, not for any reason. If the branch needs to be pushed first (e.g., to open a PR), ask the user to push. The only exception: if the only unpushed changes involve CI/CD or GitHub Actions, flag it and let the user decide.
 
 ## Commenting
 
