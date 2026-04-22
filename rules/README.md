@@ -16,7 +16,9 @@ Rule files govern how Claude should behave across all projects, not just in spec
 
 **`honesty.md`** — Rules about quantitative claims: never present estimates as measurements, source every number, separate verified facts from assumptions, don't optimize for looking helpful over being accurate. Applies extra scrutiny to any external-facing content.
 
-**`self-improvement.md`** — When and how to fix the config itself. Errors, drifted parameters, and workarounds should be corrected immediately in the canonical location (the relevant SKILL.md, rule file, or CLAUDE.md). Feedback that isn't project-specific lives in `~/.claude`.
+**`self-improvement.md`** — Triggers for when to self-improve: user corrections, workarounds, failed commands, violated rules, and inconsistencies. Points to `rule-maintenance.md` for how to act on them.
+
+**`rule-maintenance.md`** — Procedures for making corrections: where to edit skills and rules, YAML quoting requirements, feedback routing, permissions allow list, keeping `rules/README.md` up to date, and criteria for reviewing skills and rules.
 
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
 
