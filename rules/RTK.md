@@ -39,6 +39,10 @@ in-file replacements. `sed -i` is error-prone on macOS and unnecessary when Edit
 Exception: use the built-in Read/Grep/Glob tools when the full, unfiltered output is needed
 (e.g., editing a file you haven't read yet, or when RTK filtering would hide relevant content).
 
+`rtk git diff` suppresses diff content and shows only a summary line. When the actual diff
+is needed, use `git show HEAD:path/to/file` to read the committed version. Do not retry
+`git diff` variants expecting different output — they all go through the same filter.
+
 ## Golden Rule
 
 **Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
