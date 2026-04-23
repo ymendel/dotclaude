@@ -1,6 +1,6 @@
 ---
 name: session-handoff
-description: "Create or resume a session handoff document. Use when saving context to continue later, when context is running low, or when resuming with 'load handoff' / 'continue where we left off'. Proactively suggest after substantial work (multiple file edits, complex debugging, architecture decisions)."
+description: "Create or resume a session handoff document. Trigger: 'create/save/load/resume handoff', 'continue where we left off', context running low, or proactively after substantial work (5+ edits, major decisions)."
 ---
 
 # Handoff
