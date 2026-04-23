@@ -8,7 +8,7 @@
 rtk gain              # Show token savings analytics
 rtk gain --history    # Show command usage history with savings
 rtk discover          # Analyze Claude Code history for missed opportunities
-rtk proxy <cmd>       # Execute raw command without filtering (for debugging)
+rtk proxy <cmd>       # Execute raw command without filtering (bypasses all RTK filters)
 ```
 
 ## Installation Verification
@@ -36,12 +36,21 @@ instead to get compact output:
 The Edit tool is **not** overridden by RTK — always use Edit (not `sed` via Bash) for
 in-file replacements. `sed -i` is error-prone on macOS and unnecessary when Edit exists.
 
-Exception: use the built-in Read/Grep/Glob tools when the full, unfiltered output is needed
-(e.g., editing a file you haven't read yet, or when RTK filtering would hide relevant content).
+Exception: use the built-in Read/Grep/Glob tools when full, unfiltered output is needed.
+Two concrete reasons this matters:
+
+- **Editing a file**: Edit requires exact string matching against file content. RTK's filtered
+  output may truncate or omit lines, making it impossible to construct a valid `old_string`.
+  Always use the Read tool before editing — never `rtk read`.
+- **RTK filtering hides the relevant content**: RTK suppresses parts of output to save tokens.
+  If the information you need falls in the suppressed portion (e.g., a matching line that RTK
+  omitted from grep output), you'll miss it and make incorrect decisions based on incomplete
+  data. Use the built-in tool to get everything.
 
 `rtk git diff` suppresses diff content and shows only a summary line. When the actual diff
-is needed, use `git show HEAD:path/to/file` to read the committed version. Do not retry
-`git diff` variants expecting different output — they all go through the same filter.
+is needed, use `rtk proxy git diff` to get unfiltered output. Do not retry `git diff`
+variants expecting different output — they all go through the same filter. `git show` cannot
+substitute here: it only shows committed changes, not working tree differences.
 
 ## Golden Rule
 
