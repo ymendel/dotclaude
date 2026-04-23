@@ -13,3 +13,9 @@ Specific case: `fatal: bad revision '<file>'` in git means git is interpreting a
 When searching for a file or pattern, start from the most specific known directory — not a broad ancestor. Searching from a parent directory is slower, noisier, and risks touching unintended paths. If the search fails, widen incrementally.
 
 Also: when the target path is a symlink, `find` may not follow it without a trailing slash. Use `find /path/to/symlink/ ...` (with trailing slash) to ensure the symlink is resolved.
+
+## Path variables in settings.json
+
+In Claude Code's `settings.json`, path fields (e.g. `additionalDirectories`) support `~/` tilde expansion but **not** `$HOME` variable expansion. Use `~/.claude` not `$HOME/.claude`.
+
+Hook `command` strings are different — they're executed by bash, so `$HOME` works fine there.
