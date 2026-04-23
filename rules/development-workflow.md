@@ -24,6 +24,7 @@
 - Keep commits to small, logical changes. Do not make one big commit at the end.
 - When refining a change that just happened, amend the previous commit instead of creating a new one.
 - To reword a non-HEAD commit, ask the user to run `git rebase -i` interactively. Scripted workarounds (GIT_EDITOR overrides, chained amends) are unreliable and cause cascading message corruption.
+- To split a file's changes across commits, ask the user to run `git add -p` interactively. Once the partial stage is done, use plain `git add <file>` for any remaining hunks — no further interactivity needed.
 - Use the `gh` command-line tool when interacting with GitHub
 
 ## Pull Requests
