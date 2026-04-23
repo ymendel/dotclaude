@@ -3,6 +3,8 @@
   "minimumVersion": "2.1.92",
   "claudeMdExcludes": ["**/rules/README.md", "**/rules/rtk-commands.md"],
   "permissions": {
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": ["~/.claude"],
     "allow": [
       "Bash(jq:*)",
       "Bash(rtk discover:*)",
@@ -57,7 +59,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
@@ -66,11 +68,11 @@
         ]
       },
       {
-        "matcher": "Edit",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/ensure-trailing-newline.sh"
+            "command": "$HOME/.claude/hooks/notify-config-update.sh"
           }
         ]
       }
