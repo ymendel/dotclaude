@@ -87,7 +87,7 @@ def check_recommended_sections(content: str) -> list[str]:
     """Check which recommended sections are missing."""
     missing = []
     for section in RECOMMENDED_SECTIONS:
-        pattern = rf'(?:^|\n)##?\s*{re.escape(section)}'
+        pattern = rf'(?:^|\n)#{{1,6}}\s*{re.escape(section)}'
         if not re.search(pattern, content, re.IGNORECASE):
             missing.append(section)
     return missing
