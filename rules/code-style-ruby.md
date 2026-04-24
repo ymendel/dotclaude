@@ -36,6 +36,10 @@ paths:
 - Gems used in all environments go above the group blocks; gems scoped to specific environments go inside the appropriate `group` block — never use the `groups:` kwarg.
 - Always specify version constraints with the `~>` operator when adding a gem.
 
+### Commits
+
+- Keep database changes (migrations, schema) in a separate commit from model/code changes. Without this separation, a single commit conflates schema and logic, making bisect and rollback harder.
+
 ### Rake Tasks
 
 - Rake task arguments use bracket syntax, not space-separated: `task[arg]` not `task arg`.
