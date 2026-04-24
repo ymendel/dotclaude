@@ -26,7 +26,9 @@
       "Bash(rtk gh:*)",
       "Bash(claude --version)",
       "Bash(chmod +x:*)",
-      "Skill(*)"
+      "Skill(*)",
+      "Edit(~/.claude/*)",
+      "Read(~/Library/Application Support/rtk/tee/*)"
     ],
     "deny": [
       "Bash(*rm -rf*)",
