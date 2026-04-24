@@ -76,3 +76,15 @@ workflows, use shell commands via Bash instead: `cat`/`head`/`tail`, `rg`/`grep`
 or call `rtk read`, `rtk grep`, `rtk find` directly.
 
 Full command reference: `rules/rtk-commands.md` (excluded from context).
+
+## Paths With Spaces
+
+When constructing shell commands that reference paths containing spaces (e.g., `~/Library/Application Support/`), use `$HOME` with proper quoting instead of backslash-escaping. Claude Code's permission system triggers a separate confirmation dialog for any command containing backslash-escaped whitespace, regardless of allow-list rules.
+
+```bash
+# ❌ Triggers backslash-escaped whitespace warning
+rtk read "$(ls -t ~/Library/Application\ Support/rtk/tee/*.log | head -1)"
+
+# ✅ No warning — $HOME + quoted path
+rtk read "$(ls -t "$HOME/Library/Application Support/rtk/tee/"*.log | head -1)"
+```
