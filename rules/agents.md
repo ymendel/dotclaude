@@ -14,7 +14,7 @@ Three agents handle codebase work — choose based on what you need back:
 
 ## Planning
 
-Use `Plan` before non-trivial implementations. Prefer ADRs over plan mode for decisions with long-term architectural impact (see `rules/development-workflow.md`).
+Use the `Plan` subagent before non-trivial implementations. For decisions with long-term architectural impact, prefer ADRs over Claude Code's plan mode (EnterPlanMode) — see `rules/development-workflow.md`.
 
 ## Parallelization
 
