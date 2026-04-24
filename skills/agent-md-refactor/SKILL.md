@@ -108,6 +108,12 @@ Organize remaining instructions into logical categories.
 
 ### Phase 4: Create the File Structure
 
+**First: determine how files are loaded.** Tools differ:
+- **Explicit links** (e.g., `@import`, Cursor's `@file` syntax): links in the root file are the loading mechanism — adding them is functional.
+- **Auto-scanning** (e.g., Claude Code loads all `.md` files in `~/.claude/`): files are already loaded regardless of links in the root. Skip adding navigational links; check whether a human-readable index file (e.g., `rules/README.md`) already exists before creating a redundant one.
+
+If auto-scanning is in use, Phase 4 is complete once the files are organized into the right directories. No root-file links needed.
+
 **Output structure:**
 ```
 project-root/
@@ -207,7 +213,7 @@ Identify instructions that should be removed entirely.
 [ ] Phase 1: All contradictions identified and resolved
 [ ] Phase 2: Root file contains ONLY essentials
 [ ] Phase 3: All remaining instructions categorized
-[ ] Phase 4: File structure created with proper links
+[ ] Phase 4: File structure created; links added only if tool uses explicit-link loading (not auto-scanning)
 [ ] Phase 5: Redundant/vague instructions removed
 [ ] Verify: Each linked file is self-contained
 [ ] Verify: Root file is under 50 lines
