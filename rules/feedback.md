@@ -19,3 +19,5 @@ Also: when the target path is a symlink, `find` may not follow it without a trai
 In Claude Code's `settings.json`, path fields (e.g. `additionalDirectories`) support `~/` tilde expansion but **not** `$HOME` variable expansion. Use `~/.claude` not `$HOME/.claude`.
 
 Hook `command` strings are different — they're executed by bash, so `$HOME` works fine there.
+
+Permission glob patterns (e.g. `Edit(~/.claude/*)`) use `*` which does **not** match subdirectories. Use `**` to match recursively: `Edit(~/.claude/**)`. Failing to do so leaves subdirectory edits unmatched, causing unexpected permission prompts.
