@@ -34,3 +34,4 @@
 # and supporting files
 !README.md
 !Makefile
+!statusline-command.sh

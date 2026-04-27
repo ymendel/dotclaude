@@ -77,6 +77,10 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/statusline-command.sh"
+  },
   "effortLevel": "high",
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.92",
