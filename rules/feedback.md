@@ -14,6 +14,10 @@ When searching for a file or pattern, start from the most specific known directo
 
 Also: when the target path is a symlink, `find` may not follow it without a trailing slash. Use `find /path/to/symlink/ ...` (with trailing slash) to ensure the symlink is resolved.
 
+## Stay within review scope
+
+When reviewing or auditing, stay within the requested scope — do not propose or make code changes unless asked. A review request is a read-only task unless the user explicitly says to fix what's found.
+
 ## settings.json and Permission Rules
 
 In Claude Code's `settings.json`, path fields (e.g. `additionalDirectories`) support `~/` tilde expansion but **not** `$HOME` variable expansion. Use `~/.claude` not `$HOME/.claude`.
