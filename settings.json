@@ -1,10 +1,5 @@
 {
-  "autoUpdatesChannel": "stable",
-  "minimumVersion": "2.1.92",
-  "claudeMdExcludes": ["**/rules/README.md", "**/rules/rtk-commands.md"],
   "permissions": {
-    "defaultMode": "acceptEdits",
-    "additionalDirectories": ["~/.claude"],
     "allow": [
       "Bash(jq:*)",
       "Bash(rtk discover:*)",
@@ -33,14 +28,16 @@
     "deny": [
       "Bash(*rm -rf*)",
       "Bash(*rm -fr*)",
-      "Bash(*git push --force*)",
-      "Bash(*git push -f *)",
-      "Bash(*git push -f)",
+      "Bash(*git push*)",
       "Bash(*git reset --hard*)",
       "Bash(git checkout .)",
       "Bash(git restore .)",
       "Bash(*git clean -f*)",
       "Bash(*git branch -D *)"
+    ],
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "~/.claude"
     ]
   },
   "hooks": {
@@ -79,5 +76,12 @@
         ]
       }
     ]
-  }
+  },
+  "effortLevel": "high",
+  "autoUpdatesChannel": "stable",
+  "minimumVersion": "2.1.92",
+  "claudeMdExcludes": [
+    "**/rules/README.md",
+    "**/rules/rtk-commands.md"
+  ]
 }
