@@ -44,6 +44,8 @@ Invoke manually with `/skill-name [args]`.
 
 **`rails-upgrade`** — Analyzes a Rails application's upgrade path: checks current version, fetches upgrade notes and diffs, performs selective upgrade while preserving local customizations.
 
+**`rails-test-discipline`** — TDD discipline and review posture for Rails (RSpec or Minitest). Covers test level selection (model vs. system vs. request), red/green/refactor workflow, ADR alignment checks, and a structured output template with explicit coverage gaps and assumptions. Loads automatically when working in `spec/` or `test/`.
+
 ## Database
 
 **`supabase-postgres-best-practices`** — Postgres performance and best practices from Supabase's engineering. Covers query optimization, indexing, connection pooling, locking, schema design, security (RLS), and monitoring. Heavy on reference files; the skill body is a navigation index.
