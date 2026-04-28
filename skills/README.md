@@ -40,11 +40,13 @@ Invoke manually with `/skill-name [args]`.
 
 **`lesson-learned`** — Extracts grounded software engineering lessons from recent git history. Produces a dominant pattern mapped to SE principles, with actual file/line references. Reference files contain the principles and anti-patterns catalog.
 
+**`tdd`** — Language-agnostic TDD via red/green/refactor. Covers test-first workflow (vertical slices, tracer bullets), mocking strategy (mock only at system boundaries, use a real database), public interface testing, and testable interface design. Pairs with `rails-test-discipline` for Rails projects.
+
 ## Rails
 
 **`rails-upgrade`** — Analyzes a Rails application's upgrade path: checks current version, fetches upgrade notes and diffs, performs selective upgrade while preserving local customizations.
 
-**`rails-test-discipline`** — TDD discipline and review posture for Rails (RSpec or Minitest). Covers test level selection (model vs. system vs. request), red/green/refactor workflow, ADR alignment checks, and a structured output template with explicit coverage gaps and assumptions. Loads automatically when working in `spec/` or `test/`.
+**`rails-test-discipline`** — Test level selection, ADR alignment, and review posture for Rails (RSpec or Minitest). Defers general TDD principles to `tdd`; handles what's Rails-specific: model vs. system vs. request selection, factory/fixture guidance, and structured output with explicit coverage gaps. Loads automatically when working in `spec/` or `test/`.
 
 ## Database
 
