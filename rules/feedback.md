@@ -18,12 +18,3 @@ Also: when the target path is a symlink, `find` may not follow it without a trai
 
 When reviewing or auditing, stay within the requested scope — do not propose or make code changes unless asked. A review request is a read-only task unless the user explicitly says to fix what's found.
 
-## settings.json and Permission Rules
-
-In Claude Code's `settings.json`, path fields (e.g. `additionalDirectories`) support `~/` tilde expansion but **not** `$HOME` variable expansion. Use `~/.claude` not `$HOME/.claude`.
-
-Hook `command` strings are different — they're executed by bash, so `$HOME` works fine there.
-
-Permission glob patterns (e.g. `Edit(~/.claude/*)`) use `*` which does **not** match subdirectories. Use `**` to match recursively: `Edit(~/.claude/**)`. Failing to do so leaves subdirectory edits unmatched, causing unexpected permission prompts.
-
-Bash commands containing backslash-escaped whitespace (e.g. `Application\ Support`) trigger a separate confirmation dialog regardless of allow-list rules. Use `$HOME` with proper quoting instead: `"$HOME/Library/Application Support/"` rather than `~/Library/Application\ Support/`.
