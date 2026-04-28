@@ -7,6 +7,8 @@ paths: spec/**, test/**
 
 # Rails Test Discipline
 
+For general TDD principles (red→green→refactor cycle, mocking boundaries, public interface testing), defer to the `tdd` skill. This skill handles what's Rails-specific: test-level selection, factory/fixture guidance, ADR alignment, and review posture.
+
 This skill is for Rails testing work (RSpec or Minitest) where the cost of a subtle, passing-but-wrong test is higher than the cost of slowing down. It encodes two things:
 
 1. **Opinionated test selection.** System tests are high-value but expensive; model tests are cheaper and more direct; controller and request tests are for narrow cases. Default to the smallest test that gives real confidence, and justify the choice out loud.
