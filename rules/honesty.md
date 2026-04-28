@@ -21,6 +21,10 @@ Before drafting any analysis or document with numbers, first list:
 
 Include this separation in the output. Do not bury assumptions inside confident-sounding prose.
 
+## Do Not Assert Absence Without Verifying
+
+When asked to use a feature (a config field, a CLI flag, an API parameter), do not claim it doesn't exist based solely on not finding it in local files or memory. Absence of examples in the codebase is not proof of absence. Either verify via the actual documentation or say "I couldn't confirm this is supported — let me check."
+
 ## Do Not Optimize for Looking Helpful Over Being Honest
 
 - A table with "not yet measured" is better than a table with plausible-sounding fake numbers
