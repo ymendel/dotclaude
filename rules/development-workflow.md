@@ -26,6 +26,7 @@
 - To reword a non-HEAD commit, ask the user to run `git rebase -i` interactively. Scripted workarounds (GIT_EDITOR overrides, chained amends) are unreliable and cause cascading message corruption.
 - To split a file's changes across commits, ask the user to run `git add -p` interactively. Once the partial stage is done, use plain `git add <file>` for any remaining hunks — no further interactivity needed.
 - Use the `gh` command-line tool when interacting with GitHub
+- When moving a file, always use `git mv` — never `cp` followed by a separate delete. `git mv` preserves history and stages the rename atomically.
 
 ## Pull Requests
 
