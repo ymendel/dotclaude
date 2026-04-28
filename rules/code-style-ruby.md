@@ -45,6 +45,3 @@ paths:
 - Rake task arguments use bracket syntax, not space-separated: `task[arg]` not `task arg`.
   When passing args via `bin/rails`, this means e.g. `bin/rails tailwindcss:watch[always]`.
 
-### Testing
-
-- Avoid fixtures at all costs. Use factories instead, with factory_bot_rails. (exception: interacting with very specific data, like files and network-call responses. vcr is a good choice for the latter.)
