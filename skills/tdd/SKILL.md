@@ -1,6 +1,8 @@
 ---
 name: tdd
-description: Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions "red-green-refactor", wants integration tests, or asks for test-first development.
+description: "TDD via red-green-refactor. Use when implementing features test-first, or asking about mocking strategy, test doubles, stubbing external services, or testable interface design."
+allowed-tools: Read, Edit, Write, Glob, Grep, Bash(bundle exec *), Bash(bin/rails *), Bash(npm test*), Bash(npx *), Bash(pytest *)
+paths: spec/**, test/**, tests/**, __tests__/**
 ---
 
 # Test-Driven Development
@@ -15,9 +17,18 @@ For Rails projects, use this skill alongside `rails-test-discipline`. This skill
 
 **Good tests** are integration-style: they exercise real code paths through public APIs. They describe _what_ the system does, not _how_ it does it. A good test reads like a specification - "user can checkout with valid cart" tells you exactly what capability exists. These tests survive refactors because they don't care about internal structure.
 
-**Bad tests** are coupled to implementation. They mock internal collaborators, test private methods, or verify through external means (like querying a database directly instead of using the interface). The warning sign: your test breaks when you refactor, but behavior hasn't changed. If you rename an internal function and tests fail, those tests were testing implementation, not behavior.
+**Bad tests** are coupled to implementation. They mock internal collaborators, test private methods, or verify state through back-channel means (like a raw SQL query) instead of through the public interface. Note: using a real database is correct — the problem is bypassing the interface to inspect it directly. The warning sign: your test breaks when you refactor, but behavior hasn't changed. If you rename an internal function and tests fail, those tests were testing implementation, not behavior.
 
 See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
+
+## Never
+
+- **Never mock what you control.** Only mock at system boundaries: external APIs, third-party services, time, randomness. Your own classes, internal collaborators, and the database are not mocking targets — test them for real.
+- **Never stub DB reads/writes.** Use a real test database. Stubbing hides real behavior and tests something you own.
+- **Never assert on call counts or call order** unless specifically testing protocol compliance or performance. These break on internal refactors without behavior changing.
+- **Never test private methods or internal state.** Test through the public interface only. If an internal needs its own test, it belongs on a different object.
+- **Never write implementation before a failing test.** No red = no confidence the test would have caught anything.
+- **Never batch multiple behaviors into one red step.** One behavior per cycle — batching collapses the discipline.
 
 ## Anti-Pattern: Horizontal Slices
 
@@ -53,15 +64,18 @@ Before writing any code:
 - [ ] Confirm with user what interface changes are needed
 - [ ] Confirm with user which behaviors to test (prioritize)
 - [ ] Identify opportunities for [deep modules](deep-modules.md) (small interface, deep implementation)
-- [ ] Design interfaces for [testability](interface-design.md)
 - [ ] List the behaviors to test (not implementation steps)
 - [ ] Get user approval on the plan
+
+**MANDATORY when designing new interfaces**: Load [interface-design.md](interface-design.md) before finalizing the interface plan.
 
 Ask: "What should the public interface look like? Which behaviors are most important to test?"
 
 **You can't test everything.** Confirm with the user exactly which behaviors matter most. Focus testing effort on critical paths and complex logic, not every possible edge case.
 
 ### 2. Tracer Bullet
+
+**MANDATORY when the path touches external services, APIs, or system boundaries**: Load [mocking.md](mocking.md) before writing test setup.
 
 Write ONE test that confirms ONE thing about the system:
 
@@ -92,15 +106,15 @@ Rules:
 
 After all tests pass, look for [refactor candidates](refactoring.md):
 
-- [ ] Extract duplication
 - [ ] Deepen modules (move complexity behind simple interfaces)
-- [ ] Apply SOLID principles where natural
 - [ ] Consider what new code reveals about existing code
 - [ ] Run tests after each refactor step
 
 **Never refactor while RED.** Get to GREEN first.
 
 ## Checklist Per Cycle
+
+**MANDATORY when unsure whether a test is well-formed**: Load [tests.md](tests.md) for good/bad examples.
 
 ```
 [ ] Test describes behavior, not implementation
@@ -109,3 +123,5 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 [ ] Code is minimal for this test
 [ ] No speculative features added
 ```
+
+Do NOT load reference files unless a MANDATORY trigger above applies.
