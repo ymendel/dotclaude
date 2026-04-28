@@ -14,7 +14,10 @@
 ## Implementation
 
 - Use the ADR as the guidelines for implementing the plan.
+- Work through the implementation in logical steps, committing as you go.
 - When conflicts come up between the ADR and the implementation, reconcile them. Determine whether the ADR or the implementation is correct. If you're not sure, ask.
+- If anything is unclear or ambiguous mid-implementation — edge cases, missing detail, unexpected constraints — stop and ask rather than guessing.
+- When implementation is complete, provide a list of remaining next steps (follow-on work, config, documentation, etc.) that fall outside the scope of what was just implemented.
 
 ## Version Control
 
