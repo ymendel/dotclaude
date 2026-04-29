@@ -75,5 +75,7 @@ Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
 workflows, use shell commands via Bash instead: `cat`/`head`/`tail`, `rg`/`grep`, `find` —
 or call `rtk read`, `rtk grep`, `rtk find` directly.
 
+**`cat` slip**: Dynamic path patterns like `cat "$(ls ...)"` frequently bypass RTK. Always use `rtk read "$(ls ...)"` — never `cat "$(ls ...)"`.  
+
 Full command reference: `rules/rtk-commands.md` (excluded from context).
 
