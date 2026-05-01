@@ -31,6 +31,12 @@
 - Use the `gh` command-line tool when interacting with GitHub
 - When moving a file, always use `git mv` — never `cp` followed by a separate delete. `git mv` preserves history and stages the rename atomically.
 
+## User's Independent Habits
+
+The user pushes branches, creates commits, creates new branches, and switches contexts independently — without narrating it. When interpreting a request, always check current state first (`git status`, `git branch`, `git diff HEAD`) rather than assuming the working context matches what was last discussed.
+
+Specific case: "review the current diff" or "review this" without a PR number means review the local uncommitted or unpushed changes (`git diff HEAD`), not a PR. Run `git diff HEAD` directly rather than invoking the `review` skill, which assumes a PR context.
+
 ## Pull Requests
 
 - Always create PRs as 'drafts'.
