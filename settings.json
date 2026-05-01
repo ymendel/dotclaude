@@ -81,6 +81,10 @@
     "type": "command",
     "command": "$HOME/.claude/statusline-command.sh"
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "effortLevel": "high",
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.92",
