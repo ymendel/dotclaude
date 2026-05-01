@@ -4,6 +4,7 @@
 
 - Always include a trailing newline at the end of the file.
 - Simple is better than clever.
+- Prefer `if/else` over ternary operators. The ternary has a readable longhand; use it. Without this rule, conditional logic gets buried in expressions and is harder to read at a glance.
 - Parse files with parser libraries, not regex.
 - Always use latest versions of languages, frameworks, and dependencies. Check upstream for actual latest — don't guess from memory.
 - Use intention-revealing names, not keystroke-saving abbreviations in code names (e.g., `destination` not `dest`, `config` not `cfg`).
