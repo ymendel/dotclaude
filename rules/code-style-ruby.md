@@ -17,6 +17,7 @@ paths:
 - Never use numbered block arguments (`_1`, `_2`, …) in blocks. Always use explicit named arguments (e.g. `|item|`, `|node|`, `|x|`). Prefer a meaningful name to a single-character one.
 - Use Symbol#to_proc where appropriate — single-argument blocks where only a single method is called on the argument. e.g. use `words.map(&:upcase)` rather than `words.map { |word| word.upcase }`
 - If a gem exists that does it well and isn't abandoned, use it over reinventing the wheel — especially for nuanced domains (I18n, email, URLs, slugs, protocols, specs, etc).
+- Keep non-trivial defaults out of method signatures — put them in the method body instead. Keyword defaults are evaluated once at parse/load time, so a default like `client: ApiClient.new` creates a single shared instance rather than a fresh one per call. Even for simple values, a body default keeps logic visible and easy to change.
 
 ### Aesthetics
 
