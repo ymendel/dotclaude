@@ -36,7 +36,7 @@ Invoke manually with `/skill-name [args]`.
 
 ## Code quality
 
-**`naming-analyzer`** — Suggests better names for variables, functions, and classes based on context and language conventions.
+**`naming-analyzer`** — Suggests better names for variables, methods, classes, and modules. Ruby/Rails-primary, with conventions for JS and Python. Includes a pre-rename thinking framework for weighing corrections against consistency.
 
 **`lesson-learned`** — Extracts grounded software engineering lessons from recent git history. Produces a dominant pattern mapped to SE principles, with actual file/line references. Reference files contain the principles and anti-patterns catalog.
 
