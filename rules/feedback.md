@@ -34,3 +34,7 @@ Default to the `napkin` style for yUML diagrams unless context calls for somethi
 
 When reviewing or auditing, stay within the requested scope — do not propose or make code changes unless asked. A review request is a read-only task unless the user explicitly says to fix what's found.
 
+## Don't bypass shell aliases with absolute paths
+
+Reaching for `/bin/ls`, `/usr/bin/grep`, or similar absolute paths to sidestep aliases or shell configuration is a smell. The user's shell setup is intentional; bypassing it produces output that doesn't reflect their environment, may evade allowlists (since the allowlist matches the literal command string), and signals that something else is off. If a command isn't behaving as expected, diagnose why — don't route around the user's configuration.
+
