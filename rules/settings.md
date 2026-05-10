@@ -1,3 +1,7 @@
+---
+paths: ["**/settings.json", "**/settings.local.json"]
+---
+
 # settings.json
 
 Gotchas and conventions for Claude Code's `settings.json`.
