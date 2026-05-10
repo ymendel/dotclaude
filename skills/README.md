@@ -24,9 +24,9 @@ Invoke manually with `/skill-name [args]`.
 
 ## Architecture & design
 
-**`adr`** — Writes Architecture Decision Records or advises whether a decision is ADR-worthy. Auto-invokes `adr-refine` after drafting.
+**`adr`** — Writes Architecture Decision Records, advises on ADR-worthiness, or updates the status of an existing ADR (accept, supersede, deprecate). Auto-invokes `adr-refine` after drafting.
 
-**`adr-refine`** — Critiques a draft ADR: surfaces unclear context, missing tradeoffs, hand-wavy language, and codebase inconsistencies. Auto-invoked by `adr`; also use when reviewing an existing draft.
+**`adr-refine`** — Critiques a draft ADR: surfaces unclear context, missing tradeoffs, hand-wavy language, and codebase inconsistencies. Auto-invoked by `adr`; also use when reviewing an existing draft or re-refining a Proposed ADR after implementation surfaces new info.
 
 **`mermaid-diagrams`** — Comprehensive Mermaid syntax reference and diagram-type selection guide. Reference files cover each diagram type in depth; the skill body covers selection logic and quick-start examples.
 

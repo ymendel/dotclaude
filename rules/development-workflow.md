@@ -13,11 +13,11 @@
 
 ## Implementation
 
-- Use the ADR as the guidelines for implementing the plan.
+- Use the ADR as the guidelines for implementing the plan. While implementing, keep the ADR in `Proposed` status — it's a working document until the implementation validates it. If the work surfaces gaps or contradictions, update the Proposed ADR rather than reconciling around it. Flip to `Accepted` once the decision has been validated by working code.
 - Work through the implementation in logical steps, committing as you go.
-- When conflicts come up between the ADR and the implementation, reconcile them. Determine whether the ADR or the implementation is correct. If you're not sure, ask.
-- If anything is unclear or ambiguous mid-implementation — edge cases, missing detail, unexpected constraints — stop and ask rather than guessing.
-- When implementation is complete, provide a list of remaining next steps (follow-on work, config, documentation, etc.) that fall outside the scope of what was just implemented.
+- When you hit a confusion or contradiction you can resolve confidently, resolve it and note it for the post-implementation report — don't interrupt the flow for handleable issues.
+- Stop and ask only when you genuinely can't proceed: the ADR seems materially wrong, the resolution affects scope, or you'd be guessing at intent.
+- When implementation is complete, provide a post-implementation report covering: (a) anything you handled inline that the user might want to revisit (small reconciliations, judgment calls, deviations from the ADR), and (b) remaining next steps (follow-on work, config, documentation, etc.) that fall outside the scope of what was just implemented.
 
 ## Version Control
 
