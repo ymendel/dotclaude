@@ -32,6 +32,8 @@ Invoke manually with `/skill-name [args]`.
 
 **`yuml-diagrams`** — yUML DSL syntax reference and diagram-type selection guide. Covers class, sequence, activity, use case, state, C4, journey, timeline, roadmap, canvas (SWOT, Strategy Choice Cascade), and chart diagrams. Reference files cover each type in depth; the skill body covers type selection, loading triggers, NEVER rules, and render troubleshooting.
 
+**`graphify`** — Builds a knowledge graph of a codebase or folder with community detection. Outputs interactive HTML, GraphRAG-ready JSON, and a plain-language audit report. Pairs with `rules/graphify.md`, which directs graph-first exploration in projects where a `graphify-out/` artifact already exists.
+
 **`database-schema-designer`** — Production-ready SQL and NoSQL schema design: normalization, indexing strategies, constraints, migrations, performance. Reference files contain the checklist and migration templates.
 
 **`requirements-clarity`** — Transforms vague feature requests into actionable PRDs through structured dialogue. Scores clarity on a 100-point rubric; generates the PRD when the score reaches 90.

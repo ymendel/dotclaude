@@ -22,6 +22,8 @@ Rule files govern how Claude should behave across all projects, not just in spec
 
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
 
+**`graphify.md`** — How to use a graphify knowledge graph when one is present in a project (`graphify-out/graph.json`). Conditional: applies only when the artifact exists, surfaced via `PreToolUse` and `SessionStart` hooks.
+
 **`RTK.md`** — Usage guide for RTK (Rust Token Killer), a token-optimized CLI proxy. Covers the hook scope limitation (Bash only, not built-in tools), the override for file/search operations, and command reference by workflow.
 
 **`settings.md`** — Gotchas for `settings.json`: tilde vs. `$HOME` in path fields, `*` vs. `**` in permission globs, and backslash-escaped whitespace triggering permission dialogs.
