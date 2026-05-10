@@ -64,3 +64,10 @@ Specific case: "review the current diff" or "review this" without a PR number me
 - After a work block, proactively check whether `lesson-learned` or `self-improvement` applies. Don't wait to be asked.
 - In sessions where multiple commits have been made and work is ongoing, suggest `/session-handoff` after each major phase completes (e.g., after a logical group of commits). Do not wait for the user to signal they are wrapping up — by then the context may already be near its limit.
 - Also suggest `/session-handoff` when the user signals wrapping up, or when significant in-progress work exists that would be disorienting to resume cold.
+- **No automated safety net before compaction.** Claude Code's `PreCompact` hook cannot inject context for the model to react to — it can only block compaction or show a user-facing message. The model must therefore take responsibility for noticing when compaction is approaching and surfacing a handoff suggestion *before* it lands. Bias toward suggesting earlier rather than later: false positives are cheap; a missed handoff before compaction means the context is lost.
+- Any one of these signals is enough to surface a handoff suggestion:
+  - 5+ file edits, multiple commits, or non-trivial decisions that wouldn't be obvious from the diff alone
+  - The user pauses, switches topic, or signals winding down
+  - The conversation has been long enough that compaction is plausible (extended back-and-forth, large tool outputs)
+  - A new phase of work is starting that depends on context from the previous phase
+- A `SessionStart` hook surfaces the most recent handoff (within 7 days) at session start. When that reminder fires, weigh whether the user's prompt is continuing prior work — if so, invoke `/session-handoff` to resume rather than starting cold.
