@@ -37,6 +37,10 @@ The user pushes branches, creates commits, creates new branches, and switches co
 
 Specific case: "review the current diff" or "review this" without a PR number means review the local uncommitted or unpushed changes (`git diff HEAD`), not a PR. Run `git diff HEAD` directly rather than invoking the `review` skill, which assumes a PR context.
 
+## Reviewing
+
+- Stay within the requested scope — do not propose or make code changes unless asked. A review request is a read-only task unless the user explicitly says to fix what's found.
+
 ## Pull Requests
 
 - Always create PRs as 'drafts'.

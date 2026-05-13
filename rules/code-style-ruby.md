@@ -46,3 +46,7 @@ paths:
 - Rake task arguments use bracket syntax, not space-separated: `task[arg]` not `task arg`.
   When passing args via `bin/rails`, this means e.g. `bin/rails tailwindcss:watch[always]`.
 
+### Runners and Scripts
+
+- Before writing a Rails runner (or any script) that references multiple ActiveRecord models, confirm each one actually exists where assumed — list `app/models/` or grep for the constant. A model name that sounds right ("SyntheticRun", "Objective") may live in a gem under a namespace, may be an external service's concept with no local table at all, or may simply not exist. Guessing leads to `NameError`s mid-script and a wasted round-trip; a 1-second check up front avoids it. This is especially important in projects that pull domain models from engines or gems — the convention "models live in `app/models/`" is not universal.
+

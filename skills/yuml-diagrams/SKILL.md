@@ -15,6 +15,8 @@ Types: `class`, `sequence`, `activity`, `usecase`, `state`, `c4`, `journey`, `ti
 
 Styles: `clean`, `plain`, `boring`, `sketch`, `scruffy`, `napkin`, `midnight`, `blueprint`
 
+Default to `napkin` unless context calls for something else — a formal presentation might warrant `clean` or `blueprint`.
+
 Canonical DSL spec: https://app.yuml.me/dsl/v1/spec.txt
 
 ## Metadata Directives
