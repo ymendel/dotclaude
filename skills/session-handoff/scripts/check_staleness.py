@@ -14,10 +14,16 @@ Usage:
     python check_staleness.py .claude/handoffs/2024-01-15-143022-auth.md
 """
 
+import sys
+
+if sys.version_info < (3, 9):
+    sys.exit(
+        f"requires Python 3.9+ (running {sys.version_info.major}.{sys.version_info.minor})"
+    )
+
 import os
 import re
 import subprocess
-import sys
 from datetime import datetime
 from pathlib import Path
 

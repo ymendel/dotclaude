@@ -12,9 +12,15 @@ Usage:
     python list_handoffs.py /path     # List handoffs in specified path
 """
 
+import sys
+
+if sys.version_info < (3, 9):
+    sys.exit(
+        f"requires Python 3.9+ (running {sys.version_info.major}.{sys.version_info.minor})"
+    )
+
 import os
 import re
-import sys
 from datetime import datetime
 from pathlib import Path
 

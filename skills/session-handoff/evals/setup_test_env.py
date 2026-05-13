@@ -12,6 +12,13 @@ Usage:
     python setup_test_env.py --clean  # Remove test environment
 """
 
+import sys
+
+if sys.version_info < (3, 9):
+    sys.exit(
+        f"requires Python 3.9+ (running {sys.version_info.major}.{sys.version_info.minor})"
+    )
+
 import argparse
 import os
 import shutil

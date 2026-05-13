@@ -174,6 +174,8 @@ Example: `2024-01-15-143022-implementing-auth.md`
 
 ## Resources
 
+The scripts below require **Python 3.9+** on `PATH`. They exit with a clear error if invoked on an older interpreter.
+
 ### scripts/
 
 | Script | Purpose |
