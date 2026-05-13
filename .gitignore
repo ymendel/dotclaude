@@ -35,3 +35,8 @@
 !README.md
 !Makefile
 !statusline-command.sh
+
+# but re-ignore Python build artifacts that show up anywhere under the
+# allowlisted directories above (e.g., when running the session-handoff tests)
+**/__pycache__/
+**/*.pyc
