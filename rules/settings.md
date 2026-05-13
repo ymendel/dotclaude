@@ -16,6 +16,18 @@ Hook `command` strings are executed by bash, so `$HOME` works fine there.
 
 `*` in permission patterns (e.g. `Edit(~/.claude/*)`) does **not** match subdirectories. Use `**` to match recursively: `Edit(~/.claude/**)`. Failing to do so leaves subdirectory edits unmatched, causing unexpected permission prompts.
 
+## Project vs. Global Settings — Match Scope to Use
+
+When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:
+
+- **`~/.claude/settings.json`** (global) — for tools used across projects: skills, common scripts, shared CLI tools (`gh`, `heroku`, `jq`). The fact that the tool happens to live in one repo today doesn't change this if it's invoked from many.
+- **`<project>/.claude/settings.json`** (project, committed) — for permissions other contributors should inherit (the project's build tooling, its CI invocations).
+- **`<project>/.claude/settings.local.json`** (project, local-only) — for permissions only this user needs in this project (one-off experimentation, personal CLI shortcuts).
+
+Failure mode: dropping skill-related permissions into a project's `.claude/settings.local.json` because that file already exists. The permission only kicks in when working inside *that* project, not when the same skill is used elsewhere — so the prompts return as soon as the skill is invoked in another repo. Default to global for anything skill-related or cross-cutting.
+
+For paths in skill-related permissions, leading `**` lets a single global rule cover any project: `Write(**/.claude/handoffs/*.md)` matches a handoffs directory in every project the skill is used from.
+
 ## Paths With Spaces
 
 When constructing shell commands that reference paths containing spaces (e.g. `~/Library/Application Support/`), use `$HOME` with proper quoting instead of backslash-escaping. Claude Code's permission system triggers a separate confirmation dialog for any command containing backslash-escaped whitespace, regardless of allow-list rules.
