@@ -174,7 +174,7 @@ Example: `2024-01-15-143022-implementing-auth.md`
 
 ## Resources
 
-The scripts below require **Python 3.9+** on `PATH`. They exit with a clear error if invoked on an older interpreter.
+The scripts below require a **Python 3.9+** interpreter. They exit with a clear error if invoked on an older version.
 
 ### scripts/
 
@@ -189,3 +189,4 @@ The scripts below require **Python 3.9+** on `PATH`. They exit with a clear erro
 
 - [handoff-template.md](references/handoff-template.md) - Complete template structure with guidance
 - [resume-checklist.md](references/resume-checklist.md) - Verification checklist for resuming agents
+- [setup.md](references/setup.md) - One-time host setup: recommended permissions and how to run the tests

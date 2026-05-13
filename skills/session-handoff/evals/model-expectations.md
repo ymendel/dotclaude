@@ -67,16 +67,18 @@ This document describes expected behavior differences across Claude models when 
 
 ### Scenario 4: Proactive Handoff Suggestion
 
+The canonical trigger lives in `SKILL.md` ("5+ edits, major decisions") and applies to all models. The rows below describe *observed* behavior — when each model actually volunteers the suggestion in practice — not per-model thresholds.
+
 | Aspect | Haiku | Sonnet | Opus |
 |--------|-------|--------|------|
 | Recognizes substantial work | Unlikely without prompt | Sometimes | Usually |
 | Suggests handoff | Rarely proactive | Sometimes proactive | Often proactive |
-| Timing of suggestion | N/A | After 5+ major items | After 3-5 items |
+| Observed timing vs. canonical 5+ trigger | N/A — rarely suggests | Typically waits until 5+ items (aligned with trigger) | Often volunteers at 3–5 items (earlier than trigger) |
 
 **Notes:**
 - Haiku will rarely proactively suggest handoffs
 - Sonnet may suggest after explicit substantial work description
-- Opus most likely to suggest unprompted
+- Opus most likely to suggest unprompted, sometimes before the 5+ threshold is reached
 
 ### Scenario 5: Validation Flow
 

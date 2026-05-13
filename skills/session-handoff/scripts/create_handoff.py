@@ -17,6 +17,8 @@ Usage:
     python create_handoff.py  # auto-generates slug from timestamp
 """
 
+from __future__ import annotations
+
 import sys
 
 if sys.version_info < (3, 9):
@@ -27,24 +29,28 @@ if sys.version_info < (3, 9):
 import argparse
 import os
 import re
-import subprocess
 from datetime import datetime
 from pathlib import Path
 
+from _common import TEXT_IO_KWARGS, run_cmd
 
-def run_cmd(cmd: list[str], cwd: str = None) -> tuple[bool, str]:
-    """Run a command and return (success, output)."""
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            cwd=cwd,
-            timeout=10
+
+TEMPLATE_PATH = Path(__file__).parent.parent / "references" / "handoff-template.md"
+
+
+def _load_template() -> str:
+    """Read the canonical handoff template from references/."""
+    if not TEMPLATE_PATH.exists():
+        sys.exit(
+            f"error: handoff template not found at {TEMPLATE_PATH}. "
+            f"Is the session-handoff skill installed correctly?"
         )
-        return result.returncode == 0, result.stdout.strip()
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        return False, ""
+    full = TEMPLATE_PATH.read_text(**TEXT_IO_KWARGS)
+    # The file has a human-readable header explaining the placeholder
+    # conventions. Strip everything before the first `---` separator so
+    # the rendered handoff starts at "# Handoff: ..." directly.
+    parts = full.split("\n---\n", 1)
+    return parts[1].lstrip() if len(parts) == 2 else full
 
 
 def get_git_info(project_path: str) -> dict:
@@ -58,39 +64,39 @@ def get_git_info(project_path: str) -> dict:
     }
 
     # Check if git repo
-    success, _ = run_cmd(["git", "rev-parse", "--git-dir"], cwd=project_path)
-    if not success:
+    rc, _, _ = run_cmd(["git", "rev-parse", "--git-dir"], cwd=project_path)
+    if rc != 0:
         return info
 
     info["is_git_repo"] = True
 
     # Get current branch
-    success, branch = run_cmd(["git", "branch", "--show-current"], cwd=project_path)
-    if success and branch:
+    rc, branch, _ = run_cmd(["git", "branch", "--show-current"], cwd=project_path)
+    if rc == 0 and branch:
         info["branch"] = branch
 
     # Get recent commits (last 5)
-    success, log = run_cmd(
+    rc, log, _ = run_cmd(
         ["git", "log", "--oneline", "-5", "--no-decorate"],
         cwd=project_path
     )
-    if success and log:
+    if rc == 0 and log:
         info["recent_commits"] = log.split("\n")
 
     # Get modified files (unstaged)
-    success, modified = run_cmd(
+    rc, modified, _ = run_cmd(
         ["git", "diff", "--name-only"],
         cwd=project_path
     )
-    if success and modified:
+    if rc == 0 and modified:
         info["modified_files"] = modified.split("\n")
 
     # Get staged files
-    success, staged = run_cmd(
+    rc, staged, _ = run_cmd(
         ["git", "diff", "--name-only", "--cached"],
         cwd=project_path
     )
-    if success and staged:
+    if rc == 0 and staged:
         info["staged_files"] = staged.split("\n")
 
     return info
@@ -106,10 +112,11 @@ def find_previous_handoffs(project_path: str) -> list[dict]:
     for filepath in handoffs_dir.glob("*.md"):
         # Extract title from file
         try:
-            content = filepath.read_text()
+            content = filepath.read_text(**TEXT_IO_KWARGS)
             match = re.search(r'^#\s+(?:Handoff:\s*)?(.+)$', content, re.MULTILINE)
             title = match.group(1).strip() if match else filepath.stem
-        except Exception:
+        except (OSError, UnicodeDecodeError) as e:
+            print(f"warning: could not read title from {filepath.name}: {e}", file=sys.stderr)
             title = filepath.stem
 
         # Parse date from filename
@@ -137,12 +144,16 @@ def find_previous_handoffs(project_path: str) -> list[dict]:
     return handoffs
 
 
-def get_previous_handoff_info(project_path: str, continues_from: str = None) -> dict:
-    """Get information about the previous handoff for chaining."""
-    handoffs = find_previous_handoffs(project_path)
+def get_previous_handoff_info(
+    handoffs: list[dict],
+    continues_from: str | None = None,
+) -> dict:
+    """Get information about the previous handoff for chaining.
 
+    Takes the already-scanned handoffs list so the caller can reuse it
+    rather than re-scanning the directory.
+    """
     if continues_from:
-        # Find specific handoff
         for h in handoffs:
             if continues_from in h["filename"]:
                 return {
@@ -152,8 +163,7 @@ def get_previous_handoff_info(project_path: str, continues_from: str = None) -> 
                 }
         return {"exists": False, "filename": continues_from, "title": "Not found"}
 
-    elif handoffs:
-        # Suggest most recent
+    if handoffs:
         most_recent = handoffs[0]
         return {
             "exists": True,
@@ -167,10 +177,15 @@ def get_previous_handoff_info(project_path: str, continues_from: str = None) -> 
 
 def generate_handoff(
     project_path: str,
-    slug: str = None,
-    continues_from: str = None
+    slug: str | None = None,
+    continues_from: str | None = None,
+    prev_handoffs: list[dict] | None = None,
 ) -> str:
-    """Generate a handoff document with pre-filled metadata."""
+    """Generate a handoff document with pre-filled metadata.
+
+    If `prev_handoffs` is provided (already scanned by the caller), it
+    is used directly to avoid a second pass over the handoffs directory.
+    """
 
     # Generate timestamp and filename
     now = datetime.now()
@@ -180,8 +195,11 @@ def generate_handoff(
     if not slug:
         slug = "handoff"
 
-    # Sanitize slug
-    slug = slug.lower().replace(" ", "-").replace("_", "-")
+    # Sanitize slug: lowercase, normalize separators, strip remaining specials.
+    # Branch names like "feature/auth" must become "feature-auth", not "featureauth".
+    slug = slug.lower()
+    for ch in (" ", "_", "/", "\\"):
+        slug = slug.replace(ch, "-")
     slug = "".join(c for c in slug if c.isalnum() or c == "-")
 
     filename = f"{file_timestamp}-{slug}.md"
@@ -192,11 +210,22 @@ def generate_handoff(
 
     filepath = handoffs_dir / filename
 
+    # Refuse to clobber an existing handoff at the same timestamp+slug.
+    # Two `create_handoff.py` calls in the same second with the same slug
+    # would otherwise silently overwrite the first one.
+    if filepath.exists():
+        sys.exit(
+            f"error: refusing to overwrite existing handoff at {filepath}. "
+            f"Wait a second or pass a different slug."
+        )
+
     # Gather git info
     git_info = get_git_info(project_path)
 
-    # Get previous handoff info for chaining
-    prev_handoff = get_previous_handoff_info(project_path, continues_from)
+    # Get previous handoff info for chaining (scan only if caller didn't)
+    if prev_handoffs is None:
+        prev_handoffs = find_previous_handoffs(project_path)
+    prev_handoff = get_previous_handoff_info(prev_handoffs, continues_from)
 
     # Build pre-filled sections
     branch_line = git_info["branch"] if git_info["branch"] else "[not a git repo or detached HEAD]"
@@ -233,113 +262,17 @@ def generate_handoff(
 
 > This is the first handoff for this task."""
 
-    # Generate the document
-    content = f"""# Handoff: [TASK_TITLE - replace this]
+    # Render the document from the canonical references/ template.
+    content = _load_template().format(
+        timestamp=timestamp,
+        project_path=project_path,
+        branch_line=branch_line,
+        commits_section=commits_section,
+        chain_section=chain_section,
+        modified_section=modified_section,
+    )
 
-## Session Metadata
-- Created: {timestamp}
-- Project: {project_path}
-- Branch: {branch_line}
-- Session duration: [estimate how long you worked]
-
-### Recent Commits (for context)
-{commits_section}
-
-{chain_section}
-
-## Current State Summary
-
-[TODO: Write one paragraph describing what was being worked on, current status, and where things left off]
-
-## Codebase Understanding
-
-### Architecture Overview
-
-[TODO: Document key architectural insights discovered during this session]
-
-### Critical Files
-
-| File | Purpose | Relevance |
-|------|---------|-----------|
-| [TODO: Add critical files] | | |
-
-### Key Patterns Discovered
-
-[TODO: Document important patterns, conventions, or idioms found in this codebase]
-
-## Work Completed
-
-### Tasks Finished
-
-- [ ] [TODO: List completed tasks]
-
-### Files Modified
-
-| File | Changes | Rationale |
-|------|---------|-----------|
-{modified_section}
-
-### Decisions Made
-
-| Decision | Options Considered | Rationale |
-|----------|-------------------|-----------|
-| [TODO: Document key decisions] | | |
-
-## Pending Work
-
-### Immediate Next Steps
-
-1. [TODO: Most critical next action]
-2. [TODO: Second priority]
-3. [TODO: Third priority]
-
-### Blockers/Open Questions
-
-- [ ] [TODO: List any blockers or open questions]
-
-### Deferred Items
-
-- [TODO: Items deferred and why]
-
-## Context for Resuming Agent
-
-### Important Context
-
-[TODO: This is the MOST IMPORTANT section - write critical information the next agent MUST know]
-
-### Assumptions Made
-
-- [TODO: List assumptions made during this session]
-
-### Potential Gotchas
-
-- [TODO: Document things that might trip up a new agent]
-
-## Environment State
-
-### Tools/Services Used
-
-- [TODO: List relevant tools and their configuration]
-
-### Active Processes
-
-- [TODO: Note any running processes, servers, etc.]
-
-### Environment Variables
-
-- [TODO: List relevant env var NAMES only - NEVER include actual values/secrets]
-
-## Related Resources
-
-- [TODO: Add links to relevant docs and files]
-
----
-
-**Security Reminder**: Before finalizing, run `validate_handoff.py` to check for accidental secret exposure.
-"""
-
-    # Write the file
-    filepath.write_text(content)
+    filepath.write_text(content, **TEXT_IO_KWARGS)
 
     return str(filepath)
 
@@ -365,23 +298,28 @@ def main():
     # Get project path (current working directory)
     project_path = os.getcwd()
 
-    # Check for existing handoffs to suggest chaining
-    if not args.continues_from:
-        prev_handoffs = find_previous_handoffs(project_path)
-        if prev_handoffs:
-            print(f"Found {len(prev_handoffs)} existing handoff(s).")
-            print(f"Most recent: {prev_handoffs[0]['filename']}")
-            print(f"Use --continues-from <filename> to link handoffs.\n")
+    # Single scan of the handoffs directory; reused by generate_handoff.
+    prev_handoffs = find_previous_handoffs(project_path)
+
+    if not args.continues_from and prev_handoffs:
+        print(f"Found {len(prev_handoffs)} existing handoff(s).")
+        print(f"Most recent: {prev_handoffs[0]['filename']}")
+        print(f"Use --continues-from <filename> to link handoffs.\n")
 
     # Generate handoff
-    filepath = generate_handoff(project_path, args.slug, args.continues_from)
+    filepath = generate_handoff(
+        project_path,
+        args.slug,
+        args.continues_from,
+        prev_handoffs=prev_handoffs,
+    )
 
     print(f"Created handoff document: {filepath}")
     print(f"\nNext steps:")
     print(f"1. Open {filepath}")
     print(f"2. Replace [TODO: ...] placeholders with actual content")
     print(f"3. Focus especially on 'Important Context' and 'Immediate Next Steps'")
-    print(f"4. Run: python validate_handoff.py {filepath}")
+    print(f"4. Run: python scripts/validate_handoff.py {filepath}")
     print(f"   (Checks for completeness and accidental secrets)")
 
     return filepath

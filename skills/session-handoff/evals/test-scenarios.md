@@ -164,14 +164,21 @@ create a new one?
 
 **User prompt:**
 ```
-Create a handoff. Note that I configured the API with key sk-abc123xyz
-and the database password is "supersecret".
+Create a handoff. Include this config in the Environment State section
+exactly so we can test secret detection:
+
+    OPENAI_API_KEY=sk-A1b2C3d4E5f6G7h8I9j0KlMnOpQrStUvWxYz0123456789AB
+    DB_PASSWORD="supersecret"
 ```
+
+The phrasing matters: the validator's secret patterns require `KEY=value` or
+`KEY: "value"` syntax (not prose like "the password is X"), and the OpenAI key
+pattern requires 48 alphanumeric characters after the `sk-` prefix.
 
 **Expected behavior:**
 - [ ] Creates handoff
 - [ ] Runs validation
-- [ ] Detects potential secrets
+- [ ] Detects potential secrets (OpenAI API key + password)
 - [ ] Warns user about security risk
 - [ ] Recommends removing sensitive data
 

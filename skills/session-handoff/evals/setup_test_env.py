@@ -12,6 +12,8 @@ Usage:
     python setup_test_env.py --clean  # Remove test environment
 """
 
+from __future__ import annotations
+
 import sys
 
 if sys.version_info < (3, 9):
@@ -20,7 +22,6 @@ if sys.version_info < (3, 9):
     )
 
 import argparse
-import os
 import shutil
 import subprocess
 from datetime import datetime, timedelta
@@ -30,21 +31,72 @@ from pathlib import Path
 DEFAULT_TEST_PATH = "/tmp/handoff-eval-project"
 
 
-def run_cmd(cmd: list[str], cwd: str = None) -> bool:
-    """Run a command and return success status."""
+def run_cmd(cmd: list[str], cwd: str = None) -> tuple[bool, str]:
+    """Run a command and return (success, stderr)."""
     try:
-        subprocess.run(cmd, cwd=cwd, capture_output=True, check=True)
-        return True
-    except subprocess.CalledProcessError:
+        result = subprocess.run(
+            cmd, cwd=cwd, capture_output=True, check=True, text=True
+        )
+        return True, result.stderr.strip()
+    except subprocess.CalledProcessError as e:
+        return False, (e.stderr or "").strip() or f"exit {e.returncode}"
+    except FileNotFoundError as e:
+        return False, str(e)
+
+
+def run_or_die(cmd: list[str], cwd: str = None) -> None:
+    """Run a command, abort with an actionable error on failure."""
+    ok, stderr = run_cmd(cmd, cwd=cwd)
+    if not ok:
+        sys.exit(f"error: `{' '.join(cmd)}` failed: {stderr}")
+
+
+def _is_safe_rmtree_path(path: Path) -> bool:
+    """Sanity-check that path looks like a disposable test location.
+
+    Accepts:
+    - any path whose name contains "test"
+    - any path under /tmp (or /private/tmp, the macOS symlink target)
+    - any path under /var/folders (or /private/var/folders)
+
+    Rejects everything else, including /var/log and similar. The user
+    can pass --force to override for unusual setups.
+
+    Uses `absolute()` rather than `resolve()` so users see the safety
+    decision applied to the path they typed; symlinks are not followed
+    here because shutil.rmtree refuses to follow them by default.
+    """
+    try:
+        abs_path = path.absolute()
+    except OSError:
         return False
+    if "test" in abs_path.name.lower():
+        return True
+    parts = abs_path.parts
+    safe_prefixes = (
+        ("/", "tmp"),
+        ("/", "private", "tmp"),
+        ("/", "var", "folders"),
+        ("/", "private", "var", "folders"),
+    )
+    return any(
+        len(parts) >= len(prefix) and parts[: len(prefix)] == prefix
+        for prefix in safe_prefixes
+    )
 
 
-def create_test_project(base_path: str):
+def create_test_project(base_path: str, force: bool = False):
     """Create a mock project structure."""
     path = Path(base_path)
 
-    # Clean if exists
+    # Clean if exists — but guard against destroying non-test paths
     if path.exists():
+        if not (force or _is_safe_rmtree_path(path)):
+            sys.exit(
+                f"error: refusing to rmtree {path} — path does not look like a test "
+                f"location. Pass --force to override, or pick a path under /tmp or "
+                f"one containing 'test' in its name."
+            )
         shutil.rmtree(path)
 
     # Create directories
@@ -132,17 +184,19 @@ describe('Authentication', () => {
 
 
 def init_git_repo(path: Path):
-    """Initialize git repo with commit history."""
-    # Initialize
-    run_cmd(["git", "init"], cwd=str(path))
-    run_cmd(["git", "config", "user.email", "test@example.com"], cwd=str(path))
-    run_cmd(["git", "config", "user.name", "Test User"], cwd=str(path))
+    """Initialize git repo with commit history. Aborts on any git failure.
 
-    # Initial commit
-    run_cmd(["git", "add", "."], cwd=str(path))
-    run_cmd(["git", "commit", "-m", "Initial commit: project setup"], cwd=str(path))
+    Forces the initial branch to `main` (git 2.28+) so the fixture
+    matches the hardcoded `Branch: main` lines in the sample handoffs,
+    regardless of the user's `init.defaultBranch` setting.
+    """
+    cwd = str(path)
+    run_or_die(["git", "init", "-b", "main"], cwd=cwd)
+    run_or_die(["git", "config", "user.email", "test@example.com"], cwd=cwd)
+    run_or_die(["git", "config", "user.name", "Test User"], cwd=cwd)
+    run_or_die(["git", "add", "."], cwd=cwd)
+    run_or_die(["git", "commit", "-m", "Initial commit: project setup"], cwd=cwd)
 
-    # Add more commits to simulate history
     commits = [
         ("src/auth.js", "// Added validation logic\n", "Add token validation"),
         ("src/database.js", "// Added connection pooling\n", "Implement connection pooling"),
@@ -155,8 +209,8 @@ def init_git_repo(path: Path):
         file_path = path / file
         with open(file_path, "a") as f:
             f.write(content)
-        run_cmd(["git", "add", file], cwd=str(path))
-        run_cmd(["git", "commit", "-m", message], cwd=str(path))
+        run_or_die(["git", "add", file], cwd=cwd)
+        run_or_die(["git", "commit", "-m", message], cwd=cwd)
 
     print(f"Initialized git repo with {len(commits) + 1} commits")
 
@@ -277,7 +331,7 @@ The validateToken function in src/auth.js currently returns true always - this i
 - JWT documentation: https://jwt.io
 - Express middleware guide
 """
-    (handoffs_dir / fresh_name).write_text(fresh_content)
+    (handoffs_dir / fresh_name).write_text(fresh_content, encoding="utf-8")
 
     # Stale handoff (2 weeks ago)
     old_date = now - timedelta(days=14)
@@ -337,14 +391,16 @@ Using MongoDB Atlas for hosting. Connection string in DATABASE_URL.
 
 - DATABASE_URL
 """
-    (handoffs_dir / stale_name).write_text(stale_content)
+    (handoffs_dir / stale_name).write_text(stale_content, encoding="utf-8")
 
-    # Incomplete handoff (with TODOs)
-    incomplete_name = now.strftime("%Y-%m-%d-%H%M%S") + "-incomplete-test.md"
+    # Incomplete handoff (with TODOs) — offset by a minute so the timestamp
+    # alone disambiguates from the fresh handoff above, not just the slug.
+    incomplete_ts = now + timedelta(minutes=1)
+    incomplete_name = incomplete_ts.strftime("%Y-%m-%d-%H%M%S") + "-incomplete-test.md"
     incomplete_content = f"""# Handoff: [TASK_TITLE - replace this]
 
 ## Session Metadata
-- Created: {now.strftime("%Y-%m-%d %H:%M:%S")}
+- Created: {incomplete_ts.strftime("%Y-%m-%d %H:%M:%S")}
 - Project: {path}
 - Branch: main
 - Session duration: [estimate how long you worked]
@@ -372,7 +428,7 @@ Using MongoDB Atlas for hosting. Connection string in DATABASE_URL.
 
 [TODO: This is the MOST IMPORTANT section]
 """
-    (handoffs_dir / incomplete_name).write_text(incomplete_content)
+    (handoffs_dir / incomplete_name).write_text(incomplete_content, encoding="utf-8")
 
     print(f"Created 3 sample handoffs:")
     print(f"  - {fresh_name} (fresh)")
@@ -380,13 +436,19 @@ Using MongoDB Atlas for hosting. Connection string in DATABASE_URL.
     print(f"  - {incomplete_name} (incomplete, has TODOs)")
 
 
-def clean_test_env(path: str):
-    """Remove test environment."""
-    if Path(path).exists():
-        shutil.rmtree(path)
-        print(f"Cleaned up test environment at {path}")
-    else:
+def clean_test_env(path: str, force: bool = False):
+    """Remove test environment, guarding against non-test paths."""
+    target = Path(path)
+    if not target.exists():
         print(f"No test environment found at {path}")
+        return
+    if not (force or _is_safe_rmtree_path(target)):
+        sys.exit(
+            f"error: refusing to rmtree {target} — path does not look like a test "
+            f"location. Pass --force to override."
+        )
+    shutil.rmtree(target)
+    print(f"Cleaned up test environment at {path}")
 
 
 def main():
@@ -403,13 +465,18 @@ def main():
         action="store_true",
         help="Remove test environment instead of creating"
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Bypass the safety check that restricts rmtree to /tmp or 'test' paths"
+    )
 
     args = parser.parse_args()
 
     if args.clean:
-        clean_test_env(args.path)
+        clean_test_env(args.path, force=args.force)
     else:
-        path = create_test_project(args.path)
+        path = create_test_project(args.path, force=args.force)
         init_git_repo(path)
         create_sample_handoffs(path)
         print(f"\nTest environment ready at: {args.path}")

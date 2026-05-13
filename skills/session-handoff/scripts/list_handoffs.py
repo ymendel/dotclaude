@@ -12,6 +12,8 @@ Usage:
     python list_handoffs.py /path     # List handoffs in specified path
 """
 
+from __future__ import annotations
+
 import sys
 
 if sys.version_info < (3, 9):
@@ -19,42 +21,34 @@ if sys.version_info < (3, 9):
         f"requires Python 3.9+ (running {sys.version_info.major}.{sys.version_info.minor})"
     )
 
+import argparse
 import os
 import re
 from datetime import datetime
 from pathlib import Path
 
-
-def extract_title(filepath: Path) -> str:
-    """Extract the title from a handoff document."""
-    try:
-        content = filepath.read_text()
-        # Look for first H1 header
-        match = re.search(r'^#\s+(?:Handoff:\s*)?(.+)$', content, re.MULTILINE)
-        if match:
-            title = match.group(1).strip()
-            # Clean up placeholder text
-            if title.startswith("[") and title.endswith("]"):
-                return "[Untitled - needs completion]"
-            return title[:50] + "..." if len(title) > 50 else title
-    except Exception:
-        pass
-    return "[Unable to read title]"
+from _common import TEXT_IO_KWARGS
 
 
-def check_completion_status(filepath: Path) -> str:
-    """Check if handoff appears complete or has TODOs remaining."""
-    try:
-        content = filepath.read_text()
-        todo_count = content.count("[TODO:")
-        if todo_count == 0:
-            return "Complete"
-        elif todo_count <= 3:
-            return f"In Progress ({todo_count} TODOs)"
-        else:
-            return f"Needs Work ({todo_count} TODOs)"
-    except Exception:
-        return "Unknown"
+def extract_title(content: str) -> str:
+    """Extract the title from handoff content."""
+    match = re.search(r'^#\s+(?:Handoff:\s*)?(.+)$', content, re.MULTILINE)
+    if not match:
+        return "[Unable to read title]"
+    title = match.group(1).strip()
+    if title.startswith("[") and title.endswith("]"):
+        return "[Untitled - needs completion]"
+    return title[:50] + "..." if len(title) > 50 else title
+
+
+def check_completion_status(content: str) -> str:
+    """Classify a handoff by remaining TODO count."""
+    todo_count = content.count("[TODO:")
+    if todo_count == 0:
+        return "Complete"
+    if todo_count <= 3:
+        return f"In Progress ({todo_count} TODOs)"
+    return f"Needs Work ({todo_count} TODOs)"
 
 
 def parse_date_from_filename(filename: str) -> datetime | None:
@@ -79,13 +73,24 @@ def list_handoffs(project_path: str) -> list[dict]:
 
     handoffs = []
     for filepath in handoffs_dir.glob("*.md"):
-        parsed_date = parse_date_from_filename(filepath.name)
+        try:
+            content = filepath.read_text(**TEXT_IO_KWARGS)
+        except (OSError, UnicodeDecodeError) as e:
+            print(
+                f"warning: could not read {filepath.name}: {e}",
+                file=sys.stderr,
+            )
+            title = "[Unable to read]"
+            status = "Unknown"
+        else:
+            title = extract_title(content)
+            status = check_completion_status(content)
         handoffs.append({
             "path": str(filepath),
             "filename": filepath.name,
-            "title": extract_title(filepath),
-            "status": check_completion_status(filepath),
-            "date": parsed_date,
+            "title": title,
+            "status": status,
+            "date": parse_date_from_filename(filepath.name),
             "size": filepath.stat().st_size,
         })
 
@@ -103,15 +108,24 @@ def format_date(dt: datetime | None) -> str:
 
 
 def main():
-    # Get project path
-    project_path = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
+    parser = argparse.ArgumentParser(
+        description="List handoff documents in a project's .claude/handoffs/."
+    )
+    parser.add_argument(
+        "project_path",
+        nargs="?",
+        default=None,
+        help="Project root to scan (defaults to current working directory)",
+    )
+    args = parser.parse_args()
 
+    project_path = args.project_path or os.getcwd()
     handoffs = list_handoffs(project_path)
 
     if not handoffs:
         print(f"No handoffs found in {project_path}/.claude/handoffs/")
         print("\nTo create a handoff, run: python create_handoff.py [task-slug]")
-        return
+        sys.exit(1)
 
     print(f"Found {len(handoffs)} handoff(s) in {project_path}/.claude/handoffs/\n")
     print("-" * 80)

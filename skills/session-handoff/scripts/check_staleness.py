@@ -14,6 +14,8 @@ Usage:
     python check_staleness.py .claude/handoffs/2024-01-15-143022-auth.md
 """
 
+from __future__ import annotations
+
 import sys
 
 if sys.version_info < (3, 9):
@@ -21,31 +23,22 @@ if sys.version_info < (3, 9):
         f"requires Python 3.9+ (running {sys.version_info.major}.{sys.version_info.minor})"
     )
 
-import os
+import argparse
 import re
-import subprocess
 from datetime import datetime
 from pathlib import Path
 
-
-def run_cmd(cmd: list[str], cwd: str = None) -> tuple[bool, str]:
-    """Run a command and return (success, output)."""
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            cwd=cwd,
-            timeout=10
-        )
-        return result.returncode == 0, result.stdout.strip()
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        return False, ""
+from _common import (
+    TEXT_IO_KWARGS,
+    infer_project_root,
+    log_cmd_failure,
+    run_cmd,
+)
 
 
 def parse_handoff_metadata(filepath: str) -> dict:
     """Extract metadata from a handoff file."""
-    content = Path(filepath).read_text()
+    content = Path(filepath).read_text(**TEXT_IO_KWARGS)
     metadata = {
         "created": None,
         "branch": None,
@@ -88,47 +81,44 @@ def get_commits_since(timestamp: datetime, project_path: str) -> list[str]:
         return []
 
     iso_time = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
-    success, output = run_cmd(
-        ["git", "log", f"--since={iso_time}", "--oneline", "--no-decorate"],
-        cwd=project_path
-    )
+    cmd = ["git", "log", f"--since={iso_time}", "--oneline", "--no-decorate"]
+    rc, output, stderr = run_cmd(cmd, cwd=project_path)
 
-    if success and output:
-        return output.split("\n")
-    return []
+    if rc != 0:
+        log_cmd_failure(cmd, stderr)
+        return []
+
+    return output.split("\n") if output else []
 
 
 def get_current_branch(project_path: str) -> str | None:
-    """Get current git branch."""
-    success, branch = run_cmd(
-        ["git", "branch", "--show-current"],
-        cwd=project_path
-    )
-    return branch if success else None
+    """Get current git branch. Returns None on detached HEAD or failure."""
+    cmd = ["git", "branch", "--show-current"]
+    rc, branch, stderr = run_cmd(cmd, cwd=project_path)
+    if rc != 0:
+        log_cmd_failure(cmd, stderr)
+        return None
+    return branch or None
 
 
 def get_changed_files_since(timestamp: datetime, project_path: str) -> list[str]:
-    """Get files that changed since timestamp."""
+    """Get files changed in commits since timestamp.
+
+    Uses `git log --name-only` since `git diff` has no `--since` flag.
+    """
     if not timestamp:
         return []
 
     iso_time = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
-    success, output = run_cmd(
-        ["git", "diff", "--name-only", f"--since={iso_time}", "HEAD"],
-        cwd=project_path
-    )
+    cmd = ["git", "log", f"--since={iso_time}", "--name-only", "--pretty=format:"]
+    rc, output, stderr = run_cmd(cmd, cwd=project_path)
 
-    # Fallback: get files changed in commits since timestamp
-    if not output:
-        success, output = run_cmd(
-            ["git", "log", f"--since={iso_time}", "--name-only", "--pretty=format:"],
-            cwd=project_path
-        )
+    if rc != 0:
+        log_cmd_failure(cmd, stderr)
+        return []
 
-    if success and output:
-        files = [f.strip() for f in output.split("\n") if f.strip()]
-        return list(set(files))  # Deduplicate
-    return []
+    files = [f.strip() for f in output.split("\n") if f.strip()]
+    return sorted(set(files))
 
 
 def check_files_exist(files: list[str], project_path: str) -> tuple[list[str], list[str]]:
@@ -146,83 +136,93 @@ def check_files_exist(files: list[str], project_path: str) -> tuple[list[str], l
     return existing, missing
 
 
+# Staleness thresholds — bumped to module level so tuning happens in one place.
+# Each tuple is (threshold, points_added, optional issue-message format).
+AGE_THRESHOLDS_DAYS = (
+    (30, 3, "Handoff is {n} days old"),
+    (7, 2, "Handoff is {n} days old"),
+    (1, 1, None),  # Minor staleness — not worth surfacing as an issue.
+)
+COMMIT_THRESHOLDS = (
+    (50, 3, "{n} commits since handoff - significant changes"),
+    (20, 2, "{n} commits since handoff"),
+    (5, 1, None),
+)
+FILES_CHANGED_THRESHOLDS = (
+    (20, 2, "{n} files changed since handoff"),
+    (5, 1, None),
+)
+FILES_MISSING_THRESHOLDS = (
+    (5, 2, "{n} referenced files no longer exist"),
+    (0, 1, "{n} referenced file(s) missing"),
+)
+BRANCH_MISMATCH_POINTS = 2
+
+# Score to level mapping. Higher score = more stale.
+LEVEL_FRESH_MAX = 0
+LEVEL_SLIGHT_MAX = 2
+LEVEL_STALE_MAX = 4
+
+
+def _bucket_score(value: float, thresholds, issues: list) -> int:
+    """Walk a threshold table (high-to-low) and return the score for `value`.
+
+    Appends a formatted issue message when the matched threshold defines one.
+    """
+    for threshold, points, message in thresholds:
+        if value > threshold:
+            if message is not None:
+                issues.append(message.format(n=int(value)))
+            return points
+    return 0
+
+
 def calculate_staleness_level(
     days_old: float,
     commits_since: int,
     files_changed: int,
     branch_matches: bool,
-    files_missing: int
+    files_missing: int,
 ) -> tuple[str, str, list[str]]:
     """Calculate staleness level and provide recommendations.
 
-    Staleness scoring rationale:
-    - Each factor adds 1-3 points based on severity
-    - Thresholds based on typical development patterns:
-      - Age: 1 day (active work), 7 days (sprint), 30 days (stale)
-      - Commits: 5 (minor changes), 20 (feature work), 50 (major changes)
-      - Files: 5 (localized), 20 (widespread changes)
-    - Final score: 0=FRESH, 1-2=SLIGHTLY_STALE, 3-4=STALE, 5+=VERY_STALE
+    Each factor adds 1-3 points based on severity, summed into a final
+    score that maps to FRESH/SLIGHTLY_STALE/STALE/VERY_STALE per the
+    LEVEL_*_MAX constants above.
     """
-    issues = []
-
-    # Scoring
-    staleness_score = 0
-
-    # Age thresholds: 1 day = active, 7 days = sprint boundary, 30 days = likely stale
-    if days_old > 30:
-        staleness_score += 3  # Over a month: high risk of outdated context
-        issues.append(f"Handoff is {int(days_old)} days old")
-    elif days_old > 7:
-        staleness_score += 2  # Over a week: moderate staleness
-        issues.append(f"Handoff is {int(days_old)} days old")
-    elif days_old > 1:
-        staleness_score += 1  # Over a day: minor staleness
-
-    # Commit thresholds: 5 = routine, 20 = feature work, 50 = major development
-    if commits_since > 50:
-        staleness_score += 3  # Major changes likely invalidate handoff context
-        issues.append(f"{commits_since} commits since handoff - significant changes")
-    elif commits_since > 20:
-        staleness_score += 2  # Substantial work done since handoff
-        issues.append(f"{commits_since} commits since handoff")
-    elif commits_since > 5:
-        staleness_score += 1  # Some changes, worth reviewing
-
-    # Branch mismatch: likely working on different feature/context
+    issues: list[str] = []
+    score = 0
+    score += _bucket_score(days_old, AGE_THRESHOLDS_DAYS, issues)
+    score += _bucket_score(commits_since, COMMIT_THRESHOLDS, issues)
+    score += _bucket_score(files_changed, FILES_CHANGED_THRESHOLDS, issues)
+    score += _bucket_score(files_missing, FILES_MISSING_THRESHOLDS, issues)
     if not branch_matches:
-        staleness_score += 2  # Different branch = different context
+        score += BRANCH_MISMATCH_POINTS
         issues.append("Current branch differs from handoff branch")
 
-    # Missing files: 5+ suggests significant restructuring
-    if files_missing > 5:
-        staleness_score += 2  # Many refs broken = codebase restructured
-        issues.append(f"{files_missing} referenced files no longer exist")
-    elif files_missing > 0:
-        staleness_score += 1  # Some refs broken
-        issues.append(f"{files_missing} referenced file(s) missing")
-
-    # Changed files: 5 = localized, 20 = widespread
-    if files_changed > 20:
-        staleness_score += 2  # Widespread changes affect handoff relevance
-        issues.append(f"{files_changed} files changed since handoff")
-    elif files_changed > 5:
-        staleness_score += 1  # Some files changed
-
-    # Staleness levels: 0=fresh, 1-2=slight, 3-4=stale, 5+=very stale
-    if staleness_score == 0:
-        level = "FRESH"
-        recommendation = "Safe to resume - minimal changes since handoff"
-    elif staleness_score <= 2:
-        level = "SLIGHTLY_STALE"
-        recommendation = "Generally safe to resume - review changes before continuing"
-    elif staleness_score <= 4:
-        level = "STALE"
-        recommendation = "Proceed with caution - significant changes may affect context"
-    else:
-        level = "VERY_STALE"
-        recommendation = "Consider creating new handoff - too many changes since original"
-
-    return level, recommendation, issues
+    if score <= LEVEL_FRESH_MAX:
+        return (
+            "FRESH",
+            "Safe to resume - minimal changes since handoff",
+            issues,
+        )
+    if score <= LEVEL_SLIGHT_MAX:
+        return (
+            "SLIGHTLY_STALE",
+            "Generally safe to resume - review changes before continuing",
+            issues,
+        )
+    if score <= LEVEL_STALE_MAX:
+        return (
+            "STALE",
+            "Proceed with caution - significant changes may affect context",
+            issues,
+        )
+    return (
+        "VERY_STALE",
+        "Consider creating new handoff - too many changes since original",
+        issues,
+    )
 
 
 def check_staleness(handoff_path: str) -> dict:
@@ -238,12 +238,24 @@ def check_staleness(handoff_path: str) -> dict:
     # Determine project path
     project_path = metadata.get("project_path")
     if not project_path or not Path(project_path).exists():
-        # Fallback: assume handoff is in .claude/handoffs/ within project
-        project_path = str(path.parent.parent.parent)
+        original = project_path
+        project_path = str(infer_project_root(path))
+        if original:
+            print(
+                f"warning: handoff Project path '{original}' does not exist; "
+                f"falling back to {project_path}",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"warning: handoff has no Project metadata; "
+                f"assuming project root at {project_path}",
+                file=sys.stderr,
+            )
 
     # Check if git repo
-    success, _ = run_cmd(["git", "rev-parse", "--git-dir"], cwd=project_path)
-    is_git_repo = success
+    rc, _, _ = run_cmd(["git", "rev-parse", "--git-dir"], cwd=project_path)
+    is_git_repo = rc == 0
 
     result = {
         "handoff_file": str(path),
@@ -368,23 +380,28 @@ def print_report(result: dict):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python check_staleness.py <handoff-file>")
-        print("Example: python check_staleness.py .claude/handoffs/2024-01-15-auth.md")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Check whether a handoff document is still current.",
+    )
+    parser.add_argument(
+        "handoff_file",
+        help="Path to the handoff markdown file to check.",
+    )
+    args = parser.parse_args()
 
-    handoff_path = sys.argv[1]
-    result = check_staleness(handoff_path)
+    result = check_staleness(args.handoff_file)
     print_report(result)
 
-    # Exit code based on staleness
+    # Exit code reflects the staleness gradient and separates the
+    # "tooling couldn't inspect" case from "context is genuinely stale":
+    #   0 = FRESH / SLIGHTLY_STALE        safe to resume
+    #   1 = STALE                         user should review before resuming
+    #   2 = VERY_STALE                    handoff likely needs to be redone
+    #   3 = UNKNOWN                       inspection failed (e.g. not a git repo)
     level = result.get("staleness_level", "UNKNOWN")
-    if level in ["FRESH", "SLIGHTLY_STALE"]:
-        sys.exit(0)
-    elif level == "STALE":
-        sys.exit(1)
-    else:
-        sys.exit(2)
+    sys.exit(
+        {"FRESH": 0, "SLIGHTLY_STALE": 0, "STALE": 1, "VERY_STALE": 2}.get(level, 3)
+    )
 
 
 if __name__ == "__main__":

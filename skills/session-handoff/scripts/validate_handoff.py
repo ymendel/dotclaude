@@ -14,6 +14,8 @@ Usage:
     python validate_handoff.py .claude/handoffs/2024-01-15-143022-auth.md
 """
 
+from __future__ import annotations
+
 import sys
 
 if sys.version_info < (3, 9):
@@ -21,9 +23,11 @@ if sys.version_info < (3, 9):
         f"requires Python 3.9+ (running {sys.version_info.major}.{sys.version_info.minor})"
     )
 
-import os
+import argparse
 import re
 from pathlib import Path
+
+from _common import TEXT_IO_KWARGS, infer_project_root
 
 # Secret detection patterns
 SECRET_PATTERNS = [
@@ -36,10 +40,13 @@ SECRET_PATTERNS = [
     (r'mongodb(\+srv)?://[^/\s]+:[^@\s]+@', "MongoDB connection string with password"),
     (r'postgres://[^/\s]+:[^@\s]+@', "PostgreSQL connection string with password"),
     (r'mysql://[^/\s]+:[^@\s]+@', "MySQL connection string with password"),
-    (r'Bearer\s+[a-zA-Z0-9_\-\.]+', "Bearer token"),
+    # Length floors below avoid prose false positives like
+    # "the Bearer token" or short Slack tag mentions. Real bearer/Slack
+    # tokens are well above these minimums in practice.
+    (r'Bearer\s+[a-zA-Z0-9_\-\.]{20,}', "Bearer token"),
     (r'ghp_[a-zA-Z0-9]{36}', "GitHub personal access token"),
     (r'sk-[a-zA-Z0-9]{48}', "OpenAI API key"),
-    (r'xox[baprs]-[a-zA-Z0-9-]+', "Slack token"),
+    (r'xox[baprs]-[a-zA-Z0-9-]{10,}', "Slack token"),
 ]
 
 # Required sections for a complete handoff
@@ -208,8 +215,8 @@ def validate_handoff(filepath: str) -> dict:
     if not path.exists():
         return {"error": f"File not found: {filepath}"}
 
-    content = path.read_text()
-    base_path = path.parent.parent.parent  # Go up from .claude/handoffs/
+    content = path.read_text(**TEXT_IO_KWARGS)
+    base_path = infer_project_root(path)
 
     # Run checks
     todos_clear, remaining_todos = check_todos(content)
@@ -306,15 +313,17 @@ def print_report(result: dict):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python validate_handoff.py <handoff-file>")
-        print("Example: python validate_handoff.py .claude/handoffs/2024-01-15-auth.md")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Validate a handoff document for completeness and secrets."
+    )
+    parser.add_argument(
+        "handoff_file",
+        help="Path to the handoff markdown file to validate.",
+    )
+    args = parser.parse_args()
 
-    filepath = sys.argv[1]
-    result = validate_handoff(filepath)
+    result = validate_handoff(args.handoff_file)
     success = print_report(result)
-
     sys.exit(0 if success else 1)
 
 
