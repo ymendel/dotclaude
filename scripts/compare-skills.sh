@@ -54,9 +54,7 @@ while [[ $# -gt 0 ]]; do
     *)            positional+=("$1"); shift ;;
   esac
 done
-set -- "${positional[@]:-}"
-# Drop the placeholder empty arg that bash produces when positional is empty.
-[[ $# -eq 1 && -z "${1:-}" ]] && shift
+set -- "${positional[@]+"${positional[@]}"}"
 
 MINE="${MINE:-$HOME/dev/projects/mine/dotclaude/skills}"
 THEIRS="${THEIRS:-$HOME/dev/team-skills/skills}"
@@ -90,17 +88,45 @@ last_commit_subject() {
 mine_root() { dirname "$MINE"; }
 theirs_root() { dirname "$THEIRS"; }
 
+# Emit each line of a multi-line string; emit nothing if the string is empty.
+# Plain `printf '%s\n' "$var"` produces a single empty line for an empty
+# string, which becomes a phantom entry in `comm` and here-string loops.
+emit_lines() {
+  [[ -n "$1" ]] && printf '%s\n' "$1"
+}
+
 # File names within a skill directory to ignore for comparison purposes.
 # These are typically present on one side but not maintained on the other,
 # so treating them as drift adds noise. Anything that should be ignored more
 # broadly belongs in .gitignore on the relevant side — gitignore is respected
 # automatically via `git ls-files` below.
+#
+# Entries are matched via bash `[[ == ]]`, so glob patterns work (e.g. "*.bak").
 EXCLUDE_NAMES=("README.md")
 
 # Enumerate non-gitignored files under $2 (a repo-relative path) within the
 # repo rooted at $1. Returns one path per line, repo-relative.
 non_ignored_files() {
   ( cd "$1" && git ls-files -co --exclude-standard -- "$2" 2>/dev/null )
+}
+
+# Top-level skill directory names under $1 (a skills/ directory), respecting
+# the gitignore of the repo that contains it. Returns one name per line,
+# sorted. Files directly under skills/ (e.g. a top-level README) are skipped;
+# only entries that look like a skill subdirectory are returned.
+top_level_skills() {
+  local skills_dir="$1"
+  local repo_root rel
+  repo_root=$(dirname "$skills_dir")
+  rel="skills"
+  ( cd "$repo_root" && git ls-files -co --exclude-standard -- "$rel" 2>/dev/null ) \
+    | sed "s|^${rel}/||" \
+    | awk -F/ 'NF >= 2 {print $1}' \
+    | sort -u \
+    | while IFS= read -r name; do
+        [[ -z "$name" ]] && continue
+        [[ -d "$skills_dir/$name" ]] && printf '%s\n' "$name"
+      done
 }
 
 # Return one path per line, relative to $base (a skill directory), for files
@@ -126,33 +152,30 @@ compare_one() {
   local skill="$1"
   local mine_dir="$MINE/$skill"
   local theirs_dir="$THEIRS/$skill"
-
-  local mine_rel="skills/$skill"
-  local theirs_rel="skills/$skill"
+  local rel="skills/$skill"
 
   local mine_date theirs_date mine_msg theirs_msg
-  mine_date=$(last_commit_iso "$(mine_root)" "$mine_rel")
-  theirs_date=$(last_commit_iso "$(theirs_root)" "$theirs_rel")
-  mine_msg=$(last_commit_subject "$(mine_root)" "$mine_rel")
-  theirs_msg=$(last_commit_subject "$(theirs_root)" "$theirs_rel")
+  mine_date=$(last_commit_iso "$(mine_root)" "$rel")
+  theirs_date=$(last_commit_iso "$(theirs_root)" "$rel")
+  mine_msg=$(last_commit_subject "$(mine_root)" "$rel")
+  theirs_msg=$(last_commit_subject "$(theirs_root)" "$rel")
 
   local mine_files theirs_files
-  mine_files=$(skill_files "$(mine_root)" "$mine_rel" "$mine_dir")
-  theirs_files=$(skill_files "$(theirs_root)" "$theirs_rel" "$theirs_dir")
+  mine_files=$(skill_files "$(mine_root)" "$rel" "$mine_dir")
+  theirs_files=$(skill_files "$(theirs_root)" "$rel" "$theirs_dir")
 
   local only_mine only_theirs in_both
-  only_mine=$(comm -23 <(printf '%s\n' "$mine_files") <(printf '%s\n' "$theirs_files"))
-  only_theirs=$(comm -13 <(printf '%s\n' "$mine_files") <(printf '%s\n' "$theirs_files"))
-  in_both=$(comm -12 <(printf '%s\n' "$mine_files") <(printf '%s\n' "$theirs_files"))
+  only_mine=$(comm -23 <(emit_lines "$mine_files") <(emit_lines "$theirs_files"))
+  only_theirs=$(comm -13 <(emit_lines "$mine_files") <(emit_lines "$theirs_files"))
+  in_both=$(comm -12 <(emit_lines "$mine_files") <(emit_lines "$theirs_files"))
 
   # Of the files present on both sides, find the ones that actually differ.
   local diff_files=""
   while IFS= read -r f; do
-    [[ -z "$f" ]] && continue
     if ! cmp -s "$mine_dir/$f" "$theirs_dir/$f"; then
       diff_files+="$f"$'\n'
     fi
-  done <<< "$in_both"
+  done < <(emit_lines "$in_both")
   diff_files="${diff_files%$'\n'}"
 
   if [[ -z "$only_mine" && -z "$only_theirs" && -z "$diff_files" ]]; then
@@ -188,29 +211,22 @@ compare_one() {
   printf "  %bmine%b    %s  %s\n" "$DIM" "$RESET" "${mine_date:-—}" "${mine_msg:-—}"
   printf "  %btheirs%b  %s  %s\n" "$DIM" "$RESET" "${theirs_date:-—}" "${theirs_msg:-—}"
 
-  if [[ -n "$only_mine" ]]; then
-    while IFS= read -r f; do
-      [[ -n "$f" ]] && printf "    only in mine:    %s\n" "$f"
-    done <<< "$only_mine"
-  fi
-  if [[ -n "$only_theirs" ]]; then
-    while IFS= read -r f; do
-      [[ -n "$f" ]] && printf "    only in theirs:  %s\n" "$f"
-    done <<< "$only_theirs"
-  fi
-  if [[ -n "$diff_files" ]]; then
-    while IFS= read -r f; do
-      [[ -n "$f" ]] && printf "    differs:         %s\n" "$f"
-    done <<< "$diff_files"
-  fi
+  while IFS= read -r f; do
+    printf "    only in mine:    %s\n" "$f"
+  done < <(emit_lines "$only_mine")
+  while IFS= read -r f; do
+    printf "    only in theirs:  %s\n" "$f"
+  done < <(emit_lines "$only_theirs")
+  while IFS= read -r f; do
+    printf "    differs:         %s\n" "$f"
+  done < <(emit_lines "$diff_files")
 
   if [[ $verbose -eq 1 && -n "$diff_files" ]]; then
     echo
     while IFS= read -r f; do
-      [[ -z "$f" ]] && continue
       echo "    --- $f ---"
       diff -u "$mine_dir/$f" "$theirs_dir/$f" | sed 's/^/    /'
-    done <<< "$diff_files"
+    done < <(emit_lines "$diff_files")
     echo
   fi
   return 1
@@ -222,10 +238,11 @@ if [[ $# -gt 0 ]]; then
   skills_to_check=("$@")
 else
   scan_all=1
-  # Intersection of skill directories.
+  # Intersection of skill directories (gitignore-aware on the theirs side;
+  # mine-side existence check handles the other half of the intersection).
   while IFS= read -r name; do
     [[ -d "$MINE/$name" ]] && skills_to_check+=("$name")
-  done < <(cd "$THEIRS" && ls -1)
+  done < <(top_level_skills "$THEIRS")
 fi
 
 drift=0
@@ -243,10 +260,10 @@ done
 if [[ $scan_all -eq 1 ]]; then
   echo
   echo "${BOLD}Only in mine:${RESET}"
-  comm -23 <(cd "$MINE" && ls -1 | sort) <(cd "$THEIRS" && ls -1 | sort) \
+  comm -23 <(top_level_skills "$MINE") <(top_level_skills "$THEIRS") \
     | sed 's/^/  /' || true
   echo "${BOLD}Only in theirs:${RESET}"
-  comm -13 <(cd "$MINE" && ls -1 | sort) <(cd "$THEIRS" && ls -1 | sort) \
+  comm -13 <(top_level_skills "$MINE") <(top_level_skills "$THEIRS") \
     | sed 's/^/  /' || true
 fi
 
