@@ -147,10 +147,13 @@ the destination. Plugins and marketplaces are not used.
   publish authority; this approach concentrates it. Finally, the approach
   does not address skills that depend on resources outside their own
   directory (hook configuration, rule files, settings) — those have to be
-  shared by hand, and `sync-skill.sh` will not flag the dependency.
-  Re-evaluate if the team repo gains active contributors beyond the author,
-  or if the iteration cadence on the personal side slows enough that the
-  plugin publish-install loop becomes tolerable.
+  shared by hand. `sync-skill.sh` prints a heuristic warning when it detects
+  likely external dependencies (either the skill referencing outside paths,
+  or top-level `rules/`/`hooks/`/`agents/`/`settings.json` referencing the
+  skill by name), but the heuristic is best-effort and will miss implicit
+  dependencies. Re-evaluate if the team repo gains active contributors
+  beyond the author, or if the iteration cadence on the personal side slows
+  enough that the plugin publish-install loop becomes tolerable.
 
 ## References
 
