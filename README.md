@@ -13,6 +13,8 @@ This is personal config, and it's going to reflect my preferences, workflows, an
 - **[skills/](skills/README.md)** — invokable skills that extend Claude's capabilities for specific tasks
 - **[agents/](agents/README.md)** — custom subagent configurations
 - **settings.json** — Claude Code settings
+- **[scripts/](scripts/README.md)** — tooling for maintaining skills across this repo and a separate team skills repo
+- **[docs/adr/](docs/adr/)** — architecture decision records
 
 ## Prerequisites
 
