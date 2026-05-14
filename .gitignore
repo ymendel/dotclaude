@@ -31,6 +31,14 @@
 # and of course, CLAUDE.md
 !CLAUDE.md
 
+# and scripts
+!/scripts
+!/scripts/**/*
+
+# and docs (ADRs, etc.)
+!/docs
+!/docs/**/*
+
 # and supporting files
 !README.md
 !Makefile
