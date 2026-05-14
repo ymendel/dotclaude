@@ -33,7 +33,8 @@ Environment:
 Exit status:
   0  All compared skills are identical.
   1  At least one skill differs.
-  2  A configured path is missing or arguments are invalid.
+  2  A configured path is missing, arguments are invalid, or a named skill
+     wasn't found in both repos.
 
 Examples:
   compare-skills.sh
@@ -228,9 +229,11 @@ else
 fi
 
 drift=0
+missing=0
 for skill in "${skills_to_check[@]}"; do
   if [[ ! -d "$MINE/$skill" || ! -d "$THEIRS/$skill" ]]; then
     printf "%b%-30s%b  %bnot in both%b\n" "$BOLD" "$skill" "$RESET" "$DIM" "$RESET"
+    missing=1
     continue
   fi
   compare_one "$skill" || drift=1
@@ -247,4 +250,7 @@ if [[ $scan_all -eq 1 ]]; then
     | sed 's/^/  /' || true
 fi
 
+if [[ $missing -eq 1 ]]; then
+  exit 2
+fi
 exit $drift
