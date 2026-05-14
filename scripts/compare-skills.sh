@@ -13,6 +13,9 @@ Compare skills present in both ~/.claude (dotclaude) and the team skills repo.
 For each skill, report whether the contents differ and which side has the
 newer commit, so you can decide which direction to propagate updates.
 
+Comparison respects each side's .gitignore (via `git ls-files`), so build
+artifacts and other untracked-but-ignored files don't surface as drift.
+
 Arguments:
   skill-name ...   Compare only the named skill(s). With no names, scan every
                    skill present on both sides.
@@ -86,9 +89,37 @@ last_commit_subject() {
 mine_root() { dirname "$MINE"; }
 theirs_root() { dirname "$THEIRS"; }
 
-# Files present in the team skills repo but not maintained on my side — ignore
-# so they don't show up as drift.
-DIFF_EXCLUDES=(--exclude=README.md)
+# File names within a skill directory to ignore for comparison purposes.
+# These are typically present on one side but not maintained on the other,
+# so treating them as drift adds noise. Anything that should be ignored more
+# broadly belongs in .gitignore on the relevant side — gitignore is respected
+# automatically via `git ls-files` below.
+EXCLUDE_NAMES=("README.md")
+
+# Enumerate non-gitignored files under $2 (a repo-relative path) within the
+# repo rooted at $1. Returns one path per line, repo-relative.
+non_ignored_files() {
+  ( cd "$1" && git ls-files -co --exclude-standard -- "$2" 2>/dev/null )
+}
+
+# Return one path per line, relative to $base (a skill directory), for files
+# that exist on disk, aren't gitignored, and don't match any EXCLUDE_NAMES
+# entry. Output is sorted.
+skill_files() {
+  local root="$1" rel="$2" base="$3"
+  non_ignored_files "$root" "$rel" \
+    | sed "s|^${rel}/||" \
+    | while IFS= read -r f; do
+        [[ -z "$f" ]] && continue
+        local skip=0
+        for pat in "${EXCLUDE_NAMES[@]}"; do
+          [[ "$f" == "$pat" ]] && { skip=1; break; }
+        done
+        [[ $skip -eq 1 ]] && continue
+        [[ -f "$base/$f" ]] && printf '%s\n' "$f"
+      done \
+    | sort
+}
 
 compare_one() {
   local skill="$1"
@@ -104,11 +135,26 @@ compare_one() {
   mine_msg=$(last_commit_subject "$(mine_root)" "$mine_rel")
   theirs_msg=$(last_commit_subject "$(theirs_root)" "$theirs_rel")
 
-  # Quiet recursive diff; capture file-level differences.
-  local diff_out
-  diff_out=$(diff -rq "${DIFF_EXCLUDES[@]}" "$mine_dir" "$theirs_dir" 2>&1 || true)
+  local mine_files theirs_files
+  mine_files=$(skill_files "$(mine_root)" "$mine_rel" "$mine_dir")
+  theirs_files=$(skill_files "$(theirs_root)" "$theirs_rel" "$theirs_dir")
 
-  if [[ -z "$diff_out" ]]; then
+  local only_mine only_theirs in_both
+  only_mine=$(comm -23 <(printf '%s\n' "$mine_files") <(printf '%s\n' "$theirs_files"))
+  only_theirs=$(comm -13 <(printf '%s\n' "$mine_files") <(printf '%s\n' "$theirs_files"))
+  in_both=$(comm -12 <(printf '%s\n' "$mine_files") <(printf '%s\n' "$theirs_files"))
+
+  # Of the files present on both sides, find the ones that actually differ.
+  local diff_files=""
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    if ! cmp -s "$mine_dir/$f" "$theirs_dir/$f"; then
+      diff_files+="$f"$'\n'
+    fi
+  done <<< "$in_both"
+  diff_files="${diff_files%$'\n'}"
+
+  if [[ -z "$only_mine" && -z "$only_theirs" && -z "$diff_files" ]]; then
     printf "%b%-30s%b  %bidentical%b\n" "$BOLD" "$skill" "$RESET" "$GREEN" "$RESET"
     return 0
   fi
@@ -140,15 +186,31 @@ compare_one() {
   printf "%b%-30s%b  %bdiffers%b  %s\n" "$BOLD" "$skill" "$RESET" "$RED" "$RESET" "$arrow"
   printf "  %bmine%b    %s  %s\n" "$DIM" "$RESET" "${mine_date:-—}" "${mine_msg:-—}"
   printf "  %btheirs%b  %s  %s\n" "$DIM" "$RESET" "${theirs_date:-—}" "${theirs_msg:-—}"
-  if [[ $verbose -eq 1 ]]; then
-    # Unified diff already includes "Only in" lines, so don't print the -rq
-    # summary above it.
+
+  if [[ -n "$only_mine" ]]; then
+    while IFS= read -r f; do
+      [[ -n "$f" ]] && printf "    only in mine:    %s\n" "$f"
+    done <<< "$only_mine"
+  fi
+  if [[ -n "$only_theirs" ]]; then
+    while IFS= read -r f; do
+      [[ -n "$f" ]] && printf "    only in theirs:  %s\n" "$f"
+    done <<< "$only_theirs"
+  fi
+  if [[ -n "$diff_files" ]]; then
+    while IFS= read -r f; do
+      [[ -n "$f" ]] && printf "    differs:         %s\n" "$f"
+    done <<< "$diff_files"
+  fi
+
+  if [[ $verbose -eq 1 && -n "$diff_files" ]]; then
     echo
-    diff -ru "${DIFF_EXCLUDES[@]}" "$mine_dir" "$theirs_dir" | sed 's/^/    /'
+    while IFS= read -r f; do
+      [[ -z "$f" ]] && continue
+      echo "    --- $f ---"
+      diff -u "$mine_dir/$f" "$theirs_dir/$f" | sed 's/^/    /'
+    done <<< "$diff_files"
     echo
-  else
-    # Indent the file-level diff list.
-    printf "%s\n" "$diff_out" | sed 's/^/    /'
   fi
   return 1
 }
