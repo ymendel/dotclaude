@@ -6,6 +6,9 @@
 #
 # See ADR 0001 (docs/adr/0001-skill-maintenance-via-parallel-repos.md) for
 # the why.
+#
+# Requires bash 4+ (empty-array expansion under `set -u` aborts on bash 3.2,
+# which is stock macOS — install a current bash via Homebrew if needed).
 
 set -euo pipefail
 
@@ -237,22 +240,26 @@ while IFS= read -r f; do
   fi
 done < <(emit_lines "$src_files")
 
+# Escape ERE metacharacters in the skill name so unusual names (`.`, `+`,
+# `*`, etc.) are treated literally inside the `\b...\b` pattern.
+skill_re=$(printf '%s' "$skill" | sed 's/[][\\.^$*+?(){}|]/\\&/g')
+
 inward_matches=""
 inward_targets=("rules" "hooks" "agents" "settings.json")
 for target in "${inward_targets[@]}"; do
   path="$src_root/$target"
   [[ ! -e "$path" ]] && continue
   if [[ -d "$path" ]]; then
-    hits=$(grep -rlnE "\\b${skill}\\b" "$path" 2>/dev/null || true)
+    hits=$(grep -rlnE "\\b${skill_re}\\b" "$path" 2>/dev/null || true)
   else
-    grep -qnE "\\b${skill}\\b" "$path" 2>/dev/null && hits="$path" || hits=""
+    grep -qnE "\\b${skill_re}\\b" "$path" 2>/dev/null && hits="$path" || hits=""
   fi
   while IFS= read -r hit; do
     [[ -z "$hit" ]] && continue
-    count=$(grep -cE "\\b${skill}\\b" "$hit" 2>/dev/null || echo 0)
-    rel_hit="${hit#$src_root/}"
+    count=$(grep -cE "\\b${skill_re}\\b" "$hit" 2>/dev/null || echo 0)
+    rel_hit="${hit#"$src_root/"}"
     inward_matches+="  $rel_hit ($count match$([[ $count -eq 1 ]] || echo es))"$'\n'
-  done < <(printf '%s\n' "$hits")
+  done < <(emit_lines "$hits")
 done
 
 if [[ -n "$outward_matches" || -n "$inward_matches" ]]; then
@@ -295,7 +302,11 @@ apply_copy() {
   local f="$1"
   local target="$dst/$f"
   mkdir -p "$(dirname "$target")"
-  cp "$src/$f" "$target"
+  # -p preserves mode/timestamps so executable scripts stay executable and
+  # diffs after sync reflect content only. Symlinks within a skill aren't
+  # currently a thing; macOS cp without -R follows them, which would silently
+  # turn a symlink into a regular file — flag the day a skill needs one.
+  cp -p "$src/$f" "$target"
 }
 
 apply_delete() {
