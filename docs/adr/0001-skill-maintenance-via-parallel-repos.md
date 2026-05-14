@@ -1,7 +1,7 @@
 # ADR 0001: Skill Maintenance via Parallel Git Repos
 
 **Date:** 2026-05-13
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
