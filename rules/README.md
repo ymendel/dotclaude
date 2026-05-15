@@ -29,3 +29,5 @@ Rule files govern how Claude should behave across all projects, not just in spec
 **`RTK.md`** — Usage guide for RTK (Rust Token Killer), a token-optimized CLI proxy. Covers the hook scope limitation (Bash only, not built-in tools), the override for file/search operations, and command reference by workflow.
 
 **`settings.md`** — Gotchas for `settings.json`: tilde vs. `$HOME` in path fields, `*` vs. `**` in permission globs, and backslash-escaped whitespace triggering permission dialogs.
+
+**`writing.md`** — User-specific writing preferences that supplement the `writing-clearly-and-concisely` skill: avoid violent metaphors and military or war-origin idioms (including "in anger"); emulate the user's voice when appropriate (register, archaic Latin abbreviations like `&c.`, `viz.`, `cf.`), without mirroring his lowercase prompting shorthand in formal output.
