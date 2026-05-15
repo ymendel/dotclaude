@@ -16,6 +16,8 @@ Hook `command` strings are executed by bash, so `$HOME` works fine there.
 
 `*` in permission patterns (e.g. `Edit(~/.claude/*)`) does **not** match subdirectories. Use `**` to match recursively: `Edit(~/.claude/**)`. Failing to do so leaves subdirectory edits unmatched, causing unexpected permission prompts.
 
+`~/` in a permission pattern is **not** expanded against the absolute path the tool receives. Edit/Write/Read tools require absolute paths (`/Users/<you>/.claude/...`), so `Edit(~/.claude/**)` silently fails to match — every edit prompts even though the rule looks correct. Use the portable glob form instead: `Edit(**/.claude/**)`. This matches regardless of whether the path is written as `~/...`, `$HOME/...`, or fully absolute, and is the same form already used for handoff patterns above it.
+
 ## Project vs. Global Settings — Match Scope to Use
 
 When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:
