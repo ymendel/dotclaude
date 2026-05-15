@@ -30,6 +30,8 @@
 - To split a file's changes across commits, ask the user to run `git add -p` interactively. Once the partial stage is done, use plain `git add <file>` for any remaining hunks — no further interactivity needed.
 - Use the `gh` command-line tool when interacting with GitHub
 - When moving a file, always use `git mv` — never `cp` followed by a separate delete. `git mv` preserves history and stages the rename atomically.
+- Branch names should be descriptive of the work, not a numeric identifier. Avoid leading IDs like `ym/adr-0003-...` or `ym/jira-1234-...`. If a ticket/ADR/issue reference is worth including, put it at the *end* of the branch name, not the start (e.g. `ym/opt-in-publishing-adr-0003`, not `ym/adr-0003-opt-in-publishing`). Without this rule, branch lists read as a wall of opaque identifiers instead of as a description of what each branch does.
+- Before describing a commit as an extraction, move, rename, revert, or refactor *of existing committed work*, verify with `git log` or `git show` that the prior state actually exists in history. Unstaged or in-session changes are not history — claiming to extract from them produces commit messages that describe a refactor that never happened. Failure mode: a future reader reads the commit message, looks for the prior state in `git log`, and finds nothing.
 
 ## User's Independent Habits
 
