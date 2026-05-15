@@ -74,4 +74,4 @@ Specific case: "review the current diff" or "review this" without a PR number me
   - The user pauses, switches topic, or signals winding down
   - The conversation has been long enough that compaction is plausible (extended back-and-forth, large tool outputs)
   - A new phase of work is starting that depends on context from the previous phase
-- A `SessionStart` hook surfaces the most recent handoff (within 7 days) at session start. When that reminder fires, weigh whether the user's prompt is continuing prior work — if so, invoke `/session-handoff` to resume rather than starting cold.
+- A `SessionStart` hook surfaces the most recent handoff (within 7 days) at session start. When that reminder fires, surface it to the user on the first turn and ask whether to resume — do not silently judge from the prompt alone. The filename slug is rarely enough signal to decide on its own, and a missed continuation means working without the prior context. Phrase the question briefly (e.g., "There's a recent handoff: `<slug>`. Resume?") and let the user decide.

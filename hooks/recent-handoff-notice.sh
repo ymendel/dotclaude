@@ -19,7 +19,7 @@ RECENT=$(find "$HANDOFF_DIR" -maxdepth 1 -name "*.md" -mtime -7 -type f 2>/dev/n
   | head -1)
 
 if [ -n "$RECENT" ]; then
-  echo "session-handoff: Recent handoff exists at $RECENT (within last 7 days). Invoke /session-handoff to resume if continuing prior work."
+  echo "session-handoff: Recent handoff exists at $RECENT (within last 7 days). On the first turn, ask the user whether to resume from it before proceeding — do not judge from the prompt alone."
 fi
 
 exit 0
