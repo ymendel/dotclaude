@@ -34,6 +34,7 @@
       "Edit(**/.claude/handoffs/*.md)",
       "Skill(*)",
       "Edit(**/.claude/**)",
+      "Edit(**/dotclaude/**)",
       "Read(~/Library/Application Support/rtk/tee/*)",
       "WebFetch(domain:api.rubyonrails.org)",
       "WebFetch(domain:code.claude.com)",
