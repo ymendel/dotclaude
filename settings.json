@@ -146,5 +146,10 @@
   "claudeMdExcludes": [
     "**/rules/README.md",
     "**/rules/rtk-commands.md"
-  ]
+  ],
+  "skillOverrides": {
+    "init": "user-invocable-only",
+    "review": "user-invocable-only",
+    "security-review": "user-invocable-only"
+  }
 }
