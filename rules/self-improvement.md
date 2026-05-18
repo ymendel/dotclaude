@@ -14,3 +14,8 @@ Concrete triggers — act on these without waiting to be asked:
 - A conflict or inconsistency between two rules or instructions was noticed
 
 See `rules/rule-maintenance.md` for where and how to make corrections.
+
+## Failure mode this prevents
+
+Without this rule, corrections, workarounds, and diagnoses live only in the conversation that surfaced them. The model improves in-session and reverts in the next session. The same correction is needed twice, the same workaround is fallen back to without a rule update, the same failed command is retried without access to last time's diagnosis. Durable improvement requires that the trigger fires *during* the work that exposes the gap — not at end-of-session, not when the user prompts, not when memory happens to surface it — because the context that makes the fix obvious is freshest right then.
+
