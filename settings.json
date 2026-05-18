@@ -151,5 +151,6 @@
     "init": "user-invocable-only",
     "review": "user-invocable-only",
     "security-review": "user-invocable-only"
-  }
+  },
+  "skillListingBudgetFraction": 0.015
 }
