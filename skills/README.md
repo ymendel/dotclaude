@@ -22,6 +22,8 @@ Invoke manually with `/skill-name [args]`.
 
 **`crafting-effective-readmes`** — README guidance and templates matched to project type (OSS, personal, internal, XDG config). Not all READMEs are the same.
 
+**`project-notes`** — Files long-running project notes that don't belong in code, commit messages, memory, or session handoffs: cleanup debt, drafted upstream feedback, lessons for a derived template. Per-destination templates and a deterministic search for declared destinations. Pairs with `rules/project-notes.md`, which covers the recognition habit.
+
 ## Architecture & design
 
 **`adr`** — Writes Architecture Decision Records, advises on ADR-worthiness, or updates the status of an existing ADR (accept, supersede, deprecate). Auto-invokes `adr-refine` after drafting.

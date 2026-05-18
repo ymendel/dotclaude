@@ -20,6 +20,8 @@ Rule files govern how Claude should behave across all projects, not just in spec
 
 **`self-improvement.md`** — Triggers for when to self-improve: user corrections, workarounds, failed commands, violated rules, and inconsistencies. Points to `rule-maintenance.md` for how to act on them.
 
+**`project-notes.md`** — Recognition triggers for long-running project notes that don't belong in code, commit messages, memory, or session handoffs: cleanup-debt, drafted upstream feedback, lessons for a derived-template. Covers the *when* to file; the `project-notes` skill covers structure and the *how*. Destinations are project-specific config.
+
 **`rule-maintenance.md`** — Procedures for making corrections: where to edit skills and rules, YAML quoting requirements, feedback routing, permissions allow list, keeping `rules/README.md` up to date, and criteria for reviewing skills and rules.
 
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
