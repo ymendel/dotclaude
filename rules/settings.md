@@ -18,6 +18,12 @@ Hook `command` strings are executed by bash, so `$HOME` works fine there.
 
 `~/` in a permission pattern is **not** expanded against the absolute path the tool receives. Edit/Write/Read tools require absolute paths (`/Users/<you>/.claude/...`), so `Edit(~/.claude/**)` silently fails to match — every edit prompts even though the rule looks correct. Use the portable glob form instead: `Edit(**/.claude/**)`. This matches regardless of whether the path is written as `~/...`, `$HOME/...`, or fully absolute, and is the same form already used for handoff patterns above it.
 
+The `**/` form is not always sufficient on its own. Empirically, edits to `<project>/.claude/...` in a project *other than* the dotclaude repo still prompt despite a global `Edit(**/.claude/**)` rule being loaded — the per-session "Yes, don't ask again" accept writes `Edit(/.claude/**)` (single-slash, project-root-anchored), and that form is what actually silences the prompt going forward. The single-slash form follows the docs' "path relative to project root" semantics and is the shape Claude Code itself writes on accept, so treat it as the empirically-known-working anchor.
+
+Pair both forms in global settings for any path under `.claude/`: `Edit(**/.claude/**)` covers edits made from a deeper cwd, and `Edit(/.claude/**)` covers the project-root case that the `**/` form under-matches in practice. Same pairing applies to specific subpaths like handoffs.
+
+Symlinks are resolved to their canonical target *before* glob matching, so a rule that names the symlink path won't fire for edits that go through it. The `~/.claude` → `dotclaude/` symlink on this machine is the prime example: an edit to `~/.claude/some-file.md` is matched as `/Users/<you>/dev/projects/mine/dotclaude/some-file.md`, so `Edit(**/.claude/**)` alone doesn't cover it — the canonical-name form `Edit(**/dotclaude/**)` does, and is currently in `settings.json` for exactly this reason. The rule generalises: any time the path the tool sees is reachable via two names (a symlink and its target), at least one matching glob must be written against the canonical name.
+
 ## Project vs. Global Settings — Match Scope to Use
 
 When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:
