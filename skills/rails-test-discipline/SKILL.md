@@ -3,6 +3,8 @@ name: rails-test-discipline
 description: "Test selection, TDD discipline, and review posture for Rails (RSpec or Minitest). Trigger on write tests/specs, review this test/code, or when implementing an ADR."
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash(bundle exec *), Bash(bin/rails *)
 paths: spec/**, test/**
+metadata:
+  publish: marketplace
 ---
 
 # Rails Test Discipline

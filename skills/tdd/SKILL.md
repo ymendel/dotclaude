@@ -3,6 +3,8 @@ name: tdd
 description: "TDD via red-green-refactor. Use when implementing features test-first, or asking about mocking strategy, test doubles, stubbing external services, or testable interface design."
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash(bundle exec *), Bash(bin/rails *), Bash(npm test*), Bash(npx *), Bash(pytest *)
 paths: spec/**, test/**, tests/**, __tests__/**
+metadata:
+  publish: marketplace
 ---
 
 # Test-Driven Development
