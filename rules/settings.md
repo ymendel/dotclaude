@@ -43,9 +43,11 @@ For a path reached via a symlink, every allow rule is checked against both the s
 
 The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/foo/SKILL.md` resolves to two paths whose only common segments are below the `skills/` (or `handoffs/`, &c.) directory — the symlink side anchors under `.claude/`, the target side under `dotclaude/`. Rules anchored on either of those top-level segments alone match only one path, so the allow rule fails and the prompt fires.
 
-For a single rule to cover both paths, the pattern needs a segment that appears in both — e.g. `Edit(**/skills/**)` for skill edits, `Edit(**/handoffs/*.md)` for handoffs. This is the docs' plain reading of "both must match" (same single rule).
+Confirmed empirically (2026-05-21): pairing `Edit(~/.claude/**)` with `Edit(**/dotclaude/**)` does *not* silence — two separate allow rules each matching one side don't compose. A *single* rule pattern must match both paths.
 
-> **Pending empirical test (2026-05-21):** add `Edit(~/.claude/**)` persistently to `settings.json` and restart. If prompts still fire on edits via `~/.claude/...`, the same-single-rule interpretation is confirmed and the symlinked case needs cross-path patterns. If prompts go silent, "both must match" means any allow rule matches each side independently — and `Edit(~/.claude/**)` + `Edit(**/dotclaude/**)` would be the working pair. Until tested, write rules under the same-rule assumption.
+For one rule to cover both paths, the pattern needs a segment that appears in both — e.g. `Edit(**/skills/**)` for skill edits, `Edit(**/handoffs/*.md)` for handoffs. The trade-off: these patterns also auto-match any `skills/` or `handoffs/` directory in any project, broader than the original intent. Default: accept the prompts as the cost.
+
+> **PreToolUse hook — future option.** When the prompt cost becomes load-bearing (the live case is session handoffs being interrupted mid-departure), a hook can intercept Edit/Write under specific paths, validate narrowly, and exit 0 to skip the prompt without broadening the global allow list. Sketch: check that the path is under `~/.claude/handoffs/` (or the canonical `dotclaude/.claude/handoffs/`), exit 0 to allow. Design properly when picked up.
 
 ## Project vs. Global Settings — Match Scope to Use
 
