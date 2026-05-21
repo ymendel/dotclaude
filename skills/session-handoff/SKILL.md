@@ -34,16 +34,28 @@ python scripts/create_handoff.py [task-slug]
 
 Example: `python scripts/create_handoff.py implementing-user-auth`
 
-**For continuation handoffs** (linking to previous work):
+**Specify the chain relationship to any prior handoff** (one of three flags):
+
 ```bash
+# Linear continuation — same thread of work as a prior handoff:
 python scripts/create_handoff.py "auth-part-2" --continues-from 2024-01-15-auth.md
+
+# Branch — diverged from a prior thread; both threads remain valid.
+# Use when a prior handoff was surfaced this session but NOT resumed
+# (declined to continue and did something else instead):
+python scripts/create_handoff.py "different-thing" --branches-from 2024-01-15-auth.md
+
+# Independent — no relationship to any prior handoff:
+python scripts/create_handoff.py "new-task" --no-chain
 ```
+
+If none of the three flags is passed and prior handoffs exist, the script auto-suggests the most recent as a continuation and prints a hint to rerun with the right flag. Prefer being explicit — the script can't tell whether you resumed or declined a surfaced handoff.
 
 The script will:
 - Create `.claude/handoffs/` directory if needed
 - Generate timestamped filename
 - Pre-fill: timestamp, project path, git branch, recent commits, modified files
-- Add handoff chain links if continuing from previous
+- Render the chain section based on the relationship flag
 - Output file path for editing
 
 ### Step 2: Complete the Handoff Document
@@ -149,22 +161,32 @@ As you work:
 
 ## Handoff Chaining
 
-For long-running projects, chain handoffs together to maintain context lineage:
+Three distinct relationships a new handoff can declare to prior ones:
+
+| Relationship    | When to use                                                                                                                | Renders as            |
+| :-------------- | :------------------------------------------------------------------------------------------------------------------------- | :-------------------- |
+| **Continues from** | Linear continuation — this session picked up where a prior handoff left off and the work stayed on that thread.            | `--continues-from`    |
+| **Branches from**  | A prior handoff was surfaced this session but not resumed (declined to continue), and the new handoff captures the divergent thread that happened instead. Both threads remain valid. | `--branches-from`     |
+| **Supersedes**     | This handoff replaces and invalidates one or more prior handoffs. Filled into the chain section as a list, not via a CLI flag. | (manual list)         |
+
+A typical lineage:
 
 ```
 handoff-1.md (initial work)
     ↓
-handoff-2.md --continues-from handoff-1.md
-    ↓
-handoff-3.md --continues-from handoff-2.md
+handoff-2.md --continues-from handoff-1.md   (same thread)
+    ↘
+     handoff-3.md --branches-from handoff-2.md   (diverged: surfaced but not resumed)
 ```
 
-Each handoff in the chain:
-- Links to its predecessor
-- Can mark older handoffs as superseded
-- Provides context breadcrumbs for new agents
+When resuming from a chain, read the most recent handoff first, then reference predecessors as needed. A **Branches from** link signals there's a parallel thread that may still need attention.
 
-When resuming from a chain, read the most recent handoff first, then reference predecessors as needed.
+### Deciding which flag to use
+
+If the SessionStart hook surfaced a recent handoff this session:
+- **Resumed it and continued the work?** → `--continues-from <that-handoff>`
+- **Declined to resume and did something different?** → `--branches-from <that-handoff>`
+- **No handoff was surfaced, or surfaced one is irrelevant?** → `--no-chain` (or `--continues-from` if you genuinely chose to continue an older one)
 
 ## Storage Location
 
@@ -182,7 +204,7 @@ The scripts below require a **Python 3.9+** interpreter. They exit with a clear 
 
 | Script | Purpose |
 |--------|---------|
-| `create_handoff.py [slug] [--continues-from <file>]` | Generate new handoff with smart scaffolding |
+| `create_handoff.py [slug] [--continues-from <file> \| --branches-from <file> \| --no-chain]` | Generate new handoff with smart scaffolding |
 | `list_handoffs.py [path]` | List available handoffs in a project |
 | `validate_handoff.py <file>` | Check completeness, quality, and security |
 | `check_staleness.py <file>` | Assess if handoff context is still current |
