@@ -14,15 +14,47 @@ Hook `command` strings are executed by bash, so `$HOME` works fine there.
 
 ## Permission Glob Patterns
 
-`*` in permission patterns (e.g. `Edit(~/.claude/*)`) does **not** match subdirectories. Use `**` to match recursively: `Edit(~/.claude/**)`. Failing to do so leaves subdirectory edits unmatched, causing unexpected permission prompts.
+Per the [official docs](https://code.claude.com/docs/en/permissions), `Read` and `Edit` permission rules follow gitignore semantics with four pattern anchors:
 
-`~/` in a permission pattern is **not** expanded against the absolute path the tool receives. Edit/Write/Read tools require absolute paths (`/Users/<you>/.claude/...`), so `Edit(~/.claude/**)` silently fails to match — every edit prompts even though the rule looks correct. Use the portable glob form instead: `Edit(**/.claude/**)`. This matches regardless of whether the path is written as `~/...`, `$HOME/...`, or fully absolute, and is the same form already used for handoff patterns above it.
+| Pattern            | Meaning                                | Example                          | Matches                        |
+| :----------------- | :------------------------------------- | :------------------------------- | :----------------------------- |
+| `//path`           | **Absolute** path from filesystem root | `Read(//Users/alice/secrets/**)` | `/Users/alice/secrets/**`      |
+| `~/path`           | Path from **home** directory           | `Read(~/Documents/*.pdf)`        | `/Users/alice/Documents/*.pdf` |
+| `/path`            | Path **relative to project root**      | `Edit(/src/**/*.ts)`             | `<project root>/src/**/*.ts`   |
+| `path` or `./path` | Path **relative to current directory** | `Read(*.env)`                    | `<cwd>/*.env`                  |
 
-The `**/` form is not always sufficient on its own. Empirically, edits to `<project>/.claude/...` in a project *other than* the dotclaude repo still prompt despite a global `Edit(**/.claude/**)` rule being loaded — the per-session "Yes, don't ask again" accept writes `Edit(/.claude/**)` (single-slash, project-root-anchored), and that form is what actually silences the prompt going forward. The single-slash form follows the docs' "path relative to project root" semantics and is the shape Claude Code itself writes on accept, so treat it as the empirically-known-working anchor.
+Two pattern-shape gotchas the docs flag explicitly:
 
-Pair both forms in global settings for any path under `.claude/`: `Edit(**/.claude/**)` covers edits made from a deeper cwd, and `Edit(/.claude/**)` covers the project-root case that the `**/` form under-matches in practice. Same pairing applies to specific subpaths like handoffs.
+- **`/Users/alice/file` is NOT absolute** — it's project-root-relative. Use `//Users/alice/file` for absolute paths.
+- **`*` matches a single directory; `**` matches recursively.** `Edit(~/.claude/*)` does not match subdirectory files; use `Edit(~/.claude/**)`. Failure mode: subdirectory edits prompt unexpectedly because the rule that looks correct doesn't actually match.
 
-Symlinks are resolved to their canonical target *before* glob matching, so a rule that names the symlink path won't fire for edits that go through it. The `~/.claude` → `dotclaude/` symlink on this machine is the prime example: an edit to `~/.claude/some-file.md` is matched as `/Users/<you>/dev/projects/mine/dotclaude/some-file.md`, so `Edit(**/.claude/**)` alone doesn't cover it — the canonical-name form `Edit(**/dotclaude/**)` does, and is currently in `settings.json` for exactly this reason. The rule generalises: any time the path the tool sees is reachable via two names (a symlink and its target), at least one matching glob must be written against the canonical name.
+### Symlinks: rules check both paths
+
+Per the docs, verbatim:
+
+> When Claude accesses a symlink, permission rules check two paths: the symlink itself and the file it resolves to. Allow and deny rules treat that pair differently: allow rules fall back to prompting you, while deny rules block outright.
+>
+> - **Allow rules**: apply only when both the symlink path and its target match. A symlink inside an allowed directory that points outside it still prompts you.
+> - **Deny rules**: apply when either the symlink path or its target matches. A symlink that points to a denied file is itself denied.
+
+For a path reached via a symlink, every allow rule is checked against both the symlink and the target — the rule applies only if both match. Failure mode: a rule that names only the symlink path (or only the canonical target) silently produces prompts for every edit, with no signal that the rule "didn't fire" because of the symlink.
+
+### Special case: `~/.claude → dotclaude/` on this machine
+
+The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/foo/SKILL.md` resolves to two paths:
+
+- Symlink path: `/Users/yossef/.claude/skills/foo/SKILL.md`
+- Target path: `/Users/yossef/dev/projects/mine/dotclaude/skills/foo/SKILL.md`
+
+The currently-loaded rules each match only one of these:
+
+- `Edit(**/.claude/**)` — symlink path only (the target has no `.claude` segment).
+- `Edit(**/dotclaude/**)` — target path only (the symlink has no `dotclaude` segment).
+- `Edit(/.claude/**)` — project-root-anchored in dotclaude expands to `dotclaude/.claude/**` and matches neither.
+
+For a single rule to cover both paths, the pattern needs a segment common to both — e.g. `Edit(**/skills/**)` for skill edits, `Edit(**/handoffs/*.md)` for handoffs. This is the docs' plain reading of "both must match" (same single rule).
+
+> **Pending empirical test (2026-05-21):** add `Edit(~/.claude/**)` persistently to `settings.json` and restart. If prompts still fire on edits via `~/.claude/...`, the same-single-rule interpretation is confirmed and the symlinked case needs cross-path patterns. If prompts go silent, "both must match" means any allow rule matches each side independently — and `Edit(~/.claude/**)` + `Edit(**/dotclaude/**)` would be the working pair. Until tested, write rules under the same-rule assumption.
 
 ## Project vs. Global Settings — Match Scope to Use
 
