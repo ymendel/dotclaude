@@ -41,18 +41,9 @@ For a path reached via a symlink, every allow rule is checked against both the s
 
 ### Special case: `~/.claude → dotclaude/` on this machine
 
-The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/foo/SKILL.md` resolves to two paths:
+The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/foo/SKILL.md` resolves to two paths whose only common segments are below the `skills/` (or `handoffs/`, &c.) directory — the symlink side anchors under `.claude/`, the target side under `dotclaude/`. Rules anchored on either of those top-level segments alone match only one path, so the allow rule fails and the prompt fires.
 
-- Symlink path: `/Users/yossef/.claude/skills/foo/SKILL.md`
-- Target path: `/Users/yossef/dev/projects/mine/dotclaude/skills/foo/SKILL.md`
-
-The currently-loaded rules each match only one of these:
-
-- `Edit(**/.claude/**)` — symlink path only (the target has no `.claude` segment).
-- `Edit(**/dotclaude/**)` — target path only (the symlink has no `dotclaude` segment).
-- `Edit(/.claude/**)` — project-root-anchored in dotclaude expands to `dotclaude/.claude/**` and matches neither.
-
-For a single rule to cover both paths, the pattern needs a segment common to both — e.g. `Edit(**/skills/**)` for skill edits, `Edit(**/handoffs/*.md)` for handoffs. This is the docs' plain reading of "both must match" (same single rule).
+For a single rule to cover both paths, the pattern needs a segment that appears in both — e.g. `Edit(**/skills/**)` for skill edits, `Edit(**/handoffs/*.md)` for handoffs. This is the docs' plain reading of "both must match" (same single rule).
 
 > **Pending empirical test (2026-05-21):** add `Edit(~/.claude/**)` persistently to `settings.json` and restart. If prompts still fire on edits via `~/.claude/...`, the same-single-rule interpretation is confirmed and the symlinked case needs cross-path patterns. If prompts go silent, "both must match" means any allow rule matches each side independently — and `Edit(~/.claude/**)` + `Edit(**/dotclaude/**)` would be the working pair. Until tested, write rules under the same-rule assumption.
 
