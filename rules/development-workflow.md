@@ -49,6 +49,7 @@ Specific case: "review the current diff" or "review this" without a PR number me
 - Always create PRs as 'drafts'.
 - Keep PR descriptions up to date with changes – e.g. TODO lists, deferred work, references to ADRs, &c.
 - Never push to GitHub on your own — not after commits, not as a prerequisite for creating a PR, not for any reason. If the branch needs to be pushed first (e.g., to open a PR), ask the user to push. The only exception: if the only unpushed changes involve CI/CD or GitHub Actions, flag it and let the user decide.
+- Never merge PRs on the user's behalf — even when the PR is approved, CI is green, and the user says "looks clean." Merging is the user's action, paired with pushes. Confirm readiness (state, checks, conflicts), surface anything off, and leave the merge button to the user. The same applies to closing PRs and deleting remote branches: confirm and surface, do not execute. Failure mode: autonomous merging denies the user the final-eyeball moment before main moves.
 
 ## Commenting
 
