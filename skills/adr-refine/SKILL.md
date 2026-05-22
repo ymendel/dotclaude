@@ -16,7 +16,8 @@ This skill is the refinement half of the ADR workflow. The `adr` skill writes th
 
 - **Automatically after `adr`.** The `adr` skill's final step invokes this one on the file it just wrote. No user action required.
 - **On explicit request.** "Review this ADR", "refine ADR NNNN", "is this ADR good enough to commit?", or any pointer to an existing ADR file paired with a request for critique.
-- **Not for Accepted ADRs.** If the status line says `Accepted`, don't refine — propose a superseding ADR instead. The historical record matters, and `Accepted` ADRs are immutable except for the status/reference updates documented in the `adr` skill.
+- **Not for Accepted ADRs' original sections.** If the status line says `Accepted`, don't refine the original sections — propose a superseding ADR instead. The historical record matters, and `Accepted` ADRs are immutable except for the status, reference, and Amendment updates documented in the `adr` skill.
+- **Amendment blocks on Accepted ADRs may be refined.** A newly appended `## Amendment — YYYY-MM-DD (ADR NNNN)` section is itself a written artifact. Scope the critique to the Amendment block only (clarity, accuracy of what shifted, completeness of the implementing-issue pointer); leave the original Accepted sections alone.
 - **Re-refining a Proposed ADR is fine.** If implementation surfaced gaps or contradictions that fed back into a Proposed ADR, running this skill again on the updated draft is expected, not redundant.
 
 ## What to do
