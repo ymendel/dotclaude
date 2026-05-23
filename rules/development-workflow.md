@@ -5,6 +5,14 @@
 - Unless working on a small, relatively obvious change, plan before doing. (exception: spikes)
 - Prefer ADRs to any sort of internal or proprietary "plan mode".
 
+## Active Attention to Constraints
+
+At the start of any long, multi-file, or multi-thread task, restate the constraints that apply to this work before acting — even though the rules are loaded passively in context. Examples: Edit tool not `sed`, `rtk proxy git diff` when diff output is suppressed, devenv-only commands for test/rubocop on projects that use it, no autonomous pushes or merges.
+
+This is not a request to re-derive the rules from scratch — it's a one-pass acknowledgment of which ones govern the work about to start. A short bulleted recap is enough; it goes in the first response of the task, not every response within it.
+
+Failure mode this prevents: with many rules loaded passively, applying them during fast-moving work requires deliberate attention. Without restating them at the start, the easy path is to default to the unconstrained action and rely on the user to catch the slip mid-tool-use. This is the dominant source of "wrong approach" friction in long sessions; the rules already exist, the gap is attention, and the user shouldn't have to add a constraint header to every prompt to compensate.
+
 ## Spikes
 
 - Sometimes something has to be tried out as a "spike" to determine the proper path or the full shape of the problem.
