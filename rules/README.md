@@ -4,7 +4,7 @@ Rule files govern how Claude should behave across all projects, not just in spec
 
 ---
 
-**`agents.md`** — When to use each available agent type. Covers the distinction between `Explore` and `codebase-pattern-finder`, when to reach for `Plan`, when specialized agents beat `general-purpose`, and when to parallelize.
+**`agents.md`** — When to use each available agent type. Covers the distinction between `Explore` and `codebase-pattern-finder`, when to reach for `Plan`, when specialized agents beat `general-purpose`, when to parallelize (including the big-ADR-kickoff trigger), and when to delegate noisy reads to preserve main context.
 
 **`code-style.md`** — General code style: trailing newlines, simplicity, parser libraries over regex, naming, consistency.
 
