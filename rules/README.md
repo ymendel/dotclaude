@@ -14,7 +14,7 @@ Rule files govern how Claude should behave across all projects, not just in spec
 
 **`diagnosis.md`** — Diagnose before retrying. When a command fails or gives unexpected output, reason about why before issuing variants — including not routing around the user's shell configuration to silence a symptom. Includes specific cases for git tree-ish ambiguity and RTK diff filtering.
 
-**`honesty.md`** — Rules about quantitative claims: never present estimates as measurements, source every number, separate verified facts from assumptions, don't optimize for looking helpful over being accurate. Applies extra scrutiny to any external-facing content.
+**`honesty.md`** — Rules about factual claims: never present estimates as measurements, source every number, verify the framing of external systems and codebase concepts against the source before writing prose about them, separate verified facts from assumptions, don't optimize for looking helpful over being accurate. Applies extra scrutiny to any external-facing content.
 
 **`searching.md`** — How to pick the right tool and scope when looking something up: scoping searches to the known location, never searching locally for external library docs, and choosing between WebFetch and raw curl.
 

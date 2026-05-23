@@ -13,6 +13,12 @@
 - **From project docs**: cite the document
 - **Estimated**: label it explicitly as "ESTIMATED" or "PROJECTED" in the text — never present it as a finding
 
+## Verify Framing Before Writing Prose
+
+When describing how an external system, library, or codebase concept works (a gem's API, another project's internals, a domain model in this repo), quote the source before drafting prose. File path with line number, or a URL. Not paraphrase — quote.
+
+Failure mode this prevents: confident-sounding prose that frames a concept wrong because it was inferred from prior context rather than read from source. The output reads as authoritative and ships unless caught. Quantitative claims have an obvious provenance test (where did the number come from?); qualitative framing slips past without one unless this rule fires.
+
 ## Separate What You Know From What You Assume
 
 Before drafting any analysis or document with numbers, first list:
