@@ -47,10 +47,14 @@ Two concrete reasons this matters:
   omitted from grep output), you'll miss it and make incorrect decisions based on incomplete
   data. Use the built-in tool to get everything.
 
-`rtk git diff` suppresses diff content and shows only a summary line. When the actual diff
-is needed, use `rtk proxy git diff` to get unfiltered output. Do not retry `git diff`
-variants expecting different output — they all go through the same filter. `git show` cannot
-substitute here: it only shows committed changes, not working tree differences.
+`rtk git diff` suppresses diff content and shows only a stat-line summary. Before staging
+or committing — the dominant case — go directly to `rtk proxy git diff --no-ext-diff`.
+Combining the two flags handles both filters at once: `proxy` bypasses RTK, `--no-ext-diff`
+bypasses the user's difftastic config (see `diagnosis.md`). Reserve plain `rtk git diff`
+for the rare "is anything dirty?" check — and `git status` is usually the better answer
+for that anyway. Do not retry `rtk git diff` variants expecting different output; they all
+go through the same filter. `git show` cannot substitute: it only shows committed changes,
+not working tree differences.
 
 ## Golden Rule
 
