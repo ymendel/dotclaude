@@ -2,6 +2,12 @@
 
 Rule files govern how Claude should behave across all projects, not just in specific tasks. Most load unconditionally at session start; files with `paths` frontmatter load only when Claude reads a matching file.
 
+## Rules vs. skills
+
+Rules load eagerly; skills load on demand when their trigger description matches the context. Behavioral defaults — guidance that should apply to every response — belong in rules. Procedural workflows with their own steps, templates, or references belong in skills.
+
+A single concern occasionally splits across both. The `project-notes` rule covers the recognition habit — when to notice something filing-worthy. The `project-notes` skill covers the production workflow — how to file it once recognized. The rule fires unconditionally so recognition stays on; the skill loads only when invoked.
+
 ---
 
 **`agents.md`** — When to use each available agent type. Covers the distinction between `Explore` and `codebase-pattern-finder`, when to reach for `Plan`, when specialized agents beat `general-purpose`, when to parallelize (including the big-ADR-kickoff trigger), and when to delegate noisy reads to preserve main context.

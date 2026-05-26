@@ -4,6 +4,10 @@ Skills extend Claude's capabilities for specific tasks. The `description` frontm
 
 Invoke manually with `/skill-name [args]`.
 
+## Skills vs. rules
+
+Skills load on demand; rules load eagerly. Procedural workflows with their own steps, templates, or references belong in skills. Behavioral defaults that should apply to every response belong in rules. A single concern occasionally splits across both — see the `project-notes` and `graphify` entries below, each paired with a rule for the always-on side.
+
 ---
 
 ## Git & code changes
