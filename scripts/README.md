@@ -1,8 +1,10 @@
 # scripts/
 
-Tooling for maintaining skills across this personal repo and a separate team
-skills repo. See [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md)
-for the why.
+Tooling for maintaining this repo's setup: keeping skills in sync with a
+separate team skills repo (`compare-skills.sh`, `sync-skill.sh` — see
+[ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for the
+why), and tracking which skills and agents actually get used
+(`usage-report.sh`).
 
 ## `compare-skills.sh`
 
@@ -89,3 +91,46 @@ for the reasoning.
 - `0` Sync (or dry-run) completed.
 - `1` Destination has uncommitted changes for this skill; refused.
 - `2` Invalid arguments, missing paths, or skill not found on source side.
+
+## `usage-report.sh`
+
+Report how much of the setup actually gets used.
+
+```
+./scripts/usage-report.sh [--no-snapshot]
+```
+
+Scans Claude Code session transcripts (`$HOME/.claude/projects`) for skill
+invocations (`"skill":"<name>"`) and agent invocations
+(`"subagent_type":"<name>"`), cross-references them against the `skills/` and
+`agents/` inventory, and prints each item's count — with the unused ones
+called out per section. Items invoked but absent from the inventory
+(built-in agents, removed skills) are listed separately.
+
+### Snapshots and the retention window
+
+Transcripts rotate after roughly 30 days, so any single scan only sees usage
+within that window — a one-off run can never show a longer trend. To work
+around that, each run appends a dated snapshot (one row per skill/agent) to
+`usage-data/usage-history.tsv`, accumulating history the transcripts
+themselves discard. `--no-snapshot` prints the report without writing.
+
+The history file lives under `usage-data/`, which the repo's allowlist
+`.gitignore` excludes — it's local working data, not committed. The report
+header states the actual window covered, so a `0` reads as "not invoked in
+the window," not "never."
+
+### Configuration
+
+```
+REPO=...           # repo root; default is the script's parent dir
+PROJECTS_DIR=...   # transcripts; default $HOME/.claude/projects
+HISTORY_FILE=...   # snapshot log; default $REPO/usage-data/usage-history.tsv
+```
+
+Requires bash 4+ (associative arrays, `mapfile`, namerefs).
+
+### Exit status
+
+- `0` Report produced.
+- `2` A configured path is missing or arguments are invalid.
