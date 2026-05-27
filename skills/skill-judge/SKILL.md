@@ -98,7 +98,7 @@ The most important dimension. Does the Skill add genuine expert knowledge?
 - Decision trees for non-obvious choices ("when X fails, try Y because Z")
 - Trade-offs only an expert would know ("A is faster but B handles edge case C")
 - Edge cases from real-world experience
-- "NEVER do X because [non-obvious reason]"
+- Anti-patterns with the non-obvious reason attached ("avoid X because Z — something only experience teaches")
 - Domain-specific thinking frameworks
 
 **Evaluation questions**:
@@ -174,7 +174,7 @@ A good Skill provides both when needed.
 
 ### D3: Anti-Pattern Quality (15 points)
 
-Does the Skill have effective NEVER lists?
+Does the Skill identify specific anti-patterns — what to avoid, and why?
 
 **Why this matters**: Half of expert knowledge is knowing what NOT to do. A senior designer sees purple gradient on white background and instinctively cringes — "too AI-generated." This intuition for "what absolutely not to do" comes from stepping on countless landmines.
 
@@ -184,12 +184,14 @@ Claude hasn't stepped on these landmines. It doesn't know Inter font is overused
 |-------|----------|
 | 0-3 | No anti-patterns mentioned |
 | 4-7 | Generic warnings ("avoid errors", "be careful", "consider edge cases") |
-| 8-11 | Specific NEVER list with some reasoning |
+| 8-11 | Specific anti-patterns with some reasoning |
 | 12-15 | Expert-grade anti-patterns with WHY — things only experience teaches |
+
+**Score the reasoning, not the keyword.** A skill earns full marks when it explains *why* to avoid something — whether or not it uses the word NEVER. Per the **skill-architecture** skill's writing guide, all-caps NEVER/MUST/ALWAYS is itself a smell: the model internalizes explained principles and treats shouted commands as constraints to satisfy minimally. So do not reward the NEVER keyword or dock a skill for framing anti-patterns as reasoned principles; reserve the low scores for anti-patterns that are vague or missing their *why*.
 
 **Expert anti-patterns** (specific + reason):
 ```markdown
-NEVER use generic AI-generated aesthetics like:
+Avoid generic AI-generated aesthetics — they read as machine-made to anyone with design sense:
 - Overused font families (Inter, Roboto, Arial)
 - Cliched color schemes (particularly purple gradients on white backgrounds)
 - Predictable layouts and component patterns
@@ -485,7 +487,7 @@ Consider edge cases.
 - **NEVER** let length impress you — a 43-line Skill can outperform a 500-line Skill
 - **NEVER** skip mentally testing the decision trees — do they actually lead to correct choices?
 - **NEVER** forgive explaining basics with "but it provides helpful context"
-- **NEVER** overlook missing anti-patterns — if there's no NEVER list, that's a significant gap
+- **NEVER** overlook missing anti-patterns — if the skill never says what to avoid (with reasons), that's a significant gap
 - **NEVER** assume all procedures are valuable — distinguish domain-specific from generic
 - **NEVER** undervalue the description field — poor description = skill never gets used
 - **NEVER** put "when to use" info only in the body — Agent only sees description before loading
@@ -686,7 +688,7 @@ Fix: High freedom for creative (principles, not steps)
 │    [ ] Distinguishes valuable procedures from generic ones              │
 │                                                                         │
 │  ANTI-PATTERNS:                                                         │
-│    [ ] Has explicit NEVER list                                          │
+│    [ ] Calls out anti-patterns                                          │
 │    [ ] Anti-patterns are specific, not vague                            │
 │    [ ] Includes WHY (non-obvious reasons)                               │
 │                                                                         │
