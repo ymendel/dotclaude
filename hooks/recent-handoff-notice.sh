@@ -19,7 +19,7 @@ RECENT=$(find "$HANDOFF_DIR" -maxdepth 1 -name "*.md" -mtime -7 -type f 2>/dev/n
   | head -1)
 
 if [ -n "$RECENT" ]; then
-  echo "session-handoff: Recent handoff exists at $RECENT (within last 7 days). On the first turn, ask the user whether to resume from it before proceeding — do not judge from the prompt alone."
+  echo "session-handoff: Recent handoff exists at $RECENT (within last 7 days). On the first turn, surface it and ask whether to resume — unless the first message already answers that (e.g. 'resume'/'continue' -> resume directly; an explicit 'start fresh' -> skip). The 'don't judge from the prompt alone' guard is against inferring a decline from an unrelated-looking prompt, not against honoring an explicit instruction."
 fi
 
 exit 0
