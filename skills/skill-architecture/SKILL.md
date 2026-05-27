@@ -166,6 +166,8 @@ For each test prompt, run the skill and examine the output:
 
 When subagents are available, run with-skill and without-skill versions in parallel to measure the skill's actual value-add. When not available, run test cases yourself as a sanity check.
 
+For a structured quality pass beyond ad-hoc inspection, run the **skill-judge** skill — it scores the skill across eight dimensions (knowledge delta, anti-patterns, progressive disclosure, freedom calibration, and more) and surfaces specific gaps to fix back here. Build with skill-architecture, audit with skill-judge: a build → judge → fix loop.
+
 ### Iterate Based on Feedback
 
 After evaluating results, improve the skill and retest. Keep iterating until the user is satisfied or feedback is consistently positive. Key principles for each iteration:

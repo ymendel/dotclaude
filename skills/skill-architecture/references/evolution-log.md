@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-05-27: Cross-link with skill-judge (build → judge → fix loop)
+
+**Trigger**: A review found that skill-architecture and skill-judge never referenced each other, and that skill-judge's D3 contradicted this skill's writing guide (it rewarded all-caps "NEVER lists" while the writing guide calls that phrasing a smell). Two skills covering the same lifecycle from building vs. auditing angles, with no connective tissue and one outright conflict.
+
+### Changes Made
+
+1. **Added a cross-reference to skill-judge** in "Testing and Iteration → Run and Evaluate" — directs the author to run skill-judge for a structured quality pass after writing a skill.
+2. **Contradiction resolved on the skill-judge side** (separate commit): D3 now scores whether anti-patterns explain *why* rather than whether they use the NEVER keyword, with the resolution citing this skill's writing guide as the winning principle.
+
+### Key Insight
+
+> skill-architecture builds, skill-judge audits, skill-architecture fixes. The loop only closes if each skill names the other at the hand-off point — otherwise the two sit as disconnected references and the author never completes the cycle.
+
+---
+
 ## 2026-03-31: Relocate Self-Evolution for Attention Primacy/Recency
 
 **Trigger**: Empirical observation over months that the self-evolving mechanism was not firing — skills never evolved despite instructions to do so. Research across 6 GitHub repos, 4 blog posts, and Anthropic's own context window documentation confirmed the root cause.
