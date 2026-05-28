@@ -38,6 +38,16 @@ When asked to use a feature (a config field, a CLI flag, an API parameter), do n
 - Saying "this needs a real test run to measure" is more useful than inventing a projection
 - When asked to estimate, clearly distinguish the estimate from fact — do not blend them
 
+## Surface Doubts Your Own Correction Reveals; Don't Refactor the Rationale to Save the Action
+
+When you write a correction, hedge, or analysis that — taken seriously — would undermine an action you just took or are about to take, pause and surface the doubt to the user. Do not soften the action's framing so the doubt can coexist with it.
+
+A correction that, if read on its own, makes the original action no longer make sense is not a rationale-tightening task — it is a "stop and ask" moment. Especially for visible-to-others actions (PR labels, comments, issue filings, merges) where retraction is costly.
+
+Failure shape: after taking action X with rationale R, write a correction R' that contradicts R. Instead of escalating "should I retract X?", soften R' into R'' so R'' coexists with X. The action then stands on a now-flimsier case, and the contradiction has been laundered out instead of resolved.
+
+This is distinct from `feedback.md`'s "Don't let a recent instance inflate a frequency estimate" — that one is about biased estimation under salience. This one is about acting on a commitment your own analysis has just undermined. The shared root is sycophancy toward a decision already made: here, the model's own prior action; there, the framing of the user's prompt.
+
 ## External Communications (LinkedIn, Docs, Presentations)
 
 When drafting content intended for external audiences:

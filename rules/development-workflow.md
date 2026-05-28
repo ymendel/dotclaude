@@ -51,6 +51,8 @@ The user pushes branches, creates commits, creates new branches, and switches co
 
 Specific case: "review the current diff" or "review this" without a PR number means review the local uncommitted or unpushed changes (`git diff HEAD`), not a PR. Run `git diff HEAD` directly rather than invoking the `review` skill, which assumes a PR context.
 
+Specific case: "block this PR", "comment on this PR", "label this PR", "approve this PR", and similar requests about "this PR" / "this branch" / "this issue" without a number must trigger a state check (`gh pr list`, `git branch --show-current` + `gh pr list --head <branch>`) — even when an earlier turn in the same session named a specific PR. A salient antecedent does not survive a silent context-switch. Failure mode: a multi-action request (labels, blocking, comments) lands on the wrong PR, requiring retraction of the wrong-PR labels and comments while redoing the work on the right PR. The cost of the state check is one shell command; the cost of acting on the wrong antecedent is visible to reviewers.
+
 ## Reviewing
 
 - Stay within the requested scope — do not propose or make code changes unless asked. A review request is a read-only task unless the user explicitly says to fix what's found.
