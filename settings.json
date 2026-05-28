@@ -39,6 +39,7 @@
       "Edit(**/.claude/**)",
       "Edit(/.claude/**)",
       "Read(~/Library/Application Support/rtk/tee/*)",
+      "Read(//tmp/*)",
       "WebFetch(domain:api.rubyonrails.org)",
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:developer.mozilla.org)",
