@@ -26,7 +26,9 @@ Determine which mode applies:
 
 ### Step 1: Generate Scaffold
 
-Run the smart scaffold script to create a pre-filled handoff document:
+Run the smart scaffold script to create a pre-filled handoff document.
+
+**Run it from the project root, using the script's absolute path — do NOT `cd` into the skill directory.** The script derives the project root (and therefore where the handoff is written, plus the git/commit metadata it pre-fills) from the current working directory. The `scripts/...` form below is relative for brevity; if you `cd` into the skill dir to make it resolve, the handoff lands in the *skill's* repo and captures the *skill's* git state instead of your project's. Invoke it like `python3 /absolute/path/to/skills/session-handoff/scripts/create_handoff.py [task-slug]` from the project you're handing off.
 
 ```bash
 python scripts/create_handoff.py [task-slug]
