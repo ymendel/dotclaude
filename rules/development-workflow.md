@@ -31,7 +31,7 @@ Failure mode this prevents: with many rules loaded passively, applying them duri
 
 - git is the version-control tool of choice, and GitHub is the preferred hosting provider
 - Commit structuring and message format are governed by the `purposeful-commits` and `commit-message-guide` skills. When both are active, `purposeful-commits` runs first to structure the work into logical commits, then `commit-message-guide` applies to each individual commit message.
-- Never use `git add -A` or `git add .` — always stage specific files by name.
+- Never use `git add -A` or `git add .` — these sweep in untracked files. Prefer staging specific files by name. `git add -u` (stages modifications and deletions to already-tracked files only, never untracked) is acceptable when naming files individually is impractical (e.g. a wide mechanical rename) *and* the working tree has been verified to contain only in-scope changes — confirm `git status` shows no untracked files first, since `-u` is still a bulk stage. The hazard `-A`/`.` guard against is pulling in untracked junk; `-u` can't do that, which is why it's allowed where they aren't.
 - Keep commits to small, logical changes. Do not make one big commit at the end.
 - When refining a change that just happened, amend the previous commit instead of creating a new one. If a new commit was already made by mistake, recover with `git reset --soft HEAD~1` followed by `git commit --amend` — no interactive rebase needed.
 - To reword a non-HEAD commit, ask the user to run `git rebase -i` interactively. Scripted workarounds (GIT_EDITOR overrides, chained amends) are unreliable and cause cascading message corruption.
