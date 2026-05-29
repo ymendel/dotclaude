@@ -272,7 +272,13 @@ if [[ -n "$outward_matches" || -n "$inward_matches" ]]; then
     echo "  $src_label-side files that reference this skill by name:" >&2
     printf '%s' "$inward_matches" | sed 's/^  /    /' >&2
   fi
-  echo "  handle these manually if the $dst_label side needs them." >&2
+  # If the skill ships a COMPANIONS.md, point the user there — the doc is
+  # the contract for the manual setup the warning is flagging.
+  if [[ -f "$src/COMPANIONS.md" ]]; then
+    echo "  see $skill/COMPANIONS.md for the manual setup steps." >&2
+  else
+    echo "  handle these manually if the $dst_label side needs them." >&2
+  fi
   echo >&2
 fi
 
