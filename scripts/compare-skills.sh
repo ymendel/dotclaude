@@ -183,7 +183,10 @@ compare_one() {
     return 0
   fi
 
-  # Determine "newer" by commit date (string-comparable ISO 8601).
+  # Determine "newer" by commit date (string-comparable ISO 8601). Timestamp
+  # arrow applies only when shared files actually differ; otherwise drift
+  # shape decides — a metadata-only commit on one side can look "newer" than
+  # substantive additions on the other.
   local newer
   if [[ -z "$mine_date" && -z "$theirs_date" ]]; then
     newer="unknown"
@@ -200,12 +203,20 @@ compare_one() {
   fi
 
   local arrow
-  case "$newer" in
-    mine)      arrow="${BLUE}mine →  push to theirs?${RESET}" ;;
-    theirs)    arrow="${YELLOW}theirs →  pull into mine?${RESET}" ;;
-    same-time) arrow="${DIM}commits at same time — inspect${RESET}" ;;
-    unknown)   arrow="${DIM}no git history — inspect${RESET}" ;;
-  esac
+  if [[ -z "$diff_files" && -n "$only_mine" && -z "$only_theirs" ]]; then
+    arrow="${BLUE}mine has extras — push to theirs?${RESET}"
+  elif [[ -z "$diff_files" && -z "$only_mine" && -n "$only_theirs" ]]; then
+    arrow="${YELLOW}theirs has extras — pull into mine?${RESET}"
+  elif [[ -z "$diff_files" && -n "$only_mine" && -n "$only_theirs" ]]; then
+    arrow="${DIM}both sides have extras — inspect${RESET}"
+  else
+    case "$newer" in
+      mine)      arrow="${BLUE}mine →  push to theirs?${RESET}" ;;
+      theirs)    arrow="${YELLOW}theirs →  pull into mine?${RESET}" ;;
+      same-time) arrow="${DIM}commits at same time — inspect${RESET}" ;;
+      unknown)   arrow="${DIM}no git history — inspect${RESET}" ;;
+    esac
+  fi
 
   printf "%b%-30s%b  %bdiffers%b  %s\n" "$BOLD" "$skill" "$RESET" "$RED" "$RESET" "$arrow"
   printf "  %bmine%b    %s  %s\n" "$DIM" "$RESET" "${mine_date:-—}" "${mine_msg:-—}"
