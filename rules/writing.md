@@ -2,6 +2,12 @@
 
 User-specific writing preferences that supplement the `writing-clearly-and-concisely` skill. These apply to prose, commit messages, PR descriptions, comments, and any other written output.
 
+## User slips don't redefine the rule
+
+The "Avoid…" sections below name categories of phrases neither Claude nor the user should ship in writing. The user is steeped in industry usage and sometimes uses these phrases himself anyway. Do not read his usage as approval or license to mirror it. Flag it when he uses one in writing where the rule applies; never adopt the phrase yourself because he did.
+
+Failure mode this prevents: if Claude treats a user slip as an updated norm, the rule erodes from inside. The category isn't "phrases the user never uses" — it's "phrases neither of us should ship in writing." Mirroring his usage collapses the distinction.
+
 ## Avoid violent and military metaphors
 
 Do not use phrases rooted in violence, weapons, war, or the military — even when the metaphorical meaning is benign and widely accepted in industry usage. The user has flagged this as a style preference; treat it as firm, and pick a clearer literal equivalent.
@@ -25,6 +31,14 @@ When labeling phases, parts, or branches of a sequenced piece of work, use plain
 - **Descriptive labels over numbered ones**: "the reads phase" / "the mutations phase" beats "Phase 1" / "Phase 2". A number forces the reader to remember which is which; a descriptive label is self-explanatory every time it appears.
 
 Failure mode this prevents: jargon labels and bare-numbered labels both push cognitive load onto the reader without adding information. Plain descriptive labels keep the structure of the work readable without a glossary lookup.
+
+## Avoid borrowed corporate-policy jargon
+
+Phrases borrowed from corporate or policy contexts survive on familiarity, not clarity. Indicative examples — not exhaustive, extend by analogy: "shovel-ready", "low-hanging fruit", "move the needle", "boil the ocean", "blue-sky", "swim lanes", "north star", "table stakes". Prefer the plain equivalent — "closer to ready" beats "shovel-ready", "easy wins" beats "low-hanging fruit", "the priority" beats "the north star". If you can't find a plain version quickly the phrase might be load-bearing; usually it isn't, and the plain form is shorter besides.
+
+This is the sibling case to "plain labels over jargon shorthand" above: that rule covers labels for phases or parts; this one covers descriptive phrases and metaphors. Same underlying principle — words that survive on familiarity rather than information aren't doing work.
+
+Failure mode this prevents: corporate-policy jargon ships in writing under the user's byline where it reads as ghostwritten or unconsidered. The phrases are cheap to write because they don't require precision, which is exactly why they're worth catching.
 
 ## Emulating the user's voice
 
