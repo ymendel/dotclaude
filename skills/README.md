@@ -76,4 +76,6 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 **`ascii-diagram-validator`** — Validates alignment of ASCII box-drawing diagrams in markdown. Runs a bundled Python script via `uv`; reports issues with file:line:column locations and suggested fixes.
 
-**`session-handoff`** — Creates handoff documents for transferring context between sessions. Also handles resuming from a handoff. Proactively suggested after substantial work or when context is running low.
+**`session-handoff`** — Creates handoff documents for transferring context between sessions. Also handles resuming from a handoff. Proactively suggested after substantial work or when context is running low. Auto-invokes `session-doc` after confirming a handoff when the project declares a session-docs destination.
+
+**`session-doc`** — Produces a narrative session document for a human re-reader weeks later: why this session happened, what was done, inline decisions worth re-examining, lessons, and suggested next moves. Paired with `session-handoff` (the mechanical resume artifact), not collapsed with it — their audiences and shapes differ. Auto-fires alongside `session-handoff` when the project's `CLAUDE.md` declares a `## Session docs` destination.

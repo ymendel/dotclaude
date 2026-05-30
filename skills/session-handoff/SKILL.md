@@ -98,6 +98,8 @@ Report to user:
 - Summary of captured context
 - First action item for next session
 
+If the project declares a `## Session docs` destination (in `CLAUDE.md` or an imported rule), also invoke `session-doc` — the narrative companion to this handoff handles the rest.
+
 ## RESUME Workflow
 
 ### Step 1: Find Available Handoffs
