@@ -263,20 +263,23 @@ for target in "${inward_targets[@]}"; do
 done
 
 if [[ -n "$outward_matches" || -n "$inward_matches" ]]; then
-  echo "${YELLOW}warning:${RESET} $skill has likely external dependencies that will NOT be copied:" >&2
-  if [[ -n "$outward_matches" ]]; then
-    echo "  source-skill references to outside resources:" >&2
-    printf '%s' "$outward_matches" | sed 's/^  /    /' >&2
-  fi
-  if [[ -n "$inward_matches" ]]; then
-    echo "  $src_label-side files that reference this skill by name:" >&2
-    printf '%s' "$inward_matches" | sed 's/^  /    /' >&2
-  fi
-  # If the skill ships a COMPANIONS.md, point the user there — the doc is
-  # the contract for the manual setup the warning is flagging.
   if [[ -f "$src/COMPANIONS.md" ]]; then
-    echo "  see $skill/COMPANIONS.md for the manual setup steps." >&2
+    # The skill ships a COMPANIONS.md — adopters have an explicit contract for
+    # the manual setup, so the heuristic match is informational rather than
+    # urgent. One-line note, no detail dump.
+    echo "${DIM}note:${RESET} $skill has external dependencies (heuristic detected); see $skill/COMPANIONS.md for the manual setup contract." >&2
   else
+    # No COMPANIONS.md — the adopter has nothing to consult, so surface the
+    # full match detail at warning weight.
+    echo "${YELLOW}warning:${RESET} $skill has likely external dependencies that will NOT be copied:" >&2
+    if [[ -n "$outward_matches" ]]; then
+      echo "  source-skill references to outside resources:" >&2
+      printf '%s' "$outward_matches" | sed 's/^  /    /' >&2
+    fi
+    if [[ -n "$inward_matches" ]]; then
+      echo "  $src_label-side files that reference this skill by name:" >&2
+      printf '%s' "$inward_matches" | sed 's/^  /    /' >&2
+    fi
     echo "  handle these manually if the $dst_label side needs them." >&2
   fi
   echo >&2
