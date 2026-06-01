@@ -667,6 +667,20 @@ Fix: High freedom for creative (principles, not steps)
      Low freedom for fragile (exact scripts, no parameters)
 ```
 
+### Pattern 10: The Heavy Coordination
+```
+Symptom: Multi-line prose in the skill body explaining how this skill
+         coordinates with another skill — the artifact split, the analogy,
+         the detection logic, the "look for X heading in CLAUDE.md" check
+Root cause: Treating cross-skill references as documentation rather than a
+         conditional check that should fail gracefully when the other skill
+         is absent
+Fix: Compress to one conditional sentence. If the other skill isn't installed,
+     the check no-ops harmlessly; if it is, the coordination fires. Skill
+     bodies shouldn't carry multi-paragraph descriptions of skills that may
+     not be present in every project.
+```
+
 ---
 
 ## Quick Reference Checklist

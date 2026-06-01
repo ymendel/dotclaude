@@ -190,6 +190,7 @@ These principles (aligned with Anthropic's official guidance) apply to all skill
 
 - **Imperative form**: "Run the script", "Check the output" -- not passive or indirect phrasing.
 - **Explain reasoning over rigid rules**: If you find yourself writing MUST/NEVER/ALWAYS in all caps, that's a signal to reframe. Explain the reasoning so the model internalizes the principle rather than treating it as an arbitrary constraint. The model is smart -- help it understand, don't just command it.
+- **Cross-skill references should be lightweight**: When a skill coordinates with another that may not be installed, prefer a single conditional sentence over multi-line prose explaining the relationship. A cheap conditional check fails gracefully when the other skill is absent; heavy coordination prose reads as a dangling pointer into a void. If the coordination needs more than one sentence, that's a signal the boundary between the two skills is wrong.
 - **Pushy descriptions for triggering**: Claude tends to undertrigger skills. Descriptions should actively claim territory: "Use this skill whenever the user mentions X, Y, or Z, even if they don't explicitly ask for it." Include negative triggers too: "Do NOT use for A or B."
 - **Natural language descriptions**: Write descriptions as sentences a human could read, not keyword lists. "Use this skill whenever..." is better than "TRIGGERS - keyword1, keyword2".
 - **Keep execution out of descriptions**: Descriptions tell Claude _when_ to trigger. The skill body tells Claude _how_ to execute. Don't mix them.

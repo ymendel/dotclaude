@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-06-01: Cross-skill coordination weight (writing principle + skill-judge Pattern 10)
+
+**Trigger**: When `session-handoff` was first updated to coordinate with the new `session-doc` skill (2026-05-30), the first draft of the coordination step ran 12 lines — artifact split, analogy, detection logic for the `## Session docs` heading in CLAUDE.md. User pushback was correct: the heavier the cross-skill prose, the more breakable the coordination is when one skill isn't installed. The final coordination shrank to one conditional sentence. The lesson was filed as the highest-priority capture from that session's handoff; this entry codifies it across both skills.
+
+### Changes Made
+
+1. **New principle in Skill Writing Principles**: "Cross-skill references should be lightweight" — prefer a single conditional sentence over multi-line prose. Placed between "Explain reasoning over rigid rules" (skill body content) and "Pushy descriptions for triggering" (description content) because cross-skill coordination is a body-content concern.
+2. **New Common Failure Pattern in skill-judge (Pattern 10: The Heavy Coordination)** — gives skill-judge the detection point. Filed under Common Failure Patterns rather than D3 because D3 scores how skills identify anti-patterns in *their domain*, while heavy coordination is an anti-pattern in skill *design itself* — same category as Patterns 1-9.
+
+### Key Insight
+
+> A multi-line cross-skill reference is documentation; a one-sentence conditional check is integration. Documentation breaks when the referenced skill is absent (dangling pointer); integration just no-ops. If the coordination needs more than one sentence, the boundary between the two skills is probably wrong.
+
+---
+
 ## 2026-05-27: Cross-link with skill-judge (build → judge → fix loop)
 
 **Trigger**: A review found that skill-architecture and skill-judge never referenced each other, and that skill-judge's D3 contradicted this skill's writing guide (it rewarded all-caps "NEVER lists" while the writing guide calls that phrasing a smell). Two skills covering the same lifecycle from building vs. auditing angles, with no connective tissue and one outright conflict.
