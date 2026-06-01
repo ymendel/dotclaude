@@ -40,6 +40,19 @@ This is the sibling case to "plain labels over jargon shorthand" above: that rul
 
 Failure mode this prevents: corporate-policy jargon ships in writing under the user's byline where it reads as ghostwritten or unconsidered. The phrases are cheap to write because they don't require precision, which is exactly why they're worth catching.
 
+## Avoid words that collide with terms of art
+
+A word's meaning is decided by the reader's nearest context, not by the writer's intent. A word with a strong term-of-art meaning will be parsed as that term of art first, even when the surrounding sentence makes another sense structurally possible. The reader pays a cost: either spotting the collision (one re-parse) or missing it (silent misread). Either way, the word is wrong even if the dictionary defines what you meant.
+
+Two shapes to watch for:
+
+- **Loose or metaphorical use vs. term of art.** A word used in its plain sense, or stretched metaphorically, that also names a specific technical operation in the reader's domain. The technical sense wins the parse. Examples in software contexts: "rebase" (metaphorical: re-anchor onto a different foundation; git: replay commits onto a new base), "fork" (lay: a branch in a path; git/process: copy a repo or process), "merge" (lay: combine; git: combine branches), "stash" (lay: hide away; git: shelve working changes), "amend" (lay: edit/improve; git: rewrite the most recent commit), "rollback" (lay: undo; databases: revert a transaction). When the looser sense is what you want, pick a word that doesn't collide — "re-anchor," "split," "combine," "park," "edit," "undo."
+- **Term of art in one context vs. another.** A word that's technical in multiple sub-fields, distinguished only by surrounding cues. The dominant sub-field for the immediate reader wins. Examples: "branch" (git vs. AST traversal vs. control flow), "thread" (concurrency vs. message thread vs. textile), "kernel" (OS vs. linear algebra vs. ML), "argument" (function parameter vs. rhetoric), "tree" (data structure vs. file system vs. UI vs. botany), "stream" (Turbo/HTTP vs. functional iterators vs. video), "lock" (concurrency vs. cryptography vs. file system). If two sub-fields are both plausible from the surrounding text, disambiguate explicitly or pick a non-colliding word.
+
+When in doubt, ask: in this paragraph, which sense will the reader reach for *first*? If that isn't the sense you mean, the word is wrong — even if it's a defensible synonym of what you mean.
+
+Failure mode this prevents: a word chosen for its loose or metaphorical sense (or for the wrong sub-field's term of art) gets parsed as the dominant local sense, producing a confident-sounding sentence that means something other than what you wrote.
+
 ## Emulating the user's voice
 
 When writing in the user's voice — drafting a message *from* him, ghostwriting a comment he'll post, or any output where the goal is to sound like Yossef rather than to serve a broader audience — match the register described below.
