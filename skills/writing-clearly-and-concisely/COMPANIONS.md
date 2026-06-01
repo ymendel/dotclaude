@@ -4,7 +4,7 @@ What `writing-clearly-and-concisely` depends on beyond the skill directory itsel
 
 ## Why this file exists
 
-This config maintains skills in parallel git repos (see ADR 0001: "Skill Maintenance via Parallel Git Repos"). The `scripts/sync-skill.sh` script copies a skill between repos, but explicitly does **not** copy resources outside the skill directory — rules, hooks, settings. This file is the manual half: when you sync `writing-clearly-and-concisely` into a new environment, this is what to consider setting up alongside it.
+A skill packages as a self-contained directory and can be installed in many ways — a personal config repo, a plugin, a marketplace install. But anything that integrates with the host — rules loaded passively each session, `settings.json` hooks, permission allowlist entries — lives *outside* the skill directory and doesn't ship with the package. This file is the manual half: when you install `writing-clearly-and-concisely` into a new environment, this is what to consider setting up alongside it.
 
 The skill has no host config — no scripts, no hooks, no permission allowlist. The companion is one optional rule.
 

@@ -4,9 +4,9 @@ What `session-handoff` depends on beyond the skill directory itself. The skill w
 
 ## Why this file exists
 
-This config maintains skills in parallel git repos (see ADR 0001: "Skill Maintenance via Parallel Git Repos"). The `scripts/sync-skill.sh` script copies a skill between repos, but explicitly does **not** copy resources outside the skill directory — rules, hooks, settings. It emits a heuristic warning when it spots likely external references, but the heuristic is best-effort and the actual setup work is manual.
+A skill packages as a self-contained directory and can be installed in many ways — a personal config repo, a plugin, a marketplace install. But anything that integrates with the host — rules loaded passively each session, `settings.json` hooks, permission allowlist entries — lives *outside* the skill directory and doesn't ship with the package.
 
-This file is the manual half: when you sync `session-handoff` into a new environment, this is what to set up alongside it. Skip it and the skill still works on demand; adopt it and the handoff workflow feels automatic.
+This file is the manual half: when you install `session-handoff` into a new environment, this is what to set up alongside it. Skip it and the skill still works on demand; adopt it and the handoff workflow feels automatic.
 
 ## 1. Host config: see `references/setup.md`
 
