@@ -22,7 +22,7 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 ## Writing & documentation
 
-**`writing-clearly-and-concisely`** — Applies Strunk's rules for clarity and concision. Also covers AI writing anti-patterns (puffery, empty -ing phrases, overused vocabulary). Reference files contain the relevant chapters from *The Elements of Style*.
+**`writing-clearly-and-concisely`** — Applies Strunk's rules for clarity and concision. Also covers AI writing anti-patterns (puffery, empty -ing phrases, overused vocabulary). Reference files contain the relevant chapters from *The Elements of Style*. Optionally pairs with `rules/writing.md`, a personal-voice overlay that supplements (not replaces) the skill — see the skill's `COMPANIONS.md` for the pattern.
 
 **`crafting-effective-readmes`** — README guidance and templates matched to project type (OSS, personal, internal, XDG config). Not all READMEs are the same.
 
