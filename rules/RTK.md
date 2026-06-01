@@ -56,6 +56,15 @@ for that anyway. Do not retry `rtk git diff` variants expecting different output
 go through the same filter. `git show` cannot substitute: it only shows committed changes,
 not working tree differences.
 
+`rtk find` suppresses output the same way — fine for navigating ("does this directory have
+a README?"), wrong when an exact count or full list matters. Counting via
+`rtk find ... | wc -l` returns the *filtered* count and silently underreports the real one.
+When the answer feeds a quantitative check — file counts after a copy, an audit of every
+match, anything where a decision rides on the total — use `rtk proxy find` instead. Failure
+mode this prevents: a filtered `find | wc -l` looks authoritative and makes plausible-but-wrong
+counts feel like ground truth, leading to false alarms (or worse, missed real ones) when the
+delta between filtered and real is large.
+
 ## Golden Rule
 
 **Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
