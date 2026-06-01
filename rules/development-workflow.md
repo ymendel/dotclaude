@@ -26,6 +26,7 @@ Failure mode this prevents: with many rules loaded passively, applying them duri
 - When you hit a confusion or contradiction you can resolve confidently, resolve it and note it for the post-implementation report — don't interrupt the flow for handleable issues.
 - Stop and ask only when you genuinely can't proceed: the ADR seems materially wrong, the resolution affects scope, or you'd be guessing at intent.
 - When implementation is complete, provide a post-implementation report covering: (a) anything you handled inline that the user might want to revisit (small reconciliations, judgment calls, deviations from the ADR), and (b) remaining next steps (follow-on work, config, documentation, etc.) that fall outside the scope of what was just implemented.
+- Before declaring an implementation complete, grep the pattern, not just the enumeration. When the work relaxes or flips an invariant, sites that *enforced* it get named in the issue (the unique index, the validation); sites that *assumed* it are scattered through business-logic queries and don't surface until verification or production. Name the literal pattern (e.g. a `where(child_table: { id: nil })` join, a subquery through the old single-FK column), grep, audit each hit — including in files the PR already touched.
 
 ## Version Control
 
