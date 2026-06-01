@@ -17,3 +17,11 @@ When reviewing or designing a skill, "don't restate what Claude already knows" (
 **Why:** Misapplied this on 2026-05-21 when reviewing the `adr` skill via `skill-judge`. Suggested cutting the Nygard template restatement as "Activation, Claude knows this" — but the template was the *artifact*, and the project-specific Consequences-valence prescription was baked into it inline. Cutting it would have undone work just done to make that prescription concrete. User caught it.
 
 **How to apply:** When skill-judge or any similar review flags a section as "Claude already knows this," ask whether the section is a *template/example to copy* or *guidance to internalize*. If template/example, the right action is keep-and-tighten (drop redundant examples, keep the canonical one), not compress-to-pointer. If guidance, the standard compression rule applies.
+
+## Don't escape inside single-quoted heredocs
+
+In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content literally — no parameter expansion, no command substitution, no backslash processing. Backticks, double-quotes, and dollar signs inside one don't need escaping; doing so ships the literal backslash through to whatever consumes the heredoc.
+
+**Why:** On 2026-05-31, I filed a GitHub issue with `gh issue create --body "$(cat <<'EOF' ... EOF)"` and reflexively escaped backtick fences (`` \`\`\` ``) and quoted Ruby strings (`\"`) inside the body. The result rendered with literal backslashes wherever markdown was supposed to format — broken code fences, broken quotes. User caught it and asked for a fix. The escaping was a reflex carried over from double-quoted contexts, where backslashes do matter.
+
+**How to apply:** When writing inside `<<'EOF'`, write content as-is. The single-quoted delimiter is the explicit "treat this as a string literal" signal; escaping inside it always overshoots. If you find yourself reaching for a backslash inside a heredoc, check the opening — if it's `'EOF'`, don't. (The same caution applies in reverse to `<<EOF` without quotes, where backticks and dollar signs *do* need escaping if you want them literal.)
