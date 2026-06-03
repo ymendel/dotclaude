@@ -16,9 +16,13 @@ When a turn's output is long enough that the user would have to scroll back and 
 
 ## How to apply
 
-- Pick a sensible path inside the project (`docs/`, alongside related artifacts, or `.claude/handoffs/` for handoffs). Don't create a new top-level directory.
+- Pick a sensible path inside the project (`docs/`, alongside related artifacts, `.claude/handoffs/` for handoffs, `.claude/reviews/` for code reviews). Don't create a new top-level directory.
 - Write the file, then post a short pointer in the chat: filename, one to three sentences of framing, and the specific things to look at. The pointer goes in the chat; the content goes in the file.
 - If the output is genuinely throwaway / one-shot and unlikely to be re-read, ask before creating the file rather than defaulting to one.
+
+## Skill-prescribed output formats do not exempt content from this rule
+
+A skill's prescribed output format — JSON findings, a structured report, anything multi-section — is a contract for *shape*, not for *placement*. The file-it threshold above still applies. Default to filing: write a markdown narrative to a file with the prescribed-format payload inside (a fenced block, or appended at the end), and post the usual pointer in chat.
 
 ## Failure mode this prevents
 
