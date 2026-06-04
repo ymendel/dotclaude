@@ -33,7 +33,23 @@ Ruby has distinct conventions that differ from other languages — apply these w
 - Mutating or exception-raising variants use `!` suffix: `save!`, `update!`, `destroy!`
 - Readers: just the noun — `name`, `email`, not `get_name`
 - Writers: `name=` — never `set_name`
-- Class method entry points use prepositions: `.for`, `.from`, `.of` — e.g. `Invoice.for(user)` rather than `Invoice.find_by_user(user)`
+- Class method entry points that **construct an instance** (delegate to `.new`) use prepositions like `.for`, `.from`, `.of` when the argument is unambiguous in context. When the argument isn't self-evident, prefer a clearly-named method over a preposition with kwargs — a clear method name does more work than kwargs that disambiguate after the fact.
+
+  ```ruby
+  # GOOD — preposition with unambiguous args, construction semantics
+  Money.from(cents)
+  Schedule.from(start_date)
+  Invoice.for(user)              # builds an invoice for this user
+
+  # WHEN AMBIGUOUS — use a clear method name, not kwargs to disambiguate
+  Invoice.draft_for(user)        # action + relation, both clear
+  Invoice.for(user, kind: :draft) # avoid: kwargs rescuing a too-vague entry point
+
+  # Retrieval is a different category — use finders, not prepositions
+  Invoice.find_by(user: user)
+  ```
+
+  Find-or-build operations sit comfortably under this convention if the caller treats the source as opaque (e.g., `Cart.for(user)` whether it finds or builds). When find-vs-build is part of the contract the caller relies on, name it explicitly: `Cart.find_for(user)`, `Cart.build_for(user)`, `Cart.find_or_build_for(user)`.
 
 ### Rails naming
 

@@ -21,7 +21,7 @@ paths:
 
 ### Aesthetics
 
-- Use prepositions (e.g. `.for`, `.of`, `.from`) for expressive class method entry points that delegate to `.new`. Unless it is _incredibly_ clear what the argument(s) would be, name the method for clarity. Heavily prefer a clear method name to using kwargs.
+- Use prepositions (`.for`, `.of`, `.from`) for class method entry points that construct an instance, when args are unambiguous; otherwise name the method clearly. Prefer a named method over kwargs that disambiguate. (Examples and edge cases: `naming-analyzer` skill.)
 - Prefer guard clauses and early returns over nested `if`/`else`/`elsif` when it improves readability.
 - Prefer kwargs over positional args (exceptions: single arg, or leading positional + kwargs).
 - Prefer symbol keys in hashes; convert at serialization boundaries.
