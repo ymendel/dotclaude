@@ -9,6 +9,7 @@ description: Clarify ambiguous requirements through focused dialogue before impl
 
 Automatically transforms vague requirements into actionable PRDs through systematic clarification with a 100-point scoring system.
 
+Sibling: when clarification produces a question that goes *outward* to a stakeholder, client, or other non-engineer collaborator, the global `stakeholder-questions` rule governs the phrasing (ask about behavior, not implementation; match the stakeholder's vocabulary). This skill identifies what needs clarifying; that rule shapes how to ask for it.
 
 ## Instructions
 
