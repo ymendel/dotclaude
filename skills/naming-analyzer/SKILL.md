@@ -46,10 +46,10 @@ Ruby has distinct conventions that differ from other languages — apply these w
 | Job | Verb + Job | `SendWelcomeEmailJob` |
 | Concern | Adjective/capability | `Searchable`, `Taggable` |
 | Scope | Adjective or past participle | `active`, `published`, `for_user` |
-| Service object | VerbNoun (preferred) | `CreateInvoice`, `SendWelcomeEmail` |
+| Service object | NounVerber (preferred) | `InvoiceCreator`, `WelcomeEmailSender` |
 | Namespace | Domain noun | `Admin`, `Api`, `Internal` |
 
-**Service object naming**: `VerbNoun` (`CreateInvoice`) signals intent more clearly than `NounVerber` (`InvoiceCreator`), which reads like a class description rather than an action. Either is defensible — flag inconsistency within a project.
+**Service object naming**: `NounVerber` (`InvoiceCreator`) is the more common Rails idiom — `-er`/`-or` doer suffixes like `Updater`, `Broadcaster`, `Presenter`, `Notifier`, `Hydrator`. `VerbNoun` (`CreateInvoice`) is also defensible, especially with a callable-class invocation style. Either works; flag inconsistency within a project.
 
 **Module namespacing**: `Admin::UsersController` is preferred over `AdminUsersController` — the double-colon signals a domain boundary, not just a prefix. Namespace names should be domain nouns (`Admin`, `Api`, `Public`, `Internal`), not organizational catch-alls (`Helpers`, `Concerns`).
 
