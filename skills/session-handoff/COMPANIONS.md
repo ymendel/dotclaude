@@ -68,7 +68,7 @@ Adopt as many as suit your taste. Each section gives the intent, the failure mod
 Rough order:
 
 1. Apply the `settings.json` entries from `references/setup.md` (permissions + optional `SessionStart` hook registration).
-2. Install `recent-handoff-notice.sh` into your `hooks/` directory if you want the proactive surfacing.
+2. Register the `SessionStart` hook (the script ships at `hooks/recent-handoff-notice.sh` inside this skill) if you want the proactive surfacing — `references/setup.md` has the exact entry.
 3. Paste the sample wording above into your rule file (`~/.claude/rules/<something>.md`, or your project's `CLAUDE.md`), editing freely. Three sections, three behaviors — adopt all or just the ones that fit.
 
 None of these are required for the skill to function; they make the surrounding workflow feel automatic instead of on-demand.

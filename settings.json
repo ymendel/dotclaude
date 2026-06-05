@@ -103,7 +103,7 @@
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/recent-handoff-notice.sh"
+            "command": "$HOME/.claude/skills/session-handoff/hooks/recent-handoff-notice.sh"
           }
         ]
       }
