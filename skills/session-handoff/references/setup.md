@@ -12,10 +12,12 @@ Claude Code's permission system prompts on every tool invocation that isn't on a
 "Bash(python3 *skills/session-handoff/scripts/validate_handoff.py *)",
 "Bash(python3 *skills/session-handoff/scripts/check_staleness.py *)",
 "Write(**/.claude/handoffs/*.md)",
-"Edit(**/.claude/handoffs/*.md)"
+"Write(**/.claude/handoffs/artifacts/**)",
+"Edit(**/.claude/handoffs/*.md)",
+"Edit(**/.claude/handoffs/artifacts/**)"
 ```
 
-The leading `*` in each Bash pattern lets the rule match both in-repo (`skills/session-handoff/scripts/...`) and installed (`~/.claude/skills/...`) locations. `**` in the Write/Edit patterns matches any project's `.claude/handoffs/` directory.
+The leading `*` in each Bash pattern lets the rule match both in-repo (`skills/session-handoff/scripts/...`) and installed (`~/.claude/skills/...`) locations. `**` in the Write/Edit patterns matches any project's `.claude/handoffs/` directory. The separate `artifacts/**` rules cover companion files (drafts, wireframes, &c.) that the skill prescribes saving alongside handoffs — those live in the `artifacts/` subdirectory to stay out of the way of the `SessionStart` hook and `list_handoffs.py`, which only see top-level `.md` files.
 
 Skill frontmatter does not drive permissions — `settings.json` is the only source.
 

@@ -55,13 +55,13 @@ Adopt as many as suit your taste. Each section gives the intent, the failure mod
 
 ### 2c. Save external artifacts as they're produced
 
-**Intent:** when the session produces an artifact that lives outside the repo — a draft message to a teammate, an ASCII wireframe in a chat window, a question put to a stakeholder — a copy gets saved under `.claude/handoffs/` while it's still in front of the model. The skill carries this principle at handoff-write time (see `SKILL.md`); the rule carries the *timing* half.
+**Intent:** when the session produces an artifact that lives outside the repo — a draft message to a teammate, an ASCII wireframe in a chat window, a question put to a stakeholder — a copy gets saved under `.claude/handoffs/artifacts/` while it's still in front of the model. The skill carries this principle at handoff-write time (see `SKILL.md`); the rule carries the *timing* half. The `artifacts/` subdirectory keeps companion files out of the way of the hook and listing scripts, which only see top-level `.md` handoffs.
 
 **Failure without it:** draft artifacts scroll out of context before the handoff is written, and the resuming session can't reason about replies like "I like B" that came in afterwards.
 
 **Sample wording:**
 
-> When work in a session produces an artifact that lives outside the repo — a draft message sent to a teammate, an ASCII wireframe in a chat window, a question put to a stakeholder — save a copy under `.claude/handoffs/` while the artifact is still in front of you. The `session-handoff` skill covers how a handoff should reference these; the rule's half is timing, because by handoff-write time a chat-only draft may already be scrolled out of context.
+> When work in a session produces an artifact that lives outside the repo — a draft message sent to a teammate, an ASCII wireframe in a chat window, a question put to a stakeholder — save a copy under `.claude/handoffs/artifacts/` while the artifact is still in front of you. The `session-handoff` skill covers how a handoff should reference these; the rule's half is timing, because by handoff-write time a chat-only draft may already be scrolled out of context.
 
 ## Adopting these in a new environment
 
