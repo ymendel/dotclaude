@@ -1,10 +1,11 @@
 # scripts/
 
-Tooling for maintaining this repo's setup: keeping skills in sync with a
+Tooling for maintaining this repo's setup — keeping skills in sync with a
 separate team skills repo (`compare-skills.sh`, `sync-skill.sh` — see
 [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for the
 why), and tracking which skills and agents actually get used
-(`usage-report.sh`).
+(`usage-report.sh`). Also includes runtime workarounds for Claude Code
+bugs (`enospc-workaround.sh`).
 
 ## `compare-skills.sh`
 
@@ -134,3 +135,36 @@ Requires bash 4+ (associative arrays, `mapfile`, namerefs).
 
 - `0` Report produced.
 - `2` A configured path is missing or arguments are invalid.
+
+## `enospc-workaround.sh`
+
+Workaround for a Claude Code preflight ENOSPC false-positive on macOS
+x86_64 APFS.
+
+Bun 1.3.14 (embedded in Claude Code ~2.1.153 through 2.1.163) has a
+`statfs` alignment bug that returns `bsize=0`. Claude Code's preflight
+check, which runs when a child process exits non-zero with empty stdout,
+then computes `0 MB free` regardless of actual free space, kills the
+process, and reports a misleading `ENOSPC` error. The trigger in practice
+is any command that legitimately exits non-zero with no output — `grep`
+with no match, `ls` against a missing file, &c.
+
+The script sets an `EXIT` trap that prints a newline on any non-zero exit,
+so the "empty stdout AND non-zero exit" pattern never holds. Successful
+commands are unaffected.
+
+### Usage
+
+Source the script via `BASH_ENV` in your shell rc:
+
+```sh
+export BASH_ENV="$HOME/.claude/scripts/enospc-workaround.sh"
+```
+
+Restart Claude Code (new terminal) after adding. Remove once Claude Code
+ships with Bun >= 1.3.15.
+
+### References
+
+- [claude-code#63877](https://github.com/anthropics/claude-code/issues/63877) — the original ENOSPC preflight bug.
+- [Comment with this specific workaround](https://github.com/anthropics/claude-code/issues/63877#issuecomment-4627467164) — the Bun `bsize=0` variant on macOS x86_64 APFS.
