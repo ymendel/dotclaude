@@ -70,8 +70,8 @@ anything.
 
 ### Dependency warning
 
-`sync-skill.sh` runs two heuristic checks before applying, and prints a
-warning if either fires:
+`sync-skill.sh` runs three heuristic checks before applying, and prints a
+warning when any fire:
 
 - **Outward references:** the source skill's files mention `rules/`,
   `hooks/`, or `settings.json`. Catches skills that explicitly call out
@@ -79,13 +79,19 @@ warning if either fires:
 - **Inward references:** files under the source repo's `rules/`, `hooks/`,
   `agents/`, or `settings.json` mention the skill name. Catches dependencies
   that point *into* the skill from outside.
+- **Missing companions:** code/script filenames (`.sh`, `.py`, etc.) named
+  in the skill's markdown docs that don't exist anywhere inside the skill
+  directory. Catches the "documented but not shipped" shape — e.g. setup.md
+  tells the adopter to copy a script that lives elsewhere in the source
+  repo and won't travel with the skill.
 
-Either check can produce false positives (a skill that just happens to
-mention "rules/" in passing) or false negatives (an implicit dependency
-not named anywhere). The warning lists likely-affected paths — none of
-them are copied by the sync; bring them across by hand if the destination
-needs them. See [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md)
-for the reasoning.
+Each check can produce false positives (a skill that just happens to
+mention "rules/" in passing; a markdown code-block example name like
+`test.py`) or false negatives (an implicit dependency not named anywhere).
+The warnings list likely-affected paths — none of them are copied by the
+sync; bring them across by hand if the destination needs them. See
+[ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for
+the reasoning.
 
 ### Exit status
 

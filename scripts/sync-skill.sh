@@ -285,6 +285,49 @@ if [[ -n "$outward_matches" || -n "$inward_matches" ]]; then
   echo >&2
 fi
 
+# Completeness check: script/code filenames mentioned in skill markdown that
+# don't ship inside the skill. Catches the "documented but not present" shape
+# — e.g. SKILL.md or setup.md references `foo.sh` but no foo.sh exists
+# anywhere in the skill directory. Distinct from the outward/inward dep check
+# above: that one is about deps *outside* the skill; this one is about
+# completeness *inside* it. COMPANIONS.md presence does not mute this — the
+# failure mode is "the file the docs name doesn't ship," and a COMPANIONS.md
+# contract describing how to install something that isn't there is exactly
+# the situation this catches.
+#
+# Scoped to `.md` files outside `tests/` and `evals/` — that's where skill
+# docs make claims about what ships. Code files (Python test helpers) and
+# fixture markdown (eval scenarios narrating fake project setups) frequently
+# contain filenames that aren't real references; those would noise the
+# warning without adding signal.
+#
+# Heuristic, with the usual caveats: a generic example name (`test.py`)
+# inside a markdown code block, or a tool the adopter is expected to already
+# have on PATH, will also trip this. Tolerate the false positives.
+mentioned_names=$(
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    [[ "$f" != *.md ]] && continue
+    [[ "$f" == tests/* || "$f" == evals/* ]] && continue
+    grep -hoE '\b[A-Za-z0-9_.-]+\.(sh|py|rb|js|ts|mjs|cjs|sql|rake)\b' "$src/$f" 2>/dev/null || true
+  done < <(emit_lines "$src_files") | sort -u
+)
+
+missing_files=""
+while IFS= read -r name; do
+  [[ -z "$name" ]] && continue
+  if ! find "$src" -name "$name" -print -quit 2>/dev/null | grep -q .; then
+    missing_files+="  $name"$'\n'
+  fi
+done < <(emit_lines "$mentioned_names")
+
+if [[ -n "$missing_files" ]]; then
+  echo "${YELLOW}warning:${RESET} $skill mentions code/script files that don't ship with the skill:" >&2
+  printf '%s' "$missing_files" | sed 's/^  /    /' >&2
+  echo "  if these are companion files the skill needs, consider shipping them inside the skill directory." >&2
+  echo >&2
+fi
+
 # Print header + change list.
 if [[ $dry_run -eq 1 ]]; then
   printf "%b[dry-run]%b %s (%s → %s)\n" "$DIM" "$RESET" "$skill" "$src_label" "$dst_label"
