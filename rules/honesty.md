@@ -13,6 +13,14 @@
 - **From project docs**: cite the document
 - **Estimated**: label it explicitly as "ESTIMATED" or "PROJECTED" in the text — never present it as a finding
 
+## Re-query numbers at draft time
+
+When drafting a structured document (plan, ADR, summary, report, post-implementation writeup) that includes numeric claims, re-query each number at draft time. Numbers lifted from earlier turns, prior sessions, or handoffs can be stale (the state has moved), misframed (an upstream system's count restated as a local-DB count; one model's count restated as a related model's count), or misremembered (a value from a few turns back that doesn't match what was actually measured).
+
+The act of placing a number into a structured document gives it the aura of having been verified — readers see a tidy plan and assume "this is current." Recall errors that would be caught in conversational back-and-forth slip through to a document that looks authoritative.
+
+Before each number ships in prose, ask "where is this from, *right now*?" If the answer is "earlier this session," "the handoff," or "I think I saw it during the same task," re-query — SQL, file read, tool call — rather than reuse. This is the quantitative analogue of "Verify Framing Before Writing Prose" below: that rule says quote-before-paraphrase for qualitative claims; this one says re-query-before-restate for quantitative ones.
+
 ## Verify Framing Before Writing Prose
 
 When describing how an external system, library, or codebase concept works (a gem's API, another project's internals, a domain model in this repo), quote the source before drafting prose. File path with line number, or a URL. Not paraphrase — quote.
