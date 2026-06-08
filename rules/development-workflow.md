@@ -21,7 +21,7 @@ Failure mode this prevents: with many rules loaded passively, applying them duri
 
 ## Implementation
 
-- Use the ADR as the guidelines for implementing the plan. While implementing, keep the ADR in `Proposed` status — it's a working document until the implementation validates it. If the work surfaces gaps or contradictions, update the Proposed ADR rather than reconciling around it. Flip to `Accepted` once the decision has been validated by working code.
+- Use the ADR as the guidelines for implementing the plan. While implementing, keep the ADR in `Proposed` status — it's a working document until the implementation validates it. If the work surfaces gaps or contradictions, update the Proposed ADR rather than reconciling around it. Flip to `Accepted` once the decision has been validated by working code — meaning the decision's *central premise* has been exercised against real data, not just that the code ran without crashing. For a matching or sync strategy, that means measuring the match rate against a representative slice; for a schema change, running the queries that drove the decision; for an integration, at least one round-trip against the real upstream. "Ran the task once and it completed" is not validation when the premise itself was never tested.
 - Work through the implementation in logical steps, committing as you go.
 - When you hit a confusion or contradiction you can resolve confidently, resolve it and note it for the post-implementation report — don't interrupt the flow for handleable issues.
 - Stop and ask only when you genuinely can't proceed: the ADR seems materially wrong, the resolution affects scope, or you'd be guessing at intent.

@@ -27,6 +27,8 @@ When describing how an external system, library, or codebase concept works (a ge
 
 Failure mode this prevents: confident-sounding prose that frames a concept wrong because it was inferred from prior context rather than read from source. The output reads as authoritative and ships unless caught. Quantitative claims have an obvious provenance test (where did the number come from?); qualitative framing slips past without one unless this rule fires.
 
+Specific case: ADR Context. Claims about *what an external system actually does* are easy to phrase confidently from one or two examples. They feel like Context (background facts setting up the Decision) but are often Premises (load-bearing assumptions the Decision depends on). Label them accordingly: an inferred premise should read as a premise to be validated, not as an observation. Honest forms: "a sample of N showed [shape]; the matcher needs to tolerate this" (observation, with sample size disclosed); "we expect X; this has not been checked across the full set and is an assumption to validate when sync runs" (assumption, labeled); or a quote from the system's docs with a citation (authoritative). The trap is phrasing an unverified premise with the cadence of an observation, then taking the Decision as if the premise were checked.
+
 ## Separate What You Know From What You Assume
 
 Before drafting any analysis or document with numbers, first list:
