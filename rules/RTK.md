@@ -11,6 +11,8 @@ rtk discover          # Analyze Claude Code history for missed opportunities
 rtk proxy <cmd>       # Execute raw command without filtering (bypasses all RTK filters)
 ```
 
+**Reading `rtk discover` output:** the "missed savings" totals are an upper bound — the tool reads pre-hook transcript commands, so commands the hook *did* rewrite still show up as if they ran un-RTK'd. The adoption-rate number is accurate (post-hook execution); the missed-savings total is not a measurement. Known upstream and extensively reported.
+
 ## Installation Verification
 
 ```bash
