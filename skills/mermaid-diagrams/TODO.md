@@ -23,3 +23,13 @@ Ideas worth picking back up on later.
 **Trigger to revisit:** when a parse-success-but-semantically-wrong diagram actually ships and the ASCII review didn't catch it. That instance shows which smell would have helped, and the lint logic can target it specifically rather than speculatively covering every category above.
 
 **Not yet worth doing because:** no concrete case has bitten. The ASCII preview is the cheaper, broader lever for now — semantic linting is a sharpening pass, valuable but speculative until a real miss shows where to aim.
+
+## Multi-file processing aborts on first missing file
+
+**Current behavior:** `blocks_from_input` calls `sys.exit(2)` when an input path isn't a file or has an unsupported extension. Running `validate_mermaid.py good.mmd missing.mmd other.mmd` aborts at `missing.mmd` — `other.mmd` is never processed.
+
+**Defensible default:** if you pointed the script at a path that doesn't exist, that's user error and fail-fast is reasonable. Surfacing per-file errors and continuing would also be reasonable.
+
+**Trigger to revisit:** when "validate everything in this directory" or a glob-style use case shows up and the abort-on-first behavior is actively in the way. At that point, switch to collect-errors-and-continue, exiting non-zero at the end with a summary of which inputs failed.
+
+**Not yet worth doing because:** the dominant use is "validate this one diagram I just wrote" or "validate the fences in this one doc," where fail-fast is correct.

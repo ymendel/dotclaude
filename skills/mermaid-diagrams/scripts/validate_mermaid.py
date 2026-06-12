@@ -35,11 +35,14 @@ import argparse
 import shutil
 import subprocess
 import tempfile
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator
 
 ASCII_INLINE_LINE_LIMIT = 60
+# Fence detection handles 3-backtick fences with exactly `mermaid` as the info
+# string. 4+ backticks, tilde fences, and info-string suffixes (```mermaidish)
+# are not matched — rare in practice for the diagrams this script validates.
 FENCE_OPEN_PREFIX = "```mermaid"
 FENCE_CLOSE = "```"
 
@@ -48,7 +51,6 @@ FENCE_CLOSE = "```"
 class Block:
     source: str
     text: str
-    origin_line: int
 
 
 def extract_blocks(path: Path) -> list[Block]:
@@ -70,7 +72,6 @@ def extract_blocks(path: Path) -> list[Block]:
                     Block(
                         source=f"{path}:block-{block_index}@L{current_start}",
                         text="\n".join(current),
-                        origin_line=current_start,
                     )
                 )
                 current = None
@@ -82,7 +83,6 @@ def extract_blocks(path: Path) -> list[Block]:
             Block(
                 source=f"{path}:block-{block_index}@L{current_start} (unclosed fence)",
                 text="\n".join(current),
-                origin_line=current_start,
             )
         )
     return blocks
@@ -90,14 +90,14 @@ def extract_blocks(path: Path) -> list[Block]:
 
 def blocks_from_input(arg: str) -> Iterator[Block]:
     if arg == "-":
-        yield Block(source="<stdin>", text=sys.stdin.read(), origin_line=1)
+        yield Block(source="<stdin>", text=sys.stdin.read())
         return
     p = Path(arg)
     if not p.is_file():
         print(f"error: not a file: {arg}", file=sys.stderr)
         sys.exit(2)
     if p.suffix == ".mmd":
-        yield Block(source=str(p), text=p.read_text(encoding="utf-8"), origin_line=1)
+        yield Block(source=str(p), text=p.read_text(encoding="utf-8"))
     elif p.suffix == ".md":
         yield from extract_blocks(p)
     else:
