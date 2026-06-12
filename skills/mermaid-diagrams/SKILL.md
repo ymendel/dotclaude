@@ -184,12 +184,20 @@ flowchart LR
 
 **Native support in:**
 - GitHub/GitLab - Automatically renders in Markdown
+- Zed, Notion, Obsidian, Confluence - Built-in support
 - VS Code - With Markdown Mermaid extension
-- Notion, Obsidian, Confluence - Built-in support
 
 **Export options:**
-- [Mermaid Live Editor](https://mermaid.live) - Online editor with PNG/SVG export
+- **[merman-cli](https://github.com/Latias94/merman) (recommended)** - Headless Rust binary; no Node, Chrome, or Puppeteer. `brew install merman-cli`, then:
+  ```
+  merman-cli render input.mmd --out output.svg
+  merman-cli render --format png --out output.png input.mmd
+  merman-cli render --format ascii input.mmd      # terminal preview
+  merman-cli parse input.mmd --pretty             # syntax check / semantic JSON
+  ```
+  Targets `mermaid@11.15.0`; coverage and gaps tracked in [`docs/alignment/STATUS.md`](https://github.com/Latias94/merman/blob/main/docs/alignment/STATUS.md).
 - Mermaid CLI - `npm install -g @mermaid-js/mermaid-cli` then `mmdc -i input.mmd -o output.png`
+- [Mermaid Live Editor](https://mermaid.live) - Online editor with PNG/SVG export
 - Docker - `docker run --rm -v $(pwd):/data minlag/mermaid-cli -i /data/input.mmd -o /data/output.png`
 
 ## Common Pitfalls
