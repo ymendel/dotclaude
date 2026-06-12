@@ -200,10 +200,24 @@ flowchart LR
 - [Mermaid Live Editor](https://mermaid.live) - Online editor with PNG/SVG export
 - Docker - `docker run --rm -v $(pwd):/data minlag/mermaid-cli -i /data/input.mmd -o /data/output.png`
 
+## Validating Diagrams
+
+Before declaring a diagram done, run the local validator:
+
+```
+scripts/validate_mermaid.py path/to/diagram.mmd
+scripts/validate_mermaid.py path/to/document.md   # extracts ```mermaid fences
+cat diagram.mmd | scripts/validate_mermaid.py -
+```
+
+For each block, the script parses it via `merman-cli` and renders a small ASCII preview. The ASCII output is the *semantic* check: parsing only confirms syntax — eyeballing the rendered shape catches typos and wrong-direction arrows that parse fine but don't mean what was intended. Long renders (>60 lines) spill to a tempfile and the script prints a pointer.
+
+Requires `merman-cli` on PATH (see Export options above for install).
+
 ## Common Pitfalls
 
 - **Breaking characters** - Avoid `{}` in comments, use proper escape sequences for special characters
-- **Syntax errors** - Misspellings break diagrams; validate syntax in Mermaid Live
+- **Syntax errors** - Misspellings break diagrams. Validate locally with `scripts/validate_mermaid.py` (see above), or use [Mermaid Live](https://mermaid.live) in the browser.
 - **Overcomplexity** - Split complex diagrams into multiple focused views
 - **Missing relationships** - Document all important connections between entities
 
