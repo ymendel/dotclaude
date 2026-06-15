@@ -11,7 +11,7 @@ rtk discover          # Analyze Claude Code history for missed opportunities
 rtk proxy <cmd>       # Execute raw command without filtering (bypasses all RTK filters)
 ```
 
-**Reading `rtk discover` output:** the "missed savings" totals are an upper bound — the tool reads pre-hook transcript commands, so commands the hook *did* rewrite still show up as if they ran un-RTK'd. The adoption-rate number is accurate (post-hook execution); the missed-savings total is not a measurement. Known upstream and extensively reported.
+**Reading `rtk discover` output:** the "missed savings" totals are an upper bound — the tool reads pre-hook transcript commands, so commands the hook *did* rewrite still show up as if they ran un-RTK'd. The adoption-rate number is accurate (post-hook execution). The missed-savings total is not a measurement. Known upstream and extensively reported.
 
 ## Installation Verification
 
@@ -54,7 +54,7 @@ or committing — the dominant case — go directly to `rtk proxy git diff --no-
 Combining the two flags handles both filters at once: `proxy` bypasses RTK, `--no-ext-diff`
 bypasses the user's difftastic config (see `diagnosis.md`). Reserve plain `rtk git diff`
 for the rare "is anything dirty?" check — and `git status` is usually the better answer
-for that anyway. Do not retry `rtk git diff` variants expecting different output; they all
+for that anyway. Do not retry `rtk git diff` variants expecting different output. They all
 go through the same filter. `git show` cannot substitute: it only shows committed changes,
 not working tree differences.
 

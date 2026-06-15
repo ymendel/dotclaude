@@ -7,7 +7,7 @@ paths:
   - "**/Rakefile"
 ---
 
-# Code Style — Ruby & Rails
+# Code Style, Ruby & Rails
 
 ## Ruby
 
@@ -21,10 +21,10 @@ paths:
 
 ### Aesthetics
 
-- Use prepositions (`.for`, `.of`, `.from`) for class method entry points that construct an instance, when args are unambiguous; otherwise name the method clearly. Prefer a named method over kwargs that disambiguate. (Examples and edge cases: `naming-analyzer` skill.)
+- Use prepositions (`.for`, `.of`, `.from`) for class method entry points that construct an instance, when args are unambiguous. Otherwise name the method clearly. Prefer a named method over kwargs that disambiguate. (Examples and edge cases: `naming-analyzer` skill.)
 - Prefer guard clauses and early returns over nested `if`/`else`/`elsif` when it improves readability.
 - Prefer kwargs over positional args (exceptions: single arg, or leading positional + kwargs).
-- Prefer symbol keys in hashes; convert at serialization boundaries.
+- Prefer symbol keys in hashes. Convert at serialization boundaries.
 - Alphabetize attrs, kwargs, case branches, etc. when order doesn't matter.
 
 ## Rails
@@ -34,7 +34,7 @@ paths:
 
 ### Gemfile
 
-- Gems used in all environments go above the group blocks; gems scoped to specific environments go inside the appropriate `group` block — never use the `groups:` kwarg.
+- Gems used in all environments go above the group blocks. Gems scoped to specific environments go inside the appropriate `group` block — never use the `groups:` kwarg.
 - Always specify version constraints with the `~>` operator when adding a gem.
 
 ### Commits
@@ -63,7 +63,7 @@ paths:
   ```
 
   Even when production is known to be empty, dev/staging/CI environments restored from snapshots may not be. The pre-check costs nothing and saves a confused debug session.
-- When adding a column with semantic constraints (`end_date >= start_date`, `price >= 0`, `status IN (...)`), pair the model validation with a database `CHECK` constraint. The model validation gives users a friendly error; the constraint protects against direct SQL, console writes, and the next backend that talks to the same table.
+- When adding a column with semantic constraints (`end_date >= start_date`, `price >= 0`, `status IN (...)`), pair the model validation with a database `CHECK` constraint. The model validation gives users a friendly error. The constraint protects against direct SQL, console writes, and the next backend that talks to the same table.
 
 ### Rake Tasks
 
@@ -72,5 +72,5 @@ paths:
 
 ### Runners and Scripts
 
-- Before writing a Rails runner (or any script) that references multiple ActiveRecord models, confirm each one actually exists where assumed — list `app/models/` or grep for the constant. A model name that sounds right ("SyntheticRun", "Objective") may live in a gem under a namespace, may be an external service's concept with no local table at all, or may simply not exist. Guessing leads to `NameError`s mid-script and a wasted round-trip; a 1-second check up front avoids it. This is especially important in projects that pull domain models from engines or gems — the convention "models live in `app/models/`" is not universal.
+- Before writing a Rails runner (or any script) that references multiple ActiveRecord models, confirm each one actually exists where assumed — list `app/models/` or grep for the constant. A model name that sounds right ("SyntheticRun", "Objective") may live in a gem under a namespace, may be an external service's concept with no local table at all, or may simply not exist. Guessing leads to `NameError`s mid-script and a wasted round-trip. A 1-second check up front avoids it. This is especially important in projects that pull domain models from engines or gems — the convention "models live in `app/models/`" is not universal.
 

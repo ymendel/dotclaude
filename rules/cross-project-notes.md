@@ -17,7 +17,7 @@ Cross-project, long-lived, non-behavioral knowledge:
 - **Project-specific context** — ongoing work, decisions, references for a single project. That goes in that project's memory or its declared `project-notes` destinations.
 - **Anything already covered by an existing skill or rule** — extend the skill or rule instead.
 
-When a finding could go in two places, prefer the more specific one. A note about "strong_migrations should be in our Rails template" goes here only because no template repo exists yet to file it against; once one exists, the note moves there.
+When a finding could go in two places, prefer the more specific one. A note about "strong_migrations should be in our Rails template" goes here only because no template repo exists yet to file it against. Once one exists, the note moves there.
 
 ## Structure
 
@@ -29,7 +29,7 @@ The directory is intentionally outside version control (the allowlist `.gitignor
 
 ## When to check
 
-When a question or task has plausibly accumulated cross-project wisdom — defaults for a new project of type X, a known quirk of tool Y, a pattern that's bit you before — check the relevant file in `~/.claude/notes/` before answering. Don't read the whole directory preemptively; reach for it the same way you'd reach for a skill or rule when the topic is relevant.
+When a question or task has plausibly accumulated cross-project wisdom — defaults for a new project of type X, a known quirk of tool Y, a pattern that's bit you before — check the relevant file in `~/.claude/notes/` before answering. Don't read the whole directory preemptively. Reach for it the same way you'd reach for a skill or rule when the topic is relevant.
 
 ## When to file
 

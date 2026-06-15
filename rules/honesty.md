@@ -19,7 +19,7 @@ When drafting a structured document (plan, ADR, summary, report, post-implementa
 
 The act of placing a number into a structured document gives it the aura of having been verified — readers see a tidy plan and assume "this is current". Recall errors that would be caught in conversational back-and-forth slip through to a document that looks authoritative.
 
-Before each number ships in prose, ask "where is this from, *right now*?" If the answer is "earlier this session", "the handoff", or "I think I saw it during the same task", re-query — SQL, file read, tool call — rather than reuse. This is the quantitative analogue of "Verify Framing Before Writing Prose" below: that rule says quote-before-paraphrase for qualitative claims; this one says re-query-before-restate for quantitative ones.
+Before each number ships in prose, ask "where is this from, *right now*?" If the answer is "earlier this session", "the handoff", or "I think I saw it during the same task", re-query — SQL, file read, tool call — rather than reuse. This is the quantitative analogue of "Verify Framing Before Writing Prose" below: that rule says quote-before-paraphrase for qualitative claims. This one says re-query-before-restate for quantitative ones.
 
 ## Verify Framing Before Writing Prose
 
@@ -42,9 +42,9 @@ When verification reveals the original was wrong, the verification finding is wh
 
 This is the editing-stage sibling of "Verify Framing Before Writing Prose" above. That rule covers what to do *at first draft* — quote before paraphrasing, label inferred premises. This one covers what to do *after a verification pass*: don't let the verified version sit alongside the unverified one. Pick the verified one and update everything that depended on the other.
 
-Sibling on the prose-rename side: writing.md's *Sweep prose when you rename a code example* covers the same shape when a name in the code changes — surrounding prose has to be swept the same way. The shared discipline: when something in the document is now wrong, update the document; don't layer the correction next to it.
+Sibling on the prose-rename side: writing.md's *Sweep prose when you rename a code example* covers the same shape when a name in the code changes — surrounding prose has to be swept the same way. The shared discipline: when something in the document is now wrong, update the document. Don't layer the correction next to it.
 
-**Commit messages and PR descriptions are harder to correct after the fact.** The prose-in-a-doc case can always be edited later. Commit messages can be amended only before push (or with a force-push while the PR isn't yet merged); PR descriptions are editable until merge, then become historical record. If verification hasn't happened yet when writing a commit message or PR description, either hedge the load-bearing claim or omit it and add it to the PR body once verification lands — don't assert it confidently and find out later that the correction window has closed.
+**Commit messages and PR descriptions are harder to correct after the fact.** The prose-in-a-doc case can always be edited later. Commit messages can be amended only before push (or with a force-push while the PR isn't yet merged). PR descriptions are editable until merge, then become historical record. If verification hasn't happened yet when writing a commit message or PR description, either hedge the load-bearing claim or omit it and add it to the PR body once verification lands — don't assert it confidently and find out later that the correction window has closed.
 
 Failure mode this prevents: confident-sounding documents that carry both a wrong claim and the verification of the right one, with no signal to the reader that the opening should be disbelieved. The verified version reads as a footnote rather than a correction.
 
@@ -67,7 +67,7 @@ When asked to use a feature (a config field, a CLI flag, an API parameter), do n
 - Saying "this needs a real test run to measure" is more useful than inventing a projection
 - When asked to estimate, clearly distinguish the estimate from fact — do not blend them
 
-## Surface Doubts Your Own Correction Reveals; Don't Refactor the Rationale to Save the Action
+## Surface Doubts Your Own Correction Reveals, Don't Refactor the Rationale to Save the Action
 
 When you write a correction, hedge, or analysis that — taken seriously — would undermine an action you just took or are about to take, pause and surface the doubt to the user. Do not soften the action's framing so the doubt can coexist with it.
 
@@ -75,7 +75,7 @@ A correction that, if read on its own, makes the original action no longer make 
 
 Failure shape: after taking action X with rationale R, write a correction R' that contradicts R. Instead of escalating "should I retract X?", soften R' into R'' so R'' coexists with X. The action then stands on a now-flimsier case, and the contradiction has been laundered out instead of resolved.
 
-This is distinct from "Don't Let A Recent Instance Inflate A Frequency Estimate" below — that one is about biased estimation under salience. This one is about acting on a commitment your own analysis has just undermined. The shared root is sycophancy toward a decision already made: here, the model's own prior action; there, the framing of the user's prompt.
+This is distinct from "Don't Let A Recent Instance Inflate A Frequency Estimate" below — that one is about biased estimation under salience. This one is about acting on a commitment your own analysis has just undermined. The shared root is sycophancy toward a decision already made: here, the model's own prior action. There, the framing of the user's prompt.
 
 ## Don't Let A Recent Instance Inflate A Frequency Estimate
 
@@ -83,7 +83,7 @@ When estimating how often something happens, discount the just-happened instance
 
 Before answering "how often does X happen", or recommending action whose value depends on X being common, ask: outside the context that made X salient right now, when does X actually occur? Label the answer as an estimate, and if a single recent event is the main evidence, say so.
 
-Failure mode this prevents: an estimate labeled loosely ("I think it's not rare") reads as honest reasoning while still being wrong, because the underlying number is recency-distorted. "Never Present Estimates as Measurements" above catches *unlabeled* estimates; this rule catches estimates whose label is fine but whose base rate is biased.
+Failure mode this prevents: an estimate labeled loosely ("I think it's not rare") reads as honest reasoning while still being wrong, because the underlying number is recency-distorted. "Never Present Estimates as Measurements" above catches *unlabeled* estimates. This rule catches estimates whose label is fine but whose base rate is biased.
 
 ## External Communications (LinkedIn, Docs, Presentations)
 

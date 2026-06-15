@@ -1,12 +1,12 @@
 # Rules
 
-Rule files govern how Claude should behave across all projects, not just in specific tasks. Most load unconditionally at session start; files with `paths` frontmatter load only when Claude reads a matching file.
+Rule files govern how Claude should behave across all projects, not just in specific tasks. Most load unconditionally at session start. Files with `paths` frontmatter load only when Claude reads a matching file.
 
 ## Rules vs. skills
 
-Rules load eagerly; skills load on demand when their trigger description matches the context. Behavioral defaults — guidance that should apply to every response — belong in rules. Procedural workflows with their own steps, templates, or references belong in skills.
+Rules load eagerly, skills load on demand when their trigger description matches the context. Behavioral defaults — guidance that should apply to every response — belong in rules. Procedural workflows with their own steps, templates, or references belong in skills.
 
-A single concern occasionally splits across both. The `project-notes` rule covers the recognition habit — when to notice something filing-worthy. The `project-notes` skill covers the production workflow — how to file it once recognized. The rule fires unconditionally so recognition stays on; the skill loads only when invoked.
+A single concern occasionally splits across both. The `project-notes` rule covers the recognition habit — when to notice something filing-worthy. The `project-notes` skill covers the production workflow — how to file it once recognized. The rule fires unconditionally so recognition stays on. The skill loads only when invoked.
 
 ---
 
@@ -26,7 +26,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`self-improvement.md`** — Triggers for when to self-improve: user corrections, workarounds, failed commands, violated rules, and inconsistencies. Points to `rule-maintenance.md` for how to act on them.
 
-**`project-notes.md`** — Recognition triggers for long-running project notes that don't belong in code, commit messages, memory, or session handoffs: cleanup-debt, drafted upstream feedback, lessons for a derived-template. Covers the *when* to file; the `project-notes` skill covers structure and the *how*. Destinations are project-specific config.
+**`project-notes.md`** — Recognition triggers for long-running project notes that don't belong in code, commit messages, memory, or session handoffs: cleanup-debt, drafted upstream feedback, lessons for a derived-template. Covers the *when* to file. The `project-notes` skill covers structure and the *how*. Destinations are project-specific config.
 
 **`cross-project-notes.md`** — Sibling to `project-notes.md` for findings that generalize beyond any single project and don't have an upstream / template / external destination yet. Names `~/.claude/notes/` as the durable home for those, with one file per topic (`template-lessons.md`, `postgres-quirks.md`, …). Directory is intentionally outside version control.
 
@@ -44,6 +44,6 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`writing.md`** — User-specific writing preferences that supplement the `writing-clearly-and-concisely` skill: avoid violent metaphors and military or war-origin idioms (including "in anger"); emulate the user's voice when appropriate (register, archaic Latin abbreviations like `&c.`, `viz.`, `cf.`), without mirroring his lowercase prompting shorthand in formal output.
 
-**`stakeholder-questions.md`** — When drafting a question for a stakeholder, client, or non-engineer collaborator, ask about behavior, not implementation. Covers two techniques (turn internal insights into assumption checks; match the stakeholder's vocabulary), a worked example (temporal information on records), and the failure mode that motivates the rule. Applies to Slack drafts, meeting follow-ups, ADR Context-section research — any outward-facing question whose answer feeds engineering work.
+**`stakeholder-questions.md`** — When drafting a question for a stakeholder, client, or non-engineer collaborator, ask about behavior, not implementation. Covers two techniques (turn internal insights into assumption checks, match the stakeholder's vocabulary), a worked example (temporal information on records), and the failure mode that motivates the rule. Applies to Slack drafts, meeting follow-ups, ADR Context-section research — any outward-facing question whose answer feeds engineering work.
 
 **`naming.md`** — Single name per concept across code, docs, ADRs, commit messages, and chat. Covers consistency (don't introduce synonyms for an existing concept) and adopting the domain expert's vocabulary in code. Companion to `stakeholder-questions.md`'s "Match the stakeholder's vocabulary" section — same discipline applied to naming the thing instead of asking about it. Distinct from the `naming-analyzer` skill, which judges quality of individual names rather than consistency across surfaces.

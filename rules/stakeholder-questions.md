@@ -1,6 +1,6 @@
 # Stakeholder Questions
 
-When drafting a question to a stakeholder, client, or non-engineer collaborator, ask about **behavior**, not about **implementation**. The stakeholder's job is to tell us what they need to be able to do and see; deciding how to store, structure, or validate the data behind that is ours.
+When drafting a question to a stakeholder, client, or non-engineer collaborator, ask about **behavior**, not about **implementation**. The stakeholder's job is to tell us what they need to be able to do and see. Deciding how to store, structure, or validate the data behind that is ours.
 
 This applies any time the answer will feed into engineering work — disambiguation messages on Slack, follow-up questions in a meeting recap, "before we build this, can you confirm…" notes, ADR Context-section research. Whenever the question is going *out* to someone whose role is to describe the work, not to implement it, this rule fires.
 

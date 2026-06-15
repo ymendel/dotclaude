@@ -14,7 +14,7 @@ Also: when the target path is a symlink, `find` may not follow it without a trai
 
 Do not search, list, find, glob, or read anything under `~` / `$HOME` / `/Users/yossef/` outside the current project directory. This holds regardless of how narrow or fast the search would be, and regardless of whether the access is direct or delegated to a sub-agent. If a task plausibly needs something from there, ask — the user will say so explicitly when home-directory access is intended.
 
-**Why:** the user's home directory contains personal files, configuration, and unrelated projects; reaching into it without explicit permission is a violation regardless of intent. The narrower "no home-dir search for library docs" rule below is one instance of this broader prohibition.
+**Why:** the user's home directory contains personal files, configuration, and unrelated projects. Reaching into it without explicit permission is a violation regardless of intent. The narrower "no home-dir search for library docs" rule below is one instance of this broader prohibition.
 
 **How to apply:** when constructing a search command, check the target path. If it starts with `~`, `$HOME`, or `/Users/yossef/` (or expands to one), stop and ask. Same for `Glob` patterns, `Read` targets, `Explore` agent prompts that mention home-dir paths, &c.
 

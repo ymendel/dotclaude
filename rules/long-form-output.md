@@ -17,7 +17,7 @@ When a turn's output is long enough that the user would have to scroll back and 
 ## How to apply
 
 - Pick a sensible path inside the project (`docs/`, alongside related artifacts, `.claude/handoffs/` for handoffs, `.claude/reviews/` for code reviews). Don't create a new top-level directory.
-- Write the file, then post a short pointer in the chat: filename, one to three sentences of framing, and the specific things to look at. The pointer goes in the chat; the content goes in the file.
+- Write the file, then post a short pointer in the chat: filename, one to three sentences of framing, and the specific things to look at. The pointer goes in the chat, the content goes in the file.
 - If the output is genuinely throwaway / one-shot and unlikely to be re-read, ask before creating the file rather than defaulting to one.
 
 ## Alternatives and rewrites go to a new file
@@ -28,7 +28,7 @@ The same applies to incremental drafts the user is *still reading*: if they say 
 
 Once the user picks a direction, default to keeping both files. The discarded file may still be useful as a reference for what didn't work. Only merge into one or delete the rejected version when the user explicitly says to.
 
-**Failure mode this prevents:** overwriting the original forces the user to reconstruct it from chat history or git to compare against the new version — the exact "scroll back and forth" cost the main rule is meant to remove. Comparison is the whole point of asking for an alternative; preserving both versions is what makes the comparison possible.
+**Failure mode this prevents:** overwriting the original forces the user to reconstruct it from chat history or git to compare against the new version — the exact "scroll back and forth" cost the main rule is meant to remove. Comparison is the whole point of asking for an alternative. Preserving both versions is what makes the comparison possible.
 
 ## Skill-prescribed output formats do not exempt content from this rule
 
@@ -36,4 +36,4 @@ A skill's prescribed output format — JSON findings, a structured report, anyth
 
 ## Failure mode this prevents
 
-Long structured replies posted inline force the user to scroll back and forth in the terminal to re-read or compare sections, when opening the same content in their editor would be both easier and more durable. Files survive the conversation; inline content has to be quoted, screenshotted, or re-prompted to re-visit. The default tilts toward "inline" because it's the cheaper local action for the model; this rule corrects the tilt.
+Long structured replies posted inline force the user to scroll back and forth in the terminal to re-read or compare sections, when opening the same content in their editor would be both easier and more durable. Files survive the conversation. Inline content has to be quoted, screenshotted, or re-prompted to re-visit. The default tilts toward "inline" because it's the cheaper local action for the model. This rule corrects the tilt.

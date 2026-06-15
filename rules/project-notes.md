@@ -2,19 +2,19 @@
 
 Some projects maintain long-running notes that don't belong in code, commit messages, memory, or session handoffs: cleanup-debt lists for an MVP, drafted feedback to upstream projects, lessons to roll back into a template the project was derived from. These notes outlive any single session, get appended across many sessions, and serve audiences different from the current commit reader.
 
-This rule covers the *recognition* habit — noticing mid-work that something just learned is filing-worthy, and acting on it before it evaporates. Structural conventions and the production workflow live in the `project-notes` skill; the destinations themselves are project-specific config (see *Project configuration* below).
+This rule covers the *recognition* habit — noticing mid-work that something just learned is filing-worthy, and acting on it before it evaporates. Structural conventions and the production workflow live in the `project-notes` skill. The destinations themselves are project-specific config (see *Project configuration* below).
 
 ## When to file
 
 Concrete triggers — act on these without waiting to be asked:
 
-- **An upstream gap or limitation surfaced** during real work and needed working around (a gem's missing pathway, a service's surprising behavior, a framework's silent no-op, an API's undocumented quirk). The reproduction and the workaround are vivid in working memory right now; in a week they won't be.
+- **An upstream gap or limitation surfaced** during real work and needed working around (a gem's missing pathway, a service's surprising behavior, a framework's silent no-op, an API's undocumented quirk). The reproduction and the workaround are vivid in working memory right now. In a week they won't be.
 - **A workaround was shipped that should be reverted when the upstream gap closes.** Capture the workaround, the gap it routes around, and the concrete condition under which the workaround can go away. Without this, the workaround becomes load-bearing forever.
 - **A surprising setup or configuration step** had to be discovered the hard way — a multi-buildpack ordering, an env-aware credentials gotcha, an undocumented flag, a buildpack/dependency interaction. The next person setting this up (a teammate, a future self, a stranger spinning up the template) needs to know.
-- **A debt was consciously deferred** with a clear *when to revisit* trigger (when the second deploy target is added; when the multi-dev collision bites in practice; when user count crosses N). The deferral is fine; losing track of it isn't.
+- **A debt was consciously deferred** with a clear *when to revisit* trigger (when the second deploy target is added; when the multi-dev collision bites in practice; when user count crosses N). The deferral is fine, losing track of it isn't.
 - **A lesson generalizes beyond this project** — a default that bit, a gotcha the upstream template ships, anything that would help the next template-derived app avoid the same pit. File against the template or upstream, not this project's cleanup list.
 
-The bar is *would this be lost if I don't file it somewhere outside the code or commit?* If the answer is no — it'll survive in a code comment, in the commit message, or because it's obvious from the diff — don't file. Over-firing dilutes the notes; under-firing loses them.
+The bar is *would this be lost if I don't file it somewhere outside the code or commit?* If the answer is no — it'll survive in a code comment, in the commit message, or because it's obvious from the diff — don't file. Over-firing dilutes the notes, under-firing loses them.
 
 ## What to do
 
@@ -42,7 +42,7 @@ The same moment often fires both. A workaround the model fell back to during a t
 
 ## Project configuration
 
-This rule is general; the destinations are project-specific. A project that uses this rule declares its notes destinations somewhere always-loaded — typically `CLAUDE.md` or a rule file imported from it. See the `project-notes` skill for the destination types it understands (cleanup-debt, upstream-feedback, derived-template lessons) and the per-destination structures.
+This rule is general, the destinations are project-specific. A project that uses this rule declares its notes destinations somewhere always-loaded — typically `CLAUDE.md` or a rule file imported from it. See the `project-notes` skill for the destination types it understands (cleanup-debt, upstream-feedback, derived-template lessons) and the per-destination structures.
 
 A project with no declared destinations falls through to step 5 above — the recognition still fires, but filing requires confirming a destination first.
 

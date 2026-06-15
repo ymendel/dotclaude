@@ -6,7 +6,7 @@ This rule covers *consistency* of names across surfaces. The `naming-analyzer` s
 
 ## Single name per concept
 
-Give one name to each concept and use it everywhere — class, method, column, test, comment, ADR, doc, commit message, chat. When extending an existing concept, use the established name; don't invent a synonym.
+Give one name to each concept and use it everywhere — class, method, column, test, comment, ADR, doc, commit message, chat. When extending an existing concept, use the established name. Don't invent a synonym.
 
 **How to apply:** before naming a new thing, check the codebase, ADRs, and recent docs for the concept. If a name exists, use it. If a near-synonym exists, decide deliberately — same concept (use the existing name) or genuinely different (introduce a new name and document the distinction). Slipping a new synonym in without a decision creates split vocabulary that lingers.
 

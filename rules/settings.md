@@ -26,7 +26,7 @@ Per the [official docs](https://code.claude.com/docs/en/permissions), `Read` and
 Two pattern-shape gotchas the docs flag explicitly:
 
 - **`/Users/alice/file` is NOT absolute** — it's project-root-relative. Use `//Users/alice/file` for absolute paths.
-- **`*` matches a single directory; `**` matches recursively.** `Edit(~/.claude/*)` does not match subdirectory files; use `Edit(~/.claude/**)`. Failure mode: subdirectory edits prompt unexpectedly because the rule that looks correct doesn't actually match.
+- **`*` matches a single directory. `**` matches recursively.** `Edit(~/.claude/*)` does not match subdirectory files. Use `Edit(~/.claude/**)`. Failure mode: subdirectory edits prompt unexpectedly because the rule that looks correct doesn't actually match.
 
 ### Symlinks: rules check both paths
 
@@ -49,7 +49,7 @@ For one rule to cover both paths, the pattern needs a segment that appears in bo
 
 > **PreToolUse hook — future option.** When the prompt cost becomes load-bearing (the live case is session handoffs being interrupted mid-departure), a hook can intercept Edit/Write under specific paths, validate narrowly, and exit 0 to skip the prompt without broadening the global allow list. Sketch: check that the path is under `~/.claude/handoffs/` (or the canonical `dotclaude/.claude/handoffs/`), exit 0 to allow. Design properly when picked up.
 
-## Project vs. Global Settings — Match Scope to Use
+## Project vs. Global Settings, Match Scope to Use
 
 When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:
 
@@ -79,7 +79,7 @@ rtk read "$(ls -t "$HOME/Library/Application Support/rtk/tee/"*.log | head -1)"
 
 - **`SessionStart`, `UserPromptSubmit`**: stdout is injected as a system reminder the model sees. Plain-text echo works.
 - **`PreToolUse`, `PostToolUse`**: support JSON output with `hookSpecificOutput.additionalContext` to inject context for the model.
-- **`PreCompact`**: JSON output only. Supports `decision` (block / not block) and `systemMessage` (user-facing). **Cannot inject context for the model to react to.** If the goal is to prompt the model to take action before compaction, PreCompact is the wrong tool — by hook semantics, the only intervention available is blocking compaction outright. (Storybloq's PreCompact hook works only because their MCP server has the model writing structured state to `.story/` *throughout* the session; the hook just snapshots already-written state. Without an incremental-write substrate, a DIY PreCompact hook can't replicate this.)
+- **`PreCompact`**: JSON output only. Supports `decision` (block / not block) and `systemMessage` (user-facing). **Cannot inject context for the model to react to.** If the goal is to prompt the model to take action before compaction, PreCompact is the wrong tool — by hook semantics, the only intervention available is blocking compaction outright. (Storybloq's PreCompact hook works only because their MCP server has the model writing structured state to `.story/` *throughout* the session. The hook just snapshots already-written state. Without an incremental-write substrate, a DIY PreCompact hook can't replicate this.)
 
 **Verify hook output semantics from the official docs (https://code.claude.com/docs/en/hooks) before designing a hook that depends on the model seeing the output.** Don't generalize from one hook type to another.
 
