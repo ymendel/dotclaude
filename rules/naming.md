@@ -16,7 +16,7 @@ This applies to extension as well as introduction. A new column on an existing m
 
 ## Adopt the domain expert's term
 
-When a stakeholder or domain expert uses a term for a concept, that term becomes the name in code — not an engineer-flavored synonym. If the operations team calls something "the work order," the class is `WorkOrder`, not `ServiceRequest` or `JobTicket`. If they use an acronym (BoL, SOW, PO), the code uses it too — possibly expanded if the abbreviation collides with something else, but the acronym stays primary.
+When a stakeholder or domain expert uses a term for a concept, that term becomes the name in code — not an engineer-flavored synonym. If the operations team calls something "the work order", the class is `WorkOrder`, not `ServiceRequest` or `JobTicket`. If they use an acronym (BoL, SOW, PO), the code uses it too — possibly expanded if the abbreviation collides with something else, but the acronym stays primary.
 
 Companion: `stakeholder-questions.md` covers this on the *question-asking* side ("Match the stakeholder's vocabulary"). This section is the naming-side application of the same discipline — adopt their term, let them push back on it if it's off, evolve the vocabulary jointly.
 
@@ -24,4 +24,4 @@ Companion: `stakeholder-questions.md` covers this on the *question-asking* side 
 
 ## Failure mode this prevents
 
-The same concept ends up under multiple names — class `Block`, column `inventory_block_id`, ADR "Inventory Block," Slack "the load," code comment "the carry-out unit" — and the reader pays a translation cost every time. Worse, the variants drift apart in meaning over time. The codebase ends up with names that *describe* mismatched things, hiding an actual conceptual mismatch until something breaks or a stakeholder catches the disconnect.
+The same concept ends up under multiple names — class `Block`, column `inventory_block_id`, ADR "Inventory Block", Slack "the load", code comment "the carry-out unit" — and the reader pays a translation cost every time. Worse, the variants drift apart in meaning over time. The codebase ends up with names that *describe* mismatched things, hiding an actual conceptual mismatch until something breaks or a stakeholder catches the disconnect.

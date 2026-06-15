@@ -14,7 +14,7 @@ Related: when the command in question is asynchronous (a background Bash, a long
 
 ## Distinguish "in progress" from "failed" before concluding failure
 
-When a long-running command has been started in the background (or any task whose output arrives asynchronously), an empty output file is not evidence of failure — it's also consistent with "still running, output not flushed yet." Before declaring the run failed and reissuing it, check:
+When a long-running command has been started in the background (or any task whose output arrives asynchronously), an empty output file is not evidence of failure — it's also consistent with "still running, output not flushed yet". Before declaring the run failed and reissuing it, check:
 
 - The file's modification time. If it was created moments ago and the task is one that takes time, it almost certainly hasn't finished yet.
 - The expected completion mechanism for the task. Background Bash calls emit a `task-notification` when they exit; the right move when uncertain is to wait for that notification (or use `Monitor` against the output file) rather than re-run.

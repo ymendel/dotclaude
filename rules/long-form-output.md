@@ -24,7 +24,7 @@ When a turn's output is long enough that the user would have to scroll back and 
 
 When the user has an existing filed draft and asks to see an alternative version, a rewrite, or a different angle — "show me a version that's more in my voice", "what would this look like if we cut X", "give me a tighter version" — write the new version to a new file with a short suffix that signals what it is (`-voice`, `-tight`, `-v2`, &c.), not over the existing one. Surface both paths in the pointer so the user can compare.
 
-The same applies to incremental drafts the user is *still reading*: if they say "I'm reading this now," don't overwrite while they're reading. Wait for feedback, or branch to a new file if you have edits to make in the meantime.
+The same applies to incremental drafts the user is *still reading*: if they say "I'm reading this now", don't overwrite while they're reading. Wait for feedback, or branch to a new file if you have edits to make in the meantime.
 
 Once the user picks a direction, default to keeping both files. The discarded file may still be useful as a reference for what didn't work. Only merge into one or delete the rejected version when the user explicitly says to.
 

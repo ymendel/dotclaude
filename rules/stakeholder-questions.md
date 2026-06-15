@@ -18,7 +18,7 @@ The pattern: rephrase the question until the words *the stakeholder uses to answ
 
 When you have an implementation idea that depends on a behavioral fact being true, the question to ask the stakeholder is whether the fact is true in their work — not whether to do the implementation.
 
-Worked example: the implementation idea was "we could carry the prior period's closing value forward as the default for the next period's opening, so users only enter a value when something has actually changed." The behavioral premise underneath it: "the value doesn't change between periods in ways the user doesn't already capture elsewhere." The question to ask is the premise, framed as an assumption-check: "Can we assume the opening value at period N is the same as the closing value at period N-1 unless told otherwise?"
+Worked example: the implementation idea was "we could carry the prior period's closing value forward as the default for the next period's opening, so users only enter a value when something has actually changed". The behavioral premise underneath it: "the value doesn't change between periods in ways the user doesn't already capture elsewhere". The question to ask is the premise, framed as an assumption-check: "Can we assume the opening value at period N is the same as the closing value at period N-1 unless told otherwise?"
 
 The stakeholder answers from their experience of how the work actually flows. We get either confirmation (implementation idea is safe to pursue) or a counter-example we needed to know about (the implementation idea was unsafe in a way we hadn't seen). Either way, the question stays in their domain.
 
@@ -63,6 +63,6 @@ Either way, the engineering decision ends up anchored on the wrong axis. Asking 
 
 Before sending a question outward, read it once and ask: *if I read this aloud to a non-engineer, would the answer be about what they need, or about a technical option I'm offering them?* If it's the latter, rewrite.
 
-Pay particular attention to verbs like "save," "store," "remember," "track" — these almost always smuggle in implementation framing. "Do you need to see…" or "is it ever important to know…" usually clears it up.
+Pay particular attention to verbs like "save", "store", "remember", "track" — these almost always smuggle in implementation framing. "Do you need to see…" or "is it ever important to know…" usually clears it up.
 
 When you can't see the behavior framing from where you sit, that's a signal to investigate the work the stakeholder actually does before composing the question, rather than asking them to do the translation.

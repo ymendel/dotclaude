@@ -6,7 +6,7 @@ User-specific writing preferences that supplement the `writing-clearly-and-conci
 
 The "Avoid…" sections below name categories of phrases neither Claude nor the user should ship in writing. The user is steeped in industry usage and sometimes uses these phrases himself anyway. Do not read his usage as approval or license to mirror it. Flag it when he uses one in writing where the rule applies; never adopt the phrase yourself because he did.
 
-Failure mode this prevents: if Claude treats a user slip as an updated norm, the rule erodes from inside. The category isn't "phrases the user never uses" — it's "phrases neither of us should ship in writing." Mirroring his usage collapses the distinction.
+Failure mode this prevents: if Claude treats a user slip as an updated norm, the rule erodes from inside. The category isn't "phrases the user never uses" — it's "phrases neither of us should ship in writing". Mirroring his usage collapses the distinction.
 
 ## Avoid violent and military metaphors
 
@@ -46,7 +46,7 @@ A word's meaning is decided by the reader's nearest context, not by the writer's
 
 Two shapes to watch for:
 
-- **Loose or metaphorical use vs. term of art.** A word used in its plain sense, or stretched metaphorically, that also names a specific technical operation in the reader's domain. The technical sense wins the parse. Examples in software contexts: "rebase" (metaphorical: re-anchor onto a different foundation; git: replay commits onto a new base), "fork" (lay: a branch in a path; git/process: copy a repo or process), "merge" (lay: combine; git: combine branches), "stash" (lay: hide away; git: shelve working changes), "amend" (lay: edit/improve; git: rewrite the most recent commit), "rollback" (lay: undo; databases: revert a transaction). When the looser sense is what you want, pick a word that doesn't collide — "re-anchor," "split," "combine," "park," "edit," "undo."
+- **Loose or metaphorical use vs. term of art.** A word used in its plain sense, or stretched metaphorically, that also names a specific technical operation in the reader's domain. The technical sense wins the parse. Examples in software contexts: "rebase" (metaphorical: re-anchor onto a different foundation; git: replay commits onto a new base), "fork" (lay: a branch in a path; git/process: copy a repo or process), "merge" (lay: combine; git: combine branches), "stash" (lay: hide away; git: shelve working changes), "amend" (lay: edit/improve; git: rewrite the most recent commit), "rollback" (lay: undo; databases: revert a transaction). When the looser sense is what you want, pick a word that doesn't collide — "re-anchor", "split", "combine", "park", "edit", "undo".
 - **Term of art in one context vs. another.** A word that's technical in multiple sub-fields, distinguished only by surrounding cues. The dominant sub-field for the immediate reader wins. Examples: "branch" (git vs. AST traversal vs. control flow), "thread" (concurrency vs. message thread vs. textile), "kernel" (OS vs. linear algebra vs. ML), "argument" (function parameter vs. rhetoric), "tree" (data structure vs. file system vs. UI vs. botany), "stream" (Turbo/HTTP vs. functional iterators vs. video), "lock" (concurrency vs. cryptography vs. file system). If two sub-fields are both plausible from the surrounding text, disambiguate explicitly or pick a non-colliding word.
 
 When in doubt, ask: in this paragraph, which sense will the reader reach for *first*? If that isn't the sense you mean, the word is wrong — even if it's a defensible synonym of what you mean.
@@ -65,7 +65,7 @@ Sibling: honesty.md's *Rewrite the Prose When Verification Disagrees* covers the
 
 When output is human-primary but machine-secondary — issue bodies, PR descriptions, ADRs, docs that other agents will read later for context — don't add bulleted or sectioned structure beyond what the human form naturally wants. Agents handle prose. The voice rule and the clarity rule already produce text both audiences can use. The temptation to "make it easier for an LLM to parse later" almost always produces listicle ceremony that the human form didn't need, which then has to be scrubbed during the voice pass.
 
-This is adjacent to "Do not mirror his prompting register" in the voice section below — both correct for the wrong-audience tilt. That one says "the chat-prompting form isn't the writing form"; this one says "the agent-friendly form isn't a separate target from the human-readable form."
+This is adjacent to "Do not mirror his prompting register" in the voice section below — both correct for the wrong-audience tilt. That one says "the chat-prompting form isn't the writing form"; this one says "the agent-friendly form isn't a separate target from the human-readable form".
 
 Failure mode this prevents: speculative restructuring for an imagined agent reader, producing prose that reads as ghostwritten to the human reader and saves no real effort for the agent reader (who would have done fine with the prose).
 
@@ -111,7 +111,7 @@ Failure mode this prevents: the recap-summary is the default LLM ending and he a
 
 ### Close on concrete behavior, not abstract appeal
 
-When a chain of reasoning lands, name the concrete behavior rather than gesturing at an abstract principle. "Returns `nil`, and the rest is just Ruby" lands; "follows from Ruby semantics over this path" doesn't. The abstract version reads as ghostwritten because it gestures at the *category* of the thing rather than the *thing*. Same pattern with "follows from the type system," "consistent with the contract," "by the framework's semantics" — all categories, none of them the actual behavior.
+When a chain of reasoning lands, name the concrete behavior rather than gesturing at an abstract principle. "Returns `nil`, and the rest is just Ruby" lands; "follows from Ruby semantics over this path" doesn't. The abstract version reads as ghostwritten because it gestures at the *category* of the thing rather than the *thing*. Same pattern with "follows from the type system", "consistent with the contract", "by the framework's semantics" — all categories, none of them the actual behavior.
 
 This sits next to "End with a valediction, not a summary" above. The valediction rule covers the closing *paragraph* of longer prose; this one covers the closing *sentence* of any chain of reasoning, regardless of document length. Same underlying principle — don't end on ceremony.
 
