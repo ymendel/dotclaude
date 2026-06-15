@@ -33,3 +33,21 @@ Ideas worth picking back up on later.
 **Trigger to revisit:** when "validate everything in this directory" or a glob-style use case shows up and the abort-on-first behavior is actively in the way. At that point, switch to collect-errors-and-continue, exiting non-zero at the end with a summary of which inputs failed.
 
 **Not yet worth doing because:** the dominant use is "validate this one diagram I just wrote" or "validate the fences in this one doc," where fail-fast is correct.
+
+## Image output instead of (or alongside) ASCII for the preview
+
+**Current behavior:** on parse success, the script renders `--format ascii` and either inlines the result (≤60 lines) or spills to a tempfile. The ASCII is the *semantic* eyeball check — does the shape match intent.
+
+**Open question:** would PNG or SVG output be more useful than ASCII for that check? Claude can read images, and a rendered PNG might convey topology more reliably than ASCII art — which loses fidelity on dense diagrams, and which merman's ASCII renderer has known gaps for. But images cost tokens too, possibly more than the ASCII equivalent, and the precision-vs-cost tradeoff isn't measured. The script's preview is Claude-facing; users who want image output already have `merman-cli render` directly.
+
+**Possible shapes:**
+
+1. **Replace ASCII with PNG** — single format, always image.
+2. **Both, default to one** — render PNG and write to a tempfile, keep ASCII inline for the small-diagram case; or vice versa.
+3. **Flag-controlled** — `--format ascii|png|svg` with a default. Adds a knob the user (or Claude) has to remember to set.
+
+merman-cli already supports PNG/JPG/SVG/PDF via `render --format`, so the wiring is small.
+
+**Trigger to revisit:** when ASCII fidelity is the limiting factor in a real case — a diagram that rendered to ASCII passably but the shape was actually wrong, or a category of diagram (sequence diagrams with many participants, class diagrams with crossed arrows) where ASCII just doesn't carry enough information. At that point, measure tokens-per-image vs tokens-per-ascii for the real case and decide.
+
+**Not yet worth doing because:** ASCII has worked for the diagrams exercised so far, and the token cost of images for Claude's vision pipeline hasn't been measured against the ASCII baseline. Speculation either way.
