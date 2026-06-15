@@ -1,0 +1,30 @@
+flowchart TD
+    Start([Input arg]) --> CheckEnv{merman-cli<br/>on PATH?}
+    CheckEnv -->|No| EnvFail[exit 2: install hint]
+    CheckEnv -->|Yes| TypeCheck{Input type?}
+
+    TypeCheck -->|stdin -| ReadStdin[Read stdin as one block]
+    TypeCheck -->|.mmd| ReadMmd[Read file as one block]
+    TypeCheck -->|.md| ExtractFences[Extract every mermaid fence]
+    TypeCheck -->|other| BadInput[exit 2: unsupported]
+
+    ReadStdin --> Loop
+    ReadMmd --> Loop
+    ExtractFences --> Loop
+
+    Loop[For each block] --> Parse[merman-cli parse]
+    Parse --> ParseOk{Parse OK?}
+    ParseOk -->|No| RecordFail[Print PARSE FAILED + error] --> NextBlock
+    ParseOk -->|Yes| Render[merman-cli render --format ascii]
+
+    Render --> RenderOk{Render OK?}
+    RenderOk -->|No| RenderGap[Note coverage gap, count as OK] --> NextBlock
+    RenderOk -->|Yes| SizeCheck{Lines under cap?}
+
+    SizeCheck -->|Yes| Inline[Print ASCII inline] --> NextBlock
+    SizeCheck -->|No| Spill[Write tempfile + print pointer] --> NextBlock
+
+    NextBlock{More blocks?} -->|Yes| Loop
+    NextBlock -->|No| Summary{Any failures?}
+    Summary -->|No| ExitOk[exit 0: N OK]
+    Summary -->|Yes| ExitFail[exit 1: M FAILED]

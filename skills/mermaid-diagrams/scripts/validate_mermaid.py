@@ -11,6 +11,8 @@ For each input (a .mmd file, a .md file with ```mermaid fences, or stdin):
 Exit 0 if every block parses; 1 if any fail; 2 on environment errors
 (merman-cli not installed, bad input path).
 
+See validate_mermaid.mmd for a flowchart of this script's control flow.
+
 TODO: see ../TODO.md for a sketched semantic-JSON linter pass (orphan node
 refs, dangling edges, mismatched class-diagram relationship arrows) that
 would sit on top of `merman-cli parse --pretty` output.

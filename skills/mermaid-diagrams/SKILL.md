@@ -214,6 +214,8 @@ For each block, the script parses it via `merman-cli` and renders a small ASCII 
 
 Requires `merman-cli` on PATH (see Export options above for install).
 
+For a flowchart of the script's own control flow, see `scripts/validate_mermaid.mmd`.
+
 ## Common Pitfalls
 
 - **Breaking characters** - Avoid `{}` in comments, use proper escape sequences for special characters
