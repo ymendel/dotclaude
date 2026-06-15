@@ -24,7 +24,7 @@ In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content li
 
 **Why:** On 2026-05-31, I filed a GitHub issue with `gh issue create --body "$(cat <<'EOF' ... EOF)"` and reflexively escaped backtick fences (`` \`\`\` ``) and quoted Ruby strings (`\"`) inside the body. The result rendered with literal backslashes wherever markdown was supposed to format — broken code fences, broken quotes. User caught it and asked for a fix. The escaping was a reflex carried over from double-quoted contexts, where backslashes do matter.
 
-**How to apply:** When writing inside `<<'EOF'`, write content as-is. The single-quoted delimiter is the explicit "treat this as a string literal" signal. Escaping inside it always overshoots. If you find yourself reaching for a backslash inside a heredoc, check the opening — if it's `'EOF'`, don't. (The same caution applies in reverse to `<<EOF` without quotes, where backticks and dollar signs *do* need escaping if you want them literal.)
+**How to apply:** When writing inside `<<'EOF'`, write content as-is. The single-quoted delimiter is the explicit "treat this as a string literal" signal, so escaping inside it always overshoots. If you find yourself reaching for a backslash inside a heredoc, check the opening — if it's `'EOF'`, don't. (The same caution applies in reverse to `<<EOF` without quotes, where backticks and dollar signs *do* need escaping if you want them literal.)
 
 ## Surface env-specific values via tooling output
 

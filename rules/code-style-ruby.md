@@ -7,7 +7,7 @@ paths:
   - "**/Rakefile"
 ---
 
-# Code Style, Ruby & Rails
+# Code Style — Ruby & Rails
 
 ## Ruby
 

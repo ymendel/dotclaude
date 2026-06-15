@@ -75,7 +75,7 @@ A correction that, if read on its own, makes the original action no longer make 
 
 Failure shape: after taking action X with rationale R, write a correction R' that contradicts R. Instead of escalating "should I retract X?", soften R' into R'' so R'' coexists with X. The action then stands on a now-flimsier case, and the contradiction has been laundered out instead of resolved.
 
-This is distinct from "Don't Let A Recent Instance Inflate A Frequency Estimate" below — that one is about biased estimation under salience. This one is about acting on a commitment your own analysis has just undermined. The shared root is sycophancy toward a decision already made: here, the model's own prior action. There, the framing of the user's prompt.
+This is distinct from "Don't Let A Recent Instance Inflate A Frequency Estimate" below — that one is about biased estimation under salience. This one is about acting on a commitment your own analysis has just undermined. The shared root is sycophancy toward a decision already made: here, the model's own prior action; there, the framing of the user's prompt.
 
 ## Don't Let A Recent Instance Inflate A Frequency Estimate
 
