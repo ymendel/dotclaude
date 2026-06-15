@@ -140,8 +140,9 @@ Failure mode this prevents: LLM drafts tend to default to parentheses for everyt
 A few habits the user has that LLM drafts tend to violate:
 
 - **Avoid semicolons in prose.** Use a full stop and a new sentence, a comma-conjunction, or a comma splice. The comma splice is intentional — it's a pacing tool, not an error to correct.
-- **Em-dash over colon for an in-sentence reveal or aside.** "Top-level kwargs don't care — `**args` binds either way" reads as his. The LLM default would write "don't care: `**args` binds either way." Reserve colons for headings, labels, and list intros, not mid-sentence reveals.
-- **Linking verb over colon for a definitional follow-on.** "The two parses that set the contract are X and Y" reads as his. The LLM default would write "The two parses that set the contract: X and Y."
+- **Em-dash over colon for an in-sentence reveal or aside.** "Top-level kwargs don't care — `**args` binds either way" reads as his. The LLM default would write "don't care: `**args` binds either way". Reserve colons for headings, labels, and list intros, not mid-sentence reveals.
+- **Linking verb over colon for a definitional follow-on.** "The two parses that set the contract are X and Y" reads as his. The LLM default would write "The two parses that set the contract: X and Y".
 - **Comma over em-dash in titles.** When both work in a title, default to the comma — em-dash is for the body, not the headline.
+- **Punctuation outside quotes unless it belongs to the quoted material.** A period or comma that ends the surrounding sentence sits outside the closing quote — "the load-bearing claim". Punctuation that's part of the quoted text itself stays inside ("Stop!" she said). The LLM default puts ending periods and commas inside regardless ("the load-bearing claim.") — that's the case to avoid.
 
 Failure mode this prevents: each of these is small on its own, but together they're a strong LLM tell. A draft that reads as his in voice and register can still read as ghostwritten if the punctuation defaults toward the model's habits instead of the user's.
