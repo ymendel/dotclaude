@@ -53,6 +53,22 @@ When in doubt, ask: in this paragraph, which sense will the reader reach for *fi
 
 Failure mode this prevents: a word chosen for its loose or metaphorical sense (or for the wrong sub-field's term of art) gets parsed as the dominant local sense, producing a confident-sounding sentence that means something other than what you wrote.
 
+## Sweep prose when you rename a code example
+
+When you rename or restructure a code example in a document, sweep the surrounding prose for stale references. Names in the code — variables, method arguments, class names — appear in adjacent prose too: workaround sections, verification notes, follow-up paragraphs that picked up the old name. A rename in the code without a sweep leaves a reader confused about where the new name suddenly appeared from.
+
+Failure mode this prevents: a reader sees one name in the code example and a different name in the next section's prose, and either backtracks to find out where the second name came from or assumes it's a different production case. Either way, the document has silently asked the reader to do reconciliation work the author should have done.
+
+Sibling: honesty.md's *Rewrite the Prose When Verification Disagrees* covers the same shape on the verification side — when a check reveals the original was wrong, edit the prose rather than appending the correction. The shared discipline: when something in the document is now wrong, update the document; don't layer the correction next to it.
+
+## Don't over-engineer for the secondary audience
+
+When output is human-primary but machine-secondary — issue bodies, PR descriptions, ADRs, docs that other agents will read later for context — don't add bulleted or sectioned structure beyond what the human form naturally wants. Agents handle prose. The voice rule and the clarity rule already produce text both audiences can use. The temptation to "make it easier for an LLM to parse later" almost always produces listicle ceremony that the human form didn't need, which then has to be scrubbed during the voice pass.
+
+This is adjacent to "Do not mirror his prompting register" in the voice section below — both correct for the wrong-audience tilt. That one says "the chat-prompting form isn't the writing form"; this one says "the agent-friendly form isn't a separate target from the human-readable form."
+
+Failure mode this prevents: speculative restructuring for an imagined agent reader, producing prose that reads as ghostwritten to the human reader and saves no real effort for the agent reader (who would have done fine with the prose).
+
 ## Emulating the user's voice
 
 When writing in the user's voice — drafting a message *from* him, ghostwriting a comment he'll post, or any output where the goal is to sound like Yossef rather than to serve a broader audience — match the register described below.
@@ -93,6 +109,14 @@ The valediction can be short — "Go forth" is allowed. It can also be quiet rat
 
 Failure mode this prevents: the recap-summary is the default LLM ending and he almost never uses one. A draft that ends "in summary, X, Y, and Z" reads as ghostwritten on contact, even if the rest of the piece is in voice.
 
+### Close on concrete behavior, not abstract appeal
+
+When a chain of reasoning lands, name the concrete behavior rather than gesturing at an abstract principle. "Returns `nil`, and the rest is just Ruby" lands; "follows from Ruby semantics over this path" doesn't. The abstract version reads as ghostwritten because it gestures at the *category* of the thing rather than the *thing*. Same pattern with "follows from the type system," "consistent with the contract," "by the framework's semantics" — all categories, none of them the actual behavior.
+
+This sits next to "End with a valediction, not a summary" above. The valediction rule covers the closing *paragraph* of longer prose; this one covers the closing *sentence* of any chain of reasoning, regardless of document length. Same underlying principle — don't end on ceremony.
+
+Failure mode this prevents: confident-sounding closing sentences that don't actually say what happens. The reader gets a smooth landing that's an abstract restatement of what they already inferred, instead of the concrete fact that would make the chain feel finished.
+
 ### Keep factual-uncertainty hedges audible
 
 Where a claim about a framework, history, library, or external concept isn't fully verified, leave the hedge on the page — typically as an em-dash aside, a parenthetical, or an asterisked footnote. Examples from his corpus: "(as much as I've been able to determine)", "(Anecdotally,…)", "I'm not 100% sure because I don't use 'plan mode'".
@@ -110,3 +134,14 @@ Two distinct tools, both heavily used. Em-dashes hold clausal asides that belong
 When editing a draft, ask of each parenthetical: is this an aside within the sentence, or a wink to the reader? Convert as needed.
 
 Failure mode this prevents: LLM drafts tend to default to parentheses for everything (or em-dashes for everything). Either monoculture loses the conversational pacing the two-tool habit produces.
+
+### Punctuation defaults
+
+A few habits the user has that LLM drafts tend to violate:
+
+- **Avoid semicolons in prose.** Use a full stop and a new sentence, a comma-conjunction, or a comma splice. The comma splice is intentional — it's a pacing tool, not an error to correct.
+- **Em-dash over colon for an in-sentence reveal or aside.** "Top-level kwargs don't care — `**args` binds either way" reads as his. The LLM default would write "don't care: `**args` binds either way." Reserve colons for headings, labels, and list intros, not mid-sentence reveals.
+- **Linking verb over colon for a definitional follow-on.** "The two parses that set the contract are X and Y" reads as his. The LLM default would write "The two parses that set the contract: X and Y."
+- **Comma over em-dash in titles.** When both work in a title, default to the comma — em-dash is for the body, not the headline.
+
+Failure mode this prevents: each of these is small on its own, but together they're a strong LLM tell. A draft that reads as his in voice and register can still read as ghostwritten if the punctuation defaults toward the model's habits instead of the user's.

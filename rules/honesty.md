@@ -29,6 +29,25 @@ Failure mode this prevents: confident-sounding prose that frames a concept wrong
 
 Specific case: ADR Context. Claims about *what an external system actually does* are easy to phrase confidently from one or two examples. They feel like Context (background facts setting up the Decision) but are often Premises (load-bearing assumptions the Decision depends on). Label them accordingly: an inferred premise should read as a premise to be validated, not as an observation. Honest forms: "a sample of N showed [shape]; the matcher needs to tolerate this" (observation, with sample size disclosed); "we expect X; this has not been checked across the full set and is an assumption to validate when sync runs" (assumption, labeled); or a quote from the system's docs with a citation (authoritative). The trap is phrasing an unverified premise with the cadence of an observation, then taking the Decision as if the premise were checked.
 
+## Rewrite the Prose When Verification Disagrees
+
+When a verification pass produces a finding that differs from what existing prose already claims, update the prose to match — don't just record the finding in a separate section and leave the prior claim standing. A verification section added late in a document feels conclusive once it's written: the right answer is on the page. But the original wrong claim is still on the page too, often in the opening where it primes the reader. Two contradictory claims sitting in one document leave the reader to spot which is right, and most readers don't read top-to-bottom with that question in mind. They take the opening at face value.
+
+When verification reveals the original was wrong, the verification finding is what *should have been there*. Rewrite to lead with it. Sweep the rest of the document:
+
+- The opening framing — does it still hold given what verification found?
+- Section headers and topic sentences — do any of them name the wrong subject?
+- Code examples and file:line refs — do they still point at the right code?
+- Cross-references — does anything later in the document point back at the now-corrected section in a way that still implies the original framing?
+
+This is the editing-stage sibling of "Verify Framing Before Writing Prose" above. That rule covers what to do *at first draft* — quote before paraphrasing, label inferred premises. This one covers what to do *after a verification pass*: don't let the verified version sit alongside the unverified one. Pick the verified one and update everything that depended on the other.
+
+Sibling on the prose-rename side: writing.md's *Sweep prose when you rename a code example* covers the same shape when a name in the code changes — surrounding prose has to be swept the same way. The shared discipline: when something in the document is now wrong, update the document; don't layer the correction next to it.
+
+**Commit messages and PR descriptions are harder to correct after the fact.** The prose-in-a-doc case can always be edited later. Commit messages can be amended only before push (or with a force-push while the PR isn't yet merged); PR descriptions are editable until merge, then become historical record. If verification hasn't happened yet when writing a commit message or PR description, either hedge the load-bearing claim or omit it and add it to the PR body once verification lands — don't assert it confidently and find out later that the correction window has closed.
+
+Failure mode this prevents: confident-sounding documents that carry both a wrong claim and the verification of the right one, with no signal to the reader that the opening should be disbelieved. The verified version reads as a footnote rather than a correction.
+
 ## Separate What You Know From What You Assume
 
 Before drafting any analysis or document with numbers, first list:
