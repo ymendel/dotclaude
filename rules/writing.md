@@ -127,22 +127,22 @@ This is the voice-level expression of `honesty.md`. The provenance rule says don
 
 Failure mode this prevents: sanding the hedge off to sound more authoritative produces prose that's both less honest and less his. A confident-sounding sentence over an unverified claim is the exact failure `honesty.md` is trying to prevent, expressed at the level of voice.
 
-### Em-dash for asides, parenthesis for fourth-wall breaks
+### Comma for integrated asides, em-dash for interruptions, parenthesis for fourth-wall breaks
 
-Two distinct tools, both heavily used. Em-dashes hold clausal asides that belong inside the sentence's flow — qualifications, restatements, mid-thought turns. Parentheses hold stage whispers and direct address to the reader: hedges, winks, "no promises", "this story has been compressed for your benefit".
+Three distinct tools, all heavily used, on a volume axis from light to off-stage. Commas hold integrated asides that ride with the sentence's rhythm — appositives, mild qualifiers, brief restatements. The reader barely perceives the break. Em-dashes hold asides that interrupt on purpose — restatements, mid-thought turns, strong qualifiers, or any aside that contains internal commas (where bracketing commas would be ambiguous). Parentheses hold stage whispers and direct address to the reader — hedges, winks, "no promises", source asides. The reader can skip them without losing the sentence.
 
-When editing a draft, ask of each parenthetical: is this an aside within the sentence, or a wink to the reader? Convert as needed.
+When editing a draft, ask of each aside: is it part of the sentence's flow (comma), a deliberate interruption (em-dash), or something the reader could skip (parens)? Convert as needed.
 
-Failure mode this prevents: LLM drafts tend to default to parentheses for everything (or em-dashes for everything). Either monoculture loses the conversational pacing the two-tool habit produces.
+Failure mode this prevents: LLM drafts default to one tool for all three roles — usually parens, sometimes em-dashes, rarely commas. The conversational pacing the three-tool habit produces flattens to monotone.
 
 ### Punctuation defaults
 
 A few habits the user has that LLM drafts tend to violate:
 
-- **Avoid semicolons in prose.** Use a full stop and a new sentence, a comma-conjunction, or a comma splice. The comma splice is intentional — it's a pacing tool, not an error to correct.
+- **Avoid semicolons in prose.** Use a full stop and a new sentence, a comma with a linking word (and, but, so, &c.), or a comma splice. The comma splice is intentional — it's a pacing tool, not an error to correct. The super-comma case (semicolons separating list items that contain internal commas) is a different convention and not what "in prose" covers here.
 - **Em-dash over colon for an in-sentence reveal or aside.** "Top-level kwargs don't care — `**args` binds either way" reads as his. The LLM default would write "don't care: `**args` binds either way". Reserve colons for headings, labels, and list intros, not mid-sentence reveals.
 - **Linking verb over colon for a definitional follow-on.** "The two parses that set the contract are X and Y" reads as his. The LLM default would write "The two parses that set the contract: X and Y".
-- **Em-dash in titles when the second half qualifies the first, comma otherwise.** "Code Style — Ruby & Rails" and "Project vs. Global Settings — Match Scope to Use" both use the em-dash for "concept — clarifier" structure, and the em-dash carries the structural weight. For parallel imperatives, appositives, or simple list-style titles, prefer the comma.
+- **Em-dash in titles when the second half qualifies the first, comma otherwise.** "Code Style — Ruby & Rails" and "Project vs. Global Settings — Match Scope to Use" both use the em-dash for "concept — clarifier" structure, and the em-dash carries the structural weight. For parallel imperatives, appositives, or simple list-style titles, prefer the comma. Case the two halves consistently — title-case throughout, or sentence-case throughout ("Project vs. global settings — match scope to use"). The em-dash separates structure, not case convention.
 - **Punctuation outside quotes unless it belongs to the quoted material.** A period or comma that ends the surrounding sentence sits outside the closing quote — "the load-bearing claim". Punctuation that's part of the quoted text itself stays inside ("Stop!" she said). The LLM default puts ending periods and commas inside regardless ("the load-bearing claim.") — that's the case to avoid.
 
 Failure mode this prevents: each of these is small on its own, but together they're a strong LLM tell. A draft that reads as his in voice and register can still read as ghostwritten if the punctuation defaults toward the model's habits instead of the user's.
