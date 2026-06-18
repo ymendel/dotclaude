@@ -61,6 +61,28 @@ Failure mode: dropping skill-related permissions into a project's `.claude/setti
 
 For paths in skill-related permissions, leading `**` lets a single global rule cover any project: `Write(**/.claude/handoffs/*.md)` matches a handoffs directory in every project the skill is used from.
 
+## Skill-Script Permissions — Frontmatter `allowed-tools` vs. settings.json
+
+A skill's script can be auto-allowed two ways, and they differ in *scope*:
+
+- **`settings.json` allow rule** — always in effect, no matter who invokes the script.
+- **Skill frontmatter `allowed-tools`** — in effect *only while that skill is active*. Per the [docs](https://code.claude.com/docs/en/skills), it "grants permission for the listed tools while the skill is active, so Claude can use them without prompting you for approval. It does not restrict which tools are available."
+
+Do not invert this. `allowed-tools` *pre-approves* — it is not "the only tools this skill may use." Every tool stays callable; listed ones just skip the prompt while the skill runs. The field that *restricts* is `disallowed-tools`, which removes tools from the pool while the skill is active.
+
+Choosing the home:
+
+- **Invoked only via explicit skill use** — frontmatter is cleaner, and it's portable: `allowed-tools` travels with the skill to other machines, repos, or plugins. A `settings.json` entry stays on this machine.
+- **Invoked directly, outside skill activation** — `settings.json`, because frontmatter won't cover it. Common cases: running `list_handoffs.py` on a "what handoffs exist" request, or `validate_mermaid.py` mid-doc-work — the skill isn't loaded that turn, so a frontmatter-only permission would prompt.
+- **Distributing a skill** — additive, not either/or: declare `allowed-tools` so the skill works standalone on a fresh machine, and keep the `settings.json` entry for local direct-invocation. Redundant allow is harmless — both just permit.
+
+Two more considerations:
+
+- **Project skills need trust first.** For a skill checked into a project's `.claude/skills/`, `allowed-tools` takes effect only after the workspace-trust dialog is accepted — "a skill can grant itself broad tool access." User-level skills under `~/.claude` aren't gated this way.
+- **Audit visibility.** `settings.json` keeps every auto-allow in one file. Frontmatter co-locates the permission with its skill but scatters the overall picture.
+
+Failure mode this prevents: moving a skill-script permission to frontmatter-only, on the assumption that "the skill covers it," silently reintroduces prompts for every direct or proactive invocation that happens when the skill isn't active — exactly the invocations that motivated the `settings.json` entry in the first place.
+
 ## Paths With Spaces
 
 When constructing shell commands that reference paths containing spaces (e.g. `~/Library/Application Support/`), use `$HOME` with proper quoting instead of backslash-escaping. Claude Code's permission system triggers a separate confirmation dialog for any command containing backslash-escaped whitespace, regardless of allow-list rules.
