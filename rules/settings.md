@@ -64,6 +64,19 @@ Implication for the allow list: a `Bash(rtk X:*)` rule does **not** cover `X` us
 
 Failure mode this prevents: assuming `rtk gh:*` (or `rtk find:*`, `rtk grep:*`) covers those tools everywhere, then being surprised by a prompt on a PR-created-with-a-heredoc-body or a `find | grep` pipeline — because a segment lacks an allow rule (RTK demotes the pipe to a prompt, or Claude Code's per-segment check fails on a passthrough command).
 
+## Deny Patterns Match the Command String, Not the Invocation
+
+Deny rules (`Bash(*git push*)`, `Bash(*rm -rf*)`, `Bash(*find* -delete*)`) match the literal command **string**, with no understanding of what the command does. Any command whose text *contains* the denied substring is blocked — even when it performs no such action. The recurring bite: a `git commit -m '…'` whose message describes the denied pattern, an `echo` or `grep` that mentions it, or a command documenting the deny rules themselves. Confirmed 2026-06-18 — a commit message containing the text "find … -delete" was blocked by the `*find* -delete*` carve-out.
+
+This is the safe failure direction for a deny: over-blocking costs a reword, under-blocking could run the destructive command. So the patterns stay broad rather than trying to anchor on the command name, which glob can't cleanly express anyway.
+
+Workarounds when a legitimate command is caught:
+
+- **Reword** so the denied substring doesn't appear — e.g. "the delete and exec flags" instead of the literal flag names.
+- **Pass the text via a file.** Write the message to a path and `git commit -F <file>` — the command string is then just `git commit -F <file>`, with the triggering text confined to the file. Deny rules don't read file contents.
+
+Failure mode this prevents: treating an unexpected denial as a broken deny rule or a tooling bug, and retrying variants, when the real cause is the command's *text* tripping a substring deny.
+
 ## Project vs. Global Settings — Match Scope to Use
 
 When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:

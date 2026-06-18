@@ -6,6 +6,8 @@ When a command fails **or gives unexpected output**, diagnose why before trying 
 
 Specific case: `fatal: bad revision '<file>'` in git means git is interpreting a path as a tree-ish. Fix: use `--` to separate revisions from paths (`git diff HEAD -- <file>`).
 
+Specific case: a command unexpectedly *denied* — most often a `git commit`, `echo`, or `grep` — may be tripping a deny rule on its *text* rather than its action. Deny patterns match the command string, so a message or argument that merely mentions a denied substring (a blocked git operation, a destructive flag) is denied even though the command does no such thing. Reword to drop the substring, or pass the text via a file (`git commit -F <file>`). See `settings.md` ("Deny Patterns Match the Command String").
+
 Specific case: when RTK's diff output doesn't show a change that's known to exist, RTK filtered it (e.g., a single-line change inside a long string). Do not retry diff variants — switch to `git diff --cached` to check the index, or read the file directly. Retrying `git diff` with different flags will not produce different output through the same filter.
 
 Specific case: when `git diff` output looks summarized or processed (a "Changes" header, no `+`/`-` lines, "No syntactic changes" for non-empty diffs), the user has an external diff tool configured via `diff.external`. Pass `--no-ext-diff` to `git diff` / `git show` / `git log -p` to get the standard unified diff. This is the right escape hatch — it's a documented git flag, not a workaround around the user's config. Don't reach for `/usr/bin/git` or shell out to `diff` directly.
