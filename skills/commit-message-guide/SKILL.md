@@ -18,6 +18,12 @@ Never include:
 - Time-related information (estimates, time spent)
 - AI authorship or attribution — no "Generated with Claude Code", Co-Authored-By tags, emojis, or tool attribution of any kind
 
+## Formatting
+
+Separate the subject from the body with a blank line, and wrap body lines at about 72 characters, the common git convention. If a repository's own history uses a different width, match that.
+
+`git commit -m '<text>'` does **not** wrap: a long single-string body ships as one unwrapped line, and because the commit still succeeds the defect is silent. To get wrapped paragraphs, either pass a body whose lines are already broken at ~72 (literal newlines inside the `-m` string are preserved) or write the message to a file and `git commit -F <file>`. Multiple `-m` flags create separate paragraphs but still don't wrap within one.
+
 ## Special commit types
 
 **WIP** — no formatting required, may have failing tests:
