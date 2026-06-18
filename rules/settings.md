@@ -49,6 +49,21 @@ For one rule to cover both paths, the pattern needs a segment that appears in bo
 
 > **PreToolUse hook — future option.** When the prompt cost becomes load-bearing (the live case is session handoffs being interrupted mid-departure), a hook can intercept Edit/Write under specific paths, validate narrowly, and exit 0 to skip the prompt without broadening the global allow list. Sketch: check that the path is under `~/.claude/handoffs/` (or the canonical `dotclaude/.claude/handoffs/`), exit 0 to allow. Design properly when picked up.
 
+## How Claude Code Matches Compound Commands
+
+Claude Code splits a compound Bash command on `|`, `&&`, and `;` and evaluates **each segment independently** against the permission rules. Every segment must be individually allowed, or the command prompts. There is no whole-string match for a pipeline — `echo '{}' | jq .` runs only because *both* `echo:*` and `jq:*` are allowed; a rule matching the literal `echo '{}' | jq .` would never fire (confirmed empirically 2026-06-18).
+
+RTK adds a wrinkle, doing its own segment-aware check before Claude Code sees the command — and it treats shapes differently:
+
+- **Pipe with a leading command RTK recognizes** — it rewrites the head (leaving the tail bare) and checks *every* segment against the allow rules: exit 0 (auto-allow) only when all match, otherwise exit 3 (prompt). `gh pr list | grep open` → exit 0; `git show HEAD --stat | sort` → exit 3, because `sort` has no allow rule.
+- **Command substitution (`$(...)`, backticks), an `xargs` or loop body, or a pipe/chain whose commands RTK doesn't recognize** — `rtk rewrite` returns exit 1 (passthrough), and Claude Code's own flow then runs on the bare command, splitting it the same per-segment way. So `gh pr create --body "$(…)"` and `which echo && echo done` are decided by Claude Code, not RTK.
+
+Either path needs every segment individually allowed. Verified on rtk 0.42.4 (2026-06-18); the rewrite gaps are tracked upstream in rtk-ai/rtk (#1252, #2425, #1347, #1560).
+
+Implication for the allow list: a `Bash(rtk X:*)` rule does **not** cover `X` used inside a compound command — only the standalone, rewritten `rtk X …` form. To auto-allow a safe command in compound usage (pipes, substitutions, heredoc-bodied `gh` calls), add a **bare** `Bash(X:*)` rule alongside the `rtk X:*` one. Do this only for commands safe in every form (`grep` — read-only; `gh` — destructive subcommands fenced by deny rules). Do **not** blanket-allow a command with destructive flags (`find -delete`, `find -exec`) without pairing the allow with deny carve-outs.
+
+Failure mode this prevents: assuming `rtk gh:*` (or `rtk find:*`, `rtk grep:*`) covers those tools everywhere, then being surprised by a prompt on a PR-created-with-a-heredoc-body or a `find | grep` pipeline — because a segment lacks an allow rule (RTK demotes the pipe to a prompt, or Claude Code's per-segment check fails on a passthrough command).
+
 ## Project vs. Global Settings — Match Scope to Use
 
 When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:
