@@ -38,6 +38,29 @@ instead to get compact output:
 The Edit tool is **not** overridden by RTK — always use Edit (not `sed` via Bash) for
 in-file replacements. `sed -i` is error-prone on macOS and unnecessary when Edit exists.
 
+### When not to use awk
+
+awk is fine for the genuine case it's built for — a per-line or per-field transformation
+where you need the line's *content* alongside a computed value (e.g. `awk '{ print length": "$0 }'`
+to see which commit-body lines exceed a wrap width and what they say). Reach for it only when
+no simpler tool covers the need. Three cases where it's the wrong reach:
+
+- **A dedicated tool already answers the question.** For a single number, prefer the
+  single-purpose tool: `wc -L` for the longest line's length, `wc -l` for a line count,
+  `grep -c` for a match count. `… | wc -L` beats `… | awk '{ if (length>m) m=length } END { print m }'`
+  for "is anything over 72?" — shorter, clearer, and `wc` has no destructive form so it's
+  safely allow-listed (`Bash(wc:*)`); awk is not.
+- **In-file editing.** Same rule as `sed` above — use Edit, never `awk -i inplace` or an
+  awk-to-tempfile-and-move dance.
+- **Parsing structured formats.** Use a real parser (`jq` for JSON, &c.), not awk
+  field-splitting. This is the shell-pipeline echo of code-style's "parse with parser
+  libraries, not regex" — column-counting breaks on quoted delimiters, escapes, and
+  embedded newlines exactly where it matters.
+
+Failure mode this prevents: reaching for awk by reflex on a task a single-purpose tool does
+in fewer characters and with less to get wrong — and, for parsing, building a fragile
+field-splitter that looks right on the sample and breaks on the first irregular row.
+
 Exception: use the built-in Read/Grep/Glob tools when full, unfiltered output is needed.
 Two concrete reasons this matters:
 
