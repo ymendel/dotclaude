@@ -30,6 +30,7 @@
       "Bash(echo:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
+      "Bash(wc:*)",
       "Bash(python3 *skills/mermaid-diagrams/scripts/*.py*)",
       "Bash(python3 *skills/session-handoff/scripts/*.py*)",
       "Write(**/.claude/handoffs/*.md)",
