@@ -23,7 +23,7 @@ When a finding could go in two places, prefer the more specific one. A note abou
 
 - One file per topic, named for the topic: `template-lessons.md`, `postgres-quirks.md`, `rails-defaults.md`, etc.
 - Free-form within each file. Append new entries at the bottom unless related material exists to group with.
-- Subdirectories are fine if a topic grows large enough to warrant them.
+- Subdirectories are fine if a topic grows large enough to warrant them. This applies to any working-doc directory, not just `notes/` — when a topic in `ideas/`, `notes/`, or similar accumulates more than a couple of files, group them in a named subdirectory with a `README.md` frame rather than letting the flat directory sprawl.
 
 The directory is intentionally outside version control (the allowlist `.gitignore` in `dotclaude/` excludes anything not explicitly added). These are personal working notes, not configuration to ship.
 
