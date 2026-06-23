@@ -160,10 +160,13 @@ Reference these sections as you work:
 
 ### Step 6: Update or Chain Handoffs
 
-As you work:
-- Mark completed items in "Pending Work"
-- Add new discoveries to relevant sections
-- For long sessions: create a new handoff with `--continues-from` to chain them
+The resumed handoff is a **snapshot of where this session started** — part of the chain's history. Preserve it. Light in-place touches are fine: ticking off a "Pending Work" item, noting a blocker cleared, adding a small discovery to an existing section.
+
+But once the resumed session has produced snapshot-worthy work — new commits, a completed phase, decisions that change "Current State Summary", "Immediate Next Steps", or "Work Completed" — do **not** rewrite those sections in the prior handoff. Create a **new** handoff and let the prior one stand as the record of where you began — see *Handoff Chaining* below for which relationship to declare (here, `--continues-from <prior>`).
+
+Rule of thumb: in-place edits are for marking progress, not for re-snapshotting state.
+
+Failure mode this prevents: rewriting the resumed handoff in place destroys the snapshot of where the session started, which is the whole point of the chain. The next reader loses the ability to see the progression and can only see the latest state — and an instruction like "refresh the handoff" reads as license to overwrite when it should mean "chain a fresh one."
 
 ## Handoff Chaining
 
