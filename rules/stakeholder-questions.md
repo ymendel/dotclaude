@@ -2,6 +2,8 @@
 
 When drafting a question to a stakeholder, client, or non-engineer collaborator, ask about **behavior**, not about **implementation**. The stakeholder's job is to tell us what they need to be able to do and see. Deciding how to store, structure, or validate the data behind that is ours.
 
+The split underneath is what matters: *behavior* belongs to whoever owns the requirement, *implementation* to engineering. It runs both directions — **asking** about behavior when someone else owns the requirement (most of this rule), and **telling** implementers the behavior you want when you own it (*Communicating a requirement you own*, below).
+
 This applies any time the answer will feed into engineering work — disambiguation messages on Slack, follow-up questions in a meeting recap, "before we build this, can you confirm…" notes, ADR Context-section research. Whenever the question is going *out* to someone whose role is to describe the work, not to implement it, this rule fires.
 
 Sibling: the `requirements-clarity` skill governs *what to clarify* when requirements are vague (Why? / Simpler? against YAGNI/KISS). This rule governs *how to phrase* a clarification when the audience is external. They compose — clarity work that produces an outward question runs through both.
@@ -13,6 +15,18 @@ A behavior question asks what the stakeholder needs to be able to do, see, or re
 Implementation-flavored phrasing leaks even when it sounds plain. "Do you want the system to save both numbers separately, or is the most recent count the only one we need to remember?" is asking about *storage*. The behavior version is "do you need visibility into both?" — same decision-tree on our end, but framed as something the stakeholder can actually answer from their own work.
 
 The pattern: rephrase the question until the words *the stakeholder uses to answer it* describe their work, not ours.
+
+## Communicating a requirement you own to implementers
+
+The rest of this rule covers *asking* a stakeholder about behavior when *they* own the requirements. The mirror image is just as load-bearing: when *you* own the requirement and are communicating it *down* to whoever implements (contractors, a vendor team, another engineer), specify the **behavior you want** and leave the **implementation** for them to work out. Same behavior-vs-implementation line, opposite direction — there it's a question going out, here it's a directive going out.
+
+Why the discipline matters in this direction too: the behavior is the durable interface, the implementation is downstream of it. If you hand implementers a mechanism ("set up a Heroku pipeline to promote staging to production"), you've made a technical choice that may not fit their stack, and you've coupled the outcome you actually want to one particular way of getting there. State the outcome instead ("a change is done when it's live in production and confirmed working") and let them propose the mechanism that fits. You keep ownership of *what* and *why*; they own *how*. This is the same split as a good ADR — Decision and Context are yours, the implementation detail is negotiable.
+
+This composes with **Match the stakeholder's vocabulary** below and with `naming.md`'s *Adopt the domain expert's term*: when you state the desired behavior, use the words the implementers already use for the concept, so the requirement lands in their vocabulary rather than imposing yours.
+
+Concrete tells that you've slipped into dictating implementation: naming a specific tool, service, or pipeline; prescribing a data structure or storage scheme; specifying *the steps* rather than *the end state*. When you catch one, rewrite to the behavior it was meant to produce and add — if useful — "here are options we could consider, for you to weigh," explicitly provisional.
+
+Failure mode this prevents: handing implementers a solution dressed as a requirement. They either follow it even though a better fit exists in their context, or they push back and the conversation re-litigates the mechanism instead of confirming the behavior — when the behavior was the only thing you actually needed to pin down.
 
 ## Turn internal insights into assumption checks
 
