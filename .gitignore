@@ -16,10 +16,6 @@
 !/skills
 !/skills/**/*
 
-# and commands, at least temporarily (they are deprecated in favor of skills)
-!/commands
-!/commands/**/*
-
 # and rules
 !/rules
 !/rules/**/*
