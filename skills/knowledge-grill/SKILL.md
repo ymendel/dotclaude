@@ -60,7 +60,8 @@ it:
   installed keeps this skill self-contained when shipped alone — the same soft-dependency trap the
   mattpocock grill family falls into.)
 - **Entry map and operational shape → an orientation doc** — the "read this first" map over setup,
-  how the pieces relate, and where to start.
+  how the pieces relate, and where to start. Use the `orientation-doc` skill for its shape when
+  present; otherwise write a plain "read this first" markdown doc.
 - **Gap-as-risk → flag it** at the top of the orientation or handoff doc, so the inheritor sees the
   load-bearing unknown before anything else.
 - **People and relationship knowledge → a private artifact, not the repo.** The interview surfaces

@@ -48,8 +48,9 @@ Two further-custom options, if wanted:
   be installed alongside). The current self-contained embed avoids that; revisit only when a second
   grill actually exists.
 
-## Output artifact still unbuilt
+## Output artifact — built
 
-This skill routes the entry-map output to "an orientation doc", which is itself only a candidate
-artifact in the toolkit — not yet a skill or a settled convention. Until it exists, the grill writes
-a plain "read this first" markdown doc.
+This skill routes the entry-map output to "an orientation doc", which is now backed by the
+`orientation-doc` skill (its shape: gap-as-risk first, then what-this-is, terms that bite, concepts
+that moved, soft spots, where the rest lives, what's not in the repo). When that skill isn't
+installed, the grill falls back to a plain "read this first" markdown doc.
