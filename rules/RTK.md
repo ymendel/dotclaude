@@ -115,5 +115,12 @@ or call `rtk read`, `rtk grep`, `rtk find` directly.
 
 **`cat` slip**: Dynamic path patterns like `cat "$(ls ...)"` frequently bypass RTK. Always use `rtk read "$(ls ...)"` — never `cat "$(ls ...)"`.  
 
+**heredoc commit slip**: A heredoc-fed `git commit -F - <<'EOF' … EOF` isn't rewritten —
+`rtk rewrite` passes it through (exit 1), so it reaches the permission gate as a bare `git commit`
+and prompts (only `rtk git:*` is allowed; `settings.md` covers why heredoc/substitution forms pass
+through). Write the message to a file and use `rtk git commit -F <file>`, or `rtk git commit -m "…"` —
+single-line forms the rewriter handles. The file form also keeps the message text out of the command
+string, dodging the deny-substring trap.
+
 Full command reference: `rules/rtk-commands.md` (excluded from context).
 
