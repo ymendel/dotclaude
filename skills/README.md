@@ -28,6 +28,8 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 **`project-notes`** — Files long-running project notes that don't belong in code, commit messages, memory, or session handoffs: cleanup debt, drafted upstream feedback, lessons for a derived template. Per-destination templates and a deterministic search for declared destinations. Pairs with `rules/project-notes.md`, which covers the recognition habit.
 
+**`knowledge-grill`** — Interviews the holder of an existing system to extract tacit knowledge — the why behind decisions, non-obvious constraints, the gap that would stall a successor — and routes it to durable artifacts (ADRs, an orientation doc, a private people-notes file). The backward counterpart to forward plan-stressing. Pairs with `rules/knowledge-grill.md`, which watches for an exit on the horizon and suggests the grill before the knowledge walks away.
+
 ## Architecture & design
 
 **`adr`** — Writes Architecture Decision Records, advises on ADR-worthiness, or updates an existing ADR (accept, supersede, deprecate, or amend when a downstream ADR shifts the facts under an intact decision). Auto-invokes `adr-refine` after drafting.

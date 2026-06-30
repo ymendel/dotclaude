@@ -30,6 +30,8 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`cross-project-notes.md`** — Sibling to `project-notes.md` for findings that generalize beyond any single project and don't have an upstream / template / external destination yet. Names `~/.claude/notes/` as the durable home for those, with one file per topic (`template-lessons.md`, `postgres-quirks.md`, …). Directory is intentionally outside version control.
 
+**`knowledge-grill.md`** — Companion rule for the `knowledge-grill` skill: suggest a backward, tacit-knowledge-extraction grill *before* knowledge walks away (exit, handoff, staffing change on the horizon), while the holder is still around to interview. The skill runs the interview and routes output to durable artifacts; this rule covers the *when*. Same skill+rule split as `project-notes`. Broader triggers are deferred — see `skills/knowledge-grill/TODO.md`.
+
 **`rule-maintenance.md`** — Procedures for making corrections: where to edit skills and rules, YAML quoting requirements, feedback routing, permissions allow list, keeping `rules/README.md` up to date, and criteria for reviewing skills and rules.
 
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
