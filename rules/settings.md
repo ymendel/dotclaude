@@ -64,6 +64,16 @@ Implication for the allow list: a `Bash(rtk X:*)` rule does **not** cover `X` us
 
 Failure mode this prevents: assuming `rtk gh:*` (or `rtk find:*`, `rtk grep:*`) covers those tools everywhere, then being surprised by a prompt on a PR-created-with-a-heredoc-body or a `find | grep` pipeline — because a segment lacks an allow rule (RTK demotes the pipe to a prompt, or Claude Code's per-segment check fails on a passthrough command).
 
+## Shell Expansion Makes a Command Non-Allowlistable
+
+Claude Code matches a command against the allow rules *statically*, before the shell expands anything. When the command contains expansion it can't resolve ahead of time — a bare `$VAR` (which the parser labels `simple_expansion`), `${VAR}`, or `$(...)`/backtick substitution — the evaluator can't safely match it against an allow rule, so it prompts. That prompt offers only **Yes / No**: there is no "don't ask again" option, because Claude Code won't persist an allow rule for a command whose real content is computed at runtime. The absence of the "don't ask again" line is the tell that expansion, not a missing allow entry, is the cause.
+
+Confirmed 2026-06-30: a diagnostic `for f in …; do c=$(cat "$f"); … $?; done` loop prompted with "Contains simple_expansion" and no allowlist option, where a plain bare `git commit -m '…'` the same session *did* offer "don't ask again for `git commit *`".
+
+So: when a command will face the permission gate, prefer an expansion-free form. Running two checks as two plain commands carries no expansion; folding them into a `for … do … $(…) … done` loop does — and the loop is the convenient reach that trips the guard. Split it into plain commands when the task is just a status check or a small comparison. (This is also why command substitution shows up under "How Claude Code Matches Compound Commands" above: RTK passes it through, then Claude Code's own per-segment evaluation hits the same wall.)
+
+Failure mode this prevents: reaching for a bash loop with command substitution on a task discrete commands handle, hitting an un-suppressible prompt, and assuming the permission *config* is at fault — when the cause is the expansion in the command that got written.
+
 ## Deny Patterns Match the Command String, Not the Invocation
 
 Deny rules (`Bash(*git push*)`, `Bash(*rm -rf*)`, `Bash(*find* -delete*)`) match the literal command **string**, with no understanding of what the command does. Any command whose text *contains* the denied substring is blocked — even when it performs no such action. The recurring bite: a `git commit -m '…'` whose message describes the denied pattern, an `echo` or `grep` that mentions it, or a command documenting the deny rules themselves. Confirmed 2026-06-18 — a commit message containing the text "find … -delete" was blocked by the `*find* -delete*` carve-out.
