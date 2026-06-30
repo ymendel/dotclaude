@@ -51,11 +51,14 @@ The interview is the engine; what makes it a toolkit member rather than a conver
 output lands*. Do not leave it in the chat — route each kind of finding to the artifact built for
 it:
 
-- **Decisions and their why → ADRs.** Invoke the `adr` skill if it is available; otherwise write the
-  decision as a markdown ADR directly (Context / Decision / Consequences). Offer an ADR only when the
-  decision is hard to reverse, surprising without context, and the result of a real trade-off; skip
-  it otherwise. (Not depending on `adr` being installed keeps this skill self-contained when shipped
-  alone — the same soft-dependency trap the mattpocock grill family falls into.)
+- **Decisions and their why → ADRs.** Prefer the `adr` skill when it is available; otherwise write the
+  decision as a markdown ADR directly (Context / Decision / Consequences). When the capture is racing
+  an exit and the decision content is already complete, hand-writing the ADR and offering `adr-refine`
+  as a follow-up is fine even with `adr` present — don't let the heavier workflow stall a capture
+  that's against the clock. Offer an ADR only when the decision is hard to reverse, surprising without
+  context, and the result of a real trade-off; skip it otherwise. (Not depending on `adr` being
+  installed keeps this skill self-contained when shipped alone — the same soft-dependency trap the
+  mattpocock grill family falls into.)
 - **Entry map and operational shape → an orientation doc** — the "read this first" map over setup,
   how the pieces relate, and where to start.
 - **Gap-as-risk → flag it** at the top of the orientation or handoff doc, so the inheritor sees the
