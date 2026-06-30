@@ -12,6 +12,16 @@ When editing skill frontmatter descriptions, always quote the value as a YAML st
 
 The repository history captures the details — just report what changed and summarize.
 
+## Get it down first, refine later
+
+When changing a rule or skill, prioritize getting the substance down over polishing the specifics — exact wording, section placement, cross-references, heading style. The configuration is under version control and the user runs his own refinement pass in the dotclaude project, so a recorded-but-rough change beats a delayed-but-polished one. Capture the lesson while the context that exposed it is still fresh.
+
+This goes double when the edit is made from inside another project rather than from dotclaude itself. There the surrounding rules aren't all in view, lint and review tooling aren't at hand, and the user will see and refine the edit later in dotclaude regardless. Don't stall an out-of-repo edit on getting the wording perfect — get it right in substance, report what changed, and leave the polish for the refinement pass.
+
+Sibling: `self-improvement.md` governs *when* to capture a lesson — immediately, while the trigger is fresh. This governs *how polished* that capture has to be — rough is fine.
+
+Failure mode this prevents: treating a rule edit like a public artifact that must ship perfect, which either delays the capture until the context has gone stale or drops it altogether. Because the config is recoverable, version-controlled, and owner-refined, over-polishing is pure cost.
+
 ## Writing Rules
 
 Use imperative voice throughout ("do X", "never Y"). Avoid first-person ("I will...") — it's ambiguous about whether the author is Claude or the user, and creates inconsistency across files.
