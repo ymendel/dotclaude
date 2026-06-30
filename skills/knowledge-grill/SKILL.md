@@ -60,6 +60,17 @@ it:
   how the pieces relate, and where to start.
 - **Gap-as-risk → flag it** at the top of the orientation or handoff doc, so the inheritor sees the
   load-bearing unknown before anything else.
+- **People and relationship knowledge → a private artifact, not the repo.** The interview surfaces
+  system knowledge (safe to commit) alongside people knowledge — how to work with a client, what
+  "approved" actually means, who brokers requirements. When the target repo may be client- or
+  third-party-owned, split the two: commit the orientation doc and ADRs, but route the people
+  knowledge to a private, gitignored file. Treat the raw interview transcript as private by default
+  too — it holds everything, including what was meant to stay out of the repo.
+
+Write private artifacts to a dedicated directory like `.claude/knowledge-grill/`. Avoid
+`.claude/handoffs/` — that path is conventionally the home for session-resume handoffs, a different
+kind of artifact, and handoff tooling that scans it (the `session-handoff` skill's hook, where
+installed) can mistake your notes for a session to resume.
 
 ## Firing
 
