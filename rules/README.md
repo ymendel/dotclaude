@@ -32,6 +32,8 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`knowledge-grill.md`** — Companion rule for the `knowledge-grill` skill: suggest a backward, tacit-knowledge-extraction grill *before* knowledge walks away (exit, handoff, staffing change on the horizon), while the holder is still around to interview. The skill runs the interview and routes output to durable artifacts; this rule covers the *when*. Same skill+rule split as `project-notes`. Broader triggers are deferred — see `skills/knowledge-grill/TODO.md`.
 
+**`knowledge-worker-toolkit.md`** — The map of the record-artifact skill family (`session-handoff`, `session-doc`, `project-notes`, ADRs, `orientation-doc`, `knowledge-grill`): what each captures, the boundary tests for when two seem to fit, and how to place a new member without overlapping an existing one. The authoritative cross-member view the individual skills defer to.
+
 **`rule-maintenance.md`** — Procedures for making corrections: where to edit skills and rules, YAML quoting requirements, feedback routing, permissions allow list, keeping `rules/README.md` up to date, and criteria for reviewing skills and rules.
 
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.

@@ -9,6 +9,8 @@ Produce well-structured, persistent project notes for findings that surfaced dur
 
 For the *recognition* habit — knowing *when* to file — see `~/.claude/rules/project-notes.md`. This skill is the production workflow once a moment has been recognized.
 
+Not for decisions — a decision and its rationale belong in an ADR (the `adr` skill). Project-notes captures debt, gaps, and lessons. A deferral that is both files its revisit-trigger here and its rationale as an ADR if it's ADR-worthy.
+
 ## Destination types
 
 | Type | Audience | Typical location |
