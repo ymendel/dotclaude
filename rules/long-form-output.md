@@ -4,7 +4,7 @@ When a turn's output is long enough that the user would have to scroll back and 
 
 ## What counts as long enough
 
-- **Anything the user is likely to want to respond to point-by-point.** This is the primary case — putting it in a file makes redlining possible. Inline content has to be quoted back to be addressed, which costs the user a step every time.
+- **Content the user will want to respond to point-by-point.** A file makes redlining possible without quoting each part back. On its own this is now a weak trigger — a fullscreen TUI lets the user work an inline list in place — so file when the content *also* meets one of the bars below.
 - Multi-section structured documents — plans, design docs, audits, code review findings, post-implementation reports.
 - Output worth sharing or coming back to over multiple turns.
 
