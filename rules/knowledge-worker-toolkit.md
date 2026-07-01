@@ -6,8 +6,9 @@ points where knowledge has to cross to a lower-context reader — next session, 
 successor. This rule is the authoritative cross-member map, the view no single skill holds. Use it to
 pick the right member when producing a record, and to place a new member without overlapping one that
 already exists. Each skill owns its own detail and defers here for the family's shape. For what must
-*not* go into an artifact when the repo isn't yours, see `sensitive-knowledge.md` — the companion
-production-hygiene rule the whole family inherits.
+*not* go into an artifact — the people-knowledge that defaults to a private file regardless of who
+owns the repo — see `sensitive-knowledge.md`, the companion production-hygiene rule the whole family
+inherits.
 
 ## The map
 
