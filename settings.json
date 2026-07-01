@@ -179,5 +179,6 @@
     "review": "user-invocable-only",
     "security-review": "user-invocable-only"
   },
-  "skillListingBudgetFraction": 0.015
+  "skillListingBudgetFraction": 0.015,
+  "tui": "fullscreen"
 }
