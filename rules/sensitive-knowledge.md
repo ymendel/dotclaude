@@ -6,9 +6,9 @@ default. Commit the **system knowledge** (how the code works, why a decision was
 traps are). Route the **people and relationship knowledge** to a private, gitignored artifact, never
 the tracked repo.
 
-Key this on the *kind* of knowledge, not on who owns the repo. The kind you can read from what you're
-writing; ownership you cannot reliably detect — it transfers (a repo that started yours and moved to a
-client), and a remote URL lags reality (GitHub redirects an old path indefinitely, so the remote
+Key this on the *kind* of knowledge, not on who owns the repo. You can tell the kind from what you're
+writing, but you can't reliably detect ownership — it transfers (a repo that started yours and moved
+to a client), and a remote URL lags reality (GitHub redirects an old path indefinitely, so the remote
 never has to change). So the split runs by default everywhere, keyed on content. Who owns the repo
 decides the *stakes* of a leak, not whether to split — see below.
 

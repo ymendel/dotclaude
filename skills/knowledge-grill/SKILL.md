@@ -66,10 +66,11 @@ it:
   load-bearing unknown before anything else.
 - **People and relationship knowledge → a private artifact, not the repo.** The interview surfaces
   system knowledge (safe to commit) alongside people knowledge — how to work with a client, what
-  "approved" actually means, who brokers requirements. When the target repo may be client- or
-  third-party-owned, split the two: commit the orientation doc and ADRs, but route the people
-  knowledge to a private, gitignored file. Treat the raw interview transcript as private by default
-  too — it holds everything, including what was meant to stay out of the repo.
+  "approved" actually means, who brokers requirements. Split the two by default, keyed on the kind of
+  knowledge rather than on who owns the repo — commit the orientation doc and ADRs, route the people
+  knowledge to a private, gitignored file. Ownership sets the stakes — a leak into a repo you don't
+  own can't be retracted — not whether to split. Treat the raw interview transcript as private by
+  default too — it holds everything, including what was meant to stay out of the repo.
 
 Write private artifacts to a dedicated directory like `.claude/knowledge-grill/`. Avoid
 `.claude/handoffs/` — that path is conventionally the home for session-resume handoffs, a different

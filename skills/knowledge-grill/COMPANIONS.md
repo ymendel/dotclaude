@@ -27,9 +27,9 @@ the handoff is written the person who held the why is already gone. Description-
 only when the conversation is *already about* leaving; it does not look up and notice the exit on
 the horizon.
 
-**Where it lives:** a rule in your own `~/.claude/rules/` (this repo keeps it at
-`rules/knowledge-grill.md`), `@`-imported into `CLAUDE.md`. It is not part of the skill package and
-is not synced with it.
+**Where it lives:** a rule in your own `~/.claude/rules/`, which loads automatically each session
+(this repo keeps it at `rules/knowledge-grill.md`) — or inline in a `CLAUDE.md`. It is not part of
+the skill package and is not synced with it.
 
 **Sample wording** (paste into your own rule file and adjust):
 

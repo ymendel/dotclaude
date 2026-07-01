@@ -25,10 +25,10 @@ sensitive half has to be routed out first.
 where it can't be retracted — `git` history persists and the tree isn't yours to rewrite. The doc
 that was meant to help a collaborator becomes a liability.
 
-**Where it lives:** a rule in your own `~/.claude/rules/` (this repo keeps it at
-`rules/sensitive-knowledge.md`), `@`-imported into `CLAUDE.md`. It is the family-wide statement the
-whole knowledge-worker toolkit inherits; it is not part of the skill package and does not sync with
-it.
+**Where it lives:** a rule in your own `~/.claude/rules/`, which loads automatically each session
+(this repo keeps it at `rules/sensitive-knowledge.md`) — or inline in a `CLAUDE.md`. It is the
+family-wide statement the whole knowledge-worker toolkit inherits. It is not part of the skill
+package and does not sync with it.
 
 **Sample wording** (paste into your own rule file and adjust — the fuller version is
 `sensitive-knowledge.md` in the toolkit):

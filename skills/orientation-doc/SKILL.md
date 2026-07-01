@@ -88,10 +88,10 @@ of this goes to a private artifact, not the committed doc (see Producing one, la
   consistently across the whole doc. The tell that you've drifted is a bare name sitting next to a
   formatted one (a plain `fzf` beside `rg` and `proximity-sort`). A product name used descriptively
   stays prose (Homebrew, Postgres); the executable you'd type is code (`brew`, `psql`).
-- **Split sensitive knowledge out of a repo you don't own.** *What's not in this repo* often holds
-  people- and relationship-knowledge. When the repo may be client- or third-party-owned, commit the
-  orientation doc but route that sensitive half to a private, gitignored artifact — the same split
-  `knowledge-grill` applies to interview output.
+- **Split sensitive knowledge out by default.** *What's not in this repo* often holds people- and
+  relationship-knowledge. Route that sensitive half to a private, gitignored artifact and commit the
+  orientation doc — split by the kind of knowledge, not by who owns the repo (ownership sets the
+  stakes of a leak, not whether to split). Same split `knowledge-grill` applies to interview output.
 
 ## Where it goes
 
