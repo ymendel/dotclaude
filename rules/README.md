@@ -34,6 +34,8 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`knowledge-worker-toolkit.md`** — The map of the record-artifact skill family (`session-handoff`, `session-doc`, `project-notes`, ADRs, `orientation-doc`, `knowledge-grill`): what each captures, the boundary tests for when two seem to fit, and how to place a new member without overlapping an existing one. The authoritative cross-member view the individual skills defer to.
 
+**`sensitive-knowledge.md`** — Companion production-hygiene rule to `knowledge-worker-toolkit.md`: when producing any toolkit artifact in a repo you don't own, split system knowledge (commit) from people and relationship knowledge (route to a private, gitignored artifact). Covers what counts as people knowledge, where the private half goes, and why a leak into a non-owned repo can't be retracted. The family-wide statement of a split `knowledge-grill` and `orientation-doc` already carry inline.
+
 **`rule-maintenance.md`** — Procedures for making corrections: where to edit skills and rules, YAML quoting requirements, feedback routing, permissions allow list, keeping `rules/README.md` up to date, and criteria for reviewing skills and rules.
 
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
