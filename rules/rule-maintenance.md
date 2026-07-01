@@ -28,6 +28,12 @@ Use imperative voice throughout ("do X", "never Y"). Avoid first-person ("I will
 
 When writing a new rule, include the failure mode it prevents — not just what to do, but what goes wrong without it. Rules that only describe the happy path leave room for the exact failure they're meant to prevent.
 
+## Referencing skills and other rules
+
+A rule may reference a skill or another rule freely. Rules load passively in the same config where everything they reference already co-resides, so the pointer never dangles — the target is present whenever the rule fires.
+
+The reverse direction is fragile, and it is the skill author's concern, not the rule author's — a *skill* that references a rule may ship to an environment where that rule is absent, because rules never travel with a skill package. The `skill-architecture` skill covers how a skill degrades gracefully there (a `COMPANIONS.md` entry, a conditional sentence). Nothing symmetric is needed when writing a rule — cross-reference skills and rules as freely as the prose wants.
+
 ## Rule File Index
 
 When adding a new rule file, update `rules/README.md` with a description before committing.

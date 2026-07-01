@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-07-01: Reference-direction asymmetry (skills → rules is the fragile case)
+
+**Trigger**: While promoting a client-repo-privacy pattern to a shared rule (`rules/sensitive-knowledge.md`) in the dotclaude toolkit, the user observed that this repo's distribution makes cross-references asymmetric: rules can refer to skills and other rules freely, but skills have a tougher time referring to rules or other skills. The existing "Cross-skill references should be lightweight" principle covered skill→skill coordination and "may not be installed," but never named the sharper skill→**rule** case (rules *cannot* travel at all with a skill package) or the directional asymmetry.
+
+### Changes Made
+
+1. **Extended the "Cross-skill references should be lightweight" principle** to name reference direction: a skill pointing at a rule is the fragile case (rules never travel with a skill package), so a skill documents a needed companion rule in `COMPANIONS.md` and degrades to work without it; the reverse (rule → skill/rule) is free because rules load in the same config where their targets already live.
+2. **Complementary note in `rules/rule-maintenance.md`** ("Referencing skills and other rules") stating the rule-author's side: cross-reference freely, the fragility is the skill author's concern.
+
+### Key Insight
+
+> "May not be installed" understates the skill→rule case. A sibling skill *might* be present; a rule is *guaranteed absent* from a skill-only ship, because rules never travel with a skill package. That guarantee is what forces the `COMPANIONS.md` + graceful-degradation pattern rather than an inline reference.
+
+---
+
 ## 2026-06-01: Cross-skill coordination weight (writing principle + skill-judge Pattern 10)
 
 **Trigger**: When `session-handoff` was first updated to coordinate with the new `session-doc` skill (2026-05-30), the first draft of the coordination step ran 12 lines — artifact split, analogy, detection logic for the `## Session docs` heading in CLAUDE.md. User pushback was correct: the heavier the cross-skill prose, the more breakable the coordination is when one skill isn't installed. The final coordination shrank to one conditional sentence. The lesson was filed as the highest-priority capture from that session's handoff; this entry codifies it across both skills.
