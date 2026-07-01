@@ -63,12 +63,22 @@ Adopt as many as suit your taste. Each section gives the intent, the failure mod
 
 > When work in a session produces an artifact that lives outside the repo — a draft message sent to a teammate, an ASCII wireframe in a chat window, a question put to a stakeholder — save a copy under `.claude/handoffs/artifacts/` while the artifact is still in front of you. The `session-handoff` skill covers how a handoff should reference these; the rule's half is timing, because by handoff-write time a chat-only draft may already be scrolled out of context.
 
+### 2d. Split sensitive knowledge out of a non-owned repo (family-wide)
+
+**Intent:** a handoff can carry people and relationship knowledge — how to work with a client, what "approved" really means, who holds authority. This is a family-wide rule the whole knowledge-worker toolkit inherits, not specific to `session-handoff`. It rarely bites here, because handoffs live in the gitignored `.claude/handoffs/` by convention — but if a handoff is ever committed to a shared or non-owned repo, the sensitive half has to be routed out first.
+
+**Failure without it:** people-knowledge lands in a repo the client or a third party controls, where it can't be retracted — `git` history persists and the tree isn't yours to rewrite.
+
+**Sample wording** (the fuller version is `sensitive-knowledge.md` in the toolkit):
+
+> When producing a handoff (or any knowledge-worker artifact), split the knowledge by kind, by default. Commit system knowledge (how things work, why decisions were made). Route people and relationship knowledge — how to work with a client, what "approved" really means, who holds authority, anything credentials-adjacent — to a private, gitignored file. Key the split on the *kind* of knowledge, which you can read from what you're writing, not on who owns the repo, which you can't reliably detect. Ownership sets the stakes — a leak into a repo you don't own can't be retracted.
+
 ## Adopting these in a new environment
 
 Rough order:
 
 1. Apply the `settings.json` entries from `references/setup.md` (permissions + optional `SessionStart` hook registration).
 2. Register the `SessionStart` hook (the script ships at `hooks/recent-handoff-notice.sh` inside this skill) if you want the proactive surfacing — `references/setup.md` has the exact entry.
-3. Paste the sample wording above into your rule file (`~/.claude/rules/<something>.md`, or your project's `CLAUDE.md`), editing freely. Three sections, three behaviors — adopt all or just the ones that fit.
+3. Paste the sample wording above into your rule file (`~/.claude/rules/<something>.md`, or your project's `CLAUDE.md`), editing freely. Four sections, four behaviors — adopt all or just the ones that fit. (Section 2d is stated family-wide by the toolkit's `sensitive-knowledge.md` if you've adopted it.)
 
 None of these are required for the skill to function; they make the surrounding workflow feel automatic instead of on-demand.

@@ -72,11 +72,24 @@ Skip this section unless you maintain `~/.claude/`-level config and want a place
 
 If your `~/.claude/` directory is tracked in git, gitignore the notes directory — these are personal working notes, not configuration to ship.
 
+## 3. Companion rule: sensitive knowledge (family-wide)
+
+**Intent:** `project-notes` commits by design — findings land in declared destinations, some of them tracked. So the sensitive half of a note (people and relationship knowledge, not system knowledge) has to be routed out *before* it lands, not cleaned up after. This is a family-wide rule the whole knowledge-worker toolkit inherits, not specific to `project-notes`.
+
+**Failure without it:** a candid note — how a client actually operates, who to route around, what "approved" really means — gets committed to a repo the client or a third party controls, where it can't be retracted.
+
+### Sample wording
+
+Paste into your rule file (the fuller version is `sensitive-knowledge.md` in the toolkit) and edit to taste.
+
+> When filing a note, split the knowledge by kind, by default. Commit system knowledge (how things work, why decisions were made). Route people and relationship knowledge — how to work with a client, what "approved" really means, who holds authority, anything credentials-adjacent — to a private, gitignored file. Key the split on the *kind* of knowledge, which you can read from what you're writing, not on who owns the repo, which you can't reliably detect. Ownership sets the stakes — a leak into a repo you don't own can't be retracted.
+
 ## Adopting these in a new environment
 
 Rough order:
 
 1. Paste the recognition rule wording (section 1) into your rule file or `CLAUDE.md`.
 2. (Optional) If you want a cross-project notes destination, paste section 2's wording and create the directory (`~/.claude/notes/` or your equivalent).
+3. Paste the sensitive-knowledge wording (section 3) into your rule file — or adopt the toolkit's `sensitive-knowledge.md`, which states it family-wide.
 
 The skill itself ships no host config — no permissions to add, no hooks to register.
