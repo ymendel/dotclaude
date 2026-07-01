@@ -52,7 +52,11 @@ reason just reads as a dare.
 ## Where the rest lives
 The map outward: the README for setup, the ADRs for decisions and their why, recent handoffs for
 in-flight work, the entry-point files a newcomer should open first. Point, don't duplicate. Link each
-entry's pointer, not every sub-reference it names — those are reachable from the parent link.
+entry's pointer, not every sub-reference it names — those are reachable from the parent link. Make a
+pointer a link when it names an in-repo file or directory (`[`README.md`](README.md)`), entry-point
+files included, and leave conceptual pointers (`git log`, `:help plug`) as prose. When a class of
+decision has no ADR home, say where its *why* lives instead (usually `git log`); that absence is
+navigation information, not an omission.
 
 ## What's not in this repo
 The knowledge the code can't hold — the people and relationships, the external systems, the things
@@ -79,6 +83,11 @@ of this goes to a private artifact, not the committed doc (see Producing one, la
   outward and stays short. The moment it starts restating the README or inlining an ADR's reasoning,
   it stops being a fast read, and a reader who learns it can't be skimmed stops trusting it to be the
   first thing they read.
+- **Code-format identifiers everywhere, not just in some sections.** File and path names, commands,
+  flags, env vars, and binary or tool names are literal identifiers — render them in code font
+  consistently across the whole doc. The tell that you've drifted is a bare name sitting next to a
+  formatted one (a plain `fzf` beside `rg` and `proximity-sort`). A product name used descriptively
+  stays prose (Homebrew, Postgres); the executable you'd type is code (`brew`, `psql`).
 - **Split sensitive knowledge out of a repo you don't own.** *What's not in this repo* often holds
   people- and relationship-knowledge. When the repo may be client- or third-party-owned, commit the
   orientation doc but route that sensitive half to a private, gitignored artifact — the same split
