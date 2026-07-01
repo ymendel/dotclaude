@@ -1,11 +1,11 @@
 ---
 name: session-doc
-description: "Produce the narrative session document paired with `session-handoff` — title, why this happened, what was done, decisions worth revisiting, lessons, next moves; audience is a human re-reader weeks later. Invoke after a handoff when the project declares a `## Session docs` destination in `CLAUDE.md`. Also fires on 'write session doc', 'session narrative', 'document this session'. Suggest proactively at session wrap-up if a destination is declared and no doc was produced. Skip when no destination is declared and the user didn't ask."
+description: "Produce the narrative session document paired with `session-handoff` — why this happened, what was done, decisions worth revisiting, lessons, next moves. Audience is a human collaborator catching up on the session, not the resuming agent. Invoke after a handoff when the project declares a `## Session docs` destination in `CLAUDE.md`. Also fires on 'write session doc', 'session narrative', 'document this session'. Suggest proactively at session wrap-up if a destination is declared and no doc was produced. Skip when no destination is declared and the user didn't ask."
 ---
 
 # Session Doc
 
-Produce a narrative meta-document capturing the *arc* of a working session: why it happened, what was decided, judgment calls worth re-examining, and what to carry forward. The audience is a human re-reader weeks later — a teammate joining the project, a collaborator catching up, or future-you. Pairs with `session-handoff`, which is the mechanical resume-for-next-agent document. The two are intentionally not collapsed: their audiences and shapes differ.
+Produce a narrative meta-document capturing the *arc* of a working session: why it happened, what was decided, judgment calls worth re-examining, and what to carry forward. The audience is a human collaborator catching up on the same session — a research partner picking up the thread, a teammate reading in, or future-you. Pairs with `session-handoff`, which is the mechanical resume-for-next-agent document. The two are intentionally not collapsed: their audiences and shapes differ.
 
 For the *invocation* habit — knowing *when* to produce one — see *When this fires* below. This skill is the production workflow once a session has earned a doc.
 
@@ -14,7 +14,7 @@ For the *invocation* habit — knowing *when* to produce one — see *When this 
 | Artifact | Audience | Optimized for | Where it lives |
 |---|---|---|---|
 | `session-handoff` (`.claude/handoffs/`) | The next Claude session | Cold-resume mechanics | Always |
-| `session-doc` (project-declared path) | A human re-reader weeks later | Narrative judgment-capture | Only when the project declares a destination |
+| `session-doc` (project-declared path) | A human collaborator catching up on the session | Narrative judgment-capture | Only when the project declares a destination |
 
 The handoff carries structured fields the resuming agent needs. The session doc carries *why this session happened*, *what judgment calls were made and why*, and *lessons worth carrying forward*. Overlap exists on the surface facts (commits, branch, ADR refs); divergence is on register and intent.
 
@@ -47,7 +47,7 @@ A typical declaration is a short prose block naming a path:
 
 Destination: `docs/sessions/` (one file per session, named `YYYY-MM-DD-<slug>.md`).
 
-For a human re-reader weeks later — the *why*, the judgment calls, lessons worth carrying forward. Pairs with the mechanical handoff in `.claude/handoffs/`.
+For a human collaborator catching up on the session — the *why*, the judgment calls, lessons worth carrying forward. Pairs with the mechanical handoff in `.claude/handoffs/`.
 ```
 
 The format is intentionally loose; a path inside the block is enough. If multiple paths or formats appear, ask the user which applies before proceeding.
@@ -146,7 +146,7 @@ Same principle as ADR consequences-by-valence: the section's *purpose* is fixed,
 ## Register
 
 - **Narrative prose with bullets**, not pure bullet lists. Reasoning belongs inline, not bracketed off into a separate "rationale" subsection.
-- **High specificity.** Name gem versions, exact method names, identifier prefixes, release numbers, file paths. The reader weeks later needs the specifics to recognize what was touched.
+- **High specificity.** Name gem versions, exact method names, identifier prefixes, release numbers, file paths. The reader, without your in-session context, needs the specifics to recognize what was touched.
 - **Negative-evidence reasoning is welcome.** "Why pause/unpause was fine" — explaining why a finding *didn't* fire in adjacent cases is what makes a finding solid. The doc has room for this; the handoff often doesn't.
 - **Tables for state comparison** — before/after, run-by-run, prediction vs. observation. Useful in *Live validation* especially.
 - **Length proportional to session richness.** No fixed target. A light session gets a short doc; a five-hour multi-decision session gets a long one. Resist padding to look thorough.
