@@ -70,7 +70,11 @@ it:
   knowledge rather than on who owns the repo — commit the orientation doc and ADRs, route the people
   knowledge to a private, gitignored file. Ownership sets the stakes — a leak into a repo you don't
   own can't be retracted — not whether to split. Treat the raw interview transcript as private by
-  default too — it holds everything, including what was meant to stay out of the repo.
+  default too — it holds everything, including what was meant to stay out of the repo. When you write
+  a person up, don't assume their pronouns, gender, last name, or title — a name is not evidence of
+  gender; use the name or singular "they", and mark an attribute unknown rather than guessing. Mark
+  each people-fact stated (written in a doc or given in an answer) vs. inferred (your reading), so a
+  successor can tell recorded fact from interpretation.
 
 Write private artifacts to a dedicated directory like `.claude/knowledge-grill/`. Avoid
 `.claude/handoffs/` — that path is conventionally the home for session-resume handoffs, a different
