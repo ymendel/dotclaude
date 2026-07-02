@@ -69,3 +69,16 @@ When passing `preview` content on an AskUserQuestion option, never rely on the p
 **Why:** On 2026-07-02, offering three next-step options with multi-line previews, the previews clipped to one visible line each ("N lines hidden") on the user's short terminal, hiding the content meant to inform the choice. My first correction blamed "overloading" the preview — wrong, because the available height can't be detected, so there's no judging what fits. The user can enlarge the pane, but that's not something you can count on or measure.
 
 **How to apply:** treat previews as an optional visual aid whose absence would not block the decision — a mockup or snippet the user compares *if* it renders. Keep everything load-bearing (what each option means, tradeoffs, the recommendation) in the chat message accompanying the question, where nothing is clipped. When in doubt, skip the preview and rely on labels + descriptions + prose framing in chat.
+
+## A malformed path won't error in Write the way it does in the shell — verify where it landed
+
+File tools take absolute paths. Build each one clean from the project root; don't splice a `../` segment into the middle. Such a path resolves differently depending on who handles it, and Write is the permissive one:
+
+- **The shell and filesystem resolve `..` against real directories.** `a/b/../c` requires `a/b` to exist — if it doesn't, the command errors. A garbled path passed to `ls`, `cat`, or `rtk read` fails loudly, catching the mistake.
+- **Write normalizes `..` lexically, then creates parents.** It collapses `b/..` as text without checking `a/b` exists, then `mkdir -p`'s the result. A garble the filesystem would reject instead resolves to a *different* real location, gets a full directory tree built there, and returns success — nothing pushes back at write time. (Confirmed 2026-07-02 with a scratchpad probe: writing to `<dir>/ghost/../probe/x` created `<dir>/probe/x` and no `ghost/`; the filesystem would have errored on the nonexistent `ghost/`.)
+
+So Write offers *less* protection than a shell command here, not more. After writing to any path you assembled rather than copied verbatim from a known-good source, confirm it landed where intended — a quick `ls` of the expected path — instead of trusting the success message.
+
+**Why:** On 2026-07-02, an intended project path was emitted with a spurious `<seg>/../` splice mid-path. The same path in a shell command would have errored (the intermediate directory didn't exist), but Write normalized the `..` away lexically, resolved to a different tree, built it, and reported success. The mistake surfaced only on verifying the location afterward, then needed a move plus cleanup.
+
+**How to apply:** build file-tool paths as clean absolutes from the project root, no `..` segments. Treat a mid-path `..` as a signal to re-derive, not submit. After any assembled Write, `ls` the location — Write's success confirms *a* write happened, not that it happened where you meant.
