@@ -40,6 +40,16 @@ Trigger examples:
 
 Failure mode this prevents: long sessions accumulate context from noisy reads that were only useful for extracting one or two facts. By the time the actually-important work arrives, the context window is full of incidental output and the model is operating with reduced headroom. Delegating noisy reads is cheap and preserves the runway for the real work.
 
+## Sub-Agents Don't Inherit These Rules — Pass Constraints In The Prompt
+
+A spawned sub-agent (`Explore`, `general-purpose`, a specialized agent) runs with a stripped context. It does **not** inherit the rules loaded here — RTK tool conventions, code style, searching scope, naming. So a rule that would govern the sub-agent's actual work only takes effect if it's restated in the spawning prompt.
+
+When delegating work whose *how* is governed by a rule the sub-agent won't see, pass that constraint along. The recurring case is RTK: an `Explore` agent doing file-discovery reaches for `awk` (or a bare `cat`, `find | wc -l`, &c.) because it never saw `RTK.md` — and each such command trips a permission prompt, since awk and friends aren't allow-listed. Naming the constraint in the prompt ("use `rtk ls`/`rtk find`/`rtk read`; don't pipe to `awk`") heads it off. The same applies to any rule the delegated task actually exercises — a code-style convention for an agent that will write code, the home-directory scope limit for an agent that searches paths.
+
+Don't dump the whole ruleset into every prompt — pass only the constraints the delegated work will actually exercise.
+
+Failure mode this prevents: delegating work assuming the sub-agent carries the same rules the main context does, then getting output (or, with RTK, a string of permission prompts) that violates a rule the agent never had a chance to follow. The rule exists; the gap is that it never reached the agent doing the work.
+
 ## Specialized Agents
 
 When a task clearly matches a specialized agent (`rails-expert`, `postgres-pro`, `security-engineer`, etc.), use it over `general-purpose`. Domain specialization provides heuristics that generalist prompting won't replicate.
