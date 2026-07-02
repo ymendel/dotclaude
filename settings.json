@@ -4,6 +4,7 @@
       "Bash(* --version)",
       "Bash(* --help *)",
       "Bash(rtk curl:*)",
+      "Bash(rtk diff:*)",
       "Bash(rtk discover:*)",
       "Bash(rtk find:*)",
       "Bash(rtk gain:*)",
