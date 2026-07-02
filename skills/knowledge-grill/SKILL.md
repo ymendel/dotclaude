@@ -45,6 +45,24 @@ Two failure modes to push against while extracting:
 - **Don't let the holder narrate the happy path** — the value is in the exceptions, the workarounds,
   the things that broke once.
 
+## When the "why" turns interpersonal
+
+Sometimes the backward "why" leads into charged ground — a project that paused, a fraught handoff,
+conflict between the people involved. Reconstructing that history is legitimate and often the most
+valuable part of the capture — don't steer around it. But two things change when the subject turns
+interpersonal:
+
+- **Set expectations, and let the holder pace it.** Say up front that reconstructing this "why" will
+  re-walk difficult ground, that surfacing it is intended, and that the holder sets the pace on that
+  half — they can pause a thread or come back to it later. The relentless probing that's right for a
+  technical branch is the wrong register for a painful one. The holder is usually one of the parties,
+  not a neutral narrator, so the material lands heavier than a system question does.
+- **Don't foreground a third party's grievance as a question's frame.** When a question's answer
+  touches a grievance or conflict, lead with the neutral question and mention the charged context
+  second — "independent of any of that, what's the actual coverage state?" rather than opening with
+  "X said Y wasn't done." Leading with the grievance makes the holder re-encounter the sting before
+  reaching the question they can actually answer.
+
 ## Route the output to durable artifacts
 
 The interview is the engine; what makes it a toolkit member rather than a conversation is *where the
