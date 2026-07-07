@@ -14,6 +14,16 @@ Specific case: when `git diff` output looks summarized or processed (a "Changes"
 
 Related: when the command in question is asynchronous (a background Bash, a long-running task) and the symptom is *absent* output rather than wrong output, see "Distinguish 'in progress' from 'failed' before concluding failure" below — that case has its own diagnostic checks before reissuing.
 
+## Validate a probe's detector before trusting its negative
+
+When testing an unknown by observing a downstream signal — "is X loaded?" answered by "does Y appear?" — confirm the signal actually fires in a known-positive case before trusting a *negative* result. A null from an unvalidated detector can't distinguish "X is false" from "the detector would never have shown X anyway."
+
+Concrete miss (2026-07-06): probed whether `~/.claude/settings.local.json` is read by putting an `env` var in it and checking `echo $VAR` in a fresh session. Got UNSET — but I never confirmed that settings-`env` reaches the *sandboxed Bash tool* in that environment, so UNSET was jointly ambiguous between "file not read" and "env doesn't reach this shell." The fix is a positive control first: the same `env` var in the known-read `settings.json`; only if *that* shows up is a null from the unknown file meaningful.
+
+Prefer the authoritative source when it can answer directly. The actual question here was settled by the docs (the scope table lists no user-level `settings.local.json`), which made the empirical probe both inconclusive *and* unnecessary. When docs or spec can answer, reach for them before an empirical probe whose detector you'd have to calibrate anyway.
+
+Failure mode this prevents: reading a null result as a finding ("the file isn't read") when it only reflects an uncalibrated instrument — the quantitative-absence sibling of honesty.md's "Do Not Assert Absence Without Verifying."
+
 ## Distinguish "in progress" from "failed" before concluding failure
 
 When a long-running command has been started in the background (or any task whose output arrives asynchronously), an empty output file is not evidence of failure — it's also consistent with "still running, output not flushed yet". Before declaring the run failed and reissuing it, check:
