@@ -47,6 +47,9 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 - {file:line} `- Rollback is straightforward.` → `- **Positive:** Rollback is straightforward.`
 - {file:line} `- **Positive:** Simpler to operate, but slower at p99.` → split: `- **Positive:** Simpler to operate.` and `- **Negative:** p99 latency regresses by ~Xms.`
 
+### Unmarked options
+- {file:line} option with no `(chosen)` marker on the winner, or no **`Rejected:`** line on a loser → which marker it needs, and (for a rejected option) the reason to put on the line, drawn from its own cons
+
 ### Hand-wavy language
 - {quoted phrase} → {why it's vague and what concrete version would look like}
 
@@ -71,6 +74,8 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 **Missing tradeoffs.** A decision with no negative consequences is suspicious. So is a decision that names only one alternative. Push on: what did we *not* pick, and why? What does this make harder or impossible?
 
 **Unlabeled consequences.** Every bullet under `## Consequences` must begin with **`Positive:`**, **`Neutral:`**, or **`Negative:`** (bold prefix, colon, then the body). Flag any bullet that doesn't — report it with file:line and a suggested rewrite that picks the right label. If a bullet mixes polarities ("simpler to operate, but slower at p99"), the rewrite splits it into two bullets, one per valence. Topical-only labels like "Rollback", "Privacy", or "Cost" hide whether the consequence is good news or bad news; rewrite them into the valence-first form with the topic named in the body.
+
+**Unmarked options.** In an `### Options` subsection, the chosen option must carry `(chosen)` after its name and every other option must carry a **`Rejected:`** line naming why it lost. Flag any option missing its marker — report it with file:line and, for a rejected option, the reason the line should give (drawn from that option's own cons). An options list where nothing is marked chosen, or where the rejected options don't say why, forces the reader to re-derive the outcome the author already knew. Don't police the count. Three is the normal ceiling, but a 4th option on a genuinely distinct axis is fine. Flag a longer list only when the extras are near-duplicates of the same choice.
 
 **Hand-wavy language.** Flag hedging ("we might", "consider", "probably"), vague decisions ("use a background job system" without naming the library), and non-consequences ("more complex", "some risk"). Quote the phrase and suggest a concrete replacement.
 

@@ -93,7 +93,28 @@ Avoid hedging language — "we will use X" not "we might consider X".
 
 Unless the decision is very clear with no significant trade-offs, include
 an `### Options` subsection listing the alternatives considered, with pros
-and cons for each. No more than 3 options.
+and cons for each. Mark the chosen option with `(chosen)` after its name,
+and give every other option a **`Rejected:`** line naming why it lost.
+These markers do for Options what the valence prefixes do for Consequences:
+they make the *outcome* of each option visible at a glance, so a reader
+doesn't have to re-derive which one won, or why the others didn't, from the
+pros and cons.
+
+```markdown
+#### Option 1: Solid Queue on a dedicated worker dyno (chosen)
+Pros: no new infrastructure; Active Job native; survives restarts.
+Cons: worker dyno must be scaled explicitly.
+
+#### Option 2: Sidekiq + Redis
+Pros: mature; rich tooling.
+Cons: adds a Redis dependency for a workload that doesn't need it.
+**Rejected:** the extra managed dependency isn't worth it at current volume.
+```
+
+Normally at most 3 options. Stretch past 3 only when a further option sits
+on a genuinely distinct axis — e.g. three options about *how* a class is
+tracked plus a fourth about *which* inputs are allowed — not to pad the list
+with near-duplicates of the same choice.
 
 ## Consequences
 
