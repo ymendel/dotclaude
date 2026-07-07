@@ -53,8 +53,6 @@ After modifying THIS skill (skill-architecture):
 
 ---
 
----
-
 ## About Skills
 
 Skills are modular, self-contained packages that extend Claude's capabilities with specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific domains -- transforming Claude from general-purpose to specialized agent with procedural knowledge no model fully possesses.
