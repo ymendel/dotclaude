@@ -25,3 +25,17 @@ When a question is about an external gem, package, or tool (e.g., solid_queue, R
 ## WebFetch vs curl
 
 WebFetch processes content through a small model and returns a summary — it cannot return verbatim content. Use WebFetch when you need to understand or extract information from a page. Use `rtk proxy curl -s <url>` when you need the raw content unchanged (e.g., a spec file, a config template, any file where exact text matters). If RTK filters the curl output, `rtk proxy curl` bypasses all filters.
+
+## Prefer a tool's plain output over de-formatting its rendered output
+
+When you need to grep a tool's own documentation or configuration, reach for the mode that emits plain or structured text directly — not the human-rendered surface run through a de-formatter. De-formatting in a pipeline is the smell that flags the wrong choice: `col -b` to strip a man page's overstrike bolding, an ANSI-color stripper before a grep, a pager's output piped through `sed`. Each means you rendered the content for eyes and then un-rendered it for a script, when a data surface almost certainly existed.
+
+Concrete reflexes:
+
+- **`--help` / `help <subcmd>` before `man` when grepping.** Most commands write their `--help` text as plain text to stdout — directly greppable, no `col`. `man cmd` is the *rendered* version. So reaching for `man` at all is often one step too far when the goal is to extract a fact.
+- **Look for the tool's data mode.** Tools built to be scripted expose one: `--json`, `--format`, or a `list` / `explain` / `completion` subcommand. Prefer it over scraping display output.
+- **Worked example (git config).** `git help --config | grep -i diff.external` returns plain, greppable text and names the config directly. `man git-config | col -b | grep …` renders the page (overstrike and all) only to strip it back off — more moving parts, and it silently misses matches when `col` isn't there. `git help --config` is a purpose-built plain-text dump; git's per-subcommand man pages are prominent enough to pull you toward `man` first, but the plain path was there.
+
+This is the CLI cousin of code-style's *parse with parser libraries, not regex* and `RTK.md`'s guidance against awk-parsing structured formats: don't scrape the pretty output — ask for the structured output.
+
+Failure mode this prevents: reaching for `man … | col -b | grep` (or any de-format-then-grep pipeline) by reflex, which both adds a fragile step that drops matches when the de-formatter is absent, and trips a permission prompt for a niche tool like `col` — when the tool's own plain/data mode answers the question directly, greppably, and without the round trip.
