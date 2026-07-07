@@ -1,6 +1,11 @@
 # Evolution Log
 
-> **Convention**: Reverse chronological order (newest on top, oldest at bottom). Prepend new entries.
+> **Frozen — historical record.** This log is no longer maintained. skill-architecture
+> no longer prescribes a per-skill evolution log; corrections follow the global
+> `self-improvement` rule and the change record lives in git history. The entries below are
+> kept only as imported provenance: the skill arrived here on 2026-04-15 with a log already
+> reaching back to 2024, so this repo's git history does not cover those early changes. Do
+> not prepend new entries — record changes in commit messages instead.
 
 ---
 

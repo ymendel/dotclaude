@@ -7,29 +7,11 @@ description: Create, modify, or troubleshoot skills. Use when creating a skill f
 
 Comprehensive guide for creating effective Claude Code skills following Anthropic's official standards with emphasis on security and progressive disclosure architecture.
 
-> **Self-Evolving Skill**: This skill improves through use. If instructions are wrong, parameters drifted, or a workaround was needed — fix this file immediately, don't defer. Only update for real, reproducible issues.
-
 > **Scope**: Claude Code Agent Skills (`~/.claude/skills/`), not Claude.ai API skills
 
-## Self-Evolution Protocol
+## Self-improvement is a global concern
 
-This skill — and every skill it creates — must actively evolve through use. This section is placed first because it governs all other sections.
-
-**During execution**, watch for these signals: friction in instructions, missing edge cases, better patterns discovered, repeated manual steps, drift between documentation and reality.
-
-**Before writing any change**, pass all three admission gates:
-
-| Gate           | Question                                                           | Fail → |
-| -------------- | ------------------------------------------------------------------ | ------ |
-| **VALUE**      | Does this fix a real problem observed empirically, not speculated? | Skip   |
-| **REDUNDANCY** | Is this already documented or obvious from the code?               | Skip   |
-| **FRESHNESS**  | Will this still be true next month, or is it ephemeral?            | Skip   |
-
-Most executions should produce **no evolution**. Convergence to stability is success, not stagnation.
-
-**When all gates pass**: Pause current work → fix SKILL.md or references → log in evolution-log.md with trigger + evidence → resume. Do NOT defer — the next invocation inherits whatever you leave behind.
-
-**What never passes the gate**: Major structural changes (discuss with user first), speculative improvements without empirical evidence, cosmetic preferences.
+Skills don't carry their own self-improvement machinery, since watching for improvement opportunities and fixing what's wrong is behavior, and behavior belongs in one global rule rather than copied into every SKILL.md. Version control history serves as the change record. A skill that ships where that rule is absent (a marketplace, another team) should pair with a companion rule distributed through a plugin (see the COMPANIONS.md pattern) rather than embedding a protocol inline.
 
 ---
 
@@ -48,16 +30,15 @@ Use this skill when:
 
 Select the appropriate template before starting skill work -- templates encode common workflows and prevent missing steps that cause silent failures.
 
-See [Task Templates](./references/task-templates.md) for all templates (A-F) and the quality checklist.
+See [Task Templates](./references/task-templates.md) for all templates (A-E) and the quality checklist.
 
 | Template | Purpose                           |
 | -------- | --------------------------------- |
 | A        | Create New Skill                  |
 | B        | Update Existing Skill             |
 | C        | Add Resources to Skill            |
-| D        | Convert to Self-Evolving Skill    |
-| E        | Troubleshoot Skill Not Triggering |
-| F        | Create Lifecycle Suite            |
+| D        | Troubleshoot Skill Not Triggering |
+| E        | Create Lifecycle Suite            |
 
 ---
 
@@ -68,8 +49,7 @@ After modifying THIS skill (skill-architecture):
 1. [ ] Templates and 6 Steps tutorial remain aligned
 2. [ ] Skill Quality Checklist reflects current best practices
 3. [ ] All referenced files in references/ exist
-4. [ ] Append changes to [evolution-log.md](./references/evolution-log.md)
-5. [ ] Update user's CLAUDE.md if triggers changed
+4. [ ] Update user's CLAUDE.md if triggers changed
 
 ---
 
@@ -206,7 +186,6 @@ skill-name/
 ├── SKILL.md                      # Required: YAML frontmatter + instructions
 ├── scripts/                      # Optional: Executable code (Python/Bash)
 ├── references/                   # Optional: Documentation loaded as needed
-│   └── evolution-log.md          # Required for self-evolving: Change history
 └── assets/                       # Optional: Files used in output
 ```
 
@@ -319,7 +298,7 @@ See [Scripts Reference](./references/scripts-reference.md) for marketplace scrip
 
 For detailed information, see:
 
-- [Task Templates](./references/task-templates.md) - Templates A-F and quality checklist
+- [Task Templates](./references/task-templates.md) - Templates A-E and quality checklist
 - [Creation Tutorial](./references/creation-tutorial.md) - 6-step creation process walkthrough
 - [YAML Frontmatter](./references/yaml-frontmatter.md) - Field reference, invocation control, description guidelines
 - [Structural Patterns](./references/structural-patterns.md) - 5 skill architecture patterns (including Suite Pattern)
@@ -328,9 +307,7 @@ For detailed information, see:
 - [Creation Workflow](./references/creation-workflow.md) - Step-by-step process with examples
 - [Scripts Reference](./references/scripts-reference.md) - Marketplace script usage
 - [Security Practices](./references/security-practices.md) - Threats and defenses (CVE references)
-- [Phased Execution](./references/phased-execution.md) - Preflight/Execute/Verify/Reflect/Rectify patterns and variants
-- [Post-Execution Reflection](./references/post-execution-reflection.md) - Compulsory self-rectification pattern for stepwise skills
-- [Theory: Self-Evolving Skills](./references/theory-self-evolution.md) - Research synthesis from Gemini DR #70 (6 threads)
+- [Phased Execution](./references/phased-execution.md) - Preflight/Execute/Verify patterns and variants
 - [Invocation Control](./references/invocation-control.md) - Skill invocation modes, permission rules, legacy commands migration
 - [Interactive Patterns](./references/interactive-patterns.md) - AskUserQuestion integration patterns
 - [Token Efficiency](./references/token-efficiency.md) - Context optimization
@@ -342,59 +319,4 @@ For detailed information, see:
 - [Script Design](./references/script-design.md) - Designing scripts for agentic consumption
 - [Troubleshooting](./references/troubleshooting.md) - Common issues and solutions
 - [SYNC-TRACKING](./references/SYNC-TRACKING.md) - Marketplace version tracking
-- [Evolution Log](./references/evolution-log.md) - This skill's change history
-
----
-
-## Post-Execution Reflection (Compulsory)
-
-This section is placed last so it is the final thing processed before the skill exits — maximizing recency effect.
-
-Every skill **MUST** include a Post-Execution Reflection section — workflow skills, task skills, and capability skills alike. This is a structural requirement, not advisory. Without it, errors and drift repeat silently across sessions. Task-pattern skills are just as susceptible: scripts change interfaces, parameters get added, error messages drift from documentation.
-
-### After this skill completes, reflect before closing
-
-0. **Locate yourself.** — Find this SKILL.md's canonical path (Glob for this skill's name) before editing. All corrections target THIS file and its sibling references/ — never other documentation.
-1. **What failed?** — Fix the instruction that caused it. If it could recur, add it as an anti-pattern.
-2. **What worked better than expected?** — Promote it to recommended practice. Document why.
-3. **What drifted?** — Any script, reference, or external dependency that no longer matches reality gets fixed now.
-4. **Pass the admission gates.** — Apply the Self-Evolution Protocol (top of this file). VALUE + REDUNDANCY + FRESHNESS must all pass before writing any change.
-5. **Log it.** — Every change gets an evolution-log entry with trigger, fix, and evidence.
-
-Do NOT defer. The next invocation inherits whatever you leave behind.
-
-### Template: Workflow / Stepwise Skills
-
-For skills with multiple phases, evolution-log, and references/:
-
-```markdown
-## Post-Execution Reflection
-
-After this skill completes, reflect before closing the task:
-
-0. **Locate yourself.** — Find this SKILL.md's canonical path before editing.
-1. **What failed?** — Fix the instruction that caused it.
-2. **What worked better than expected?** — Promote to recommended practice.
-3. **What drifted?** — Fix any script, reference, or dependency that no longer matches reality.
-4. **Log it.** — Evolution-log entry with trigger, fix, and evidence.
-
-Do NOT defer. The next invocation inherits whatever you leave behind.
-```
-
-### Template: Task-Pattern Skills
-
-For single-action skills wrapping a CLI command or script:
-
-```markdown
-## Post-Execution Reflection
-
-After this skill completes, check before closing:
-
-1. **Did the command succeed?** — If not, fix the instruction or error table that caused the failure.
-2. **Did parameters or output change?** — If the script's interface drifted, update Usage examples and Parameters table to match.
-3. **Was a workaround needed?** — If you had to improvise (different flags, extra steps), update this SKILL.md so the next invocation doesn't need the same workaround.
-
-Only update if the issue is real and reproducible — not speculative.
-```
-
-See [Post-Execution Reflection Reference](./references/post-execution-reflection.md) for the full pattern, validation requirements, and examples.
+- [Evolution Log](./references/evolution-log.md) - Frozen historical change record (imported; superseded by git history — see the log's header)
