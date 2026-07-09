@@ -25,6 +25,38 @@ The mechanic, one question at a time:
   existing docs *first*, and spend the interview only on what those cannot tell you — the reasons,
   the constraints, the gotchas that live in no file.
 
+## Seed questions from evidence, not introspection
+
+The open question — "what lives only in your head?" — has a built-in flaw: it asks the holder to
+introspect on knowledge that is invisible to them *because* it is internalized (above). They blank,
+or forget the days they just spent on something only they understand. Evidence flips this. The same
+up-front read of the code and git history that tells you what *not* to ask also surfaces the
+*footprint* of tacit knowledge — point at the footprint and the holder answers a concrete
+observation instead of searching an empty field.
+
+One pass through the repo, two jobs: prune the answerable, and surface the hotspots to ask about.
+Signals worth mining:
+
+- **Sole authorship, concentrated** — one person is the only author of an area and it is a large
+  share of their recent commits. "You're the only one who's touched reconciliation, and it's most of
+  your last month — walk me through it." This is the bus-factor-of-one hotspot, and the one the open
+  question most often misses: work someone knows nobody else understands, yet never thinks to raise.
+- **Recent intense focus** — recent commits cluster in one or two places. "Almost all of last week
+  was in X — what would a successor need to know there?"
+- **Churn without docs or tests** — an area changes often while nothing in docs or tests moves with
+  it; the reasoning is living in a head, not the record.
+- **Load-bearing code, terse history** — a complex module whose commits say only "fix" or "wip"; the
+  why was never written down.
+
+Turn each signal into a grounded hypothesis rather than an open question — the evidence is a strong
+basis for the "offer your recommended answer" move above: "I'd guess the sole authorship is a timing
+constraint that isn't written down — is that it?"
+
+The open-ended catch-all — asking directly what would stall whoever inherits this (the *gap-as-risk*
+below) — is the backstop, not the opener. Lead with the evidence-seeded threads; they surface what
+the holder would never have volunteered. Reach for the open question last, for whatever no signal
+pointed at.
+
 ## Aim it backward — what to extract
 
 Point every question at knowledge that currently exists only in the holder's head:
@@ -35,8 +67,9 @@ Point every question at knowledge that currently exists only in the holder's hea
   assumption nothing documents, the workaround that looks wrong but is deliberate.
 - **Operational shape** — how the thing actually runs, what breaks it, the entry points a newcomer
   needs to find first.
-- **The gap-as-risk** — ask directly: "what is the one thing that, only in your head right now,
-  would stall whoever inherits this?"
+- **The gap-as-risk** — the open catch-all, "what is the one thing that, only in your head right now,
+  would stall whoever inherits this?" The backstop, not the opener — reach for it once the
+  evidence-seeded threads are exhausted (see *Seed questions from evidence* above).
 
 Two failure modes to push against while extracting:
 
