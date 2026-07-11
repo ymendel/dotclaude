@@ -1,7 +1,7 @@
 # ADR 0005: Separate Repository for Private Skills
 
 **Date:** 2026-07-11
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
