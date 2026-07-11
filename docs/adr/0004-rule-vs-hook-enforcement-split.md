@@ -1,7 +1,7 @@
 # ADR 0004: Rule vs. Hook — Enforcement Split for Config Constraints
 
 **Date:** 2026-05-27
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
