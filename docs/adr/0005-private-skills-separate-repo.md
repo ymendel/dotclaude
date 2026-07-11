@@ -1,0 +1,189 @@
+# ADR 0005: Separate Repository for Private Skills
+
+**Date:** 2026-07-11
+**Status:** Proposed
+
+## Context
+
+This repo is the author's public Claude Code configuration, symlinked to
+`~/.claude` (ADR 0001, ADR 0003). Its tracked tree is public on GitHub. The
+allowlist `.gitignore` (ADR 0003) means only explicitly re-included paths are
+tracked, but everything that *is* tracked — and its whole history — is
+world-visible.
+
+That is the right default for configuration meant to be shared and for skills
+judged stable enough to publish. It leaves a gap: a skill under active
+development, or one that may never be appropriate to publish at all, has
+nowhere to live except the public tree. Working on such a skill in `skills/`
+means either committing it publicly before it is ready, or leaving it
+uncommitted — no history, no backup, no cross-machine sync. Distribution of
+*ready* skills is already handled by the parallel team repo (ADR 0001); this
+decision is about the opposite end of the lifecycle — incubating skills that
+are not ready to be seen.
+
+Three facts about how Claude Code loads skills shape the options, verified
+against the skills documentation when this ADR was written:
+
+- Skills load automatically from `.claude/skills/` in the user config
+  directory, in the project, and in any directory added with `--add-dir`.
+- `permissions.additionalDirectories` in `settings.json` grants file access
+  only — it explicitly does *not* load skills.
+- Skill discovery within any one `skills/` root is flat: `skills/<name>/SKILL.md`.
+  A subdirectory such as `skills/private/` is read as a skill *named* `private`,
+  not as a namespace holding more skills.
+
+### Options
+
+**1. Separate private repository, loaded via `--add-dir` (chosen).** Keep
+in-development and private skills in their own git repo, cloned *outside*
+`~/.claude`, with the `.claude/skills/<name>/SKILL.md` substructure that
+`--add-dir` looks for. Start Claude with that directory added; the private
+skills then load alongside the public ones for that session only.
+
+- *Pros:* Hard separation — private skills are physically in a different repo
+  with its own history and backup, and cannot leak into the public repo via a
+  stray `git add` or an allowlist tweak. Loading is opt-in per session. The
+  private repo carries the same skill-directory shape as this one, so promoting
+  a skill to public is a copy, not a rewrite.
+- *Cons:* Requires the `.claude/skills/` nesting inside the added directory
+  (documented and fixed, if not loved). Loading is manual — a session started
+  without adding the directory does not see the private skills. The `--add-dir`
+  path auto-loads skills only; agents and commands do not come along it, and
+  CLAUDE.md only with an extra environment variable.
+
+**2. Keep private skills in this tree, gitignored per skill.** Leave the skill
+at `skills/<name>/` and add a re-deny line to the allowlist `.gitignore` so it
+is not tracked.
+
+- *Pros:* No second repo and no launcher; the skill loads normally because it
+  already sits in `~/.claude/skills/`.
+- *Cons:* The private skill sits one `git add` away from the public repo. The
+  allowlist's whole purpose (ADR 0003) is safety-by-default; a per-skill
+  re-deny is exactly the hand-maintained exception it exists to avoid. The
+  skill also gets no independent history or backup, and the re-deny line names
+  the private skill inside the tracked `.gitignore`, partially advertising what
+  was meant to be hidden.
+- **Rejected:** puts private content in the public tree and leans on a
+  hand-maintained exception to keep it out — the failure mode is silent and
+  public.
+
+**3. Point `permissions.additionalDirectories` at an external directory.** Use
+the settings field instead of the `--add-dir` flag.
+
+- *Pros:* Persists across sessions without a launcher flag.
+- *Cons:* Grants file access only. The skills documentation is explicit that
+  this setting does *not* load skills, so it cannot do the one thing required.
+- **Rejected:** does not load skills at all; it is not a substitute for
+  `--add-dir`.
+
+**4. Symlink a subdirectory of this repo's `skills/` to an external directory**
+— e.g. `skills/private -> <private-root>/skills`.
+
+- *Pros:* Would keep the private source external while surfacing it through the
+  normal user skills directory.
+- *Cons:* Skill discovery inside a `skills/` root is flat, so `skills/private/`
+  is read as a skill named `private` with no top-level `SKILL.md`; the skills
+  nested under it are never found.
+- **Rejected:** flat skill discovery means a symlinked subdirectory does not
+  work for skills. This is precisely why `--add-dir` — which looks for a
+  `.claude/skills/` under the added root — is the mechanism for skills.
+
+**5. Private skills on a local-only, never-pushed branch of this repo.** Keep
+the private skills on a git branch that is never pushed to the public remote.
+Options 2–4 hide private content at the filesystem level (gitignore, settings,
+symlink); this one hides it at the git level.
+
+- *Pros:* No second repo and no launcher. Checking the branch out loads public
+  and private skills together, because the tree is still `~/.claude`.
+- *Cons:* The only thing keeping the skills private is not having pushed the
+  branch yet — a single `git push` (or a `git push --all`) publishes them, from
+  the same object store the public branch lives in. The private work is also
+  entangled with public history: keeping the branch usable means continuously
+  merging or rebasing `main` into it, and any promotion or public commit has to
+  be untangled from the private commits by hand.
+- **Rejected:** hides private work behind an unpushed branch in the same repo,
+  so one push publishes it and the branch must be continuously reconciled with
+  `main` to stay current. There is no separation of substance — only of what has
+  been pushed so far.
+
+## Decision
+
+Maintain in-development and private skills in a separate git repository, cloned
+outside `~/.claude`, structured as `<private-root>/.claude/skills/<name>/SKILL.md`,
+and load them by adding that directory with `--add-dir`. The public dotclaude
+repo remains the home for shared and published configuration; the private repo
+is the incubator for skills that are not ready — or may never be — public.
+Promotion to public is a copy into `skills/` here plus a commit; retirement is
+deletion from the private repo. Either way there is no trace in public history.
+
+The ergonomics of the `--add-dir` invocation — a shell alias or function and
+how it is installed — are deliberately left as an implementation detail. This
+decision is about *where private skills live and how they load*, not about the
+launcher.
+
+### Forward-looking: not only skills
+
+`--add-dir` auto-loads skills but not rules, agents, or commands. That does not
+confine the private repo to skills, because this repo *is* `~/.claude` (the
+ADR 0001 symlink). A subdirectory here can itself be a symlink into the private
+repo to surface other kinds of configuration — for example
+`rules/private -> <private-root>/rules` or `agents/private -> <private-root>/agents`
+— so private rules and agents live in the private repo yet appear in the loaded
+configuration through the symlink. This is the inverse of option 4's failure:
+it works *because* rules and agents do not carry skills' flat-discovery
+constraint. The exact loading behavior for a symlinked rules or agents
+subdirectory — recursive discovery, and whether rules need explicit `@`-import —
+has not been checked and would need validation before relying on it; it is noted
+here as a direction, not a validated mechanism.
+
+Any such symlink would be local-only. A committed symlink stores a
+machine-specific absolute path, which both breaks for anyone else and advertises
+the private repo's location, so each one takes a re-deny in the allowlist
+`.gitignore` (the ADR 0003 mechanism) and is created by the private repo's setup
+rather than tracked here.
+
+## Consequences
+
+- **Positive:** Private and in-development skills get a real home — their own
+  history, backup, and cross-machine sync — with no risk of leaking into the
+  public repo, because they live in a physically separate tree.
+- **Positive:** Loading is opt-in. A session started the ordinary way sees only
+  public configuration; the private skills appear only when the directory is
+  added, so nothing private surfaces in an ordinary screenshare or shared
+  session.
+- **Positive:** Promotion and retirement are clean — copy into public `skills/`
+  to publish, delete from the private repo to retire — with no orphaned history
+  on either side.
+- **Positive:** The same `--add-dir` grant that loads the private skills also
+  grants file access to the added tree, so a single session rooted in this repo
+  (or in any project) can read, edit, and run git in the private repo as well.
+  The two trees are worked as one workspace even though they remain separate
+  repos — which is what keeps the split tolerable in daily use, rather than
+  forcing a second session just to touch a private skill.
+- **Neutral:** The private repo mirrors this repo's `.claude/skills/` shape.
+  That is a small amount of structure to carry, but it is the same shape, so
+  there is nothing new to learn.
+- **Negative:** Private skills do not load unless the session is started with
+  the directory added. Forgetting to add it means the skills silently are not
+  there — a quiet failure, not a loud one.
+- **Negative:** The `--add-dir` path covers skills only. Extending to rules and
+  agents needs the symlink approach above, which carries its own unvalidated
+  loading questions and per-symlink `.gitignore` upkeep. The private repo is not
+  a drop-in second `~/.claude`.
+- **Negative:** Two repos to keep straight, with no drift tooling. Unlike
+  ADR 0001's `compare-skills.sh` / `sync-skill.sh`, nothing here surfaces when a
+  promoted skill and a copy left behind have diverged; the maintainer tracks
+  that by hand.
+
+## References
+
+- [ADR 0001](0001-skill-maintenance-via-parallel-repos.md) — Skill Maintenance
+  via Parallel Git Repos; the sibling decision, covering distribution of skills
+  that *are* ready to share. This ADR covers the opposite end: incubation of
+  skills that are not.
+- [ADR 0003](0003-allowlist-gitignore.md) — Allowlist-Based .gitignore; the
+  re-deny mechanism the forward-looking symlinks would rely on, and the
+  safety-by-default property option 2 would undercut.
+- [Claude Code skills documentation](https://code.claude.com/docs/en/skills) —
+  the `--add-dir` skill-loading exception and the
+  `permissions.additionalDirectories` carve-out.
