@@ -2,6 +2,10 @@
 
 Scripts bundled with skills are executed by Claude Code agents, not humans at a terminal. This reference documents the design principles that make scripts reliable in agentic contexts.
 
+## When to Reach for a Script
+
+Move a check into a script — rather than instructing the model in prose — when it is critical and has to be deterministic. Code runs the same way every time. Prose is interpreted, and interpretation varies. If a validation is load-bearing (a safety gate, a correctness check the rest of the workflow depends on), take it out of the SKILL.md instructions and into a script the model runs, so the outcome doesn't ride on how the model reads that sentence on a given run. Guidance that isn't load-bearing is fine left as prose — reserve this for the checks you can't afford to have skipped or misread.
+
 ## Core Principles
 
 ### 1. No Interactive Prompts

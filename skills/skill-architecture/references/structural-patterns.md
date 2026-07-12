@@ -161,6 +161,13 @@ my-integration/
 
 ## Choosing a Pattern
 
+Before the table, settle one design question: **does the user arrive with a problem or with a tool?**
+
+- **Problem-first**: the user has a goal and doesn't care which tools get used ("clean up this dataset"). The skill orchestrates the right calls toward the outcome — leans Workflow or Capabilities.
+- **Tool-first**: the user names a specific tool or surface and wants to use it well ("help me query BigQuery"). The skill teaches workflows and best practices for that tool — leans Reference or Capabilities.
+
+Most skills lean one way. The answer shapes the description's trigger phrasing (a goal vs. a tool name) and the body's structure (orchestration steps vs. reference material) before you pick from the table below.
+
 | Use Case            | Pattern      | Key Indicator                            |
 | ------------------- | ------------ | ---------------------------------------- |
 | Multi-step process  | Workflow     | "Then do X, then Y, then Z"              |

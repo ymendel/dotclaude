@@ -55,12 +55,13 @@
 ```
 1. Check YAML frontmatter syntax (no colons in description)
 2. Verify trigger keywords in description match user queries
-3. Check skill location (~/.claude/skills/ or project .claude/skills/)
-4. Validate with quick_validate.py for errors
-5. Validate links: bun run plugins/plugin-dev/scripts/validate-links.ts <skill-path>
-6. Test with explicit trigger phrase
-7. Document findings in skill if new issue discovered
-8. Verify against Skill Quality Checklist below
+3. Ask Claude to quote the description back ("when would you use X?") to expose the gap between the triggers you wrote and what Claude perceives (see [Troubleshooting](./troubleshooting.md))
+4. Check skill location (~/.claude/skills/ or project .claude/skills/)
+5. Validate with quick_validate.py for errors
+6. Validate links: bun run plugins/plugin-dev/scripts/validate-links.ts <skill-path>
+7. Test with explicit trigger phrase
+8. Document findings in skill if new issue discovered
+9. Verify against Skill Quality Checklist below
 ```
 
 ## Template E: Create Lifecycle Suite

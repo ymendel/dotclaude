@@ -130,6 +130,15 @@ See [Creation Tutorial](./references/creation-tutorial.md) for the detailed 6-st
 
 Good skills emerge through testing and feedback, not from getting the first draft perfect. After writing or updating a skill, verify it works by running it against realistic prompts.
 
+### Define Success Criteria First
+
+Before writing the skill, name what success looks like — it turns "does this feel better?" into something you can check. Split it two ways:
+
+- **Behavioral**: what the skill should do — triggers on the queries it should, completes the workflow without the user prompting for the next step, makes no failed tool calls. Pair each with how you'll check it (run a set of realistic prompts; count tool calls with and without the skill).
+- **Qualitative**: what good output looks like — the user doesn't have to re-ask, the result matches what a skilled human would produce.
+
+Write these down first so testing measures against a target instead of a vibe. Resist attaching arbitrary numbers ("triggers 90% of the time") unless you'll actually run enough trials to measure them — an unmeasured target is just a vibe with a number on it.
+
 ### Write Test Prompts
 
 Come up with 2-3 realistic test prompts -- the kind of thing a real user would actually say. Not abstract requests, but concrete tasks with enough detail to exercise the skill. Share them with the user for confirmation before running.

@@ -31,6 +31,8 @@ description: PDF manipulation tool
 description: Extract text and tables from PDFs, rotate pages, merge documents. Use when working with PDF files or when user mentions forms, contracts, document processing.
 ```
 
+**Diagnostic — ask Claude to quote the description back.** Before guessing at new keywords, ask "When would you use the `<skill-name>` skill?" Claude answers by paraphrasing the description it actually sees, so the gap between what you wrote and what triggers becomes visible. Add the trigger that's missing rather than piling on synonyms. This inspects the exact field that governs triggering instead of reasoning about it indirectly.
+
 ### "SKILL.md too long"
 
 **Cause**: Too much detail in main file
