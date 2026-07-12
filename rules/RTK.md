@@ -90,6 +90,19 @@ mode this prevents: a filtered `find | wc -l` looks authoritative and makes plau
 counts feel like ground truth, leading to false alarms (or worse, missed real ones) when the
 delta between filtered and real is large.
 
+**`rtk find` also respects `.gitignore` — a distinct trap from the token-suppression above.**
+It omits gitignored paths entirely, not just some lines of output. In a repo that is
+gitignored-by-default (this repo, `dotclaude`, uses an allowlist `.gitignore` per ADR 0003 — only
+explicitly re-included paths are tracked), that means a `find` for anything *not* on the allowlist
+(a stray PDF, a scratch note, a downloaded asset dropped into the tree) comes back empty even
+though the file is sitting right there. The empty result reads as "file absent" when the truth is
+"file present but gitignored." When searching for a file that may not be tracked — and especially
+in an allowlist repo, where *most* files aren't — use `rtk proxy find` (raw `find`, no gitignore
+filtering) or the built-in Glob tool. Failure mode this prevents: concluding a file doesn't exist
+here (e.g. "it must be in the home directory") from an `rtk find` miss, when the hook silently
+rewrote `find`→`rtk find` and gitignore hid the file. Confirmed 2026-07-12: a `find` for a
+gitignored PDF in this repo returned nothing — `rtk proxy find` found it immediately.
+
 ## Golden Rule
 
 **Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
