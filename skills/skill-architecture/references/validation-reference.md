@@ -87,9 +87,7 @@ description: Does X when user mentions Y (specific triggers)
 
 ## Plugin Manifest Validation
 
-<!-- ADR: /docs/adr/2025-12-14-alpha-forge-worktree-management.md (lesson learned) -->
-
-When creating **plugins** (not just skills), additional validation is required for marketplace discovery.
+When packaging a skill as part of a **plugin** (not a standalone skill), the plugin needs a manifest entry for Claude Code to discover it.
 
 ### Critical: Marketplace Registration
 
@@ -99,17 +97,7 @@ Plugins must be registered in `.claude-plugin/marketplace.json` to be discoverab
 Plugin "plugin-name" not found in any marketplace
 ```
 
-### Validation Script
-
-Run before committing plugin changes:
-
-```bash
-node scripts/validate-plugins.mjs           # Validate only
-node scripts/validate-plugins.mjs --fix     # Show fix instructions
-node scripts/validate-plugins.mjs --strict  # Fail on warnings too
-```
-
-### What It Validates
+### Entry requirements
 
 | Check                  | Error Level | Description                                        |
 | ---------------------- | ----------- | -------------------------------------------------- |
@@ -120,16 +108,6 @@ node scripts/validate-plugins.mjs --strict  # Fail on warnings too
 | Orphaned entries       | ⚠️ Warning  | Registered plugins must have directories           |
 | Missing author         | ⚠️ Warning  | Recommended field                                  |
 | Missing keywords       | ⚠️ Warning  | Recommended field                                  |
-
-### Pre-Commit Hook
-
-Install the validation hook to catch issues automatically:
-
-```bash
-./scripts/install-hooks.sh
-```
-
-The hook runs `validate-plugins.mjs` when `plugins/` or `marketplace.json` changes.
 
 ### Plugin Entry Template
 
@@ -155,10 +133,6 @@ When adding a new plugin, use this template:
 ```
 
 > **Note**: Only `name` is required. All component paths (`skills`, `hooks`, `agents`, etc.) supplement default directory discovery — if your plugin uses the standard `skills/`, `hooks/` directory layout, these fields are optional.
-
-### Workflow Recommendation
-
-Use `/plugin-dev:create` to create new plugins - it handles marketplace registration automatically (Phase 3.1).
 
 ---
 
