@@ -143,6 +143,16 @@ rtk read "$(ls -t "$HOME/Library/Application Support/rtk/tee/"*.log | head -1)"
 
 **Verify hook output semantics from the official docs (https://code.claude.com/docs/en/hooks) before designing a hook that depends on the model seeing the output.** Don't generalize from one hook type to another.
 
+## PreToolUse Hooks Block an Allowlisted Command Only via Exit Code 2
+
+A `PreToolUse` hook can force a command to be blocked even when a `permissions.allow` rule would auto-approve it — but **only by exiting with code 2** (a "blocking hook"). A JSON `hookSpecificOutput.permissionDecision: "deny"` does **not** override a matching allow rule: per the [docs](https://code.claude.com/docs/en/permissions), hook decisions don't bypass permission rules, so a matching `allow` wins against a hook's JSON `deny`. Exit code 2 is the exception — it stops the tool call *before* permission rules are evaluated, so it beats `allow`.
+
+PreToolUse hooks do run on every tool call, allowlisted ones included — an allow match doesn't skip the hook. So the hook always gets its say; the only question is which blocking mechanism it uses, and only exit 2 is authoritative over an allow rule.
+
+The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message; the safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
+
+Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule; the JSON `deny` field does not. (Confirmed against the docs 2026-07-13; the docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
+
 ## TODO: Reconsider `Bash(rtk curl:*)`
 
 `rtk curl:*` is currently in the allow list to support fetching documentation and web content. This is broad — it allows any curl command without URL restriction. Consider replacing with:

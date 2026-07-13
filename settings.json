@@ -34,6 +34,7 @@
       "Bash(wc:*)",
       "Bash(python3 *skills/mermaid-diagrams/scripts/*.py*)",
       "Bash(python3 *skills/session-handoff/scripts/*.py*)",
+      "Bash(uv run *skills/skill-architecture/scripts/*.py*)",
       "Write(**/.claude/handoffs/*.md)",
       "Write(/.claude/handoffs/*.md)",
       "Write(**/.claude/handoffs/artifacts/**)",
@@ -118,6 +119,10 @@
       {
         "matcher": "Bash",
         "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/uv-run-guard.sh"
+          },
           {
             "type": "command",
             "command": "$HOME/.claude/hooks/rtk-rewrite.sh"
