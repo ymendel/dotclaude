@@ -35,10 +35,10 @@ Analyze each example to identify what resources would be helpful:
 
 ## Step 3: Initialize the Skill
 
-Run the init script from plugin-dev:
+Run the init script:
 
 ```bash
-uv run plugins/plugin-dev/scripts/skill-creator/init_skill.py <skill-name> --path <target-path>
+uv run scripts/init_skill.py <skill-name> --path <target-path>
 ```
 
 Creates: skill directory + SKILL.md template + example resource directories
@@ -65,7 +65,7 @@ Creates: skill directory + SKILL.md template + example resource directories
 **For local development** (validation only, no zip creation):
 
 ```bash
-uv run plugins/plugin-dev/scripts/skill-creator/quick_validate.py <path/to/skill-folder>
+uv run scripts/validate_skill.py <path/to/skill-folder>
 ```
 
 **For distribution** (validates AND creates zip):
@@ -76,7 +76,7 @@ uv run plugins/plugin-dev/scripts/skill-creator/package_skill.py <path/to/skill-
 
 Validates: YAML frontmatter, naming, description, file organization
 
-**Note**: Use `quick_validate.py` for most workflows. Only use `package_skill.py` when actually distributing the skill to others.
+**Note**: Use `scripts/validate_skill.py` for most workflows. Only use `package_skill.py` when actually distributing the skill to others.
 
 ## Step 6: Register and Iterate
 

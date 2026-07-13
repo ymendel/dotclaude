@@ -68,7 +68,7 @@ Analyze each use case to identify resources needed.
 Use init script for proper structure:
 
 ```bash
-uv run plugins/plugin-dev/scripts/skill-creator/init_skill.py pdf-editor --path ~/.claude/skills/
+uv run scripts/init_skill.py pdf-editor --path ~/.claude/skills/
 ```
 
 **Creates**:

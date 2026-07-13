@@ -52,5 +52,5 @@ description: Extract text and tables from PDFs, rotate pages, merge documents. U
 **Fix**: Run validation script for details:
 
 ```bash
-uv run plugins/plugin-dev/scripts/skill-creator/quick_validate.py <skill-path>
+uv run scripts/validate_skill.py <skill-path>
 ```

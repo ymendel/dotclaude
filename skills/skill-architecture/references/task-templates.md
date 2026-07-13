@@ -11,12 +11,12 @@
 ```
 1. Gather requirements (ask user for functionality, examples, triggers)
 2. Identify reusable resources (scripts, references, assets needed)
-3. Run init script to create skill directory structure
+3. Run `scripts/init_skill.py <name> --path <dir>` to create the skill directory structure
 4. Create bundled resources first (scripts/, references/, assets/)
 5. Write SKILL.md with YAML frontmatter (name, description with triggers)
 6. Add task templates section to SKILL.md
 7. Add Post-Change Checklist section to SKILL.md
-8. Validate with quick_validate.py
+8. Validate with `scripts/validate_skill.py`
 9. Validate links (relative paths only): bun run plugins/plugin-dev/scripts/validate-links.ts <skill-path>
 10. Test skill on real example
 11. Register skill in project CLAUDE.md
@@ -30,7 +30,7 @@
 2. Identify what needs changing (triggers, workflow, resources)
 3. Make targeted changes to SKILL.md
 4. Update any affected references/ or scripts/
-5. Validate with quick_validate.py
+5. Validate with `scripts/validate_skill.py`
 6. Validate links (relative paths only): bun run plugins/plugin-dev/scripts/validate-links.ts <skill-path>
 7. Test updated behavior
 8. Update project CLAUDE.md if description changed
@@ -44,7 +44,7 @@
 2. Determine resource type (script, reference, or asset)
 3. Create resource in appropriate directory
 4. Update SKILL.md to document new resource
-5. Validate with quick_validate.py
+5. Validate with `scripts/validate_skill.py`
 6. Validate links (relative paths only): bun run plugins/plugin-dev/scripts/validate-links.ts <skill-path>
 7. Test resource integration
 8. Verify against Skill Quality Checklist below
@@ -57,7 +57,7 @@
 2. Verify trigger keywords in description match user queries
 3. Ask Claude to quote the description back ("when would you use X?") to expose the gap between the triggers you wrote and what Claude perceives (see [Troubleshooting](./troubleshooting.md))
 4. Check skill location (~/.claude/skills/ or project .claude/skills/)
-5. Validate with quick_validate.py for errors
+5. Validate with `scripts/validate_skill.py` for errors
 6. Validate links: bun run plugins/plugin-dev/scripts/validate-links.ts <skill-path>
 7. Test with explicit trigger phrase
 8. Document findings in skill if new issue discovered
@@ -97,7 +97,7 @@ After ANY skill work, verify:
 - [ ] Post-Change Checklist included for self-maintenance
 - [ ] Final template step references this checklist
 - [ ] Project CLAUDE.md updated if new/renamed skill
-- [ ] Validated with quick_validate.py
+- [ ] Validated with `scripts/validate_skill.py`
 - [ ] All markdown links use relative paths (plugin-portable)
 - [ ] No broken internal links (validate-links.ts passes)
 - [ ] Tested activation **both ways**: manual `/name` AND organic trigger keywords
