@@ -295,12 +295,6 @@ This skill follows common user conventions:
 
 ---
 
-## Marketplace Scripts
-
-See [Scripts Reference](./references/scripts-reference.md) for marketplace script usage.
-
----
-
 ## Reference Documentation
 
 For detailed information, see:
@@ -312,7 +306,6 @@ For detailed information, see:
 - [Workflow Patterns](./references/workflow-patterns.md) - Workflow skill implementation patterns
 - [Progressive Disclosure](./references/progressive-disclosure.md) - Context management patterns
 - [Creation Workflow](./references/creation-workflow.md) - Step-by-step process with examples
-- [Scripts Reference](./references/scripts-reference.md) - Marketplace script usage
 - [Security Practices](./references/security-practices.md) - Threats and defenses (CVE references)
 - [Phased Execution](./references/phased-execution.md) - Preflight/Execute/Verify patterns and variants
 - [Invocation Control](./references/invocation-control.md) - Skill invocation modes, permission rules, legacy commands migration
@@ -325,5 +318,3 @@ For detailed information, see:
 - [Writing Guide](./references/writing-guide.md) - Tone, reasoning-based instructions, description optimization
 - [Script Design](./references/script-design.md) - Designing scripts for agentic consumption
 - [Troubleshooting](./references/troubleshooting.md) - Common issues and solutions
-- [SYNC-TRACKING](./references/SYNC-TRACKING.md) - Marketplace version tracking
-- [Evolution Log](./references/evolution-log.md) - Frozen historical change record (imported; superseded by git history — see the log's header)
