@@ -11,6 +11,31 @@ building; this is its backward sibling — it surfaces what is already true but 
 knowledge so internalized the holder no longer notices it is missing from the record. Surfacing it
 takes an outside interviewer probing, not a request to "write down what's important."
 
+## Establish the occasion first
+
+Before the interview, pin down what occasions this grill. The occasion sets the depth, what to
+extract, and — most of all — where the output should land, so establishing it up front keeps the
+rest of the session aimed.
+
+Offer the occasion as named choices, and make the flagship case a first-class option rather than
+something the holder has to reach a catch-all to say. The reason to grill that this skill exists for
+is *knowledge about to walk away* — a project exit, a handoff, a staffing change; that case must be
+one of the named options, not buried under "other". Common occasions:
+
+- **Someone is rolling off** — an exit, handoff, or staffing change, with the knowledge leaving with
+  them. The headline case, and the one that pushes the interview deepest into the *why*.
+- **Wrapping up a piece of work before merge** — capturing the in-flight state and reasoning of a
+  branch or feature while it's fresh.
+- **A general system overview** — orienting a newcomer to how the whole thing fits together.
+
+Don't hand-author an "other" or "something else" option of your own — the question interface already
+appends its own catch-all, so a second one just reads as a confusing duplicate.
+
+The occasion steers the routing (see *Route the output* below): rolling off points at an orientation
+doc plus ADRs a successor will read cold; a pre-merge wrap is closer to a handoff of in-flight state;
+a system overview points at the orientation doc. Let the answer set the target before you start
+asking.
+
 ## The interview
 
 The mechanic, one question at a time:
@@ -41,6 +66,11 @@ Signals worth mining:
   share of their recent commits. "You're the only one who's touched reconciliation, and it's most of
   your last month — walk me through it." This is the bus-factor-of-one hotspot, and the one the open
   question most often misses: work someone knows nobody else understands, yet never thinks to raise.
+  Verify sole authorship, don't infer it: concentration in the holder's *own* history shows where
+  *they* focused, not that they worked there alone. Run `git shortlog -sn -- <path>` (or `git log`)
+  over the focus areas to see the full author list before treating an area as sole-authored —
+  mistaking shared work for solo work both invents a bus-factor risk that isn't there and hides the
+  co-owners a successor should actually be talking to.
 - **Recent intense focus** — recent commits cluster in one or two places. "Almost all of last week
   was in X — what would a successor need to know there?"
 - **Churn without docs or tests** — an area changes often while nothing in docs or tests moves with
