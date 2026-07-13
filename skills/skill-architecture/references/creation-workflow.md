@@ -113,7 +113,7 @@ If your skill contains bash code blocks:
 3. **Run validation**:
 
    ```bash
-   bun run plugins/plugin-dev/scripts/validate-links.ts plugins/your-plugin/skills/your-skill/
+   uv run scripts/validate_skill.py <skill-path>
    ```
 
 See [Bash Compatibility Reference](./bash-compatibility.md) for detailed patterns and examples.
@@ -152,12 +152,10 @@ description: Extract text and tables from PDFs, rotate pages, merge documents. U
 - WHAT it does (specific capabilities)
 - WHEN to use (triggers: file types, keywords, domains)
 
-### Step 5: Package and Validate
-
-Run packaging script (validates automatically):
+### Step 5: Validate
 
 ```bash
-uv run plugins/plugin-dev/scripts/skill-creator/package_skill.py ~/.claude/skills/pdf-editor/
+uv run scripts/validate_skill.py ~/.claude/skills/pdf-editor/
 ```
 
 **Validates**:
@@ -166,9 +164,7 @@ uv run plugins/plugin-dev/scripts/skill-creator/package_skill.py ~/.claude/skill
 - [ ] Required fields present
 - [ ] Naming conventions
 - [ ] Description quality
-- [ ] File organization
-
-**Output**: `pdf-editor.zip` (if valid)
+- [ ] Relative-link resolution
 
 ### Step 6: Iterate
 
@@ -355,7 +351,7 @@ description: Extract text and tables from PDFs, rotate pages, merge documents. U
 **Fix**: Run validation script for details
 
 ```bash
-uv run plugins/plugin-dev/scripts/skill-creator/package_skill.py <skill-path>
+uv run scripts/validate_skill.py <skill-path>
 ```
 
 See error messages for specific issues.

@@ -226,8 +226,6 @@ When reviewing skills/plugins for path issues:
 - `~/.claude/plugins/installed_plugins.json`
 - `~/.claude/settings.json` (hook paths)
 
-See [Troubleshooting: Literal $HOME Folders](/docs/troubleshooting/marketplace-installation.md#7-literal-home-folders-created-environment-variable-not-expanded) for recovery if you encounter this issue.
-
 ---
 
 ## Related Issues

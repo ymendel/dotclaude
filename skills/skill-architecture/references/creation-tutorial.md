@@ -62,21 +62,11 @@ Creates: skill directory + SKILL.md template + example resource directories
 
 ## Step 5: Validate the Skill
 
-**For local development** (validation only, no zip creation):
-
 ```bash
 uv run scripts/validate_skill.py <path/to/skill-folder>
 ```
 
-**For distribution** (validates AND creates zip):
-
-```bash
-uv run plugins/plugin-dev/scripts/skill-creator/package_skill.py <path/to/skill-folder>
-```
-
-Validates: YAML frontmatter, naming, description, file organization
-
-**Note**: Use `scripts/validate_skill.py` for most workflows. Only use `package_skill.py` when actually distributing the skill to others.
+Validates: YAML frontmatter, naming, description, and relative-link resolution.
 
 ## Step 6: Register and Iterate
 
