@@ -1,6 +1,6 @@
 ---
 name: skill-architecture
-description: Create, modify, or troubleshoot skills. Use when creating a skill from scratch, learning YAML frontmatter standards, validating skill structure, understanding progressive disclosure patterns, or fixing skills that don't trigger correctly.
+description: Create, modify, or troubleshoot skills. Use when creating a skill from scratch, learning YAML frontmatter standards, validating skill structure, understanding progressive disclosure patterns, or fixing skills that don't trigger correctly. Not for authoring rules, CLAUDE.md, or other non-skill configuration.
 ---
 
 # Skill Architecture

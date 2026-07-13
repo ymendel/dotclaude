@@ -7,7 +7,7 @@ These terms have distinct meanings in the skill ecosystem:
 | Term         | Definition                                  | Example Usage                                       |
 | ------------ | ------------------------------------------- | --------------------------------------------------- |
 | **audit**    | Detect violations, issues, or anti-patterns | `code-hardcode-audit` detects magic numbers         |
-| **validate** | Check compliance with format/rules          | `link-tools:link-validator` checks link portability |
+| **validate** | Check compliance with format/rules          | `validate_skill.py` checks frontmatter and link portability |
 | **verify**   | Confirm existence or state                  | Preflight verifies ADR artifacts exist              |
 
 **Guidelines**:
@@ -18,7 +18,7 @@ These terms have distinct meanings in the skill ecosystem:
 
 ---
 
-## Part 9: Validation Checklist
+## Validation Checklist
 
 Before finalizing:
 
@@ -47,7 +47,7 @@ Before finalizing:
 
 ---
 
-## Part 10: Quick Reference
+## Quick Reference
 
 **Minimal valid Agent Skill**:
 
@@ -133,24 +133,6 @@ When adding a new plugin, use this template:
 ```
 
 > **Note**: Only `name` is required. All component paths (`skills`, `hooks`, `agents`, etc.) supplement default directory discovery — if your plugin uses the standard `skills/`, `hooks/` directory layout, these fields are optional.
-
----
-
-## Meta-Example: This Agent Skill
-
-This `agent-skill-builder` demonstrates its own principles:
-
-1. ✅ **Clear name**: `agent-skill-builder` (lowercase, hyphenated, precise)
-1. ✅ **Specific description**: Mentions "agent skill", "create", "build", "structure" as triggers
-1. ✅ **Structured content**: Progressive disclosure with 10 parts
-1. ✅ **Security included**: Dedicated section on threats and best practices
-1. ✅ **Token efficient**: Core guidance here, could add reference.md for advanced topics
-1. ✅ **Scope-specific**: Clarifies this is for Claude Code, not API
-1. ✅ **Examples**: Multiple concrete patterns
-1. ✅ **Validation**: Includes checklist
-1. ✅ **Official terminology**: Uses "Agent Skills" (formal) and `skills/` (file paths)
-
-**Token usage**: ~50 tokens when inactive, ~2000 when fully loaded
 
 ---
 

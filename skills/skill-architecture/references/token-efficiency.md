@@ -1,6 +1,6 @@
 **Skill**: [Skill Architecture](../SKILL.md)
 
-## Part 2: How Agent Skills Work (Token Efficiency)
+## How Agent Skills Work (Token Efficiency)
 
 ### Progressive Disclosure Model
 

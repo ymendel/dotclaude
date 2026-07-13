@@ -1,6 +1,6 @@
 **Skill**: [Skill Architecture](../SKILL.md)
 
-## Part 3: Security (Critical)
+## Security (Critical)
 
 ### 🚨 Security Threats
 

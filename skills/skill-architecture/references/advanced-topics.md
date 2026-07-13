@@ -1,6 +1,6 @@
 **Skill**: [Skill Architecture](../SKILL.md)
 
-## Part 2.5: Critical Formatting Bugs (MUST READ)
+## Critical Formatting Bugs (MUST READ)
 
 ### 🚨 BUG #9817: Multiline Description Footgun
 
@@ -41,7 +41,7 @@ description: This description stays on one line and works correctly.
 - [ ] Description under 200 chars (CLI max is 1024 but Prettier wraps ~80)
 - [ ] Test activation with `/clear` and trigger keywords
 
-## Part 4: Content Sections (Recommended)
+## Content Sections (Recommended)
 
 After YAML frontmatter, organize content:
 
@@ -81,7 +81,7 @@ For advanced examples, see examples.md.
 
 ---
 
-## Part 5: Agent Skill Composition & Limitations
+## Agent Skill Composition & Limitations
 
 ### What Agent Skills CAN'T Do
 
@@ -103,7 +103,7 @@ For advanced examples, see examples.md.
 
 ---
 
-## Part 6: Claude Code vs API Differences
+## Claude Code vs API Differences
 
 | Feature           | Claude Code                           | Claude.ai API           |
 | ----------------- | ------------------------------------- | ----------------------- |
