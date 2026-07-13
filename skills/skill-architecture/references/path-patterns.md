@@ -32,7 +32,7 @@ PATH_PATTERNS_SCRIPT_EOF
 
 ```bash
 /usr/bin/env bash << 'PREFLIGHT_EOF'
-PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/plugins/marketplaces/cc-skills/plugins/itp}"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/plugins/marketplaces/<publisher>/plugins/<plugin>}"
 bash "$PLUGIN_DIR/scripts/install-dependencies.sh" --check
 PREFLIGHT_EOF
 ```
@@ -208,7 +208,7 @@ When reviewing skills/plugins for path issues:
 
 ```json
 {
-  "installLocation": "$HOME/.claude/plugins/marketplaces/cc-skills"
+  "installLocation": "$HOME/.claude/plugins/marketplaces/<publisher>"
 }
 ```
 
@@ -216,7 +216,7 @@ When reviewing skills/plugins for path issues:
 
 ```json
 {
-  "installLocation": "/Users/username/.claude/plugins/marketplaces/cc-skills"
+  "installLocation": "/Users/username/.claude/plugins/marketplaces/<publisher>"
 }
 ```
 
