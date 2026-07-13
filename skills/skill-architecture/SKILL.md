@@ -84,40 +84,6 @@ Skills are discovered from multiple locations. When names collide, higher-preced
 
 ---
 
-## cc-skills Plugin Architecture
-
-> This section applies specifically to the **cc-skills marketplace** plugin structure. Generic standalone skills are unaffected.
-
-### Canonical Structure
-
-```
-plugins/<plugin>/
-└── skills/
-    └── <skill-name>/
-        └── SKILL.md   <- single canonical file (context AND user-invocable)
-```
-
-`skills/<name>/SKILL.md` is the **single source of truth**. The separate `commands/` layer was eliminated -- it required maintaining two identical files per skill and caused `Skill()` invocations to return "Unknown skill". See [migration issue](https://github.com/terrylica/cc-skills/issues/26) for full context.
-
-### How Skills Become Slash Commands
-
-Two install paths, both supported:
-
-| Path                    | Mechanism                                                                                                                             | Notes                                                                                                                                                                                          |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Automated (primary)** | `mise run release:full` -> `sync-commands-to-settings.sh` reads `skills/*/SKILL.md` -> writes `~/.claude/commands/<plugin>:<name>.md` | Fully automated post-release. Bypasses Anthropic cache bugs [#17361](https://github.com/anthropics/claude-code/issues/17361), [#14061](https://github.com/anthropics/claude-code/issues/14061) |
-| **Official CLI**        | `claude plugin install itp@cc-skills` -> reads from `skills/` in plugin cache                                                         | Cache may not refresh on update -- use `claude plugin update` after new releases                                                                                                               |
-
-### Hooks
-
-`sync-hooks-to-settings.sh` reads `hooks/hooks.json` directly -> merges into `~/.claude/settings.json`. Bypasses path re-expansion bug [#18517](https://github.com/anthropics/claude-code/issues/18517).
-
-### Creating a New Skill in cc-skills
-
-Place the SKILL.md under `plugins/<plugin>/skills/<name>/SKILL.md`. No `commands/` copy needed. The validator (`bun scripts/validate-plugins.mjs`) checks frontmatter completeness.
-
----
-
 ## Skill Creation Process
 
 See [Creation Tutorial](./references/creation-tutorial.md) for the detailed 6-step walkthrough, or [Creation Workflow](./references/creation-workflow.md) for the comprehensive guide with examples.

@@ -65,17 +65,17 @@ Example in `settings.json`:
 
 ---
 
-## Historical Note: cc-skills `commands/` Elimination
+## Why SKILL.md Is the Single Source of Truth
 
-The cc-skills marketplace originally used a separate `commands/` directory alongside `skills/`. This was eliminated because:
+Maintaining a separate `commands/` directory alongside `skills/` — an identical copy of each skill in each — is an anti-pattern:
 
-1. **Duplication**: Each skill needed an identical copy in `commands/` to be slash-invocable
-2. **Sync bugs**: `Skill()` invocations returned "Unknown skill" when only the command copy existed
-3. **Maintenance burden**: Two files to update for every change
+1. **Duplication**: each skill needs an identical copy in `commands/` to be slash-invocable
+2. **Sync bugs**: `Skill()` invocations return "Unknown skill" when only the command copy exists
+3. **Maintenance burden**: two files to update for every change
 
-Now, `skills/<name>/SKILL.md` is the single source of truth. The `sync-commands-to-settings.sh` script reads from `skills/` directly.
+Keep `skills/<name>/SKILL.md` as the single source of truth — a skill is exposed as a slash command from that one file, with no `commands/` copy.
 
-See [migration issue](https://github.com/terrylica/cc-skills/issues/26) for full context.
+Related Claude Code caching bugs worth knowing: skills and commands not refreshing from cache ([#17361](https://github.com/anthropics/claude-code/issues/17361), [#14061](https://github.com/anthropics/claude-code/issues/14061)), and hook paths not re-expanding ([#18517](https://github.com/anthropics/claude-code/issues/18517)).
 
 ---
 
