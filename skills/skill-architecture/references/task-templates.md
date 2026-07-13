@@ -94,6 +94,7 @@ After ANY skill work, verify:
 - [ ] Final template step references this checklist
 - [ ] Project CLAUDE.md updated if new/renamed skill
 - [ ] Validated with `scripts/validate_skill.py`
+- [ ] Audited with the `skill-judge` skill; findings triaged (build → judge → fix loop), depth proportionate to the change
 - [ ] All markdown links use relative paths (plugin-portable)
 - [ ] No broken internal links (`scripts/validate_skill.py` passes)
 - [ ] Tested activation **both ways**: manual `/name` AND organic trigger keywords
