@@ -6,6 +6,10 @@ Scripts bundled with skills are executed by Claude Code agents, not humans at a 
 
 Move a check into a script — rather than instructing the model in prose — when it is critical and has to be deterministic. Code runs the same way every time. Prose is interpreted, and interpretation varies. If a validation is load-bearing (a safety gate, a correctness check the rest of the workflow depends on), take it out of the SKILL.md instructions and into a script the model runs, so the outcome doesn't ride on how the model reads that sentence on a given run. Guidance that isn't load-bearing is fine left as prose — reserve this for the checks you can't afford to have skipped or misread.
 
+A second reason is generation, not just validation: reach for a script when the output depends on state that only exists at run time. A static asset — a template, a boilerplate snippet — holds fixed text, so the model has to gather the live values and fill them in by hand, which is both effort and a place to drift. A script reads the current state directly (git branch and recent commits, timestamps, which files changed) and assembles the output around it, so what the model receives is already populated.
+
+The `session-handoff` skill's `create_handoff.py` is the example: instead of a static handoff template for the model to complete, it loads the template and queries git for the branch, recent commits, and changed and staged files, producing a scaffold that already reflects the session's real state. A static asset could not hold what only exists when the command runs.
+
 ## Core Principles
 
 ### 1. No Interactive Prompts
