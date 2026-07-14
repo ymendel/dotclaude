@@ -1,6 +1,6 @@
 ---
 name: orientation-doc
-description: "Write an orientation doc — the 'read this first' map that helps someone arriving cold at a system navigate it without stepping on landmines. Use when onboarding a maintainer to an unfamiliar codebase, handing a system off, or capturing a system's entry map, fragile areas, and the knowledge that isn't in the repo for a successor. Not for a usage or contributor README, and not for resuming an in-flight work session."
+description: "Write an orientation doc — the 'read this first' map that helps someone arriving cold at a system navigate it without walking into its traps. Use when onboarding a maintainer to an unfamiliar codebase, handing a system off, or capturing a system's entry map, fragile areas, and the knowledge that isn't in the repo for a successor. Not for a usage or contributor README, and not for resuming an in-flight work session."
 ---
 
 # Orientation Doc
@@ -44,7 +44,7 @@ One paragraph: what the system does, who it serves, its shape in a sentence or t
 orient, not a tutorial.
 
 ## Misleading terms
-The project's landmine vocabulary. For each entry: the term → what it means *here* → why a
+The vocabulary a newcomer misreads. For each entry: the term → what it means *here* → why a
 newcomer would read it wrong. Pay special attention to words that collide with a general term of
 art (a plain word used for a project-specific thing, or a methodology term that drags in a model
 the project doesn't mean). Render this as a table only when every entry is a term plus a one-line
@@ -86,7 +86,7 @@ where, so a reader with access can find it — but keep its contents out of this
 ## Producing one
 
 - **Explore before you ask.** Most of *What this is* and *Where the rest lives*, and many of the
-  landmine terms, come straight from the code, the commit history, and the existing docs. Read those
+  trap terms, come straight from the code, the commit history, and the existing docs. Read those
   first. Spend any interview only on what they cannot tell you — the *why* behind a fragile area, the
   history behind a redefined concept, the off-repo knowledge. This is the same explore-first discipline
   as `knowledge-grill`. When a grill is running, this doc is its entry-map output, and the grill has
@@ -99,7 +99,7 @@ where, so a reader with access can find it — but keep its contents out of this
   the one thing the reader's identity would change — whether local-only artifacts like handoffs are
   useful pointers — is already handled by the pointer discipline above. Do still settle *which system*
   the doc covers when that's ambiguous.
-- **Find landmines by their signals.** Terms that collide with a general meaning, names that appear
+- **Find traps by their signals.** Terms that collide with a general meaning, names that appear
   in two forms across the code, comments that say "don't" or "HACK", workarounds with no obvious
   cause — each is a candidate for *Misleading terms*, *Redefined concepts*, or *Fragile areas*.
 - **Interview for the tacit half.** Soft-spot reasons, drifted-concept history, and off-repo
