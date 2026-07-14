@@ -30,7 +30,7 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 **`knowledge-grill`** — Interviews the holder of an existing system to extract tacit knowledge — the why behind decisions, non-obvious constraints, the gap that would stall a successor — and routes it to durable artifacts (ADRs, an orientation doc, a private people-notes file). The backward counterpart to forward plan-stressing. Pairs with `rules/knowledge-grill.md`, which watches for an exit on the horizon and suggests the grill before the knowledge walks away.
 
-**`orientation-doc`** — Writes the "read this first" map for someone arriving cold at a system: the gap-as-risk up top, what it is, the terms that bite, concepts whose meaning drifted, soft spots, where the rest of the docs live, and the knowledge that isn't in the repo. A navigation map, not a usage manual — it points at the README rather than restating it. The entry-map output target of `knowledge-grill`.
+**`orientation-doc`** — Writes the "read this first" map for someone arriving cold at a system: the gap-as-risk up top, what it is, the misleading terms, the redefined concepts, the fragile areas, where the rest of the docs live, and the knowledge that isn't in the repo. A navigation map, not a usage manual — it points at the README rather than restating it. The entry-map output target of `knowledge-grill`.
 
 ## Architecture & design
 

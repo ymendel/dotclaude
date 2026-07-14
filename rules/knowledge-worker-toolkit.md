@@ -18,7 +18,7 @@ inherits.
 | `session-doc` | a human collaborator catching up (research partner, teammate), not the resuming agent | short — the same session horizon as the handoff | the same session(s) as the handoff | narrative — why it happened, judgment calls, lessons, in a different voice |
 | `project-notes` | future self or a maintainer | long-running, appended across sessions | project threads — cleanup debt, upstream gaps, template lessons | per-finding notes routed to a declared destination |
 | ADRs (`adr` / `adr-refine`) | a successor or teammate | durable, permanent record | one decision | Context / Decision / Consequences |
-| `orientation-doc` | a newcomer arriving cold | durable, refreshed at transfers | the whole system | entry map — traps, soft spots, where the rest lives |
+| `orientation-doc` | a newcomer arriving cold | durable, refreshed at transfers | the whole system | entry map — traps, fragile areas, where the rest lives |
 | `knowledge-grill` | producer, not artifact — feeds the rows above | — | — | adversarial interview producing an orientation doc or ADRs |
 
 ## Boundary tests — when two seem to fit

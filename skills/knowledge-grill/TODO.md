@@ -51,6 +51,6 @@ Two further-custom options, if wanted:
 ## Output artifact — built
 
 This skill routes the entry-map output to "an orientation doc", which is now backed by the
-`orientation-doc` skill (its shape: gap-as-risk first, then what-this-is, terms that bite, concepts
-that moved, soft spots, where the rest lives, what's not in the repo). When that skill isn't
+`orientation-doc` skill (its shape: gap-as-risk first, then what-this-is, misleading terms, redefined
+concepts, fragile areas, where the rest lives, what's not in the repo). When that skill isn't
 installed, the grill falls back to a plain "read this first" markdown doc.

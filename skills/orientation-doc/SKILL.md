@@ -1,6 +1,6 @@
 ---
 name: orientation-doc
-description: "Write an orientation doc — the 'read this first' map that helps someone arriving cold at a system navigate it without stepping on landmines. Use when onboarding a maintainer to an unfamiliar codebase, handing a system off, or capturing a system's entry map, soft spots, and the knowledge that isn't in the repo for a successor. Not for a usage or contributor README, and not for resuming an in-flight work session."
+description: "Write an orientation doc — the 'read this first' map that helps someone arriving cold at a system navigate it without stepping on landmines. Use when onboarding a maintainer to an unfamiliar codebase, handing a system off, or capturing a system's entry map, fragile areas, and the knowledge that isn't in the repo for a successor. Not for a usage or contributor README, and not for resuming an in-flight work session."
 ---
 
 # Orientation Doc
@@ -11,13 +11,13 @@ maintainer, a successor on a handoff, future-you after months away. A README tel
 without getting hurt, and where everything else lives.
 
 It is a map, not a manual. It points at the READMEs, ADRs, and code rather than restating them, and
-spends its words on the tacit knowledge that has no other home: the terms that bite, the concepts
-that drifted, the soft spots, the knowledge that isn't in the repo at all.
+spends its words on the tacit knowledge that has no other home: the misleading terms, the redefined
+concepts, the fragile areas, the knowledge that isn't in the repo at all.
 
 ## The shape
 
 Lead with the risk — everything after it is the map. Not every section fits every system. Drop any
-with no real content rather than fill it — a manufactured *concept that moved* reads as real and
+with no real content rather than fill it — a manufactured *redefined concept* reads as real and
 misleads, which is worse than an omitted section. An optional one-line italic subtitle can sit under
 the title to set the map-not-manual expectation and route the reader onward — keep it to one line, and
 point it at *Where the rest lives*, never a specific file, since that section owns the onward targets.
@@ -30,29 +30,35 @@ The template, heading by heading:
 [Where the rest lives](#where-the-rest-lives).*
 
 ## If you read nothing else
-The one load-bearing unknown or trap — the thing that, if missed, stalls or burns whoever
-inherits this. From a knowledge-grill, this is the gap-as-risk. If there is no single dominant
-one, list the two or three that come closest. Putting it first means the inheritor sees it
-before anything else.
+The one load-bearing unknown or trap — the thing that, if missed, stalls or costs whoever inherits
+this the most. From a knowledge-grill, this is the gap-as-risk. Rank candidates by breadth of impact —
+how many inheritors it blocks and how early — not by how much interview time it took. The trap the
+holder dwelt on is often a narrow corner only they worked in, while the one that blocks everyone (a
+hard RAM floor, a non-obvious setup step) gets mentioned in passing. Lead with the widest-reaching. If
+no single one dominates, list the two or three closest. This is the most valuable section in the doc —
+finding nothing to put here usually means the risk wasn't extracted, not that there's none. Putting it
+first means the inheritor sees it before anything else.
 
 ## What this is
 One paragraph: what the system does, who it serves, its shape in a sentence or two. Enough to
 orient, not a tutorial.
 
-## Terms that bite
+## Misleading terms
 The project's landmine vocabulary. For each entry: the term → what it means *here* → why a
 newcomer would read it wrong. Pay special attention to words that collide with a general term of
 art (a plain word used for a project-specific thing, or a methodology term that drags in a model
-the project doesn't mean).
+the project doesn't mean). Render this as a table only when every entry is a term plus a one-line
+gloss that fits a cell. Once an entry's *why* runs to a sentence or more, use a bulleted list — a
+table cell can't hold that. Keep one form across the whole doc.
 
-## Concepts that moved
+## Redefined concepts
 Where a name or model drifted from what it once meant. The current term, what the code or history
 still calls it in places, and which is authoritative now. These are the splits that hide a real
 conceptual mismatch behind a naming one — the most expensive kind to discover the hard way.
 
-## Soft spots
+## Fragile areas
 The fragile and load-bearing areas: "don't touch X because Y", the workaround that looks wrong but
-is deliberate, the assumption nothing enforces. Give each its *why* — a soft spot without its
+is deliberate, the assumption nothing enforces. Give each its *why* — a fragile area without its
 reason just reads as a dare.
 
 ## Where the rest lives
@@ -81,8 +87,8 @@ where, so a reader with access can find it — but keep its contents out of this
 
 - **Explore before you ask.** Most of *What this is* and *Where the rest lives*, and many of the
   landmine terms, come straight from the code, the commit history, and the existing docs. Read those
-  first. Spend any interview only on what they cannot tell you — the *why* behind a soft spot, the
-  history behind a moved concept, the off-repo knowledge. This is the same explore-first discipline
+  first. Spend any interview only on what they cannot tell you — the *why* behind a fragile area, the
+  history behind a redefined concept, the off-repo knowledge. This is the same explore-first discipline
   as `knowledge-grill`. When a grill is running, this doc is its entry-map output, and the grill has
   already gathered most of the tacit half.
 - **Sort pointers by what's tracked before writing *Where the rest lives*.** Run `git ls-files` /
@@ -95,7 +101,7 @@ where, so a reader with access can find it — but keep its contents out of this
   the doc covers when that's ambiguous.
 - **Find landmines by their signals.** Terms that collide with a general meaning, names that appear
   in two forms across the code, comments that say "don't" or "HACK", workarounds with no obvious
-  cause — each is a candidate for *Terms that bite*, *Concepts that moved*, or *Soft spots*.
+  cause — each is a candidate for *Misleading terms*, *Redefined concepts*, or *Fragile areas*.
 - **Interview for the tacit half.** Soft-spot reasons, drifted-concept history, and off-repo
   knowledge usually aren't written anywhere. When this skill runs standalone (no grill), ask the
   holder one question at a time, offering your best guess rather than asking cold — a concrete claim
@@ -109,6 +115,12 @@ where, so a reader with access can find it — but keep its contents out of this
   consistently across the whole doc. The tell that you've drifted is a bare name sitting next to a
   formatted one (a plain `fzf` beside `rg` and `proximity-sort`). A product name used descriptively
   stays prose (Homebrew, Postgres); the executable you'd type is code (`brew`, `psql`).
+- **Indent fenced code to the list column, or lift it out.** A *Fragile areas* entry often carries a
+  console recipe or a fix as a fenced code block inside its bullet. Indent the opening fence, the
+  closing fence, and every code line to the bullet's content column — or pull the block out of the list
+  into its own top-level fence. A fence indented differently from its content mis-pairs in strict
+  CommonMark renderers (the code escapes into a paragraph and the next block gets swallowed). It can
+  look fine in a lenient renderer and still break in an IDE preview.
 - **Produce the people-half privately, by default.** *What's not in this repo* usually holds people-
   and relationship-knowledge — how approval really works, who to route around, who owns what. That
   half doesn't go in the committed doc: write it to a private, gitignored artifact (`.claude/private/`

@@ -6,8 +6,8 @@ Deferred work and design notes, kept out of the first version on purpose.
 
 `crafting-effective-readmes` carries a template per project type (OSS, personal, internal, config)
 because a README's audience shifts with the project. An orientation doc's audience is more constant —
-always someone working inside the system — but the emphasis still shifts: a library leans on *Terms
-that bite* and the public surface, an internal service on *Soft spots* and *Where the rest lives*, a
+always someone working inside the system — but the emphasis still shifts: a library leans on *Misleading
+terms* and the public surface, an internal service on *Fragile areas* and *Where the rest lives*, a
 client engagement on *What's not in this repo*. The single template covers all three for now. Add
 variants only once a second and third real orientation doc show the single shape straining — don't
 pre-build them.
