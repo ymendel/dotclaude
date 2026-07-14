@@ -20,8 +20,12 @@ This is personal config, and it's going to reflect my preferences, workflows, an
 
 - **[Claude Code](https://claude.ai/code)** — obviously
 - **[RTK](https://github.com/rtk-ai/rtk)** — the hooks and rules assume RTK is installed. Without it, the rewrite hook degrades gracefully (commands pass through unchanged), but you'll lose the token savings it provides and the RTK rules won't apply meaningfully.
-- **[jq](https://jqlang.github.io/jq/)** — required by the hooks. Both hooks exit silently without it.
+- **[jq](https://jqlang.github.io/jq/)** — required by the hooks. Without it they exit silently and their guards and rewrites are quietly skipped.
 - **[gh](https://cli.github.com/)** — used in development workflow rules and expected for GitHub interactions.
+- **[Python 3](https://www.python.org/)** — runs the session-handoff scripts, and the `python`→`python3` rewrite hook targets it. Without it, handoff creation and loading fail and the rewrite hook no-ops.
+- **[uv](https://github.com/astral-sh/uv)** — runs the skill-architecture skill's validator and scaffolding scripts (`uv run …`). Needed only when authoring or validating skills — the allowlist and `uv-run-guard.sh` hook assume it for that path.
+
+To verify these are on your `PATH`, run `./scripts/check-prerequisites.sh` — it warns on anything missing and never fails.
 
 ## Installation
 

@@ -3,8 +3,9 @@
 Tooling for maintaining this repo's setup — keeping skills in sync with a
 separate team skills repo (`compare-skills.sh`, `sync-skill.sh` — see
 [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for the
-why), and tracking which skills and agents actually get used
-(`usage-report.sh`). Also includes runtime workarounds for Claude Code
+why), tracking which skills and agents actually get used (`usage-report.sh`),
+and verifying the declared prerequisites are present
+(`check-prerequisites.sh`). Also includes runtime workarounds for Claude Code
 bugs (`enospc-workaround.sh`).
 
 ## `compare-skills.sh`
@@ -141,6 +142,25 @@ Requires bash 4+ (associative arrays, `mapfile`, namerefs).
 
 - `0` Report produced.
 - `2` A configured path is missing or arguments are invalid.
+
+## `check-prerequisites.sh`
+
+Verify the external prerequisites this config declares are installed.
+
+```
+./scripts/check-prerequisites.sh
+```
+
+Checks each binary in the README's [Prerequisites](../README.md#prerequisites)
+ledger — RTK, `jq`, `gh`, `python3`, `uv` — against `PATH` and prints `ok` or
+`MISSING` per entry. It **warns and never fails** — every prerequisite degrades
+gracefully, so a missing one is a notice, not an error. It does not
+auto-install. The binary list (`DEPS`) is hard-coded to mirror the README
+ledger, so keep the two in sync when either changes.
+
+### Exit status
+
+- `0` always. Missing prerequisites are warnings, not failures.
 
 ## `enospc-workaround.sh`
 
