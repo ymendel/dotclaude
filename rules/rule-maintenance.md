@@ -24,7 +24,7 @@ Failure mode this prevents: treating a rule edit like a public artifact that mus
 
 ## Writing Rules
 
-Use imperative voice throughout ("do X", "never Y"). Avoid first-person ("I will...") — it's ambiguous about whether the author is Claude or the user, and creates inconsistency across files.
+Use imperative voice throughout ("do X", "never Y"). Avoid both first-person ("I will...") and second-person ("you should...") — "I" is ambiguous about whether the author is Claude or the user, "you" about whether it addresses Claude or the reader, and both create inconsistency across files. The imperative carries the actor implicitly, so neither pronoun is needed. When a rule must distinguish the agent's own actions from a human's, frame it by the situation (a programmatically issued command vs. an interactive prompt), not by a pronoun.
 
 When writing a new rule, include the failure mode it prevents — not just what to do, but what goes wrong without it. Rules that only describe the happy path leave room for the exact failure they're meant to prevent.
 

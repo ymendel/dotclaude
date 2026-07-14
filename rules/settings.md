@@ -49,6 +49,15 @@ For one rule to cover both paths, the pattern needs a segment that appears in bo
 
 > **PreToolUse hook — future option.** When the prompt cost becomes load-bearing (the live case is session handoffs being interrupted mid-departure), a hook can intercept Edit/Write under specific paths, validate narrowly, and exit 0 to skip the prompt without broadening the global allow list. Sketch: check that the path is under `~/.claude/handoffs/` (or the canonical `dotclaude/.claude/handoffs/`), exit 0 to allow. Design properly when picked up.
 
+## How Bash Command Patterns Match — `:*`, ` *`, and Word Boundaries
+
+Bash allow/deny rules match against the literal **command string** (not the Read/Edit gitignore path semantics above). Two facts that aren't obvious, per the [permissions docs](https://code.claude.com/docs/en/permissions):
+
+- **`:*` is exactly equivalent to a trailing ` *`, and both match end-of-string.** `Bash(ls:*)` and `Bash(ls *)` each match bare `ls` *and* `ls -la` — the trailing wildcard does **not** require an argument after the prefix. The space matters: `Bash(ls *)` enforces a word boundary (so it won't match `lsof`), while `Bash(ls*)` without the space does match `lsof`.
+- **Matching is literal, so short and long flag forms are distinct.** `-h` ≠ `--help`: the global help exemption `Bash(* --help *)` covers `--help` but not `-h`, which then falls through to whatever gates the command. A reason to prefer long-form flags at the gate — see code-style's long-form-flags rule.
+
+Confirmed against the docs 2026-07-13, after `git filter-branch -h` prompted despite the `--help` allow entry.
+
 ## How Claude Code Matches Compound Commands
 
 Claude Code splits a compound Bash command on `|`, `&&`, and `;` and evaluates **each segment independently** against the permission rules. Every segment must be individually allowed, or the command prompts. There is no whole-string match for a pipeline — `echo '{}' | jq .` runs only because *both* `echo:*` and `jq:*` are allowed; a rule matching the literal `echo '{}' | jq .` would never fire (confirmed empirically 2026-06-18).
