@@ -34,7 +34,7 @@ The description field is the primary mechanism Claude uses to decide whether to 
 
 ### Claude Undertriggers
 
-Claude tends to _not_ use skills when they'd be useful. Combat this by making descriptions "pushy" -- actively claiming territory:
+Claude tends to _not_ use skills when they'd be useful. Counter this by making descriptions "pushy" -- actively asserting where they apply:
 
 **Weak (undertriggers):**
 
