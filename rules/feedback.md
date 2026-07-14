@@ -86,3 +86,20 @@ So Write offers *less* protection than a shell command here, not more. After wri
 **Why:** On 2026-07-02, an intended project path was emitted with a spurious `<seg>/../` splice mid-path. The same path in a shell command would have errored (the intermediate directory didn't exist), but Write normalized the `..` away lexically, resolved to a different tree, built it, and reported success. The mistake surfaced only on verifying the location afterward, then needed a move plus cleanup.
 
 **How to apply:** build file-tool paths as clean absolutes from the project root, no `..` segments. Treat a mid-path `..` as a signal to re-derive, not submit. After any assembled Write, `ls` the location — Write's success confirms *a* write happened, not that it happened where you meant.
+
+## Format the fragile markdown constructs at generation time
+
+Markdown has no notion of an error — a CommonMark parser maps *any* input to *some* output. So there is no "invalid markdown" a check rejects — there is only a small set of **fragile constructs** that different implementations resolve differently, so the same source renders one way in a lenient renderer and another in a strict one. These bite only in *durable deliverables opened by a strict renderer* — a committed doc, a README, an IDE preview (Zed), a PR body — never in the terminal where most generated markdown is judged. Format them deliberately when generating markdown bound for such a destination. Don't rely on a post-hoc linter to catch them — see the last point.
+
+The fragile constructs, most-common first:
+
+- **Fenced code inside a list item** — the headline case. Indent the fence markers *and every code line* to the list-item content column (2 spaces after `- `). A mismatch — fence at 2 spaces, code at column 0 — makes strict parsers mis-pair the fences: the code escapes into a paragraph and the following block gets swallowed into a phantom code box. Alternative: lift the code out of the bullet into its own top-level block. When the recipe is more than a line or two, lifting it out reads better anyway.
+- **Continuation content in a list** (a second paragraph, a nested list, a blockquote under a bullet) — must align to the parent item's content column, same discipline as the fenced-code case.
+- **Tables** — cells cannot hold block content (no fenced code, no lists inside a cell). Alignment-row and pipe-escaping handling also varies across renderers.
+- **Raw HTML mixed into markdown** — renderer-dependent and often sanitized/stripped (GitHub strips much of it), so don't rely on it rendering.
+- **Nested blockquotes and blockquote-plus-code combinations** — indentation and `>` nesting are inconsistently handled.
+- **Missing blank lines around fenced blocks and lists** — a fence or list run directly against surrounding prose (no blank line) is a frequent trip — `markdownlint` flags it as MD031/MD032.
+
+**Why:** the failure is invisible at generation time. The terminal and chat surfaces render leniently (or not at all), markdown never errors, so nothing pushes back — the defect only appears once the artifact is opened downstream in a strict renderer, by which point it has shipped. Confirmed 2026-07-14: a grill-produced `ORIENTATION.md` had two console recipes as fenced code inside bullets with the fence at 2 spaces and code at column 0; it scrambled in Zed's preview (code escaped, the next bullet got swallowed).
+
+**A linter is a weak check, not the fix.** `markdownlint` and its kin catch this only obliquely — they flag *where* something is structurally off (a mis-paired fence trips MD040 plus the MD031/MD032 blank-line rules) but never name the cause, and out of the box they bury that signal under line-length noise unless the config is tuned. Reserve them, tuned, for committed deliverables where a specific renderer matters — not as a net over everything generated. The durable guard is knowing the fragile-construct list above and formatting for it up front.
