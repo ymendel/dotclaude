@@ -28,6 +28,8 @@ When the user refers to "the rule", "the skill", "settings.json", "the hook", or
 
 **How to apply:** A one-line question is enough: "Global `~/.claude/settings.json` or project `.claude/settings.json`?" Do not begin editing or searching until the scope is settled. When the context truly is unambiguous, proceed without asking — over-asking is its own friction.
 
+**Exception — the `dotclaude` repo itself:** `~/.claude` is a symlink to this repo (per its Makefile). The two paths are one tree, one set of files — there is no global-vs-project distinction to resolve. Don't diff `~/.claude/X` against `dotclaude/X`, and don't ask which scope; editing either edits the live config. When the answer to "how do these two paths relate" is wanted, it's structural (the symlink) and documented (Makefile, README) — reach for those, not an empirical diff. See `settings.md`'s `~/.claude → dotclaude` section for the permission-matching consequences of the symlink.
+
 ## Show templates in full, don't compress them
 
 When reviewing or designing a skill, "don't restate what Claude already knows" (the standard knowledge-delta rubric) applies to *concepts and procedures*, not to *templates and reference artifacts*. A template is the artifact the model is supposed to produce — showing it in full is what makes the output reliable. Compressing it to "you know the standard shape, right?" risks drift in exactly the parts that matter (heading capitalization, status vocabulary, section ordering, project-specific overlays like a required prefix or label).
