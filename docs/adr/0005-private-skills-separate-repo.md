@@ -1,7 +1,7 @@
 # ADR 0005: Separate Repository for Private Skills
 
 **Date:** 2026-07-11
-**Status:** Accepted
+**Status:** Accepted — amended 2026-07-13 (see Amendment below)
 
 ## Context
 
@@ -187,3 +187,64 @@ rather than tracked here.
 - [Claude Code skills documentation](https://code.claude.com/docs/en/skills) —
   the `--add-dir` skill-loading exception and the
   `permissions.additionalDirectories` carve-out.
+
+## Amendment — 2026-07-13
+
+The "not only skills" section above anticipated surfacing other *configuration*
+(rules, agents) through local-only symlinks. This extends the same direction to
+material that is not configuration at all: the author's working documents —
+`dotclaude/ideas/` and `~/.claude/notes/`. Both were gitignored and
+single-machine, with no history or backup, only because the public dotclaude
+tree (ADR 0003) is no place for unpublished personal material. The private repo
+is, so those directories now live there and are tracked.
+
+The core decision is unchanged: the private repo is still the separate,
+outside-`~/.claude`, `--add-dir`-loaded tree. This only widens what it
+holds — from a private-skills incubator (and, per the section above, other
+loadable config) to also a store for non-config working docs that need version
+history and cross-machine sync. Skill loading is untouched — ideas and notes are
+tracked, not loaded. The premise the original Decision rests on — that a real
+private skill loads cleanly from here — is still what would validate the repo as
+a skills incubator. This amendment concerns only its second role, as a store,
+whose own validation follows the migration below.
+
+**Mechanism.** The private repo adopts ADR 0003's allowlist `.gitignore` pattern:
+ignore everything, re-include only what should be tracked (`.claude/`, `ideas/`,
+`notes/`, and the repo's own support files), then re-ignore two classes of
+content wherever they appear in the tree — build artifacts (`*.zip`, `*.tar`, and
+the like) and anything under a `private/` directory. The `private/` rule is a
+convention, not a per-directory special case: sensitive material — the people-
+and client-knowledge captured during real runs (see `sensitive-knowledge.md`)
+that must not enter a tree which may later gain a remote — lives under a
+`private/` subdir and is never tracked. The run material from real runs (both the
+raw capture and a partially-sanitized "cleaned" copy) moves under `private/` to
+adopt it. This is the same safety-by-default move ADR 0003 makes for build
+artifacts, generalized: rather than naming each sensitive directory, one
+convention marks them all, and new sensitive material has a defined home from the
+start.
+
+**Preserving references.** The directories move into the private repo with
+local-only symlinks left behind (`dotclaude/ideas` → `<private-root>/ideas`,
+`dotclaude/notes` → `<private-root>/notes`), so existing paths —
+`dotclaude/ideas/…` in memories and docs, and `~/.claude/notes/` via the ADR 0001
+symlink — still resolve. Like the config symlinks in the section above, these
+stay gitignored in dotclaude (nothing re-includes them) and are created by
+the private repo's `make install`, not tracked.
+
+**Tradeoffs.** The extension is not free:
+
+- **Neutral:** setup on a new machine now includes cloning and `make`-installing
+  the private repo — one more step in the existing dotfiles → dotclaude
+  clone-and-install chain. The dependency is local only: the `ideas`/`notes`
+  symlinks are gitignored in dotclaude, so the public template is unaffected, and
+  the private repo's own `make` (not dotclaude's) creates them, keeping the public
+  repo free of any dependency on it.
+- **Negative:** the repo's purpose splits. The private repo is no longer only a
+  private-skills incubator but also a general working-doc store — a deliberate
+  widening, but one that gives up the single-purpose framing the original decision
+  had.
+- **Neutral:** the `private/` convention gives sensitive material a defined,
+  always-ignored home, but it does not classify the rest of `ideas/`
+  automatically. Some of that content is people-adjacent (the exit-kit material),
+  so what belongs under `private/` versus tracked in the open stays a per-content
+  judgment — and the stakes rise if the private repo ever gains a remote.
