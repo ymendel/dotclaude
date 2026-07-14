@@ -7,7 +7,7 @@ links: link_claudedir
 link_claudedir: ~/.claude
 
 ~/.claude:
-	ln -s ${PWD} ~/.claude
+	ln -s $(CURDIR) ~/.claude
 
 clean: clean_claudedir
 
