@@ -131,6 +131,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "$HOME/.claude/hooks/reflexive-cd-guard.sh"
+          },
+          {
+            "type": "command",
             "command": "$HOME/.claude/hooks/uv-run-guard.sh"
           },
           {

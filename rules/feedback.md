@@ -12,6 +12,8 @@ The Bash working directory is set to the project root at session start and persi
 
 **How to apply:** run commands directly — cwd is already the project root. If a command genuinely needs a different directory, pass it explicitly (`git -C <path>`, an absolute path) rather than `cd`-ing, and never combine `cd` with output redirection. This holds for project subdirectories too — a `cd` into `skills/` or `docs/` persists and will misdirect any cwd-relative tool (handoff scripts, generators, anything calling `getcwd`). When a tool's output lands somewhere unexpected, check `pwd` before assuming the tool is wrong.
 
+**Now gated:** `hooks/reflexive-cd-guard.sh` (a PreToolUse Bash hook, per ADR 0004's rule-vs-hook split) blocks the narrowest slice of this reflex — a leading `cd` whose target is the project root, the cwd, or `.` — with exit 2 and a pointer back to this rule. The gate enforces the mechanical case; this prose stays the discoverable *why*. A `cd` to any *other* directory still passes the gate, so the rest of this rule (subdir persistence, the `git -C` preference) remains prose-enforced.
+
 ## Use the skill-authoring skills when authoring a skill
 
 When creating or modifying a skill — even when self-initiated, not because the user typed `/skill-architecture` — invoke the `skill-architecture` skill (to build and validate structure, frontmatter, and description-match firing) and `skill-judge` (to audit quality). Don't hand-roll a `SKILL.md` from nearby examples.
