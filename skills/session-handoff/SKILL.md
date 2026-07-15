@@ -230,4 +230,5 @@ The scripts below require a **Python 3.9+** interpreter. They exit with a clear 
 
 Adapted from the `session-handoff` skill in
 [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice and the
-description of what this version adds: [ATTRIBUTION.md](./ATTRIBUTION.md).
+description of what this version adds: [ATTRIBUTION.md](./ATTRIBUTION.md). This version's own
+additions are the author's work, granted under the skill's [LICENSE](./LICENSE).

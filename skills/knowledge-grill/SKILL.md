@@ -170,4 +170,5 @@ ideas beyond the exit case, see [COMPANIONS.md](./COMPANIONS.md) and [TODO.md](.
 ## Attribution
 
 Adapted from the `grilling` skill in [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
-Full notice and the description of what this skill adds: [ATTRIBUTION.md](./ATTRIBUTION.md).
+Full notice and the description of what this skill adds: [ATTRIBUTION.md](./ATTRIBUTION.md). This
+skill's own additions are the author's work, granted under the skill's [LICENSE](./LICENSE).
