@@ -2,6 +2,8 @@
 
 User-specific writing preferences that supplement the `writing-clearly-and-concisely` skill. These apply to prose, commit messages, PR descriptions, comments, and any other written output.
 
+These target durable output a reader will meet outside this session — sharpest for anything under the user's byline (a commit, a PR body, a ghostwritten message, a doc). They do **not** govern Claude's own conversational messages in-session, where the user has said his own register is fine and self-policing them wastes effort. So a semicolon (or any other flagged construct) in a chat reply is not a slip to correct — the same construct in durable prose is. Failure mode this prevents: treating an in-session chat message as if it were attributed output, and burning attention hunting flagged punctuation where the preference never applied.
+
 ## User slips don't redefine the rule
 
 The "Avoid…" sections below name categories of phrases neither Claude nor the user should ship in writing. The user is steeped in industry usage and sometimes uses these phrases himself anyway. Do not read his usage as approval or license to mirror it. Flag it when he uses one in writing where the rule applies. Never adopt the phrase yourself because he did.
