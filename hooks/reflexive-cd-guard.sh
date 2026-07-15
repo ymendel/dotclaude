@@ -36,9 +36,14 @@ else
   exit 0
 fi
 
-# The cd target is the first token, up to a command separator (; & |) or the
-# end of the string. Trim trailing whitespace and one surrounding quote pair.
-target=${rest%%[;&|]*}
+# The cd target is the first token, up to a command separator (newline ; & |) or
+# the end of the string. The newline cut must come first: bash's `=~` lets `.`
+# match newlines, so `rest` spans a multi-line command (a bare `cd <root>` on its
+# own line, then the real command underneath) — without cutting at the newline,
+# `target` would swallow the following lines and never match the project root.
+# Trim trailing whitespace and one surrounding quote pair.
+target=${rest%%$'\n'*}
+target=${target%%[;&|]*}
 target=${target%"${target##*[![:space:]]}"}
 target=${target#[\"\']}
 target=${target%[\"\']}
