@@ -37,6 +37,7 @@
 
 # and supporting files
 !README.md
+!LICENSE
 !Makefile
 !statusline-command.sh
 
