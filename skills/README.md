@@ -58,8 +58,6 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 ## Rails
 
-**`rails-upgrade`** — Analyzes a Rails application's upgrade path: checks current version, fetches upgrade notes and diffs, performs selective upgrade while preserving local customizations.
-
 **`rails-test-discipline`** — Test level selection, ADR alignment, and review posture for Rails (RSpec or Minitest). Defers general TDD principles to `tdd`; handles what's Rails-specific: model vs. system vs. request selection, factory/fixture guidance, and structured output with explicit coverage gaps. Loads automatically when working in `spec/` or `test/`.
 
 ## Database
