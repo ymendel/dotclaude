@@ -105,3 +105,7 @@ If substantive issues — wrong framing, wrong scope, wrong decision, unverified
 - **Fabricating codebase claims.** If you didn't actually read the file, don't say "the existing X does Y". Say "I didn't verify this — can you confirm?"
 - **Burying the lede.** If the ADR has a structural problem (wrong decision, wrong framing, wrong scope), say so in **Overall** first. Don't hide it under line-level nitpicks.
 - **Infinite refinement.** Multiple rounds are normal — substantive ADRs typically take a few passes to converge, and re-refinement after implementation surfaces new information is expected. What's *not* normal is structural questions (wrong framing, wrong scope, wrong decision) still surfacing after the user has already revised in response to a prior round: that's a signal the ADR needs a rethink, not another polish pass. Say so plainly when you see it. See *When to stop refining* above.
+
+## Attribution
+
+Adapted from Flagrant's `adr-refine` skill (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

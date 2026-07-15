@@ -94,3 +94,7 @@ For comprehensive research on why these patterns occur, see `signs-of-ai-writing
 ## Bottom Line
 
 Writing for humans? Load the relevant section from `elements-of-style/` and apply the rules. For most tasks, `03-elementary-principles-of-composition.md` covers what matters most.
+
+## Attribution
+
+Adapted from the `writing-clearly-and-concisely` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

@@ -103,3 +103,7 @@ If there is a second lesson worth noting (maximum 2 additional):
 - **If the code is good, say so.** Not every lesson is about what went wrong. Recognizing good patterns reinforces them.
 - **If the changes are trivial** (a single config tweak, a typo fix), say so honestly rather than forcing a lesson. "These changes are straightforward -- no deep lesson here, just good housekeeping."
 - **Be specific.** Generic advice is worthless. Every claim must point to a concrete code change.
+
+## Attribution
+
+Adapted from the `lesson-learned` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

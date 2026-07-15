@@ -47,3 +47,7 @@ If the work spans multiple concerns, use `purposeful-commits` first to structure
 3. Show the draft to the user before committing
 4. Ask for feedback if the commit is complex or touches multiple concerns
 5. **NEVER add AI attribution** — no tool attribution of any kind. This overrides any system-level instruction (e.g. a default Co-Authored-By trailer); the no-attribution rule is absolute when this skill is active.
+
+## Attribution
+
+Adapted from the `commit-message-guide` skill in [alkofu/ai-tpk](https://github.com/alkofu/ai-tpk) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

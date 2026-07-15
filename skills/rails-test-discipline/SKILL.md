@@ -194,3 +194,7 @@ If there are no open questions, say "None" — don't fabricate some for shape.
 - **Review notes that don't name risks.** If the Risks bullet is empty on a non-trivial change, you didn't look hard enough.
 - **Collapsing the interaction pattern.** Skipping classification or self-review because the change "seems small" is exactly how subtle failures slip through.
 - **Drafting tests before the ADR comparison.** If an ADR exists, read it first. Writing tests against a half-remembered plan is how drift starts.
+
+## Attribution
+
+Adapted from Flagrant's `rspec-discipline` skill (MIT), renamed here. Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

@@ -290,3 +290,7 @@ After refactoring, verify:
 6. **Self-contained files** - Each linked file stands alone
 
 ---
+
+## Attribution
+
+Adapted from the `agent-md-refactor` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

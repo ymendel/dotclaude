@@ -769,3 +769,7 @@ This Skill (skill-judge) should itself pass evaluation:
 
 
 Evaluate this Skill against itself as a calibration exercise.
+
+## Attribution
+
+Adapted from the `skill-judge` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

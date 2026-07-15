@@ -134,3 +134,7 @@ sequenceDiagram
 - <!-- Remember to note any changes to public APIs, function signatures, or global state. -->
 
 **[TRIAGE]:** <NEEDS_REVIEW or APPROVED>
+
+## Attribution
+
+Adapted from the `explain-pr-changes` command in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT), converted to a skill here. Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

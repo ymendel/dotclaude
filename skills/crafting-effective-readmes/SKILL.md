@@ -78,3 +78,7 @@ Every README needs at minimum:
 - `references/section-checklist.md` - Which sections to include by project type
 - `references/style-guide.md` - Common README mistakes and prose guidance
 - `references/using-references.md` - Guide to deeper reference materials
+
+## Attribution
+
+Adapted from the `crafting-effective-readmes` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

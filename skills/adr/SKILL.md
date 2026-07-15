@@ -238,3 +238,7 @@ Read the Decision section literally. Has the thing it names been replaced, or ju
 - **Consequence-free decisions.** If you can't name a real negative, you probably haven't thought hard enough.
 - **Rewriting accepted ADRs to make them "accurate."** Supersede or append an Amendment instead — see *Updating an existing ADR*. The historical record matters.
 - **Vague status.** "In progress" is not a status. Use Proposed / Accepted / Superseded / Deprecated.
+
+## Attribution
+
+Adapted from Flagrant's `adr` skill (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

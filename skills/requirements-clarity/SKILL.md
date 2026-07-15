@@ -323,3 +323,7 @@ Use the `Write` tool to create or update this file. Derive `{version}` from the 
 - Execution phases actionable with concrete tasks
 - User approves final PRD
 - Ready for development handoff
+
+## Attribution
+
+Adapted from the `requirements-clarity` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

@@ -159,3 +159,7 @@ Is it a Ruby predicate (returns true/false)?
 ```
 
 Group by severity. Flag side-effect traps as Critical.
+
+## Attribution
+
+Adapted from the `naming-analyzer` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

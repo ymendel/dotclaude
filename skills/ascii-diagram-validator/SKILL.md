@@ -183,3 +183,7 @@ After this skill completes, check before closing:
 3. **Was a workaround needed?** — If you had to improvise (different flags, extra steps), update this SKILL.md so the next invocation doesn't need the same workaround.
 
 Only update if the issue is real and reproducible — not speculative.
+
+## Attribution
+
+Adapted from the `ascii-diagram-validator` skill in [terrylica/cc-skills](https://github.com/terrylica/cc-skills) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

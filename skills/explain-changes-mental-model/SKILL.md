@@ -214,3 +214,7 @@ These changes add user authentication using JWT tokens. The flow is: user submit
 
 [etc...]
 ```
+
+## Attribution
+
+Adapted from the `explain-changes-mental-model` command in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT), converted to a skill here. Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

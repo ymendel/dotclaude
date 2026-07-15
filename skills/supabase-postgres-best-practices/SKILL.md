@@ -63,3 +63,7 @@ Each rule file contains:
 - https://wiki.postgresql.org/wiki/Performance_Optimization
 - https://supabase.com/docs/guides/database/overview
 - https://supabase.com/docs/guides/auth/row-level-security
+
+## Attribution
+
+Adapted from the `supabase-postgres-best-practices` skill in [supabase/agent-skills](https://github.com/supabase/agent-skills) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

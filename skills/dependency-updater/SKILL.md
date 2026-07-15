@@ -487,3 +487,7 @@ pip install -c constraints.txt -r requirements.txt
 | [pip-review](https://github.com/jgonggrijp/pip-review) | Python | Interactive pip updates |
 | [cargo-edit](https://github.com/killercup/cargo-edit) | Rust | Cargo dependency management |
 | [bundler-audit](https://github.com/rubysec/bundler-audit) | Ruby | Security auditing |
+
+## Attribution
+
+Adapted from the `dependency-updater` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

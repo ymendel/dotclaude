@@ -684,3 +684,7 @@ results = db.query("""
 2. **Advanced Patterns:** Time-series, event sourcing, CQRS, multi-tenancy
 3. **ORM Integration:** TypeORM, Prisma, SQLAlchemy patterns
 4. **Monitoring:** Query performance tracking, slow query alerts
+
+## Attribution
+
+Adapted from the `database-schema-designer` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

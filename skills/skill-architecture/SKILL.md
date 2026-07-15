@@ -284,3 +284,7 @@ For detailed information, see:
 - [Writing Guide](./references/writing-guide.md) - Tone, reasoning-based instructions, description optimization
 - [Script Design](./references/script-design.md) - Designing scripts for agentic consumption
 - [Troubleshooting](./references/troubleshooting.md) - Common issues and solutions
+
+## Attribution
+
+Adapted from the `skill-architecture` skill in [terrylica/cc-skills](https://github.com/terrylica/cc-skills) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

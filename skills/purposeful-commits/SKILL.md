@@ -128,3 +128,7 @@ The skill would propose three commits:
 
    Files: config/session.yml
 ```
+
+## Attribution
+
+Adapted from Flagrant's `purposeful-commits` skill (MIT), building on Chris Arcand's [Purposeful Commits](https://chrisarcand.com/purposeful-commits/) method. Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

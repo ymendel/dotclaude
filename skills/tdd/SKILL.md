@@ -127,3 +127,7 @@ After all tests pass, look for [refactor candidates](references/refactoring.md):
 ```
 
 Do NOT load reference files unless a MANDATORY trigger above applies.
+
+## Attribution
+
+Adapted from the `tdd` skill in [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).
