@@ -225,3 +225,9 @@ The scripts below require a **Python 3.9+** interpreter. They exit with a clear 
 - [handoff-template.md](references/handoff-template.md) - Complete template structure with guidance
 - [resume-checklist.md](references/resume-checklist.md) - Verification checklist for resuming agents
 - [setup.md](references/setup.md) - One-time host setup: recommended permissions and how to run the tests
+
+## Attribution
+
+Adapted from the `session-handoff` skill in
+[softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice and the
+description of what this version adds: [ATTRIBUTION.md](./ATTRIBUTION.md).

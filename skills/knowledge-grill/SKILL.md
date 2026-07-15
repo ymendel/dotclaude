@@ -169,6 +169,5 @@ ideas beyond the exit case, see [COMPANIONS.md](./COMPANIONS.md) and [TODO.md](.
 
 ## Attribution
 
-The interview mechanic is adapted from the `grilling` skill in
-[mattpocock/skills](https://github.com/mattpocock/skills) (MIT License, Copyright (c) 2026 Matt
-Pocock). The backward aim and the output-routing to successor artifacts are this skill's additions.
+Adapted from the `grilling` skill in [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
+Full notice and the description of what this skill adds: [ATTRIBUTION.md](./ATTRIBUTION.md).

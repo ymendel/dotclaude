@@ -39,7 +39,7 @@ See [the Makefile](Makefile) for the specific steps. In short, it symlinks the r
 
 ## Appreciation
 
-- [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) — several agents and skills adapted from here
+- [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) — several agents and skills adapted from here, including session-handoff
 - [VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — source for many of the agents
 - [terrylica/cc-skills](https://github.com/terrylica/cc-skills) — ascii-diagram-validator and skill-architecture skills
 - [robzolkos/skill-rails-upgrade](https://github.com/robzolkos/skill-rails-upgrade) — rails-upgrade skill
