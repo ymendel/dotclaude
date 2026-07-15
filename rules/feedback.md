@@ -14,14 +14,6 @@ The Bash working directory is set to the project root at session start and persi
 
 **Now gated:** `hooks/reflexive-cd-guard.sh` (a PreToolUse Bash hook, per ADR 0004's rule-vs-hook split) blocks the narrowest slice of this reflex — a leading `cd` whose target is the project root, the cwd, or `.` — with exit 2 and a pointer back to this rule. The gate enforces the mechanical case; this prose stays the discoverable *why*. A `cd` to any *other* directory still passes the gate, so the rest of this rule (subdir persistence, the `git -C` preference) remains prose-enforced.
 
-## Use the skill-authoring skills when authoring a skill
-
-When creating or modifying a skill — even when self-initiated, not because the user typed `/skill-architecture` — invoke the `skill-architecture` skill (to build and validate structure, frontmatter, and description-match firing) and `skill-judge` (to audit quality). Don't hand-roll a `SKILL.md` from nearby examples.
-
-**Why:** On 2026-06-24, building the `knowledge-grill` skill, I wrote `SKILL.md`/`COMPANIONS.md`/`TODO.md` directly with Write, modeling them on existing skills, and never reached for skill-architecture or skill-judge. It wasn't a reasoned decision to skip them — skill creation pattern-matched to "authoring markdown", so the meta-step ("is there a skill for this?") never surfaced. The hand-write had real gaps a later validation pass caught: a missing negative trigger in the description, and a soft dependency on the `adr` skill that would dangle in a skills-only ship.
-
-**How to apply:** Treat "create or edit a skill" as a task with a dedicated skill, the same way ADR work invokes the `adr` skill (which in turn mandates `adr-refine`). Build with skill-architecture, audit with skill-judge — a build → judge → fix loop. This holds especially when the work is self-initiated, which is exactly when the reflex to invoke a matching skill is weakest.
-
 ## Disambiguate global vs. project scope before editing
 
 When the user refers to "the rule", "the skill", "settings.json", "the hook", or a similar artifact that exists in both global (`~/.claude/...`) and project-local (`.claude/...`, `CLAUDE.md`) forms, ask which scope is meant before editing — unless the surrounding context makes it unambiguous (e.g., the user just opened the global file, or just named a project-only artifact).
