@@ -180,7 +180,7 @@
   "minimumVersion": "2.1.92",
   "claudeMdExcludes": [
     "**/rules/README.md",
-    "**/rules/rtk-commands.md"
+    "**/rules/references/**"
   ],
   "skillOverrides": {
     "init": "user-invocable-only",
