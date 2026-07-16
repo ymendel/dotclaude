@@ -145,5 +145,13 @@ through). Write the message to a file and use `rtk git commit -F <file>`, or `rt
 single-line forms the rewriter handles. The file form also keeps the message text out of the command
 string, dodging the deny-substring trap.
 
+**`cd`-strip footgun**: `rtk rewrite` strips a leading `cd <project-root> &&` (the reflexive-cd
+cleanup) by a raw, **non-quote-aware** text match — `rtk rewrite 'cd <project-root> && pwd'` returns
+`rtk rewrite 'pwd'` even with the `cd …` inside a single-quoted argument. So any command that merely
+*contains* the substring `cd <project-root> &&` — in an `echo`, a `grep` pattern, a commit message, a
+heredoc, a quoted argument — has it silently removed, corrupting the command. Same
+naive-string-manipulation family as the deny-substring trap (`settings.md`) and the two slips above;
+same mitigation — keep that literal substring out of the command text (pass via a file, reword).
+
 Full command reference: `rules/rtk-commands.md` (excluded from context).
 
