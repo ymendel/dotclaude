@@ -55,6 +55,8 @@ Observations about how global tools behave (e.g., RTK filtering output unexpecte
 
 When the user approves a Bash permission prompt, ask whether it was a one-time command or should be added to the allow list in `settings.json`. If they want it added, do so immediately — do not let other work cause this follow-up to be skipped or deferred.
 
+Craft the entry from the command string the gate *actually matched*, never from an inferred or speculative invocation. The string the permission gate sees is not always the form written into the Bash call — the RTK hook rewrites some commands and passes others through unchanged (see `RTK.md`'s Golden Rule exception and `settings.md` on how patterns match). Before adding a pattern, look at the literal command that prompted; if none was observed, don't add a "just in case" entry. Confirmed 2026-07-15: a speculative `Bash(python3 *validate_handoff.py*)` entry turned out redundant because the command reaches the gate as a bare `python3 skills/session-handoff/scripts/validate_handoff.py …` string, already covered by the path-scoped `Bash(python3 *skills/session-handoff/scripts/*.py*)` glob. Failure mode: building the pattern from how the command *would* be written rather than from the string the gate matched, producing an entry that silently duplicates an existing rule (dead weight) or never fires (a false grant).
+
 ## Skill and Rule Review Criteria
 
 When reviewing skills, rules, or their interactions, evaluate against these four concerns:
