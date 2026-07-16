@@ -34,6 +34,12 @@ Use imperative voice throughout ("do X", "never Y"). Avoid both first-person ("I
 
 When writing a new rule, include the failure mode it prevents — not just what to do, but what goes wrong without it. Rules that only describe the happy path leave room for the exact failure they're meant to prevent.
 
+## Where dated observations go
+
+Dated observations, confirmation records ("Confirmed <date>: …"), and "here's the incident that motivated this" asides belong in the commit body that introduces or changes a rule — git history — not in the always-loaded rule prose. Keep the actionable directive and the failure-mode-it-prevents in the rule; move the dated incident to the commit. This is ADR 0007's destination 3 (see [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md) for the full four-destination routing policy). The one nuance: where an incident carried reusable insight, keep a compressed, un-dated version of that insight in prose and move only the dated narrative to the commit.
+
+Failure mode this prevents: incident narratives accrete in always-loaded prose, growing the context floor with documentation of what happened rather than guidance on what to do.
+
 ## Referencing skills and other rules
 
 A rule may reference a skill or another rule freely. Rules load passively in the same config where everything they reference already co-resides, so the pointer never dangles — the target is present whenever the rule fires.
