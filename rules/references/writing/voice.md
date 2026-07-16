@@ -1,6 +1,6 @@
 # Emulating the User's Voice — Specific Markers
 
-Consult-on-demand companion to the "Emulating the user's voice" section of `writing.md`, which stays always-loaded and carries the trigger and the Register directive. Load this whenever drafting anything under the user's byline — a commit message, a PR description, a ghostwritten comment or message — to get the specific markers that make prose read as his. Extracted per [ADR 0007](../../../docs/adr/0007-progressive-disclosure-for-rules.md) (destination 4).
+> Not loaded in context by default. See `rules/writing.md` for the trigger and the Register directive.
 
 ## Archaic Latin abbreviations
 

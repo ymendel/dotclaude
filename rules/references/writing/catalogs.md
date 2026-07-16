@@ -1,6 +1,6 @@
 # Writing Catalogs — Metaphor Offenders and Term-of-Art Collisions
 
-Consult-on-demand companion to `writing.md`'s "Avoid violent and military metaphors" and "Avoid words that collide with terms of art" sections, both of which stay always-loaded with their directive, heuristic, and failure mode. Load this to check a specific phrase or word against the example lists. Extracted per [ADR 0007](../../../docs/adr/0007-progressive-disclosure-for-rules.md) (destination 4).
+> Not loaded in context by default. See `rules/writing.md` for the directives, heuristics, and failure modes.
 
 ## Violent and military metaphor examples
 

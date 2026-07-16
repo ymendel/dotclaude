@@ -1,6 +1,6 @@
 # Development Workflow — Edge-Case Git Recipes
 
-Consult-on-demand companion to the Version Control section of `development-workflow.md`, which stays always-loaded. Load this when you hit one of these specific git situations — they come up rarely, so the recipes don't need to be resident. Extracted per [ADR 0007](../../../docs/adr/0007-progressive-disclosure-for-rules.md) (destination 4).
+> Not loaded in context by default. See `rules/development-workflow.md` for behavioral guidance.
 
 ## Rewording a non-HEAD commit
 

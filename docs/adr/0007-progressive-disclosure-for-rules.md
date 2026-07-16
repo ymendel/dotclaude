@@ -187,7 +187,7 @@ kind of content:
    `rtk-commands.md` to `rules/references/rtk/commands.md`. Every subdirectory
    maps to one rule, which keeps the directory legible as it grows.
 
-Two guards constrain destinations 3 and 4:
+Three guards constrain destinations 3 and 4:
 
 - **Delete-by-default.** Because git history preserves everything removed,
   trimming loses nothing recoverable. A reference file is *only* for content a
@@ -201,6 +201,14 @@ Two guards constrain destinations 3 and 4:
   the excluded file effectively dead — nothing tells the model the situation in
   which pulling it up is worthwhile. This is the same discoverability gap
   already flagged for skill reference lists.
+- **Lean reference files.** A reference file carries content, not provenance. The
+  record of *why* it was extracted — the ADR reference, the "destination 4" label —
+  belongs in the commit that creates the file (destination 3 applied to the
+  extraction itself), not in a header inside the file. A provenance header would
+  load every time the file is consulted, duplicating git history into context for a
+  reader who arrived via a pointer that already carried the context. Keep the file's
+  own header to a one-line "not loaded by default; see `<rule>.md`" note, matching
+  the `references/rtk/commands.md` precedent.
 
 The trimming pass that applies this policy is **not mechanical**. The nuance to
 preserve: keep the actionable "Failure mode this prevents" lines in always-loaded
