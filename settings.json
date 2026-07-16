@@ -32,6 +32,7 @@
       "Bash(chmod +x:*)",
       "Bash(jq:*)",
       "Bash(which:*)",
+      "Bash(command -v:*)",
       "Bash(echo:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
