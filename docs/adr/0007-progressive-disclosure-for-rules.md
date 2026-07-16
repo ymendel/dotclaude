@@ -1,7 +1,7 @@
 # ADR 0007: Progressive Disclosure for Eagerly-Loaded Rules
 
 **Date:** 2026-07-16
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
@@ -30,8 +30,9 @@ that document *what happened* rather than *what to do*; and **consult-on-demand
 reference material** (command tables, extended worked examples, edge-case
 catalogs) that a reader pulls up when a specific situation arises but doesn't
 need resident the rest of the time. Only the first kind needs to be in context
-at all times. The other two load every session and are consulted rarely or
-never.
+at all times. The other two load every session but are consulted only when a
+specific situation calls for them — dated incidents rarely or never, reference
+material on a recognizable trigger.
 
 The config already demonstrates that a rule file need not be always-loaded.
 Three mechanisms exist in the repo today, discovered while scoping this
@@ -195,7 +196,12 @@ Three guards constrain destinations 3 and 4:
   merely hard to throw away. Absent that active-consultation test, content that
   would otherwise become a reference file should simply be deleted — the
   reference subdirectory must not become an unmaintained junk drawer of
-  content no one loads.
+  content no one loads. The test is *triggered* consultation, not *rare*
+  consultation. The extracted voice markers (`references/writing/voice.md`) are
+  pulled up nearly every session that drafts under the user's byline, yet still
+  belong in a reference because they load only on a recognizable trigger and are
+  bulky. Frequency does not disqualify content from a reference file; the absence
+  of a recognizable load trigger does.
 - **Triggered pointers.** A loaded rule that points at a reference file must say
   *when* to load it, not merely "see `rtk-commands.md`". An untriggered pointer leaves
   the excluded file effectively dead — nothing tells the model the situation in
@@ -240,20 +246,26 @@ its reference-extractable bulk still matters. Lean rule files (`naming.md`,
 loaded-token floor should be measured before and after the pass via `/context`,
 so the reduction is a measurement rather than an estimate.
 
-Status stays **Proposed** until an actual trimming pass validates the policy —
-that the classification holds up against real content, that the moved content
-is genuinely not-missed in a normal session, and that the measured floor drops.
-"The convention reads well" is not validation; exercising it against
-`writing.md`/`development-workflow.md`/`feedback.md` and re-measuring is.
+This policy moved from Proposed to **Accepted** once the trimming pass validated
+it: the classification held against real content in `feedback.md`, `writing.md`,
+and `development-workflow.md`; the moved content was not missed in a normal
+session; and the measured memory floor dropped from ~52.6k to ~48.1k tokens
+(both figures from `/context` in a fresh session, so a small part of the delta
+may be incidental auto-memory-index drift — but the magnitude matches the
+byte-ratio estimate). "The convention reads well" was not the bar; exercising it
+and re-measuring was.
 
 ## Consequences
 
-- **Positive:** The always-loaded context floor drops by moving rarely-consulted
-  content (incident history, reference tables) out of every session, and the
-  convention keeps it from climbing as the rule set grows one-directionally.
-  The reduction is real but modest at first — the three target files total
-  ~20.4k tokens and not all of that moves — so the near-term value is as much
-  the *convention against future drift* as the immediate cut.
+- **Positive:** The always-loaded context floor drops by moving
+  triggered-consultation content (incident history, reference tables, voice
+  markers) out of every session, and the convention keeps it from climbing as
+  the rule set grows one-directionally. The first pass — trimming `feedback.md`
+  and extracting reference material from `writing.md` and
+  `development-workflow.md` — lowered the measured memory floor from ~52.6k to
+  ~48.1k tokens (a ~4.5k drop, ~8.6%), matching the byte-ratio estimate. The
+  reduction is real but modest, so the near-term value is as much the
+  *convention against future drift* as the immediate cut.
 
 - **Positive:** Each kind of rule content gets a clear home, so a new addition
   is routed by what it is rather than defaulting to always-loaded because
