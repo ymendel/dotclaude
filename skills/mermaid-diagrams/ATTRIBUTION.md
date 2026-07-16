@@ -1,7 +1,12 @@
 # Attribution
 
 This skill is adapted from the `mermaid-diagrams` skill in
-[softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT License).
+[softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT License). The SKILL.md
+base and the seven `references/` docs originate there.
+
+This version's additions are original tooling: `scripts/validate_mermaid.py` (a Mermaid validator
+with an ASCII-render check), its companion `scripts/validate_mermaid.mmd` diagram, and a `TODO.md` of
+design notes. These additions are the author's own work, granted under this skill's `LICENSE`.
 
 The upstream is MIT-licensed. Its notice, reproduced per the license's terms:
 

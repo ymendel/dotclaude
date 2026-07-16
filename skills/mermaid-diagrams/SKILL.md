@@ -242,4 +242,4 @@ For a flowchart of the script's own control flow, see `scripts/validate_mermaid.
 
 ## Attribution
 
-Adapted from the `mermaid-diagrams` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).
+Adapted from the `mermaid-diagrams` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). This version's own additions are the author's work, granted under the skill's [LICENSE](./LICENSE). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

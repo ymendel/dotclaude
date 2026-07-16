@@ -1,21 +1,6 @@
-# Attribution
-
-This skill is adapted from the `naming-analyzer` skill in
-[softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT License). The general
-naming-analysis concept and the multi-language baseline originate there.
-
-This version is a near-total rewrite: it drops the Java and Go material, adds the entire Ruby & Rails
-section (predicate/bang conventions, reader/writer naming, the concept-to-convention table, and
-service-object and namespacing guidance), a "Before Suggesting a Rename" thinking framework, and a
-restructured decision tree and report format. These additions are the author's own work, granted
-under this skill's `LICENSE`.
-
-The upstream is MIT-licensed. Its notice, reproduced per the license's terms:
-
-```
 MIT License
 
-Copyright (c) 2026 Leonardo Flores
+Copyright (c) 2026 Yossef Mendelssohn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,4 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-```

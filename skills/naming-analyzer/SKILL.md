@@ -162,4 +162,4 @@ Group by severity. Flag side-effect traps as Critical.
 
 ## Attribution
 
-Adapted from the `naming-analyzer` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).
+Adapted from the `naming-analyzer` skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) (MIT). This version's own additions are the author's work, granted under the skill's [LICENSE](./LICENSE). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

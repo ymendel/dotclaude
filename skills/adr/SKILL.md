@@ -241,4 +241,4 @@ Read the Decision section literally. Has the thing it names been replaced, or ju
 
 ## Attribution
 
-Adapted from Flagrant's `adr` skill (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).
+Adapted from Flagrant's `adr` skill (MIT). This version's own additions are the author's work, granted under the skill's [LICENSE](./LICENSE). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

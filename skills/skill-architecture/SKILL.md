@@ -287,4 +287,4 @@ For detailed information, see:
 
 ## Attribution
 
-Adapted from the `skill-architecture` skill in [terrylica/cc-skills](https://github.com/terrylica/cc-skills) (MIT). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).
+Adapted from the `skill-architecture` skill in [terrylica/cc-skills](https://github.com/terrylica/cc-skills) (MIT), with vendored scripts from Anthropic's skill-creator (Apache 2.0). This version's own additions are the author's work, granted under the skill's [LICENSE](./LICENSE). Full notice: [ATTRIBUTION.md](./ATTRIBUTION.md).

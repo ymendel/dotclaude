@@ -1,7 +1,14 @@
 # Attribution
 
 This skill is adapted from Flagrant's `adr` skill (MIT License). It builds on the Nygard ADR format,
-a public methodology that carries no license obligation of its own.
+a public methodology that carries no license obligation of its own. The Nygard-based baseline
+template, the ADR-worthiness criteria, and the drafting process originate with the upstream.
+
+This version's additions are original authored systems: the amendment lifecycle (amend vs.
+supersede, the substitution test, the partial-supersede and outdated-rationale traps), the
+Consequences valence prescription (every bullet prefixed Positive/Neutral/Negative), and the Options
+subsection markers (`(chosen)` / `Rejected`). These additions are the author's own work, granted
+under this skill's `LICENSE`.
 
 The upstream is MIT-licensed. Its notice, reproduced per the license's terms:
 
