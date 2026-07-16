@@ -100,8 +100,7 @@ though the file is sitting right there. The empty result reads as "file absent" 
 in an allowlist repo, where *most* files aren't — use `rtk proxy find` (raw `find`, no gitignore
 filtering) or the built-in Glob tool. Failure mode this prevents: concluding a file doesn't exist
 here (e.g. "it must be in the home directory") from an `rtk find` miss, when the hook silently
-rewrote `find`→`rtk find` and gitignore hid the file. Confirmed 2026-07-12: a `find` for a
-gitignored PDF in this repo returned nothing — `rtk proxy find` found it immediately.
+rewrote `find`→`rtk find` and gitignore hid the file.
 
 ## Golden Rule
 
@@ -123,8 +122,7 @@ So their allowlist entries take the **bare** form — `Bash(python3 *…)`, `Bas
 `rtk python3 …` prefix, which would never match the string the gate actually sees. This is the same
 passthrough mechanism as the `cat "$(…)"` and heredoc-commit slips below (`rtk rewrite` exit 1 → bare
 command at the gate); the difference is that for `python3`/`uv` the bare form is *correct*, not a slip
-to route around. Mechanism confirmed by reading `hooks/rtk-rewrite.sh`. The bare-string match was
-confirmed 2026-07-15 running `validate_handoff.py`.
+to route around. Mechanism confirmed by reading `hooks/rtk-rewrite.sh`.
 
 ## Hook-Based Usage
 
