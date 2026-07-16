@@ -36,7 +36,7 @@ When writing a new rule, include the failure mode it prevents — not just what 
 
 ## Where dated observations go
 
-Dated observations, confirmation records ("Confirmed <date>: …"), and "here's the incident that motivated this" asides belong in the commit body that introduces or changes a rule — git history — not in the always-loaded rule prose. Keep the actionable directive and the failure-mode-it-prevents in the rule; move the dated incident to the commit. This is ADR 0007's destination 3 (see [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md) for the full four-destination routing policy). The one nuance: where an incident carried reusable insight, keep a compressed, un-dated version of that insight in prose and move only the dated narrative to the commit.
+Dated observations, confirmation records ("Confirmed <date>: …"), and "here's the incident that motivated this" asides belong in the commit body that introduces or changes a rule — git history — not in the always-loaded rule prose. Keep the actionable directive and the failure-mode-it-prevents in the rule. Move the dated incident to the commit. This is ADR 0007's destination 3 (see [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md) for the full four-destination routing policy). The one nuance: where an incident carried reusable insight, keep a compressed, un-dated version of that insight in prose and move only the dated narrative to the commit.
 
 Failure mode this prevents: incident narratives accrete in always-loaded prose, growing the context floor with documentation of what happened rather than guidance on what to do.
 
@@ -65,7 +65,7 @@ Observations about how global tools behave (e.g., RTK filtering output unexpecte
 
 When the user approves a Bash permission prompt, ask whether it was a one-time command or should be added to the allow list in `settings.json`. If they want it added, do so immediately — do not let other work cause this follow-up to be skipped or deferred.
 
-Craft the entry from the command string the gate *actually matched*, never from an inferred or speculative invocation. The string the permission gate sees is not always the form written into the Bash call — the RTK hook rewrites some commands and passes others through unchanged (see `RTK.md`'s Golden Rule exception and `settings.md` on how patterns match). Before adding a pattern, look at the literal command that prompted; if none was observed, don't add a "just in case" entry. Failure mode: building the pattern from how the command *would* be written rather than from the string the gate matched, producing an entry that silently duplicates an existing rule (dead weight) or never fires (a false grant).
+Craft the entry from the command string the gate *actually matched*, never from an inferred or speculative invocation. The string the permission gate sees is not always the form written into the Bash call — the RTK hook rewrites some commands and passes others through unchanged (see `RTK.md`'s Golden Rule exception and `settings.md` on how patterns match). Before adding a pattern, look at the literal command that prompted. If none was observed, don't add a "just in case" entry. Failure mode: building the pattern from how the command *would* be written rather than from the string the gate matched, producing an entry that silently duplicates an existing rule (dead weight) or never fires (a false grant).
 
 ## Skill and Rule Review Criteria
 

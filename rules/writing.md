@@ -46,7 +46,7 @@ A word's meaning is decided by the reader's nearest context, not by the writer's
 
 Collisions come in three shapes:
 
-- **Loose or metaphorical use vs. term of art** — a word in its plain or stretched sense that also names a specific technical operation; the technical sense wins the parse (e.g. "rebase", "fork", "merge", "stash").
+- **Loose or metaphorical use vs. term of art** — a word in its plain or stretched sense that also names a specific technical operation, and the technical sense wins the parse (e.g. "rebase", "fork", "merge", "stash").
 - **Term of art in one context vs. another** — a word that's technical in multiple sub-fields, and the reader's dominant sub-field wins (e.g. "branch", "thread", "kernel", "stream").
 - **Named methodology or framework concept that imports a whole model** — a phrase that parses correctly as the words say but drags in a specific model the writer may not intend (e.g. "Definition of Done", "Sprint", "Epic").
 
@@ -76,7 +76,7 @@ Failure mode this prevents: a removal-driven edit leaves a "here's what you no l
 
 When output is human-primary but machine-secondary — issue bodies, PR descriptions, ADRs, docs that other agents will read later for context — don't add bulleted or sectioned structure beyond what the human form naturally wants. Agents handle prose. The voice rule and the clarity rule already produce text both audiences can use. The temptation to "make it easier for an LLM to parse later" almost always produces listicle ceremony that the human form didn't need, which then has to be scrubbed during the voice pass.
 
-This is adjacent to "Do not mirror his prompting register" (in `rules/references/writing/voice.md`) — both correct for the wrong-audience tilt. That one says "the chat-prompting form isn't the writing form"; this one says "the agent-friendly form isn't a separate target from the human-readable form".
+This is adjacent to "Do not mirror his prompting register" (in `rules/references/writing/voice.md`) — both correct for the wrong-audience tilt. That one says "the chat-prompting form isn't the writing form" — this one says "the agent-friendly form isn't a separate target from the human-readable form".
 
 Failure mode this prevents: speculative restructuring for an imagined agent reader, producing prose that reads as ghostwritten to the human reader and saves no real effort for the agent reader (who would have done fine with the prose).
 

@@ -200,7 +200,7 @@ Three guards constrain destinations 3 and 4:
   consultation. The extracted voice markers (`references/writing/voice.md`) are
   pulled up nearly every session that drafts under the user's byline, yet still
   belong in a reference because they load only on a recognizable trigger and are
-  bulky. Frequency does not disqualify content from a reference file; the absence
+  bulky. Frequency does not disqualify content from a reference file — the absence
   of a recognizable load trigger does.
 - **Triggered pointers.** A loaded rule that points at a reference file must say
   *when* to load it, not merely "see `rtk-commands.md`". An untriggered pointer leaves
@@ -213,7 +213,7 @@ Three guards constrain destinations 3 and 4:
   extraction itself), not in a header inside the file. A provenance header would
   load every time the file is consulted, duplicating git history into context for a
   reader who arrived via a pointer that already carried the context. Keep the file's
-  own header to a one-line "not loaded by default; see `<rule>.md`" note, matching
+  own header to a one-line "not loaded by default. See `<rule>.md`" note, matching
   the `references/rtk/commands.md` precedent.
 
 The trimming pass that applies this policy is **not mechanical**. The nuance to
@@ -252,7 +252,7 @@ and `development-workflow.md`; the moved content was not missed in a normal
 session; and the measured memory floor dropped from ~52.6k to ~48.1k tokens
 (both figures from `/context` in a fresh session, so a small part of the delta
 may be incidental auto-memory-index drift — but the magnitude matches the
-byte-ratio estimate). "The convention reads well" was not the bar; exercising it
+byte-ratio estimate). "The convention reads well" was not the bar — exercising it
 and re-measuring was.
 
 ## Consequences
