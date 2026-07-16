@@ -153,5 +153,5 @@ heredoc, a quoted argument — has it silently removed, corrupting the command. 
 naive-string-manipulation family as the deny-substring trap (`settings.md`) and the two slips above;
 same mitigation — keep that literal substring out of the command text (pass via a file, reword).
 
-Full command reference: `rules/references/rtk/commands.md` (excluded from context).
+When you need an RTK command or flag not covered above, load the full reference (read it on demand): `rules/references/rtk/commands.md` (excluded from context).
 
