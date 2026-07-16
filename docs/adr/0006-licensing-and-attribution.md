@@ -1,7 +1,7 @@
 # ADR 0006: Licensing and Attribution
 
 **Date:** 2026-07-15
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
@@ -28,9 +28,9 @@ picture:
   (softaworks), the VoltAgent subagents, `terrylica/cc-skills`, `supabase`, and
   `mattpocock` (`tdd`, `knowledge-grill`) are all MIT. `commit-message-guide` is
   adapted near-verbatim in its core prose from `alkofu/ai-tpk` (MIT).
-  `rails-test-discipline` originated as `rspec-discipline` in `beflagrant/skills`
-  (MIT) and was renamed on the way into this repo. `adr` and `adr-refine` come from
-  `beflagrant/skills` (MIT). For all of these the safe, honest grant is repo-level —
+  `rails-test-discipline` originated as `rspec-discipline` in a Flagrant repository
+  (MIT) and was renamed on the way into this repo. `adr` and `adr-refine` also come from
+  Flagrant (MIT). For all of these the safe, honest grant is repo-level —
   credit the source repository under its own license. Authorship at the person level
   was inferred from commit metadata and is not relied on. (The `graphify` skill also
   derives from an MIT upstream, `Graphify-Labs/graphify`, but it is being retired in
@@ -38,7 +38,7 @@ picture:
 - **Author's own work.** `orientation-doc`, `project-notes`, `session-doc`, the
   `session-handoff` additions, and `yuml-diagrams`.
 - **Both a code lineage and a concept credit.** `purposeful-commits` carries two
-  debts: its skill body originated in `beflagrant/skills` (MIT), and the underlying
+  debts: its skill body originated in a Flagrant repository (MIT), and the underlying
   method is Chris Arcand's public "Purposeful Commits" approach. The author's own
   contribution is a later refinement — separating its trigger from
   `commit-message-guide` — not the substance. Credit is owed to the repo (for the
@@ -111,6 +111,34 @@ Adopt the **MIT License** for this repository. Add a top-level `LICENSE` file,
 **The grant covers everything tracked.** MIT applies to all of dotclaude's tracked
 content — skills, agents, rules, hooks, scripts — not only the skills.
 
+**A per-skill `LICENSE` travels with substantial original work.** The root `LICENSE`
+is the author's grant for the whole tree, but a skill that ships individually leaves
+that root grant behind — the same problem the per-skill `ATTRIBUTION.md` solves for
+upstream credit, applied to the author's own grant. So a skill carrying substantial
+*original* work of the author's also carries its own `LICENSE` (the same MIT text,
+`Copyright (c) 2026 Yossef Mendelssohn`), so the grant rides along when the skill is
+copied out. Where the original work lives decides which files a skill carries:
+
+- An **own-work skill** — `orientation-doc`, `project-notes`, `session-doc`,
+  `yuml-diagrams` — carries a `LICENSE` and no `ATTRIBUTION.md`. There is no upstream
+  to credit; the only rights-holder is the author, and his grant has to travel.
+- A **heavily-derived skill** whose own additions are themselves a substantial work —
+  `session-handoff`, `knowledge-grill`, `skill-architecture`, `naming-analyzer`,
+  `mermaid-diagrams`, `adr` — carries *both*: an `ATTRIBUTION.md` preserving the
+  upstream's notice, and a `LICENSE` granting the author's additions. A derivative work
+  of this weight has more than one rights-holder, and every grant must travel.
+  (`skill-architecture` has three: its base is MIT from `terrylica/cc-skills`, its
+  vendored scripts are Apache 2.0 from Anthropic's skill-creator, and its rework is the
+  author's.) The set was chosen by reading each skill's post-import git history for the
+  weight of original work, not by assumption.
+- A **lightly-derived skill** — the rest — carries only its `ATTRIBUTION.md`. Its
+  original delta is too thin to stand as a separately licensable work, so the upstream
+  notice plus the repo-root grant is the whole obligation.
+
+Stated once: a per-skill `LICENSE` rides wherever there is substantial original work
+of the author's — alone for an own-work skill, alongside the upstream notice for a
+heavy derived one.
+
 **Attribution has two tiers.** The baseline is repo-level: the README's Appreciation
 section credits every upstream the repo draws from. That is the whole obligation for
 any content the repo distributes only as a whole — which is where all 24 agents sit
@@ -134,7 +162,7 @@ both tiers:
   skill's own text, naming the approach and its author — no upstream license notice
   is owed, because there is no copied code to carry one. A debt to a *code lineage*
   takes an `ATTRIBUTION.md` as above. The two can co-occur: `purposeful-commits`
-  owes an `ATTRIBUTION.md` to `beflagrant/skills` for its body *and* an in-text
+  owes an `ATTRIBUTION.md` to Flagrant for its body *and* an in-text
   credit to Chris Arcand for the "Purposeful Commits" method.
 
 **`rails-upgrade` is dropped.** Its upstream is unlicensed, so it cannot ship under
@@ -142,9 +170,10 @@ this repo's MIT grant, and the author has never used it. Removing it clears the 
 hard licensing blocker. If the capability is wanted later, the path back is a
 clean-room rewrite, not a re-import.
 
-The concrete implementation — adding the `LICENSE`, adding a `## License` section to
-the README that names MIT and points at it, adding or fixing the per-skill
-`ATTRIBUTION.md` files, reconciling the README's appreciation section (adding missing
+The concrete implementation — adding the root `LICENSE`, adding a `## License` section
+to the README that names MIT and points at it, adding or fixing the per-skill
+`ATTRIBUTION.md` files, adding the per-skill `LICENSE` files where substantial original
+work warrants one, reconciling the README's appreciation section (adding missing
 upstreams, removing the line for the dropped skill), and removing `rails-upgrade` —
 follows in the attribution pass and is out of scope for this record beyond naming
 that it happens.
@@ -174,10 +203,13 @@ that it happens.
 - **Negative:** Dropping `rails-upgrade` loses a working capability, and the only
   clean way back is a rewrite from scratch — the unlicensed upstream stays
   off-limits unless its author licenses it.
-- **Negative:** The per-skill `ATTRIBUTION.md` convention is manual upkeep. Every
-  new derived skill needs one, and the bidirectional `beflagrant/skills` sync
-  (ADR 0001) can carry or drop the file depending on which direction a skill moves;
-  nothing enforces that the notice stays attached.
+- **Negative:** The per-skill `ATTRIBUTION.md` and `LICENSE` convention is manual
+  upkeep. Every new derived skill needs an `ATTRIBUTION.md`, every own-work skill and
+  every heavily-derived one needs a `LICENSE`, and judging whether a skill's original
+  delta is "substantial" enough to warrant its own grant is a per-skill call with no
+  bright line. The bidirectional team-repo sync (ADR 0001) can carry or drop either
+  file depending on which direction a skill moves; nothing enforces that the notice or
+  the grant stays attached.
 - **Neutral:** Skills and agents are attributed asymmetrically — skills get a
   travelling per-item notice, agents get repo-level credit only — because only skills
   ship on their own. The asymmetry is deliberate and has a named revisit trigger
@@ -196,9 +228,10 @@ that it happens.
   until promoted.
 - Upstreams (all MIT unless noted): `softaworks/agent-toolkit`, `mattpocock/skills`,
   `VoltAgent/awesome-claude-code-subagents`, `terrylica/cc-skills`,
-  `supabase/agent-skills`, `alkofu/ai-tpk`, `beflagrant/skills`
-  (`Copyright (c) 2026 Flagrant`); `robzolkos/skill-rails-upgrade` (no license — the
-  reason `rails-upgrade` is dropped).
+  `supabase/agent-skills`, `alkofu/ai-tpk`, a Flagrant repository
+  (`Copyright (c) 2026 Flagrant`), `anthropics/skills` (Apache 2.0 — the skill-creator
+  scripts vendored into `skill-architecture`); `robzolkos/skill-rails-upgrade` (no
+  license — the reason `rails-upgrade` is dropped).
 - [Chris Arcand — "Purposeful Commits"](https://chrisarcand.com/purposeful-commits/) —
   the method `purposeful-commits` is built on; a concept credit, not a code lineage.
-- `LICENSE` — the top-level MIT grant added by the implementation pass.
+- [`LICENSE`](../../LICENSE) — the top-level MIT grant added by the implementation pass.
