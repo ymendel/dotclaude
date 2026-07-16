@@ -2,6 +2,10 @@
 
 Procedures for correcting and updating the `~/.claude` configuration.
 
+## How rules load
+
+`rules/*.md` load into context automatically via Claude Code's native memory-directory discovery — there is **no** `@import` in the root `CLAUDE.md`, so don't go looking for one. A rule file is *not* always-loaded when it is listed in `settings.json`'s `claudeMdExcludes` (e.g. `README.md`), carries `paths:` frontmatter that loads it only on matching paths (e.g. `settings.md`, `code-style-ruby.md`), or lives under `rules/references/` (consult-on-demand material excluded by one glob — see [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md)). `/context` lists exactly what loaded.
+
 ## Making Corrections
 
 If the issue can be traced back to a rule or CLAUDE.md, make the correction there. If no appropriate rule can be found, add to `rules/feedback.md`.
