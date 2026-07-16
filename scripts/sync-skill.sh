@@ -48,7 +48,7 @@ Exit status:
 
 Examples:
   sync-skill.sh adr --to-theirs
-  sync-skill.sh graphify --to-mine --dry-run
+  sync-skill.sh session-handoff --to-mine --dry-run
 EOF
 }
 
