@@ -58,7 +58,7 @@ Bash allow/deny rules match against the literal **command string** (not the Read
 
 ## How Claude Code Matches Compound Commands
 
-Claude Code splits a compound Bash command on `|`, `&&`, and `;` and evaluates **each segment independently** against the permission rules. Every segment must be individually allowed, or the command prompts. There is no whole-string match for a pipeline — `echo '{}' | jq .` runs only because *both* `echo:*` and `jq:*` are allowed; a rule matching the literal `echo '{}' | jq .` would never fire.
+Claude Code splits a compound Bash command on `|`, `&&`, and `;` and evaluates **each segment independently** against the permission rules. Every segment must be individually allowed, or the command prompts. There is no whole-string match for a pipeline — `echo '{}' | jq .` runs only because *both* `echo:*` and `jq:*` are allowed. A rule matching the literal `echo '{}' | jq .` would never fire.
 
 RTK adds a wrinkle, doing its own segment-aware check before Claude Code sees the command — and it treats shapes differently:
 
@@ -158,7 +158,7 @@ PreToolUse hooks do run on every tool call, allowlisted ones included — an all
 
 The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message; the safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
 
-Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule; the JSON `deny` field does not. (The docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
+Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule. The JSON `deny` field does not. (The docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
 
 ## TODO: Reconsider `Bash(rtk curl:*)`
 

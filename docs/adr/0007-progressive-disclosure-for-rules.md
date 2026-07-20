@@ -8,7 +8,7 @@
 This `dotclaude` repo is the author's Claude Code configuration, and a large
 share of it is behavioral guidance loaded passively into context every session.
 The `rules/*.md` files auto-load via Claude Code's native memory-directory
-discovery — the root `CLAUDE.md` has no `@import` lines; the harness discovers
+discovery — the root `CLAUDE.md` has no `@import` lines. The harness discovers
 the `rules/` directory on its own. As [ADR 0004](0004-rule-vs-hook-enforcement-split.md)
 observed, this set grows over time: each correction or lesson tends to add
 another rule or another bullet, and the growth is one-directional.
@@ -45,7 +45,7 @@ decision:
 - **`paths:` frontmatter** conditionally loads a file only when the session's
   working paths match its globs. `settings.md` (19.6 KB by bytes — the largest
   rule file on disk) carries `paths: ["**/settings.json", "**/settings.local.json"]`
-  and so does *not* load in a general session; `code-style-ruby.md` carries
+  and so does *not* load in a general session. `code-style-ruby.md` carries
   Ruby globs (`**/*.rb`, `**/Gemfile`, &c.) and loads only in Ruby contexts.
   This is already a working progressive-disclosure mechanism — it is why
   `settings.md`, despite being the biggest file, does not appear in the loaded
@@ -55,8 +55,8 @@ decision:
   standing call is that dated observations belong in the commit that introduces
   or changes a rule, not in the always-loaded prose.
 
-So the raw materials for progressive disclosure are all present and proven;
-what is missing is a *policy* — a single answer to "when a new piece of rule
+So the raw materials for progressive disclosure are all present and proven.
+What is missing is a *policy* — a single answer to "when a new piece of rule
 content is added, where does it go?" Without one, the path of least resistance
 is always to append to an always-loaded file (it is one Edit), so every kind of
 content drifts into the always-loaded set by inertia, exactly the way [ADR 0004](0004-rule-vs-hook-enforcement-split.md)
@@ -65,7 +65,7 @@ floor that only grows.
 
 This is the sibling problem to [ADR 0004](0004-rule-vs-hook-enforcement-split.md).
 That ADR asked *where behavioral
-guidance is enforced* (prose vs. gate); this one asks *whether a given piece of
+guidance is enforced* (prose vs. gate). This one asks *whether a given piece of
 guidance needs to be resident to be enforced at all*. The realization is
 parallel: not every rule needs to be in context at every moment, any more than
 every constraint needs to run on the model's attention.
@@ -91,7 +91,7 @@ of content it is:
   moves, it isn't deleted. Each content kind gets a clear home, so a new
   addition no longer defaults to always-loaded by inertia. Two of the four
   destinations already have working precedents in the repo (`settings.md` /
-  `code-style-ruby.md` for path-scoping; `rtk-commands.md` for the reference
+  `code-style-ruby.md` for path-scoping, `rtk-commands.md` for the reference
   file), so the policy formalizes proven mechanisms rather than inventing new
   ones. The convention scales with the rule set's one-directional growth.
 - *Cons:* The routing is a judgment call per content item, not a mechanical
@@ -101,9 +101,9 @@ of content it is:
   reader must learn.
 
 **2. Keep everything always-loaded (the inertial status quo).** Every rule
-file loads every session; the floor grows as the rule set grows.
+file loads every session. The floor grows as the rule set grows.
 
-- *Pros:* One uniform place to look; every rule is found by reading `rules/`.
+- *Pros:* One uniform place to look. Every rule is found by reading `rules/`.
   Adding content is always one Edit. No convention to learn.
 - *Cons:* This is the status quo whose cost prompted the ADR — a context floor
   that only climbs, dominated by content (incident history, reference tables)
@@ -119,12 +119,12 @@ git history.
 - *Pros:* Keeps the "here's what we saw" narrative in one browsable place
   rather than scattered across commit messages.
 - *Cons:* Duplicates what git history already is. The author has rejected a
-  separate evolution-log twice; the standing framing is "git *is* the log."
+  separate evolution-log twice. The standing framing is "git *is* the log."
   A separate log is another always-loaded (or at least maintained) artifact
   that itself accretes.
 
 **Rejected:** git history already provides durable, searchable, per-change
-provenance; a parallel log is redundant maintenance.
+provenance. A parallel log is redundant maintenance.
 
 ### Reference-file mechanism (sub-decision)
 
@@ -148,9 +148,9 @@ today.
 distant exclusion entry cost more than the per-file granularity is worth.
 
 **B. A conventional `rules/references/` subdirectory, excluded by one glob
-(chosen).** Add a single `**/rules/references/**` entry to `claudeMdExcludes`;
-any file placed in `rules/references/` is automatically not-loaded.
-`rtk-commands.md` moves there; `README.md` stays excluded by name.
+(chosen).** Add a single `**/rules/references/**` entry to `claudeMdExcludes`.
+Any file placed in `rules/references/` is automatically not-loaded.
+`rtk-commands.md` moves there. `README.md` stays excluded by name.
 
 - *Pros:* One convention to learn ("anything in `rules/references/` isn't
   loaded"), one exclude pattern regardless of how many reference files exist.
@@ -179,7 +179,7 @@ kind of content:
    mechanism `settings.md` and `code-style-ruby.md` already use.
 3. **Dated incident and verification records** go to git history, in the commit
    body that introduces or changes the rule. This formalizes the author's
-   standing call; it is not a new artifact.
+   standing call — it is not a new artifact.
 4. **Consult-on-demand reference material** goes to an excluded reference file
    under a new `rules/references/` subdirectory, excluded by a single
    `**/rules/references/**` glob in `claudeMdExcludes`. Each rule's reference
@@ -218,20 +218,20 @@ Three guards constrain destinations 3 and 4:
 
 The trimming pass that applies this policy is **not mechanical**. The nuance to
 preserve: keep the actionable "Failure mode this prevents" lines in always-loaded
-prose (they justify their rules); move only the dated incident detail to
+prose (they justify their rules). Move only the dated incident detail to
 history. Many `feedback.md` entries interleave a "**Why:** On <date>…" incident
 with a "**How to apply**" directive — deciding how aggressively to move the
 dated `Why` incidents into history versus keeping a compressed rationale in
 prose is a judgment call for the author to drive during the pass, per entry, not
 a bulk strip.
 
-The four destinations compose; they are not mutually exclusive per file. A
+The four destinations compose — they are not mutually exclusive per file. A
 single rule file can route different parts of itself to different destinations —
 a path-scoped directive in its frontmatter-loaded body, its dated incidents to
 history, and its heavy consult-on-demand tables to a reference file.
 `settings.md` is the case that makes this concrete. It is already path-scoped
 (the precedent for destination 2), but its `paths:` glob matches `settings.json`
-— a file inspected often enough that path-scoping alone buys little; in practice
+— a file inspected often enough that path-scoping alone buys little. In practice
 `settings.md` is close to always-loaded. So its bulky consult-on-demand content
 (the extended pattern-matching tables and edge-case catalogs) is still a
 candidate for destination 4, extracted to a reference file even though the file
@@ -278,7 +278,7 @@ and re-measuring was.
 
 - **Neutral:** Two of the four destinations already exist and are proven in the
   repo (`paths:` frontmatter, the `rtk-commands.md` exclude). The policy mostly
-  formalizes and names existing practice rather than building new mechanism; the
+  formalizes and names existing practice rather than building new mechanism — the
   new construction is the `rules/references/` subdirectory and its single
   exclude glob.
 
@@ -289,8 +289,8 @@ and re-measuring was.
   trimming pass is author-driven per entry.
 
 - **Negative:** Moved content is less discoverable than always-loaded prose. A
-  reference file is found only if a triggered pointer sends the reader to it;
-  an incident record in git history is found only by someone who runs `git log`/
+  reference file is found only if a triggered pointer sends the reader to it.
+  An incident record in git history is found only by someone who runs `git log`/
   `git blame` on the rule. The triggered-pointer guard mitigates the reference
   case but adds a maintenance burden — the "when to load this" cue has to stay
   accurate as the reference file evolves, or the pointer rots.
@@ -304,7 +304,7 @@ and re-measuring was.
 
 - **Negative:** The `rules/references/` glob is coarse — it cannot selectively
   load one reference file while excluding its neighbors. This is acceptable only
-  as long as selective loading isn't needed; if it ever is, the per-file
+  as long as selective loading isn't needed. If it ever is, the per-file
   `claudeMdExcludes` approach (Option A) would have to come back for that file.
 
 - **Negative:** The convention is one more thing a reader — or a future
@@ -320,14 +320,14 @@ and re-measuring was.
 ## References
 
 - [ADR 0004](0004-rule-vs-hook-enforcement-split.md) — Rule vs. Hook
-  Enforcement Split; the closest sibling. That ADR asks *where* behavioral
-  guidance is enforced (prose vs. gate); this one asks *whether* a given piece
+  Enforcement Split, the closest sibling. That ADR asks *where* behavioral
+  guidance is enforced (prose vs. gate). This one asks *whether* a given piece
   needs to be resident to be enforced. Both respond to the same
   one-directional growth of the rule set.
-- [ADR 0003](0003-allowlist-gitignore.md) — Allowlist-Based `.gitignore`; its
+- [ADR 0003](0003-allowlist-gitignore.md) — Allowlist-Based `.gitignore`. Its
   recursive `!/rules/**/*` re-include is why the `rules/references/`
   subdirectory is tracked with no new allowlist entry.
-- `settings.json` — the `claudeMdExcludes` key; the exclusion mechanism this
+- `settings.json` — the `claudeMdExcludes` key, the exclusion mechanism this
   decision builds on.
 - `rules/rtk-commands.md` — the existing excluded-reference precedent, pointed
   at from `rules/RTK.md`; the first file to move into `rules/references/`.
