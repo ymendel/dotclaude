@@ -34,7 +34,7 @@ Concrete reflexes:
 
 - **`--help` / `help <subcmd>` before `man` when grepping.** Most commands write their `--help` text as plain text to stdout — directly greppable, no `col`. `man cmd` is the *rendered* version. So reaching for `man` at all is often one step too far when the goal is to extract a fact.
 - **Look for the tool's data mode.** Tools built to be scripted expose one: `--json`, `--format`, or a `list` / `explain` / `completion` subcommand. Prefer it over scraping display output.
-- **Worked example (git config).** `git help --config | grep -i diff.external` returns plain, greppable text and names the config directly. `man git-config | col -b | grep …` renders the page (overstrike and all) only to strip it back off — more moving parts, and it silently misses matches when `col` isn't there. `git help --config` is a purpose-built plain-text dump; git's per-subcommand man pages are prominent enough to pull you toward `man` first, but the plain path was there.
+- **Worked example (git config).** `git help --config | grep -i diff.external` returns plain, greppable text and names the config directly. `man git-config | col -b | grep …` renders the page (overstrike and all) only to strip it back off — more moving parts, and it silently misses matches when `col` isn't there. `git help --config` is a purpose-built plain-text dump. Git's per-subcommand man pages are prominent enough to pull you toward `man` first, but the plain path was there.
 
 This is the CLI cousin of code-style's *parse with parser libraries, not regex* and `RTK.md`'s guidance against awk-parsing structured formats: don't scrape the pretty output — ask for the structured output.
 

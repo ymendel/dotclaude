@@ -50,7 +50,7 @@ Another high-frequency case is the no-`cd` rule (feedback.md's *Don't reflexivel
 
 Don't dump the whole ruleset into every prompt — pass only the constraints the delegated work will actually exercise.
 
-Failure mode this prevents: delegating work assuming the sub-agent carries the same rules the main context does, then getting output (or, with RTK, a string of permission prompts) that violates a rule the agent never had a chance to follow. The rule exists; the gap is that it never reached the agent doing the work.
+Failure mode this prevents: delegating work assuming the sub-agent carries the same rules the main context does, then getting output (or, with RTK, a string of permission prompts) that violates a rule the agent never had a chance to follow. The rule exists. The gap is that it never reached the agent doing the work.
 
 ## Specialized Agents
 

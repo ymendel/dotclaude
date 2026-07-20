@@ -12,7 +12,7 @@ The Bash working directory is set to the project root at session start and persi
 
 **How to apply:** run commands directly — cwd is already the project root. If a command genuinely needs a different directory, pass it explicitly (`git -C <path>`, an absolute path) rather than `cd`-ing, and never combine `cd` with output redirection. This holds for project subdirectories too — a `cd` into `skills/` or `docs/` persists and will misdirect any cwd-relative tool (handoff scripts, generators, anything calling `getcwd`). When a tool's output lands somewhere unexpected, check `pwd` before assuming the tool is wrong.
 
-**Now gated:** `hooks/reflexive-cd-guard.sh` (a PreToolUse Bash hook, per ADR 0004's rule-vs-hook split) blocks the narrowest slice of this reflex — a leading `cd` whose target is the project root, the cwd, or `.` — with exit 2 and a pointer back to this rule. The gate enforces the mechanical case; this prose stays the discoverable *why*. A `cd` to any *other* directory still passes the gate, so the rest of this rule (subdir persistence, the `git -C` preference) remains prose-enforced.
+**Now gated:** `hooks/reflexive-cd-guard.sh` (a PreToolUse Bash hook, per ADR 0004's rule-vs-hook split) blocks the narrowest slice of this reflex — a leading `cd` whose target is the project root, the cwd, or `.` — with exit 2 and a pointer back to this rule. The gate enforces the mechanical case. This prose stays the discoverable *why*. A `cd` to any *other* directory still passes the gate, so the rest of this rule (subdir persistence, the `git -C` preference) remains prose-enforced.
 
 ## Disambiguate global vs. project scope before editing
 
@@ -22,7 +22,7 @@ When the user refers to "the rule", "the skill", "settings.json", "the hook", or
 
 **How to apply:** A one-line question is enough: "Global `~/.claude/settings.json` or project `.claude/settings.json`?" Do not begin editing or searching until the scope is settled. When the context truly is unambiguous, proceed without asking — over-asking is its own friction.
 
-**Exception — the `dotclaude` repo itself:** `~/.claude` is a symlink to this repo (per its Makefile). The two paths are one tree, one set of files — there is no global-vs-project distinction to resolve. Don't diff `~/.claude/X` against `dotclaude/X`, and don't ask which scope; editing either edits the live config. When the answer to "how do these two paths relate" is wanted, it's structural (the symlink) and documented (Makefile, README) — reach for those, not an empirical diff. See `settings.md`'s `~/.claude → dotclaude` section for the permission-matching consequences of the symlink.
+**Exception — the `dotclaude` repo itself:** `~/.claude` is a symlink to this repo (per its Makefile). The two paths are one tree, one set of files — there is no global-vs-project distinction to resolve. Don't diff `~/.claude/X` against `dotclaude/X`, and don't ask which scope. Editing either edits the live config. When the answer to "how do these two paths relate" is wanted, it's structural (the symlink) and documented (Makefile, README) — reach for those, not an empirical diff. See `settings.md`'s `~/.claude → dotclaude` section for the permission-matching consequences of the symlink.
 
 ## Show templates in full, don't compress them
 
@@ -50,7 +50,7 @@ Before overwriting or discarding on-disk-only state — uncommitted working-tree
 
 This is not an always-do. Routine overwrites of regenerable or uninteresting files need no copy. It fires only when the on-disk-only state is load-bearing for a comparison or decision in play.
 
-**How to apply:** when about to overwrite or discard uncommitted/untracked/scratch state, ask whether any decision currently in play — especially an option you just offered — would want to read that exact state later. If yes, copy it to a scratch path first (project `tmp/`, the session scratchpad). This composes with `honesty.md`'s *Surface Doubts Your Own Correction Reveals* — both catch an action that undermines a position you just took; that rule catches it in prose, this one catches it in a destructive file operation.
+**How to apply:** when about to overwrite or discard uncommitted/untracked/scratch state, ask whether any decision currently in play — especially an option you just offered — would want to read that exact state later. If yes, copy it to a scratch path first (project `tmp/`, the session scratchpad). This composes with `honesty.md`'s *Surface Doubts Your Own Correction Reveals* — both catch an action that undermines a position you just took. That rule catches it in prose, this one catches it in a destructive file operation.
 
 ## Don't put decision-critical detail only in an AskUserQuestion preview — previews clip at a height you can't see
 
@@ -62,7 +62,7 @@ When passing `preview` content on an AskUserQuestion option, never rely on the p
 
 ## A malformed path won't error in Write the way it does in the shell — verify where it landed
 
-File tools take absolute paths. Build each one clean from the project root; don't splice a `../` segment into the middle. Such a path resolves differently depending on who handles it, and Write is the permissive one:
+File tools take absolute paths. Build each one clean from the project root. Don't splice a `../` segment into the middle. Such a path resolves differently depending on who handles it, and Write is the permissive one:
 
 - **The shell and filesystem resolve `..` against real directories.** `a/b/../c` requires `a/b` to exist — if it doesn't, the command errors. A garbled path passed to `ls`, `cat`, or `rtk read` fails loudly, catching the mistake.
 - **Write normalizes `..` lexically, then creates parents.** It collapses `b/..` as text without checking `a/b` exists, then `mkdir -p`'s the result. A garble the filesystem would reject instead resolves to a *different* real location, gets a full directory tree built there, and returns success — nothing pushes back at write time.
@@ -94,4 +94,4 @@ When claiming there's a finding to see — "the standout is X", "as the table ab
 
 **Why:** this has recurred — the user flags "another time you said there's something to see and I don't see it." The model treats its own tool output as if it were part of the conversation the user reads, but the user reads the *messages*. A claimed-visible finding whose data lives only in a tool result is, to the user, an assertion with no visible support.
 
-**How to apply:** when a tool call produces data a decision rides on, restate the load-bearing part in the message — a short markdown table, the ranked list, the specific numbers — even if it duplicates the tool output. The tool output is scratch; the message is the artifact. Sibling of the AskUserQuestion-preview lesson above (decision-critical detail must live where the user reliably sees it, not in a clipped preview) and of `long-form-output.md` (which governs *where* long content goes — file vs. inline; this governs *not* offloading a visible claim onto ephemeral tool output at all).
+**How to apply:** when a tool call produces data a decision rides on, restate the load-bearing part in the message — a short markdown table, the ranked list, the specific numbers — even if it duplicates the tool output. The tool output is scratch. The message is the artifact. Sibling of the AskUserQuestion-preview lesson above (decision-critical detail must live where the user reliably sees it, not in a clipped preview) and of `long-form-output.md` (which governs *where* long content goes — file vs. inline; this governs *not* offloading a visible claim onto ephemeral tool output at all).

@@ -52,4 +52,4 @@ See [the Makefile](Makefile) for the specific steps. In short, it symlinks the r
 
 ## License
 
-[MIT](LICENSE). Skills adapted from upstream projects carry an `ATTRIBUTION.md` preserving the upstream notice; see each skill's directory.
+[MIT](LICENSE). Skills adapted from upstream projects carry an `ATTRIBUTION.md` preserving the upstream notice. See each skill's directory.

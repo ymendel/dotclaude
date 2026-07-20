@@ -27,7 +27,7 @@ local-only files don't surface as drift.
 ./scripts/compare-skills.sh [-v] [skill-name ...]
 ```
 
-Pass skill names to compare only those; with no arguments, scans every skill
+Pass skill names to compare only those. With no arguments, scans every skill
 present on both sides. `-v` prints unified diffs for files that differ.
 
 Exit status: `0` if all compared skills are identical, `1` if at least one
@@ -87,17 +87,17 @@ warning when any fire:
   repo and won't travel with the skill.
 
 Each check can produce false positives (a skill that just happens to
-mention "rules/" in passing; a markdown code-block example name like
+mention "rules/" in passing, a markdown code-block example name like
 `test.py`) or false negatives (an implicit dependency not named anywhere).
 The warnings list likely-affected paths — none of them are copied by the
-sync; bring them across by hand if the destination needs them. See
+sync. Bring them across by hand if the destination needs them. See
 [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for
 the reasoning.
 
 ### Exit status
 
 - `0` Sync (or dry-run) completed.
-- `1` Destination has uncommitted changes for this skill; refused.
+- `1` Destination has uncommitted changes for this skill — refused.
 - `2` Invalid arguments, missing paths, or skill not found on source side.
 
 ## `usage-report.sh`

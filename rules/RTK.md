@@ -49,7 +49,7 @@ no simpler tool covers the need. Three cases where it's the wrong reach:
   single-purpose tool: `wc -L` for the longest line's length, `wc -l` for a line count,
   `grep -c` for a match count. `… | wc -L` beats `… | awk '{ if (length>m) m=length } END { print m }'`
   for "is anything over 72?" — shorter, clearer, and `wc` has no destructive form so it's
-  safely allow-listed (`Bash(wc:*)`); awk is not.
+  safely allow-listed (`Bash(wc:*)`) — awk is not.
 - **In-file editing.** Same rule as `sed` above — use Edit, never `awk -i inplace` or an
   awk-to-tempfile-and-move dance.
 - **Parsing structured formats.** Use a real parser (`jq` for JSON, &c.), not awk
@@ -121,7 +121,7 @@ the command reaches the permission gate exactly as written. `python3` and `uv` a
 So their allowlist entries take the **bare** form — `Bash(python3 *…)`, `Bash(uv run *…)` — never an
 `rtk python3 …` prefix, which would never match the string the gate actually sees. This is the same
 passthrough mechanism as the `cat "$(…)"` and heredoc-commit slips below (`rtk rewrite` exit 1 → bare
-command at the gate); the difference is that for `python3`/`uv` the bare form is *correct*, not a slip
+command at the gate). The difference is that for `python3`/`uv` the bare form is *correct*, not a slip
 to route around. Mechanism confirmed by reading `hooks/rtk-rewrite.sh`.
 
 ## Hook-Based Usage
@@ -138,7 +138,7 @@ or call `rtk read`, `rtk grep`, `rtk find` directly.
 
 **heredoc commit slip**: A heredoc-fed `git commit -F - <<'EOF' … EOF` isn't rewritten —
 `rtk rewrite` passes it through (exit 1), so it reaches the permission gate as a bare `git commit`
-and prompts (only `rtk git:*` is allowed; `settings.md` covers why heredoc/substitution forms pass
+and prompts (only `rtk git:*` is allowed — `settings.md` covers why heredoc/substitution forms pass
 through). Write the message to a file and use `rtk git commit -F <file>`, or `rtk git commit -m "…"` —
 single-line forms the rewriter handles. The file form also keeps the message text out of the command
 string, dodging the deny-substring trap.

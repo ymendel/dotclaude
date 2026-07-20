@@ -41,7 +41,7 @@ costs what the failure mode below describes.
   that path and can mistake other notes for a session to resume.
 - Treat raw capture as private by default — an interview transcript, a raw brain-dump, a scratch log
   holds *everything*, including what was meant to stay out of the repo. Curate the committable half
-  out of it deliberately; don't commit the raw form.
+  out of it deliberately. Don't commit the raw form.
 
 ## Marking something safe to commit
 
@@ -53,14 +53,14 @@ configuration. Marking something *safe* is the deliberate opt-out:
 - **For a repo where the answer recurs**, declare it once in the project's `CLAUDE.md` or `.claude/`
   instead of deciding each time — either "this repo is client- or third-party-owned, hold everything
   sensitive out" (how you pin down a repo you *know* isn't yours, like one transferred to a client) or
-  "people-knowledge is fine to commit here." The declaration only saves the per-instance ask; the
+  "people-knowledge is fine to commit here." The declaration only saves the per-instance ask. The
   default protects you without it.
 
 ## Ownership is the stakes, not the trigger
 
 The split runs by default everywhere, but *where* it runs decides how bad a mistake is. A leak into a
 repo you don't own can't be retracted: `git` history persists, and you can't force-push someone
-else's tree. In your own repo a slip is recoverable; in a client's it is not. That is why the default
+else's tree. In your own repo a slip is recoverable. In a client's it is not. That is why the default
 is worth keeping even where it feels unnecessary — you never have to know a repo isn't yours to be
 protected by it.
 

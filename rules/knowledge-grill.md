@@ -2,7 +2,7 @@
 
 Companion rule for the `knowledge-grill` skill — the proactive half that the skill package cannot
 carry. The skill extracts tacit knowledge from the holder of a system through a relentless backward
-interview and routes it into durable artifacts; this rule decides *when to suggest running it*.
+interview and routes it into durable artifacts. This rule decides *when to suggest running it*.
 
 ## Suggest the grill before the knowledge walks away
 
@@ -19,7 +19,7 @@ the reason the grill was needed.
 ## Failure mode this prevents
 
 The highest-stakes extraction is the one most likely to be deferred. Description-match alone fires
-the skill only when the conversation is *already about* leaving; it does not look up and notice the
+the skill only when the conversation is *already about* leaving. It does not look up and notice the
 exit approaching. Without a rule that watches the horizon, tacit knowledge walks out the door
 because the grill waited for someone to remember it, and by the time the handoff is written the
 person who held the why is already gone.

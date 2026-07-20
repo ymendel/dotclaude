@@ -30,7 +30,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`cross-project-notes.md`** — Sibling to `project-notes.md` for findings that generalize beyond any single project and don't have an upstream / template / external destination yet. Names `~/.claude/notes/` as the durable home for those, with one file per topic (`template-lessons.md`, `postgres-quirks.md`, …). Directory is intentionally outside version control.
 
-**`knowledge-grill.md`** — Companion rule for the `knowledge-grill` skill: suggest a backward, tacit-knowledge-extraction grill *before* knowledge walks away (exit, handoff, staffing change on the horizon), while the holder is still around to interview. The skill runs the interview and routes output to durable artifacts; this rule covers the *when*. Same skill+rule split as `project-notes`. Broader triggers are deferred — see `skills/knowledge-grill/TODO.md`.
+**`knowledge-grill.md`** — Companion rule for the `knowledge-grill` skill: suggest a backward, tacit-knowledge-extraction grill *before* knowledge walks away (exit, handoff, staffing change on the horizon), while the holder is still around to interview. The skill runs the interview and routes output to durable artifacts. This rule covers the *when*. Same skill+rule split as `project-notes`. Broader triggers are deferred — see `skills/knowledge-grill/TODO.md`.
 
 **`knowledge-worker-toolkit.md`** — The map of the record-artifact skill family (`session-handoff`, `session-doc`, `project-notes`, ADRs, `orientation-doc`, `knowledge-grill`): what each captures, the boundary tests for when two seem to fit, and how to place a new member without overlapping an existing one. The authoritative cross-member view the individual skills defer to.
 

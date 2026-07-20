@@ -12,7 +12,7 @@ If the issue can be traced back to a rule or CLAUDE.md, make the correction ther
 
 If a skill was involved, find that skill's canonical path (Glob for the skill's name) before editing. All corrections must target that SKILL.md, never any other documentation.
 
-A special case: when a bypassed skill's trigger and content were already complete and it simply wasn't invoked, add *no prose* anywhere — a reminder only duplicates the always-visible description and shares the very failure mode that caused the miss (passively-loaded text going unconsulted). Edit prose only for a genuine gap (trigger doesn't match, or content is missing); if such a bypass recurs enough to need enforcement, reach for a `PreToolUse` hook (ADR 0004's rule-vs-hook split), not another note.
+A special case: when a bypassed skill's trigger and content were already complete and it simply wasn't invoked, add *no prose* anywhere — a reminder only duplicates the always-visible description and shares the very failure mode that caused the miss (passively-loaded text going unconsulted). Edit prose only for a genuine gap (trigger doesn't match, or content is missing). If such a bypass recurs enough to need enforcement, reach for a `PreToolUse` hook (ADR 0004's rule-vs-hook split), not another note.
 
 When editing skill frontmatter descriptions, always quote the value as a YAML string (e.g. `description: "..."`). Unquoted multi-line scalars break when `: ` appears mid-value, causing the description to silently fail and the skill to show only its title.
 

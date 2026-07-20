@@ -4,7 +4,7 @@ Specialized subagents invoked via the `Agent` tool (or directly by Claude when d
 
 ## How they're used
 
-Claude delegates to these when a task fits the agent's scope. You can also invoke them directly by name. Agents run with their own context; they don't inherit the current conversation.
+Claude delegates to these when a task fits the agent's scope. You can also invoke them directly by name. Agents run with their own context. They don't inherit the current conversation.
 
 ---
 

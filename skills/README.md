@@ -1,12 +1,12 @@
 # Skills
 
-Skills extend Claude's capabilities for specific tasks. The `description` frontmatter is always in context so Claude knows what's available; the full skill body loads only when the skill is invoked. Most skills trigger automatically when relevant — a few are manual-only (marked below) because they have side effects or should only run when explicitly asked.
+Skills extend Claude's capabilities for specific tasks. The `description` frontmatter is always in context so Claude knows what's available. The full skill body loads only when the skill is invoked. Most skills trigger automatically when relevant — a few are manual-only (marked below) because they have side effects or should only run when explicitly asked.
 
 Invoke manually with `/skill-name [args]`.
 
 ## Skills vs. rules
 
-Skills load on demand; rules load eagerly. Procedural workflows with their own steps, templates, or references belong in skills. Behavioral defaults that should apply to every response belong in rules. A single concern occasionally splits across both — see the `project-notes` entry below, paired with a rule for the always-on side.
+Skills load on demand. Rules load eagerly. Procedural workflows with their own steps, templates, or references belong in skills. Behavioral defaults that should apply to every response belong in rules. A single concern occasionally splits across both — see the `project-notes` entry below, paired with a rule for the always-on side.
 
 ---
 
@@ -36,14 +36,14 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 **`adr`** — Writes Architecture Decision Records, advises on ADR-worthiness, or updates an existing ADR (accept, supersede, deprecate, or amend when a downstream ADR shifts the facts under an intact decision). Auto-invokes `adr-refine` after drafting.
 
-**`adr-refine`** — Critiques a draft ADR: surfaces unclear context, missing tradeoffs, hand-wavy language, and codebase inconsistencies. Auto-invoked by `adr`; also use when reviewing an existing draft, re-refining a Proposed ADR after implementation surfaces new info, or refining a newly-appended Amendment block on an Accepted ADR.
+**`adr-refine`** — Critiques a draft ADR: surfaces unclear context, missing tradeoffs, hand-wavy language, and codebase inconsistencies. Auto-invoked by `adr`. Also use when reviewing an existing draft, re-refining a Proposed ADR after implementation surfaces new info, or refining a newly-appended Amendment block on an Accepted ADR.
 
-**`mermaid-diagrams`** — Comprehensive Mermaid syntax reference and diagram-type selection guide. Reference files cover each diagram type in depth; the skill body covers selection logic and quick-start examples.
+**`mermaid-diagrams`** — Comprehensive Mermaid syntax reference and diagram-type selection guide. Reference files cover each diagram type in depth. The skill body covers selection logic and quick-start examples.
 
-**`yuml-diagrams`** — yUML DSL syntax reference and diagram-type selection guide. Covers class, sequence, activity, use case, state, C4, journey, timeline, roadmap, canvas (SWOT, Strategy Choice Cascade), and chart diagrams. Reference files cover each type in depth; the skill body covers type selection, loading triggers, NEVER rules, and render troubleshooting.
+**`yuml-diagrams`** — yUML DSL syntax reference and diagram-type selection guide. Covers class, sequence, activity, use case, state, C4, journey, timeline, roadmap, canvas (SWOT, Strategy Choice Cascade), and chart diagrams. Reference files cover each type in depth. The skill body covers type selection, loading triggers, NEVER rules, and render troubleshooting.
 **`database-schema-designer`** — Production-ready SQL and NoSQL schema design: normalization, indexing strategies, constraints, migrations, performance. Reference files contain the checklist and migration templates.
 
-**`requirements-clarity`** — Transforms vague feature requests into actionable PRDs through structured dialogue. Scores clarity on a 100-point rubric; generates the PRD when the score reaches 90.
+**`requirements-clarity`** — Transforms vague feature requests into actionable PRDs through structured dialogue. Scores clarity on a 100-point rubric. Generates the PRD when the score reaches 90.
 
 ## Code quality
 
@@ -55,11 +55,11 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 ## Rails
 
-**`rails-test-discipline`** — Test level selection, ADR alignment, and review posture for Rails (RSpec or Minitest). Defers general TDD principles to `tdd`; handles what's Rails-specific: model vs. system vs. request selection, factory/fixture guidance, and structured output with explicit coverage gaps. Loads automatically when working in `spec/` or `test/`.
+**`rails-test-discipline`** — Test level selection, ADR alignment, and review posture for Rails (RSpec or Minitest). Defers general TDD principles to `tdd`. Handles what's Rails-specific: model vs. system vs. request selection, factory/fixture guidance, and structured output with explicit coverage gaps. Loads automatically when working in `spec/` or `test/`.
 
 ## Database
 
-**`supabase-postgres-best-practices`** — Postgres performance and best practices from Supabase's engineering. Covers query optimization, indexing, connection pooling, locking, schema design, security (RLS), and monitoring. Heavy on reference files; the skill body is a navigation index.
+**`supabase-postgres-best-practices`** — Postgres performance and best practices from Supabase's engineering. Covers query optimization, indexing, connection pooling, locking, schema design, security (RLS), and monitoring. Heavy on reference files. The skill body is a navigation index.
 
 ## Skills & config
 
@@ -73,7 +73,7 @@ Skills load on demand; rules load eagerly. Procedural workflows with their own s
 
 **`dependency-updater`** ⚠️ manual-only — Smart dependency management for any language. Auto-detects project type, applies safe updates (patch/minor) automatically, prompts for major versions.
 
-**`ascii-diagram-validator`** — Validates alignment of ASCII box-drawing diagrams in markdown. Runs a bundled Python script via `uv`; reports issues with file:line:column locations and suggested fixes.
+**`ascii-diagram-validator`** — Validates alignment of ASCII box-drawing diagrams in markdown. Runs a bundled Python script via `uv`. Reports issues with file:line:column locations and suggested fixes.
 
 **`session-handoff`** — Creates handoff documents for transferring context between sessions. Also handles resuming from a handoff. Proactively suggested after substantial work or when context is running low. Auto-invokes `session-doc` after confirming a handoff when the project declares a session-docs destination.
 

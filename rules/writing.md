@@ -68,7 +68,7 @@ Sibling: honesty.md's *Rewrite the Prose When Verification Disagrees* covers the
 
 When you edit by removing or demoting something, don't leave prose that describes what's *not* happening or what the reader *doesn't* have to do. That framing is a reaction to the deleted content — it only parses for a reader who saw the prior version. A cold reader has no prior version, so "you don't have to name X up front" reads as answering a question nobody asked, and quietly signals the text was edited rather than written. State positively what *is* — the thing to do, the value on offer — and let the removed concern stay removed. If the positive form needs the old concept at all, define it in passing rather than negating it.
 
-This is the edit-artifact sibling of the two rules above: they catch stale *names* and stale *claims* left behind by an edit; this one catches stale *framing* — prose shaped by what used to be on the page. The shared tell: the sentence makes sense only against a version the reader never saw.
+This is the edit-artifact sibling of the two rules above: they catch stale *names* and stale *claims* left behind by an edit. This one catches stale *framing* — prose shaped by what used to be on the page. The shared tell: the sentence makes sense only against a version the reader never saw.
 
 Failure mode this prevents: a removal-driven edit leaves a "here's what you no longer need to do" paragraph that reads as out-of-place throat-clearing to anyone reading fresh, and betrays the document as patched rather than composed.
 

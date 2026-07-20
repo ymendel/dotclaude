@@ -15,7 +15,7 @@
 
 ## Re-query numbers at draft time
 
-When drafting a structured document (plan, ADR, summary, report, post-implementation writeup) that includes numeric claims, re-query each number at draft time. Numbers lifted from earlier turns, prior sessions, or handoffs can be stale (the state has moved), misframed (an upstream system's count restated as a local-DB count; one model's count restated as a related model's count), or misremembered (a value from a few turns back that doesn't match what was actually measured).
+When drafting a structured document (plan, ADR, summary, report, post-implementation writeup) that includes numeric claims, re-query each number at draft time. Numbers lifted from earlier turns, prior sessions, or handoffs can be stale (the state has moved), misframed (an upstream system's count restated as a local-DB count, one model's count restated as a related model's count), or misremembered (a value from a few turns back that doesn't match what was actually measured).
 
 The act of placing a number into a structured document gives it the aura of having been verified — readers see a tidy plan and assume "this is current". Recall errors that would be caught in conversational back-and-forth slip through to a document that looks authoritative.
 
@@ -25,7 +25,7 @@ Before each number ships in prose, ask "where is this from, *right now*?" If the
 
 When describing how an external system, library, or codebase concept works (a gem's API, another project's internals, a domain model in this repo), quote the source before drafting prose. File path with line number, or a URL. Not paraphrase — quote.
 
-Failure mode this prevents: confident-sounding prose that frames a concept wrong because it was inferred from prior context rather than read from source. The output reads as authoritative and ships unless caught. Quantitative claims have an obvious provenance test (where did the number come from?); qualitative framing slips past without one unless this rule fires.
+Failure mode this prevents: confident-sounding prose that frames a concept wrong because it was inferred from prior context rather than read from source. The output reads as authoritative and ships unless caught. Quantitative claims have an obvious provenance test (where did the number come from?). Qualitative framing slips past without one unless this rule fires.
 
 Specific case: ADR Context. Claims about *what an external system actually does* are easy to phrase confidently from one or two examples. They feel like Context (background facts setting up the Decision) but are often Premises (load-bearing assumptions the Decision depends on). Label them accordingly: an inferred premise should read as a premise to be validated, not as an observation. Honest forms: "a sample of N showed [shape]; the matcher needs to tolerate this" (observation, with sample size disclosed); "we expect X; this has not been checked across the full set and is an assumption to validate when sync runs" (assumption, labeled); or a quote from the system's docs with a citation (authoritative). The trap is phrasing an unverified premise with the cadence of an observation, then taking the Decision as if the premise were checked.
 
