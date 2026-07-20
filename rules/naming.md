@@ -22,6 +22,14 @@ Companion: `stakeholder-questions.md` covers this on the *question-asking* side 
 
 **Why:** code that uses the domain expert's vocabulary reduces translation friction across every conversation that involves it. It also keeps the engineering team's mental model aligned with the people they serve, instead of drifting into engineer-internal jargon that the stakeholder has to translate every time.
 
+## Serialization vocabulary
+
+For a transformation between a runtime object and its persisted or wire form, default to **serialize / deserialize**. The directionality is unambiguous — serialize always means runtime object → persistable form, regardless of which form ends up more readable. Reserve **encode / decode** for transformations that aren't about runtime-vs-storage (Base64, URL encoding, character encoding). Avoid **hydrate / dehydrate** (frontend jargon) and **inflate / deflate** (collides with compression) in writing — both trip `writing.md`'s jargon and term-of-art-collision rules.
+
+The full mental model — why serialize/deserialize sidesteps the readability-gradient collision that encode/decode carries, the `dump`/`load` idiom exception, and the when-to-reach-for-which test — is in `rules/references/naming/serialization-vocabulary.md`. Load it when choosing vocabulary for a serializer, storage coder, or wire format.
+
+**Why:** without a default, every new context produces a fresh small decision and the same operation drifts across "encoding" here, "inflating" there, "hydrating" elsewhere — none wrong, none the same. That breaks single-name-per-concept at the vocabulary level.
+
 ## Failure mode this prevents
 
 The same concept ends up under multiple names — class `Block`, column `inventory_block_id`, ADR "Inventory Block", Slack "the load", code comment "the carry-out unit" — and the reader pays a translation cost every time. Worse, the variants drift apart in meaning over time. The codebase ends up with names that *describe* mismatched things, hiding an actual conceptual mismatch until something breaks or a stakeholder catches the disconnect.
