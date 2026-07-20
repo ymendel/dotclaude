@@ -43,7 +43,7 @@ For a path reached via a symlink, every allow rule is checked against both the s
 
 The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/foo/SKILL.md` resolves to two paths whose only common segments are below the `skills/` (or `handoffs/`, &c.) directory — the symlink side anchors under `.claude/`, the target side under `dotclaude/`. Rules anchored on either of those top-level segments alone match only one path, so the allow rule fails and the prompt fires.
 
-Confirmed empirically (2026-05-21): pairing `Edit(~/.claude/**)` with `Edit(**/dotclaude/**)` does *not* silence — two separate allow rules each matching one side don't compose. A *single* rule pattern must match both paths.
+Two separate allow rules each matching one side don't compose — pairing `Edit(~/.claude/**)` with `Edit(**/dotclaude/**)` does *not* silence. A *single* rule pattern must match both paths.
 
 For one rule to cover both paths, the pattern needs a segment that appears in both — e.g. `Edit(**/skills/**)` for skill edits, `Edit(**/handoffs/*.md)` for handoffs. The trade-off: these patterns also auto-match any `skills/` or `handoffs/` directory in any project, broader than the original intent. Default: accept the prompts as the cost.
 
@@ -56,18 +56,16 @@ Bash allow/deny rules match against the literal **command string** (not the Read
 - **`:*` is exactly equivalent to a trailing ` *`, and both match end-of-string.** `Bash(ls:*)` and `Bash(ls *)` each match bare `ls` *and* `ls -la` — the trailing wildcard does **not** require an argument after the prefix. The space matters: `Bash(ls *)` enforces a word boundary (so it won't match `lsof`), while `Bash(ls*)` without the space does match `lsof`.
 - **Matching is literal, so short and long flag forms are distinct.** `-h` ≠ `--help`: the global help exemption `Bash(* --help *)` covers `--help` but not `-h`, which then falls through to whatever gates the command. A reason to prefer long-form flags at the gate — see code-style's long-form-flags rule.
 
-Confirmed against the docs 2026-07-13, after `git filter-branch -h` prompted despite the `--help` allow entry.
-
 ## How Claude Code Matches Compound Commands
 
-Claude Code splits a compound Bash command on `|`, `&&`, and `;` and evaluates **each segment independently** against the permission rules. Every segment must be individually allowed, or the command prompts. There is no whole-string match for a pipeline — `echo '{}' | jq .` runs only because *both* `echo:*` and `jq:*` are allowed; a rule matching the literal `echo '{}' | jq .` would never fire (confirmed empirically 2026-06-18).
+Claude Code splits a compound Bash command on `|`, `&&`, and `;` and evaluates **each segment independently** against the permission rules. Every segment must be individually allowed, or the command prompts. There is no whole-string match for a pipeline — `echo '{}' | jq .` runs only because *both* `echo:*` and `jq:*` are allowed; a rule matching the literal `echo '{}' | jq .` would never fire.
 
 RTK adds a wrinkle, doing its own segment-aware check before Claude Code sees the command — and it treats shapes differently:
 
 - **Pipe with a leading command RTK recognizes** — it rewrites the head (leaving the tail bare) and checks *every* segment against the allow rules: exit 0 (auto-allow) only when all match, otherwise exit 3 (prompt). `gh pr list | grep open` → exit 0; `git show HEAD --stat | sort` → exit 3, because `sort` has no allow rule.
 - **Command substitution (`$(...)`, backticks), an `xargs` or loop body, or a pipe/chain whose commands RTK doesn't recognize** — `rtk rewrite` returns exit 1 (passthrough), and Claude Code's own flow then runs on the bare command, splitting it the same per-segment way. So `gh pr create --body "$(…)"` and `which echo && echo done` are decided by Claude Code, not RTK.
 
-Either path needs every segment individually allowed. Verified on rtk 0.42.4 (2026-06-18); the rewrite gaps are tracked upstream in rtk-ai/rtk (#1252, #2425, #1347, #1560).
+Either path needs every segment individually allowed. The rewrite gaps are tracked upstream in rtk-ai/rtk (#1252, #2425, #1347, #1560).
 
 Implication for the allow list: a `Bash(rtk X:*)` rule does **not** cover `X` used inside a compound command — only the standalone, rewritten `rtk X …` form. To auto-allow a safe command in compound usage (pipes, substitutions, heredoc-bodied `gh` calls), add a **bare** `Bash(X:*)` rule alongside the `rtk X:*` one. Do this only for commands safe in every form (`grep` — read-only; `gh` — destructive subcommands fenced by deny rules). Do **not** blanket-allow a command with destructive flags (`find -delete`, `find -exec`) without pairing the allow with deny carve-outs.
 
@@ -77,17 +75,15 @@ Failure mode this prevents: assuming `rtk gh:*` (or `rtk find:*`, `rtk grep:*`) 
 
 Claude Code matches a command against the allow rules *statically*, before the shell expands anything. When the command contains expansion it can't resolve ahead of time — a bare `$VAR` (which the parser labels `simple_expansion`), `${VAR}`, or `$(...)`/backtick substitution — the evaluator can't safely match it against an allow rule, so it prompts. That prompt offers only **Yes / No**: there is no "don't ask again" option, because Claude Code won't persist an allow rule for a command whose real content is computed at runtime. The absence of the "don't ask again" line is the tell that expansion, not a missing allow entry, is the cause.
 
-Confirmed 2026-06-30: a diagnostic `for f in …; do c=$(cat "$f"); … $?; done` loop prompted with "Contains simple_expansion" and no allowlist option, where a plain bare `git commit -m '…'` the same session *did* offer "don't ask again for `git commit *`".
-
 So: when a command will face the permission gate, prefer an expansion-free form. Running two checks as two plain commands carries no expansion; folding them into a `for … do … $(…) … done` loop does — and the loop is the convenient reach that trips the guard. Split it into plain commands when the task is just a status check or a small comparison. (This is also why command substitution shows up under "How Claude Code Matches Compound Commands" above: RTK passes it through, then Claude Code's own per-segment evaluation hits the same wall.)
 
 Failure mode this prevents: reaching for a bash loop with command substitution on a task discrete commands handle, hitting an un-suppressible prompt, and assuming the permission *config* is at fault — when the cause is the expansion in the command that got written.
 
-**The Bash sandbox does not fix this.** Even in its auto-allow mode, deny and ask rules are still enforced, and enforcing them requires resolving the command string — exactly what an unresolvable expansion prevents — so an expansion-bearing command still prompts whether the sandbox is enabled or not. This was evaluated and confirmed 2026-07-16 (a bare-`$VAR` loop prompted under auto-allow), and the sandbox was dropped rather than adopted. The only lever that changes the prompt is auto mode (the permission classifier), which trades the deterministic, audited allowlist for a probabilistic per-command classifier — declined for that reason. Treat expansion prompts as unavoidable and write expansion-free commands (split the loop into discrete commands) rather than reaching for a config fix that doesn't exist.
+**The Bash sandbox does not fix this.** Even in its auto-allow mode, deny and ask rules are still enforced, and enforcing them requires resolving the command string — exactly what an unresolvable expansion prevents — so an expansion-bearing command still prompts whether the sandbox is enabled or not. The sandbox was evaluated and dropped rather than adopted. The only lever that changes the prompt is auto mode (the permission classifier), which trades the deterministic, audited allowlist for a probabilistic per-command classifier — declined for that reason. Treat expansion prompts as unavoidable and write expansion-free commands (split the loop into discrete commands) rather than reaching for a config fix that doesn't exist.
 
 ## Deny Patterns Match the Command String, Not the Invocation
 
-Deny rules (`Bash(*git push*)`, `Bash(*rm -rf*)`, `Bash(*find* -delete*)`) match the literal command **string**, with no understanding of what the command does. Any command whose text *contains* the denied substring is blocked — even when it performs no such action. The recurring bite: a `git commit -m '…'` whose message describes the denied pattern, an `echo` or `grep` that mentions it, or a command documenting the deny rules themselves. Confirmed 2026-06-18 — a commit message containing the text "find … -delete" was blocked by the `*find* -delete*` carve-out.
+Deny rules (`Bash(*git push*)`, `Bash(*rm -rf*)`, `Bash(*find* -delete*)`) match the literal command **string**, with no understanding of what the command does. Any command whose text *contains* the denied substring is blocked — even when it performs no such action. The recurring bite: a `git commit -m '…'` whose message describes the denied pattern, an `echo` or `grep` that mentions it, or a command documenting the deny rules themselves.
 
 This is the safe failure direction for a deny: over-blocking costs a reword, under-blocking could run the destructive command. So the patterns stay broad rather than trying to anchor on the command name, which glob can't cleanly express anyway.
 
@@ -162,7 +158,7 @@ PreToolUse hooks do run on every tool call, allowlisted ones included — an all
 
 The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message; the safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
 
-Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule; the JSON `deny` field does not. (Confirmed against the docs 2026-07-13; the docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
+Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule; the JSON `deny` field does not. (The docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
 
 ## TODO: Reconsider `Bash(rtk curl:*)`
 
