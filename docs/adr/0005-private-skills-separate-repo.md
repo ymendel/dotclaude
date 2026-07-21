@@ -1,7 +1,7 @@
 # ADR 0005: Separate Repository for Private Skills
 
 **Date:** 2026-07-11
-**Status:** Accepted — amended 2026-07-13 (see Amendment below)
+**Status:** Accepted — amended 2026-07-13 and 2026-07-21 (see Amendments below)
 
 ## Context
 
@@ -248,3 +248,64 @@ the private repo's `make install`, not tracked.
   automatically. Some of that content is people-adjacent (the exit-kit material),
   so what belongs under `private/` versus tracked in the open stays a per-content
   judgment — and the stakes rise if the private repo ever gains a remote.
+
+## Amendment — 2026-07-21
+
+The "Forward-looking: not only skills" section above proposed surfacing private
+*rules* through a `rules/private -> <private-root>/rules` symlink, but flagged the
+loading behavior — recursive discovery, and whether rules need an explicit
+`@`-import — as unchecked: "a direction, not a validated mechanism." That direction
+is now built and validated.
+
+A private rule now lives in the private repo at `rules/<name>.md`, surfaced through
+`dotclaude/rules/private -> <private-root>/rules`. A fresh session's `/context`
+confirms the rule in the loaded set: native memory-directory discovery follows the
+symlink into the private tree and loads the rule with no `@`-import — the same
+passive discovery that loads this repo's own `rules/*.md` (there is no `@`-import in
+the root `CLAUDE.md`). The first such rule is
+the proactive-firing companion to a private skill — the half a skill package cannot
+carry. In a session with the private directory added, the skill it companions loads
+too, making this also the first real private *skill* proven to load from the private
+repo, which validates the original Decision's core premise (a real private skill
+loads cleanly from here), independent of this amendment's rules extension.
+
+**Mechanism.** The private repo's allowlist `.gitignore` re-includes `rules/`,
+alongside the `.claude/`, `ideas/`, and `notes/` it already tracked. The
+`rules/private` symlink is created by the private repo's `make install` — the same
+install path that creates the `ideas` and `notes` symlinks — and is not tracked in
+dotclaude. Because dotclaude's own allowlist re-includes `rules/**`, the symlink
+takes one explicit re-ignore (`/rules/private`) so it is not swept into the public
+tree. That is a single re-ignore for the one symlink, not one per rule: further
+private rules are just files under the already-surfaced directory.
+
+**What this resolves, and what it doesn't.** The Consequences section listed as a
+negative that extending beyond skills "carries its own unvalidated loading
+questions." For rules those questions are answered: recursive discovery works and no
+`@`-import is required. The question the first draft left open — whether a private
+rule loads in a *plain* session with no `--add-dir` — is now settled: it does. A
+plain-`claude` session's `/context` lists the private rule, because the symlink is a
+filesystem fact under `~/.claude` and native discovery follows it regardless of
+`--add-dir` (the file-access grant `--add-dir` adds is not needed to read across it).
+That resolves the privacy question below — not in the reassuring direction. One thing
+does remain open: agents are still unexercised — the same symlink shape is expected
+to work for `agents/private`, but has not been tried.
+
+**Tradeoffs.**
+
+- **Positive:** private behavioral rules gain what the 2026-07-13 amendment gave the
+  working docs — version history, backup, and cross-machine sync — and load
+  automatically once `make install` has run. Before, a private rule had nowhere to
+  live but the public tree or an untracked, single-machine local file.
+- **Neutral:** the private repo's purpose widens once more — from skills incubator
+  (original) to working-doc store (2026-07-13) to now also a home for private
+  behavioral rules. This is consistent with the prior widening, and the same single
+  `make install` carries it.
+- **Negative:** the opt-in property the Decision claims as a Positive — "nothing
+  private surfaces in an ordinary screenshare or shared session" — does *not* hold
+  for symlinked rules the way it holds for skills. Confirmed by a plain-`claude`
+  session: the private rule is in context every session, screenshare included,
+  whether or not the private directory was added. This is accepted as inherent to the
+  symlink mechanism rather than a defect to fix — the mitigation is that rules are
+  behavioral guidance, not the people-knowledge the `private/` convention
+  quarantines, so keeping sensitive specifics out of rule prose bounds the exposure.
+  Private *skills* keep their opt-in loading; private *rules* do not.
