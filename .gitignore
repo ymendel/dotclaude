@@ -20,6 +20,11 @@
 !/rules
 !/rules/**/*
 
+# but NOT rules/private — a local symlink that points outside this repo. The
+# allowlist above would otherwise sweep it in; committing an absolute-path
+# symlink would leak the local path and dangle for anyone cloning.
+/rules/private
+
 # and hooks
 !/hooks
 !/hooks/**/*
