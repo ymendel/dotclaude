@@ -91,6 +91,12 @@ where, so a reader with access can find it — but keep its contents out of this
   history behind a redefined concept, the off-repo knowledge. This is the same explore-first discipline
   as `knowledge-grill`. When a grill is running, this doc is its entry-map output, and the grill has
   already gathered most of the tacit half.
+- **Mark facts by provenance.** Every entry is either read from a source — code, history, an existing
+  doc, with a citation (file, path, commit) — or your own inference not yet confirmed against one. Mark
+  which. It matters most in *Misleading terms*, *Redefined concepts*, and *Fragile areas*, where a
+  confident claim you inferred reads identically to one you verified and the reader can't tell them
+  apart without the mark. This is the same stated-vs-inferred split the people-half keeps, applied to
+  the system facts.
 - **Sort pointers by what's tracked before writing *Where the rest lives*.** Run `git ls-files` /
   `git check-ignore` on the candidates so the tracked-vs-local split is fact, not guess: tracked files
   are the spine, gitignored ones (handoffs, build output, local notes) get the local-only marker or

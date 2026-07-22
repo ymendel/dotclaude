@@ -162,6 +162,12 @@ Write private artifacts to a dedicated directory like `.claude/knowledge-grill/`
 kind of artifact, and handoff tooling that scans it (the `session-handoff` skill's hook, where
 installed) can mistake your notes for a session to resume.
 
+Whichever artifact a fact lands in, mark its provenance — read from code or history (with a citation:
+file, path, commit), stated by the holder, or your own inference not yet confirmed against a source. A
+grilled *why* especially tends to arrive as confident interpretation, so the mark is what lets a
+successor weigh it. This is the same stated-vs-inferred split the people-half uses (above), applied to
+every fact the grill captures.
+
 ## Firing
 
 For *proactive* firing (noticing an exit or handoff on the horizon before anyone asks) and trigger
