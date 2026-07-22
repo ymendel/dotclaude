@@ -23,6 +23,7 @@
       "Bash(git init:*)",
       "Bash(git remote:*)",
       "Bash(git ls-remote:*)",
+      "Bash(git symbolic-ref:*)",
       "Bash(gh:*)",
       "Bash(heroku config:get *)",
       "Bash(heroku help*)",
