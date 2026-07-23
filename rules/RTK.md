@@ -102,6 +102,17 @@ filtering) or the built-in Glob tool. Failure mode this prevents: concluding a f
 here (e.g. "it must be in the home directory") from an `rtk find` miss, when the hook silently
 rewrote `find`→`rtk find` and gitignore hid the file.
 
+**`rtk find` matches a glob *pattern*, not a directory — a third trap, upstream of both filters
+above.** `rtk find <pattern>` globs filenames (grouped by directory), like the built-in Glob tool. It
+is *not* real `find <dir>`, which lists a directory. So `rtk find docs/adr/` treats the directory
+path as a pattern, matches no file *named* that, and returns empty with exit 0 — even when the
+directory is full of tracked files. The hook makes it silent: a bare `find docs/adr/`, typed for
+real-find's listing behavior, gets rewritten to `rtk find docs/adr/` before anyone types `rtk`. To
+list a directory use `rtk ls <dir>` (or `rtk proxy find <dir>`, or Glob `docs/adr/*`). Reserve
+`rtk find` for filename globs like `rtk find '*.md'`. Failure mode this prevents: reading an empty
+`rtk find docs/adr/` as "the files aren't here" and reaching for the gitignore or token-suppression
+explanations above, when neither applies.
+
 ## Golden Rule
 
 **Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
