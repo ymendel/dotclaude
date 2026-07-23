@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 # reflexive-cd-guard.sh — PreToolUse (Bash) guard.
 #
-# Blocks the reflexive `cd` prefix that `feedback.md` ("Don't reflexively cd into
-# the working directory") warns against. The Bash working directory is already the
-# project root and persists across calls, so two shapes are hazards:
+# Blocks the reflexive `cd` prefix into the working directory. The Bash working
+# directory is already the project root and persists across calls, so two shapes
+# are hazards:
 #   - `cd <project-root>` / `cd .` — redundant, and `cd …;` with a redirect trips
 #     a path-resolution approval.
 #   - `cd <project-subdir>` — persists across calls and silently misdirects
 #     cwd-relative tools with no error (a handoff script writing under the wrong
 #     subtree, a relative path resolving against the wrong place).
-# Both are caught. This is the mechanical-gate half of that prose rule, per
-# ADR 0004's rule-vs-hook split (the parsing-hook branch: recognizing the
-# violation needs the project root, richer than a deny glob).
+# Both are caught. Recognizing the violation needs the project root, richer than
+# a deny glob, so this is a parsing hook rather than a settings deny rule.
 #
 # What still passes through (deliberately):
 #   - A reverting subshell `(cd <dir> && <cmd>)` — the command does not START with
@@ -19,17 +18,20 @@
 #     way to run something from another directory.
 #   - `cd ..` / `cd ../sibling` / any target OUTSIDE the project, and `cd -`.
 #   - A target the shell must expand at runtime (`$VAR`, `$(…)`, backticks) — we
-#     cannot resolve it, so we do not guess (except the literal project-root env
-#     var, handled lexically below).
+#     cannot resolve it, so we do not guess. Two exceptions are handled lexically
+#     below: the literal project-root env var, and the
+#     `$(git rev-parse --show-toplevel)` git-root idiom (never legitimate — it
+#     targets the root the shell is already in, and its `$(…)` form otherwise
+#     slips every guard onto an unavoidable approval prompt).
 #   - A `cd` into a subdirectory that does not exist — the real cd would fail and
 #     leave cwd unchanged, so there is no drift to prevent.
 #
-# Block mechanism is exit code 2 (per settings.md, the only hook signal that
-# beats a matching allow rule), matching hooks/uv-run-guard.sh.
+# Block mechanism is exit code 2 — the only hook signal that beats a matching
+# allow rule.
 
 if ! command -v jq &>/dev/null; then
   # Consistent with the other Bash hooks: without jq we cannot parse the input,
-  # so pass through. rtk-rewrite.sh already warns about a missing jq.
+  # so pass through.
   exit 0
 fi
 
@@ -85,6 +87,17 @@ if [ "$target" = "." ] \
   block=true
 fi
 
+# The `cd $(git rev-parse --show-toplevel)` idiom (any quoting) targets the git
+# root — already the shell's cwd, so never legitimate. Its `$(…)`/backtick form
+# makes the physical-path check below skip it, so without this clause it would
+# slip the guard entirely and force an unavoidable "cannot be statically
+# analyzed" approval prompt every time. Matched lexically (the target still
+# carries the substitution text at this point).
+if [ "$block" = false ] && [[ "$target" == *'git rev-parse --show-toplevel'* ]]; then
+  block=true
+  reason="gitroot"
+fi
+
 # Physical-path check (resolves symlinks AND relative targets): catch a cd whose
 # real destination is the project root (redundant) or a subdirectory of it
 # (persists, misdirects cwd-relative tools). This is what catches a cd through the
@@ -111,9 +124,11 @@ fi
 
 [ "$block" = false ] && exit 0
 
-if [ "$reason" = "subdir" ]; then
-  echo "reflexive-cd-guard: blocked. This command \`cd\`s into a project subdirectory, but the Bash working directory persists across calls, so it silently misdirects later cwd-relative tools with no error — the exact failure feedback.md warns about. To run something from another directory, use \`git -C <path>\` / an absolute path, or a reverting subshell \`(cd <dir> && <cmd>)\` — never a bare persistent cd. See feedback.md 'Don't reflexively cd into the working directory.'" >&2
+if [ "$reason" = "gitroot" ]; then
+  echo "reflexive-cd-guard: blocked. This \`cd\`s to \$(git rev-parse --show-toplevel) — the git root, which is already the Bash working directory and persists across calls, so the cd is redundant. Worse, the \$(…) substitution can't be statically analyzed, so it forces a manual approval prompt every time. Run the command directly; if it genuinely needs another directory, pass it explicitly (\`git -C <path>\`, an absolute path)." >&2
+elif [ "$reason" = "subdir" ]; then
+  echo "reflexive-cd-guard: blocked. This command \`cd\`s into a project subdirectory, but the Bash working directory persists across calls, so it silently misdirects later cwd-relative tools with no error. To run something from another directory, use \`git -C <path>\` / an absolute path, or a reverting subshell \`(cd <dir> && <cmd>)\` — never a bare persistent cd." >&2
 else
-  echo "reflexive-cd-guard: blocked. This command prefixes \`cd\` to the project root (or \`.\`), but the Bash working directory is already the project root and persists across calls, so the cd is redundant — and a \`cd …;\` with output redirection trips a path-resolution approval. Run the command directly. If it genuinely needs another directory, pass it explicitly (\`git -C <path>\`, an absolute path) instead of cd-ing. See feedback.md 'Don't reflexively cd into the working directory.'" >&2
+  echo "reflexive-cd-guard: blocked. This command prefixes \`cd\` to the project root (or \`.\`), but the Bash working directory is already the project root and persists across calls, so the cd is redundant — and a \`cd …;\` with output redirection trips a path-resolution approval. Run the command directly. If it genuinely needs another directory, pass it explicitly (\`git -C <path>\`, an absolute path) instead of cd-ing." >&2
 fi
 exit 2
