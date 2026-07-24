@@ -61,6 +61,7 @@
       "WebFetch(domain:developer.mozilla.org)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:docs.github.com)",
       "WebFetch(domain:docs.python.org)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:*.github.io)",
