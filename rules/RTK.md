@@ -38,6 +38,11 @@ instead to get compact output:
 The Edit tool is **not** overridden by RTK — always use Edit (not `sed` via Bash) for
 in-file replacements. `sed -i` is error-prone on macOS and unnecessary when Edit exists.
 
+The same holds for *creating* a file: use the **Write tool**, not `cat > file`/heredoc via Bash.
+A Bash write routes file work through the permission gate Write sidesteps entirely — `cat` isn't
+allow-listed, so it prompts, and `rtk read` is read-only, no help for a write. Write, like Edit,
+never touches the Bash gate.
+
 ### When not to use awk
 
 awk is fine for the genuine case it's built for — a per-line or per-field transformation
@@ -150,9 +155,9 @@ or call `rtk read`, `rtk grep`, `rtk find` directly.
 **heredoc commit slip**: A heredoc-fed `git commit -F - <<'EOF' … EOF` isn't rewritten —
 `rtk rewrite` passes it through (exit 1), so it reaches the permission gate as a bare `git commit`
 and prompts (only `rtk git:*` is allowed — `settings.md` covers why heredoc/substitution forms pass
-through). Write the message to a file and use `rtk git commit -F <file>`, or `rtk git commit -m "…"` —
-single-line forms the rewriter handles. The file form also keeps the message text out of the command
-string, dodging the deny-substring trap.
+through). Create the message file with the **Write tool** (per the file-creation rule above), then
+`rtk git commit -F <file>` — or `rtk git commit -m "…"` for single-line forms the rewriter handles.
+The file form also keeps the message text out of the command string, dodging the deny-substring trap.
 
 **`cd`-strip footgun**: `rtk rewrite` strips a leading `cd <project-root> &&` (the reflexive-cd
 cleanup) by a raw, **non-quote-aware** text match — `rtk rewrite 'cd <project-root> && pwd'` returns
