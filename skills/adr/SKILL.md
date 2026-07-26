@@ -116,6 +116,20 @@ on a genuinely distinct axis — e.g. three options about *how* a class is
 tracked plus a fourth about *which* inputs are allowed — not to pad the list
 with near-duplicates of the same choice.
 
+The sharpest near-duplicate tell: two options that produce the **same
+technical end state** and differ only in **motivation** — one framed as a
+deliberate choice, the other as do-nothing inertia. "Keep X because we might
+want it later" and "keep X because converting is work" are one option (keep
+X), not two; the differing justifications are two *pros of the same option*,
+not two options. When two entries would leave the system in the same state,
+merge them and fold each one's rationale into the merged option's pros. Test
+each option against the others by end state, not by story: if two land the
+system in the same place, they are one option. A binary axis correctly yields
+two options — don't invent a third to hit a count. Failure mode this prevents:
+a motivation-only distinction reads as a real alternative, and a reader trying
+to tell the two apart finds no technical difference to grab, because there
+isn't one.
+
 ## Consequences
 
 What does this make easier, harder, or impossible? Every bullet must
