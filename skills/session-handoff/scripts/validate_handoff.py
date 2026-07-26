@@ -124,9 +124,9 @@ def check_file_references(content: str, base_path: str) -> tuple[list[str], list
     # Pattern 3: path/to/file:123 with line numbers
 
     patterns = [
-        r'\|\s*([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)\s*\|',  # Table cells
-        r'`([a-zA-Z0-9_\-./]+\.[a-zA-Z]+(?::\d+)?)`',  # Inline code
-        r'(?:^|\s)([a-zA-Z0-9_\-./]+\.[a-zA-Z]+:\d+)',  # With line numbers
+        r'\|\s*([a-zA-Z0-9_\-./~]+\.[a-zA-Z]+)\s*\|',  # Table cells
+        r'`([a-zA-Z0-9_\-./~]+\.[a-zA-Z]+(?::\d+)?)`',  # Inline code
+        r'(?:^|\s)([a-zA-Z0-9_\-./~]+\.[a-zA-Z]+:\d+)',  # With line numbers
     ]
 
     found_files = set()
@@ -143,7 +143,10 @@ def check_file_references(content: str, base_path: str) -> tuple[list[str], list
     missing = []
 
     for filepath in found_files:
-        full_path = Path(base_path) / filepath
+        # expanduser so a ~/… home-dir reference resolves instead of being
+        # joined literally onto base_path (Path('/base') / '~/x' == '/base/~/x')
+        # and reported unverified
+        full_path = Path(base_path) / Path(filepath).expanduser()
         if full_path.exists():
             existing.append(filepath)
         else:
