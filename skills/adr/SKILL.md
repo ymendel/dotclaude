@@ -198,6 +198,8 @@ An ADR moves through states:
 
 Only flip `Proposed` → `Accepted` once the implementation has validated the decision. Don't accept prematurely just to mark the document "done" — that forfeits the ability to fix the ADR based on what implementation teaches you.
 
+When you flip to `Accepted`, that status-line change is the whole edit to the ADR. Record *what* validated the decision — the run, the measurement, the round-trip that exercised the premise — in the commit message that makes the flip, not in a block inside the ADR. A dated "validated on X by Y" narrative is a confirmation record: it belongs in git history — where the acceptance commit already sits — not in the ADR's decision prose. If the acceptance seems to need more than the status line to explain itself, that extra belongs in the commit body.
+
 ## Updating an existing ADR
 
 Once an ADR is `Accepted`, it is effectively immutable. The only edits permitted are:
