@@ -1,22 +1,28 @@
 #!/usr/bin/env bash
 # reflexive-cd-guard.sh — PreToolUse (Bash) guard.
 #
-# Blocks the reflexive `cd` prefix into the working directory. The Bash working
-# directory is already the project root and persists across calls, so two shapes
-# are hazards:
+# Blocks the reflexive `cd` prefix into a working directory. The Bash working
+# directory persists across calls, so three shapes are hazards:
 #   - `cd <project-root>` / `cd .` — redundant, and `cd …;` with a redirect trips
 #     a path-resolution approval.
 #   - `cd <project-subdir>` — persists across calls and silently misdirects
 #     cwd-relative tools with no error (a handoff script writing under the wrong
 #     subtree, a relative path resolving against the wrong place).
-# Both are caught. Recognizing the violation needs the project root, richer than
-# a deny glob, so this is a parsing hook rather than a settings deny rule.
+#   - `cd <additional-working-dir>` (or a subdir of one) — an --add-dir path or a
+#     settings.json additionalDirectories entry. Same persist-and-misdirect
+#     hazard, and it lands commands in the WRONG REPO — the drift that ran a
+#     dotclaude `git add` inside secret-dotclaude. The dirs come from
+#     CLAUDE_ADDED_DIRS + settings.json (see the gathering block below).
+# All are caught. Recognizing the violation needs the project root and the added
+# dirs, richer than a deny glob, so this is a parsing hook rather than a settings
+# deny rule.
 #
 # What still passes through (deliberately):
 #   - A reverting subshell `(cd <dir> && <cmd>)` — the command does not START with
 #     `cd`, so the cwd change is scoped and cannot leak. This is the sanctioned
 #     way to run something from another directory.
-#   - `cd ..` / `cd ../sibling` / any target OUTSIDE the project, and `cd -`.
+#   - `cd ..` / `cd ../sibling` / any target OUTSIDE the project AND outside every
+#     additional working dir, and `cd -`.
 #   - A target the shell must expand at runtime (`$VAR`, `$(…)`, backticks) — we
 #     cannot resolve it, so we do not guess. Two exceptions are handled lexically
 #     below: the literal project-root env var, and the
@@ -68,6 +74,33 @@ target=${target%[\"\']}
 CWD=$(jq -r '.cwd // empty' <<<"$INPUT")
 PROJECT="${CLAUDE_PROJECT_DIR:-$CWD}"
 
+# Additional working directories carry the SAME persist-and-misdirect hazard as a
+# project subdir: a bare persistent cd into one silently steers later cwd-relative
+# calls into the wrong tree. Gather them from two sources, because the PreToolUse
+# payload carries neither:
+#   - CLAUDE_ADDED_DIRS — colon-separated, exported by whatever launcher passes
+#     --add-dir (the payload has no field for it, so the launcher must surface it).
+#   - settings.json's permissions.additionalDirectories — the declared list.
+# Both are tilde-expanded and resolved to real paths below; unresolvable or
+# non-existent entries are dropped.
+added_raw=()
+if [ -n "$CLAUDE_ADDED_DIRS" ]; then
+  IFS=':' read -r -a _split <<<"$CLAUDE_ADDED_DIRS"
+  added_raw+=("${_split[@]}")
+fi
+SETTINGS="$HOME/.claude/settings.json"
+if [ -f "$SETTINGS" ]; then
+  while IFS= read -r _dir; do
+    [ -n "$_dir" ] && added_raw+=("$_dir")
+  done < <(jq -r '.permissions.additionalDirectories[]?' "$SETTINGS" 2>/dev/null)
+fi
+added_real=()
+for _a in "${added_raw[@]}"; do
+  _ae=${_a/#\~/$HOME}
+  _ar=$(cd "$_ae" 2>/dev/null && pwd -P)
+  [ -n "$_ar" ] && added_real+=("$_ar")
+done
+
 # Normalize for the lexical checks: expand a leading ~, drop a trailing slash.
 expanded=${target/#\~/$HOME}
 expanded=${expanded%/}
@@ -98,11 +131,13 @@ if [ "$block" = false ] && [[ "$target" == *'git rev-parse --show-toplevel'* ]];
   reason="gitroot"
 fi
 
-# Physical-path check (resolves symlinks AND relative targets): catch a cd whose
-# real destination is the project root (redundant) or a subdirectory of it
-# (persists, misdirects cwd-relative tools). This is what catches a cd through the
-# `~/.claude → dotclaude` symlink alias, whose lexical path never prefix-matches
-# the canonical project root. Skipped for unresolvable runtime expansions.
+# Physical-path check (resolves symlinks AND relative targets): resolve the
+# target's real destination once, then test it against every guarded working root
+# — the project root (redundant if equal, misdirecting if a subdir of it) and each
+# additional working dir (always misdirecting — a separate tree the cwd would
+# silently move into). This is what catches a cd through the `~/.claude →
+# dotclaude` symlink alias, whose lexical path never prefix-matches the canonical
+# project root. Skipped for unresolvable runtime expansions.
 if [ "$block" = false ]; then
   case "$target" in
     *'$'* | *'`'*) : ;; # runtime expansion — cannot resolve, do not guess
@@ -110,12 +145,20 @@ if [ "$block" = false ]; then
       proj_real=$(cd "$proj" 2>/dev/null && pwd -P)
       # Resolve the target relative to the tool's cwd, following symlinks.
       resolved=$(cd "$cwd" 2>/dev/null && cd "$expanded" 2>/dev/null && pwd -P)
-      if [ -n "$resolved" ] && [ -n "$proj_real" ]; then
-        if [ "$resolved" = "$proj_real" ]; then
+      if [ -n "$resolved" ]; then
+        if [ -n "$proj_real" ] && [ "$resolved" = "$proj_real" ]; then
           block=true
-        elif [[ "$resolved" == "$proj_real"/* ]]; then
+        elif [ -n "$proj_real" ] && [[ "$resolved" == "$proj_real"/* ]]; then
           block=true
           reason="subdir"
+        else
+          for _root in "${added_real[@]}"; do
+            if [ "$resolved" = "$_root" ] || [[ "$resolved" == "$_root"/* ]]; then
+              block=true
+              reason="addeddir"
+              break
+            fi
+          done
         fi
       fi
       ;;
@@ -128,6 +171,8 @@ if [ "$reason" = "gitroot" ]; then
   echo "reflexive-cd-guard: blocked. This \`cd\`s to \$(git rev-parse --show-toplevel) — the git root, which is already the Bash working directory and persists across calls, so the cd is redundant. Worse, the \$(…) substitution can't be statically analyzed, so it forces a manual approval prompt every time. Run the command directly; if it genuinely needs another directory, pass it explicitly (\`git -C <path>\`, an absolute path)." >&2
 elif [ "$reason" = "subdir" ]; then
   echo "reflexive-cd-guard: blocked. This command \`cd\`s into a project subdirectory, but the Bash working directory persists across calls, so it silently misdirects later cwd-relative tools with no error. To run something from another directory, use \`git -C <path>\` / an absolute path, or a reverting subshell \`(cd <dir> && <cmd>)\` — never a bare persistent cd." >&2
+elif [ "$reason" = "addeddir" ]; then
+  echo "reflexive-cd-guard: blocked. This command \`cd\`s into an additional working directory (an --add-dir path or a settings.json additionalDirectories entry), but the Bash working directory persists across calls, so it silently misdirects later cwd-relative tools with no error — the exact drift that lands a command in the wrong repo. To run something there, use \`git -C <path>\` / an absolute path, or a reverting subshell \`(cd <dir> && <cmd>)\` — never a bare persistent cd." >&2
 else
   echo "reflexive-cd-guard: blocked. This command prefixes \`cd\` to the project root (or \`.\`), but the Bash working directory is already the project root and persists across calls, so the cd is redundant — and a \`cd …;\` with output redirection trips a path-resolution approval. Run the command directly. If it genuinely needs another directory, pass it explicitly (\`git -C <path>\`, an absolute path) instead of cd-ing." >&2
 fi
