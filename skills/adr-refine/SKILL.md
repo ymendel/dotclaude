@@ -56,6 +56,9 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 ### Codebase inconsistencies
 - {claim in the ADR} vs {what the code actually shows, with file:line reference}
 
+### House-style divergences
+- {draft's formatting or voice} vs {the neighboring ADR's, with its path} → {the fix}
+
 ### Questions for you
 1. {direct question about an ambiguity — do not guess}
 2. ...
@@ -86,6 +89,8 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 **Questions you shouldn't paper over.** If something is ambiguous, ask. Do not guess and do not fabricate context. A short list of direct questions is more valuable than a long draft that hides its assumptions.
 
 **Link hygiene.** If this ADR supersedes or builds on a prior one, is it linked? If another ADR in the repo covers overlapping ground, flag the overlap.
+
+**House-style divergences.** The presence checks above (labeled consequences, marked options) verify *that* the markers exist — this verifies the draft's *formatting* matches neighboring ADRs. Actually open one existing ADR in the same directory and compare: are Pros/Cons rendered as bulleted lists or crammed into a prose line? Are options headed `**Option A: … (chosen).**` or `#### Option 1`? Lettered or numbered? A draft that carries every required marker but formats them differently from its neighbors still reads as foreign. Match the neighbor, or flag the divergence. Sweep the prose voice too — punctuation and phrasing the author avoids in durable byline output (an ADR is byline output). Do this against a neighbor actually read this pass, not from memory of the house style.
 
 ## Applying edits after the user responds
 
