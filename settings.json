@@ -30,6 +30,7 @@
       "Bash(heroku logs:*)",
       "Bash(heroku ps:*)",
       "Bash(heroku releases:*)",
+      "Bash(bundle show:*)",
       "Bash(chmod +x:*)",
       "Bash(jq:*)",
       "Bash(which:*)",
