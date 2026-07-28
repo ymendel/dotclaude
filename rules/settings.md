@@ -106,6 +106,21 @@ Failure mode: dropping skill-related permissions into a project's `.claude/setti
 
 For paths in skill-related permissions, leading `**` lets a single global rule cover any project: `Write(**/.claude/handoffs/*.md)` matches a handoffs directory in every project the skill is used from.
 
+## Organizing the allow list
+
+Claude Code ignores the order of `allow` entries — the layout exists only for human scanning. Keep it so a reader can find an entry and knows where a new one goes:
+
+- **Group by tool**, in the order the tool name sorts: `Bash` → `Edit` → `Read` → `Skill` → `WebFetch`. Separate the tool groups with a blank line.
+- **Within `Bash`**, keep two groups: the general commands (alphabetical), then the skill-script runners (`python3 …/scripts/…`, `uv run …/scripts/…`) as a separate trailing group.
+- **Within `Edit` / `Read`**: alphabetical.
+- **Within `WebFetch`**: group by ecosystem or vendor — all Anthropic/Claude together, all GitHub together, all Ruby together, &c. Which ecosystem a domain serves is a **judgment call**. Order *within* a group is mechanical — a **reversed-label sort** (compare domains right-to-left: TLD, then registrable name, then subdomain), so `github.com` sorts before `docs.github.com`, and a `.com` domain before a `.org` one. Do **not** blank-line-separate the WebFetch sub-groups — they're contiguous runs inside the one `WebFetch` block.
+
+The split is deliberate: only *group assignment* needs a human, everything else is reproducible. Cross-group order (which ecosystem leads) is curated too — append a new group where it reads well rather than re-sorting the existing ones.
+
+**Blank-line separators are cosmetic.** JSON has no comments, so a blank line is the only visual separator available — but any reformatter (prettier, `jq` piped to file, editor format-on-save) strips blank lines inside an array. Never rely on them structurally — they are a reading aid a format pass will silently erase.
+
+Failure mode this prevents: without recording the convention, the next reorg "helpfully" collapses the whole array into one mechanical sort, destroying the ecosystem grouping — scattering `rubydoc.info` away from `rubygems.org` and `*.github.io` away from `github.com`, the exact adjacencies the layout was built to create.
+
 ## Skill-Script Permissions — Frontmatter `allowed-tools` vs. settings.json
 
 A skill's script can be auto-allowed two ways, and they differ in *scope*:
