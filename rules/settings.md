@@ -62,12 +62,12 @@ Claude Code splits a compound Bash command on `|`, `&&`, and `;` and evaluates *
 
 RTK adds a wrinkle, doing its own segment-aware check before Claude Code sees the command — and it treats shapes differently:
 
-- **Pipe with a leading command RTK recognizes** — it rewrites the head (leaving the tail bare) and checks *every* segment against the allow rules: exit 0 (auto-allow) only when all match, otherwise exit 3 (prompt). `gh pr list | grep open` → exit 0; `git show HEAD --stat | sort` → exit 3, because `sort` has no allow rule.
+- **Pipe with a leading command RTK recognizes** — it rewrites the head (leaving the tail bare) and checks *every* segment against the allow rules: exit 0 (auto-allow) only when all match, otherwise exit 3 (prompt). `gh pr list | grep open` → exit 0. `git show HEAD --stat | sort` → exit 3, because `sort` has no allow rule.
 - **Command substitution (`$(...)`, backticks), an `xargs` or loop body, or a pipe/chain whose commands RTK doesn't recognize** — `rtk rewrite` returns exit 1 (passthrough), and Claude Code's own flow then runs on the bare command, splitting it the same per-segment way. So `gh pr create --body "$(…)"` and `which echo && echo done` are decided by Claude Code, not RTK.
 
 Either path needs every segment individually allowed. The rewrite gaps are tracked upstream in rtk-ai/rtk (#1252, #2425, #1347, #1560).
 
-Implication for the allow list: a `Bash(rtk X:*)` rule does **not** cover `X` used inside a compound command — only the standalone, rewritten `rtk X …` form. To auto-allow a safe command in compound usage (pipes, substitutions, heredoc-bodied `gh` calls), add a **bare** `Bash(X:*)` rule alongside the `rtk X:*` one. Do this only for commands safe in every form (`grep` — read-only; `gh` — destructive subcommands fenced by deny rules). Do **not** blanket-allow a command with destructive flags (`find -delete`, `find -exec`) without pairing the allow with deny carve-outs.
+Implication for the allow list: a `Bash(rtk X:*)` rule does **not** cover `X` used inside a compound command — only the standalone, rewritten `rtk X …` form. To auto-allow a safe command in compound usage (pipes, substitutions, heredoc-bodied `gh` calls), add a **bare** `Bash(X:*)` rule alongside the `rtk X:*` one. Do this only for commands safe in every form — `grep` (read-only) and `gh` (destructive subcommands fenced by deny rules). Do **not** blanket-allow a command with destructive flags (`find -delete`, `find -exec`) without pairing the allow with deny carve-outs.
 
 Failure mode this prevents: assuming `rtk gh:*` (or `rtk find:*`, `rtk grep:*`) covers those tools everywhere, then being surprised by a prompt on a PR-created-with-a-heredoc-body or a `find | grep` pipeline — because a segment lacks an allow rule (RTK demotes the pipe to a prompt, or Claude Code's per-segment check fails on a passthrough command).
 
@@ -75,7 +75,7 @@ Failure mode this prevents: assuming `rtk gh:*` (or `rtk find:*`, `rtk grep:*`) 
 
 Claude Code matches a command against the allow rules *statically*, before the shell expands anything. When the command contains expansion it can't resolve ahead of time — a bare `$VAR` (which the parser labels `simple_expansion`), `${VAR}`, or `$(...)`/backtick substitution — the evaluator can't safely match it against an allow rule, so it prompts. That prompt offers only **Yes / No**: there is no "don't ask again" option, because Claude Code won't persist an allow rule for a command whose real content is computed at runtime. The absence of the "don't ask again" line is the tell that expansion, not a missing allow entry, is the cause.
 
-So: when a command will face the permission gate, prefer an expansion-free form. Running two checks as two plain commands carries no expansion; folding them into a `for … do … $(…) … done` loop does — and the loop is the convenient reach that trips the guard. Split it into plain commands when the task is just a status check or a small comparison. (This is also why command substitution shows up under "How Claude Code Matches Compound Commands" above: RTK passes it through, then Claude Code's own per-segment evaluation hits the same wall.)
+So: when a command will face the permission gate, prefer an expansion-free form. Running two checks as two plain commands carries no expansion. Folding them into a `for … do … $(…) … done` loop does — and the loop is the convenient reach that trips the guard. Split it into plain commands when the task is just a status check or a small comparison. (This is also why command substitution shows up under "How Claude Code Matches Compound Commands" above: RTK passes it through, then Claude Code's own per-segment evaluation hits the same wall.)
 
 Failure mode this prevents: reaching for a bash loop with command substitution on a task discrete commands handle, hitting an un-suppressible prompt, and assuming the permission *config* is at fault — when the cause is the expansion in the command that got written.
 
@@ -128,7 +128,7 @@ A skill's script can be auto-allowed two ways, and they differ in *scope*:
 - **`settings.json` allow rule** — always in effect, no matter who invokes the script.
 - **Skill frontmatter `allowed-tools`** — in effect *only while that skill is active*. Per the [docs](https://code.claude.com/docs/en/skills), it "grants permission for the listed tools while the skill is active, so Claude can use them without prompting you for approval. It does not restrict which tools are available."
 
-Do not invert this. `allowed-tools` *pre-approves* — it is not "the only tools this skill may use." Every tool stays callable; listed ones just skip the prompt while the skill runs. The field that *restricts* is `disallowed-tools`, which removes tools from the pool while the skill is active.
+Do not invert this. `allowed-tools` *pre-approves* — it is not "the only tools this skill may use." Every tool stays callable — listed ones just skip the prompt while the skill runs. The field that *restricts* is `disallowed-tools`, which removes tools from the pool while the skill is active.
 
 Choosing the home:
 
@@ -169,9 +169,9 @@ rtk read "$(ls -t "$HOME/Library/Application Support/rtk/tee/"*.log | head -1)"
 
 A `PreToolUse` hook can force a command to be blocked even when a `permissions.allow` rule would auto-approve it — but **only by exiting with code 2** (a "blocking hook"). A JSON `hookSpecificOutput.permissionDecision: "deny"` does **not** override a matching allow rule: per the [docs](https://code.claude.com/docs/en/permissions), hook decisions don't bypass permission rules, so a matching `allow` wins against a hook's JSON `deny`. Exit code 2 is the exception — it stops the tool call *before* permission rules are evaluated, so it beats `allow`.
 
-PreToolUse hooks do run on every tool call, allowlisted ones included — an allow match doesn't skip the hook. So the hook always gets its say; the only question is which blocking mechanism it uses, and only exit 2 is authoritative over an allow rule.
+PreToolUse hooks do run on every tool call, allowlisted ones included — an allow match doesn't skip the hook. So the hook always gets its say. The only question is which blocking mechanism it uses, and only exit 2 is authoritative over an allow rule.
 
-The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message; the safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
+The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message. The safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
 
 Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule. The JSON `deny` field does not. (The docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
 
