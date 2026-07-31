@@ -18,6 +18,16 @@ When editing skill frontmatter descriptions, always quote the value as a YAML st
 
 The repository history captures the details — just report what changed and summarize.
 
+## Disambiguate global vs. project scope before editing
+
+When the user refers to "the rule", "the skill", "settings.json", "the hook", or a similar artifact that exists in both global (`~/.claude/...`) and project-local (`.claude/...`, `CLAUDE.md`) forms, ask which scope is meant before editing — unless the surrounding context makes it unambiguous (e.g., the user just opened the global file, or just named a project-only artifact).
+
+**Why:** Ambiguity here has consistently produced edit-and-revert cycles where Claude guessed the wrong scope. The user shouldn't have to talk like a robot ("the global naming-analyzer skill") to keep Claude from guessing — one disambiguating question is cheaper than a wrong edit.
+
+**How to apply:** A one-line question is enough: "Global `~/.claude/settings.json` or project `.claude/settings.json`?" Do not begin editing or searching until the scope is settled. When the context truly is unambiguous, proceed without asking — over-asking is its own friction.
+
+**Exception — the `dotclaude` repo itself:** `~/.claude` is a symlink to this repo (per its Makefile). The two paths are one tree, one set of files — there is no global-vs-project distinction to resolve. Don't diff `~/.claude/X` against `dotclaude/X`, and don't ask which scope. Editing either edits the live config. When the answer to "how do these two paths relate" is wanted, it's structural (the symlink) and documented (Makefile, README) — reach for those, not an empirical diff. See `settings.md`'s `~/.claude → dotclaude` section for the permission-matching consequences of the symlink.
+
 ## Get it down first, refine later
 
 When changing a rule or skill, prioritize getting the substance down over polishing the specifics — exact wording, section placement, cross-references, heading style. The configuration is under version control and the user runs his own refinement pass in the dotclaude project, so a recorded-but-rough change beats a delayed-but-polished one. Capture the lesson while the context that exposed it is still fresh.
@@ -75,3 +85,9 @@ When reviewing skills, rules, or their interactions, evaluate against these four
 - **Contradictions**: Do two sources give conflicting instructions? Resolve to a single authoritative source.
 - **Effectiveness**: Will the skill/rule actually fire in the situations it's meant for? Check trigger language and workflow integration.
 - **Completeness**: Does anything important fall through the gaps between skills/rules?
+
+## Show templates in full, don't compress them
+
+When reviewing or designing a skill, "don't restate what Claude already knows" (the standard knowledge-delta rubric) applies to *concepts and procedures*, not to *templates and reference artifacts*. A template is the artifact the model is supposed to produce — showing it in full is what makes the output reliable. Compressing it to "you know the standard shape, right?" risks drift in exactly the parts that matter (heading capitalization, status vocabulary, section ordering, project-specific overlays like a required prefix or label).
+
+**How to apply:** When skill-judge or any similar review flags a section as "Claude already knows this", ask whether the section is a *template/example to copy* or *guidance to internalize*. If template/example, the right action is keep-and-tighten (drop redundant examples, keep the canonical one), not compress-to-pointer. If guidance, the standard compression rule applies.
