@@ -41,6 +41,8 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
 **`RTK.md`** — Usage guide for RTK (Rust Token Killer), a token-optimized CLI proxy. Covers the hook scope limitation (Bash only, not built-in tools), the override for file/search operations, and command reference by workflow.
 
+**`tool-and-shell-safety.md`** — Operating the shell and file tools without silent misfires: don't reflexively `cd` into the working directory (gated by `reflexive-cd-guard.sh`), don't escape inside single-quoted heredocs, verify where an assembled Write path actually landed, and copy off-disk-only state before overwriting it when a pending decision depends on it.
+
 **`settings.md`** — Gotchas for `settings.json`: tilde vs. `$HOME` in path fields, `*` vs. `**` in permission globs, and backslash-escaped whitespace triggering permission dialogs.
 
 **`long-form-output.md`** — When a turn's output is long enough that the user would have to scroll back and forth in the conversation to re-read it, write it to a file and post a short pointer in the chat instead of dumping it inline. Covers what counts as "long enough", what doesn't need a file, and the file-plus-pointer pattern.
