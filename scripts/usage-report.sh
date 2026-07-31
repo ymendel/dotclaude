@@ -2,11 +2,13 @@
 # Report how much of this repo's setup (skills and agents) actually gets used,
 # by scanning Claude Code session transcripts for invocations.
 #
-# Transcripts rotate (~30 days of retention), so a single scan can only ever
-# show usage within that window. To watch the trend over a longer horizon, each
-# run appends a dated snapshot to a cumulative history file — the transcripts
-# themselves can't preserve history past the rotation window, but the snapshot
-# log can.
+# Transcripts rotate, so a single scan only sees recent sessions. Counts are
+# restricted to a fixed lookback (WINDOW_DAYS, default 30) so every run measures
+# the same span and the label can't drift with retention quirks. Even so, a run
+# made late undercounts — transcripts that rotated out before the scan are gone.
+# So don't compare raw counts between two runs; watch the trend in the
+# cumulative history file (usage-data/usage-history.tsv), which keeps one dated
+# snapshot per run past the rotation horizon.
 
 set -euo pipefail
 
@@ -14,10 +16,12 @@ usage() {
   cat <<'EOF'
 Usage: usage-report.sh [options]
 
-Scan Claude Code transcripts and report invocation counts for every skill
-(skills/<name>/) and agent (agents/<name>.md) in this repo, highlighting the
-ones that went unused in the available window. Appends a dated snapshot to the
-history file so usage can be tracked over time despite transcript rotation.
+Scan Claude Code transcripts from the last WINDOW_DAYS and report invocation
+counts for every skill (skills/<name>/) and agent (agents/<name>.md) in this
+repo, highlighting the ones that went unused in that window. Appends a dated
+snapshot to the history file so the trend can be tracked despite transcript
+rotation — read the TSV for the trend rather than comparing raw counts between
+two runs, which drift as transcripts rotate.
 
 Options:
   --no-snapshot   Print the report but do not append to the history file.
@@ -28,6 +32,9 @@ Environment:
                   Default: the parent of this script's directory.
   PROJECTS_DIR    Where Claude Code stores session transcripts.
                   Default: $HOME/.claude/projects
+  WINDOW_DAYS     Fixed lookback in days for counting transcripts. Default: 30.
+                  Keeps the window constant across runs so counts stay
+                  comparable regardless of when the run happens.
   HISTORY_FILE    Cumulative snapshot log (TSV).
                   Default: $REPO/usage-data/usage-history.tsv
 
@@ -56,6 +63,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="${REPO:-$(dirname "$SCRIPT_DIR")}"
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/.claude/projects}"
 HISTORY_FILE="${HISTORY_FILE:-$REPO/usage-data/usage-history.tsv}"
+WINDOW_DAYS="${WINDOW_DAYS:-30}"
+
+if ! [[ "$WINDOW_DAYS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "error: WINDOW_DAYS must be a positive integer, got: $WINDOW_DAYS" >&2
+  exit 2
+fi
 
 SKILLS_DIR="$REPO/skills"
 AGENTS_DIR="$REPO/agents"
@@ -82,37 +95,43 @@ fi
 # Portable mtime (BSD stat first, then GNU).
 file_mtime() { stat -f '%m' "$1" 2>/dev/null || stat -c '%Y' "$1" 2>/dev/null; }
 
-# --- Gather invocation counts from transcripts -----------------------------
-# Skills appear as "skill":"<name>"; agents as "subagent_type":"<name>".
-declare -A skill_counts agent_counts
-while read -r cnt name; do
-  [[ -n "${name:-}" ]] && skill_counts["$name"]=$cnt
-done < <(grep -rohI '"skill":"[a-z0-9_-]\+"' "$PROJECTS_DIR" 2>/dev/null \
-           | sed 's/.*"skill":"//; s/"$//' | sort | uniq -c)
-while read -r cnt name; do
-  [[ -n "${name:-}" ]] && agent_counts["$name"]=$cnt
-done < <(grep -rohI '"subagent_type":"[a-z0-9_-]\+"' "$PROJECTS_DIR" 2>/dev/null \
-           | sed 's/.*"subagent_type":"//; s/"$//' | sort | uniq -c)
+# --- Window (fixed lookback) -----------------------------------------------
+# Count only transcripts modified within the last WINDOW_DAYS, so every run
+# measures the same span. This fixes a bug in an earlier version: it counted
+# every surviving transcript and labelled the span by min/max file date, so a
+# run made after some transcripts had rotated out could show a *longer* labelled
+# window with *fewer* counts than a prior run. A fixed lookback can't recover
+# rotated data, but it keeps the window — and the label — constant across runs.
+now_ts="$(date '+%s')"
+cutoff_ts=$(( now_ts - WINDOW_DAYS * 86400 ))
+total_files=$(find "$PROJECTS_DIR" -name '*.jsonl' | wc -l | tr -d ' ')
+mapfile -t window_files < <(
+  find "$PROJECTS_DIR" -name '*.jsonl' -print0 \
+    | xargs -0 stat -f '%m %N' 2>/dev/null \
+    | awk -v cutoff="$cutoff_ts" '$1 >= cutoff { sub(/^[0-9]+ /, ""); print }'
+)
+n_files="${#window_files[@]}"
+window_start="$(date -r "$cutoff_ts" '+%Y-%m-%d' 2>/dev/null || true)"
+window_end="$(date '+%Y-%m-%d')"
 
 # --- Inventory -------------------------------------------------------------
 mapfile -t skills < <(find "$SKILLS_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)
 mapfile -t agents < <(find "$AGENTS_DIR" -maxdepth 1 -mindepth 1 -name '*.md' ! -name 'README.md' -exec basename {} .md \; | sort)
 
-# --- Window ----------------------------------------------------------------
-n_files=$(find "$PROJECTS_DIR" -name '*.jsonl' | wc -l | tr -d ' ')
-oldest_ts=""; newest_ts=""
+# --- Gather invocation counts from in-window transcripts -------------------
+# Skills appear as "skill":"<name>"; agents as "subagent_type":"<name>".
+declare -A skill_counts agent_counts
 if [[ "$n_files" -gt 0 ]]; then
-  read -r oldest_ts newest_ts < <(
-    find "$PROJECTS_DIR" -name '*.jsonl' -print0 \
-      | xargs -0 -n1 stat -f '%m' 2>/dev/null \
-      | sort -n | sed -n '1p;$p' | paste -sd' ' -
-  )
-fi
-window_start="n/a"; window_end="n/a"; window_days="?"
-if [[ -n "$oldest_ts" && -n "$newest_ts" ]]; then
-  window_start="$(date -r "$oldest_ts" '+%Y-%m-%d' 2>/dev/null || true)"
-  window_end="$(date -r "$newest_ts" '+%Y-%m-%d' 2>/dev/null || true)"
-  window_days=$(( (newest_ts - oldest_ts) / 86400 ))
+  while read -r cnt name; do
+    [[ -n "${name:-}" ]] && skill_counts["$name"]=$cnt
+  done < <(printf '%s\0' "${window_files[@]}" \
+             | xargs -0 grep -ohI '"skill":"[a-z0-9_-]\+"' 2>/dev/null \
+             | sed 's/.*"skill":"//; s/"$//' | sort | uniq -c)
+  while read -r cnt name; do
+    [[ -n "${name:-}" ]] && agent_counts["$name"]=$cnt
+  done < <(printf '%s\0' "${window_files[@]}" \
+             | xargs -0 grep -ohI '"subagent_type":"[a-z0-9_-]\+"' 2>/dev/null \
+             | sed 's/.*"subagent_type":"//; s/"$//' | sort | uniq -c)
 fi
 
 # --- Report a section ------------------------------------------------------
@@ -166,8 +185,9 @@ report_external() {
 
 # --- Output ----------------------------------------------------------------
 echo "${BOLD}Usage report — dotclaude skills & agents${RESET}"
-echo "Transcripts: ${n_files} files in ${PROJECTS_DIR}"
-echo "Window: ${window_start} → ${window_end} (~${window_days}d) — counts below cover this window only."
+echo "Transcripts in window: ${n_files} (of ${total_files} present) in ${PROJECTS_DIR}"
+echo "Window: last ${WINDOW_DAYS}d (${window_start} → ${window_end})."
+echo "${DIM}Retention-limited — a run made late undercounts as transcripts rotate out. Track the trend in the history TSV; don't compare raw counts across runs.${RESET}"
 echo
 
 report_section "SKILLS" skill_counts "${skills[@]}"
