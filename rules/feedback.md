@@ -28,14 +28,6 @@ This is not an always-do. Routine overwrites of regenerable or uninteresting fil
 
 **How to apply:** when about to overwrite or discard uncommitted/untracked/scratch state, ask whether any decision currently in play — especially an option you just offered — would want to read that exact state later. If yes, copy it to a scratch path first (project `tmp/`, the session scratchpad). This composes with `honesty.md`'s *Surface Doubts Your Own Correction Reveals* — both catch an action that undermines a position you just took. That rule catches it in prose, this one catches it in a destructive file operation.
 
-## Don't put decision-critical detail only in an AskUserQuestion preview — previews clip at a height you can't see
-
-When passing `preview` content on an AskUserQuestion option, never rely on the preview to carry information the user needs in order to choose. The picker renders previews in a pane sized to the user's terminal — a height you can't observe — and clips overflow to a "N lines hidden" marker with no scroll. On a short terminal even a two-or-three-line preview can collapse to a single visible line, so no preview length reliably fits.
-
-**Why:** the available height of the preview pane can't be detected, so there's no judging what length will fit — even a two-or-three-line preview can collapse to a single visible line. The user can enlarge the pane, but that's not something to count on or measure.
-
-**How to apply:** treat previews as an optional visual aid whose absence would not block the decision — a mockup or snippet the user compares *if* it renders. Keep everything load-bearing (what each option means, tradeoffs, the recommendation) in the chat message accompanying the question, where nothing is clipped. When in doubt, skip the preview and rely on labels + descriptions + prose framing in chat.
-
 ## A malformed path won't error in Write the way it does in the shell — verify where it landed
 
 File tools take absolute paths. Build each one clean from the project root. Don't splice a `../` segment into the middle. Such a path resolves differently depending on who handles it, and Write is the permissive one:
@@ -46,11 +38,3 @@ File tools take absolute paths. Build each one clean from the project root. Don'
 So Write offers *less* protection than a shell command here, not more. After writing to any path you assembled rather than copied verbatim from a known-good source, confirm it landed where intended — a quick `ls` of the expected path — instead of trusting the success message.
 
 **How to apply:** build file-tool paths as clean absolutes from the project root, no `..` segments. Treat a mid-path `..` as a signal to re-derive, not submit. After any assembled Write, `ls` the location — Write's success confirms *a* write happened, not that it happened where you meant.
-
-## Don't point at tool output as a shared visible surface
-
-When claiming there's a finding to see — "the standout is X", "as the table above shows", "the output confirms" — reproduce the load-bearing part *in the chat message itself*. Do not reference "the table above" / "the output above" pointing at a Bash result or other tool output. Tool outputs are not a reliable shared surface: depending on the user's interface they may be collapsed, scrolled off, or not rendered as the model imagined (a sorted plaintext dump is not a "table" the user sees). So "see above" points at something the user may not have in front of them.
-
-**Why:** this has recurred — the user flags "another time you said there's something to see and I don't see it." The model treats its own tool output as if it were part of the conversation the user reads, but the user reads the *messages*. A claimed-visible finding whose data lives only in a tool result is, to the user, an assertion with no visible support.
-
-**How to apply:** when a tool call produces data a decision rides on, restate the load-bearing part in the message — a short markdown table, the ranked list, the specific numbers — even if it duplicates the tool output. The tool output is scratch. The message is the artifact. Sibling of the AskUserQuestion-preview lesson above (decision-critical detail must live where the user reliably sees it, not in a clipped preview) and of `long-form-output.md` (which governs *where* long content goes — file vs. inline; this governs *not* offloading a visible claim onto ephemeral tool output at all).
