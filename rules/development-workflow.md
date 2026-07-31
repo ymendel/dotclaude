@@ -82,6 +82,14 @@ Specific case: "block this PR", "comment on this PR", "label this PR", "approve 
     - **FIXME**: definitely broken, but may not need to worry about it right now
     - **TBD**: uncertainty about an implementation, behavior, conceptual understanding, &c.
 
+## Documentation
+
+When a setup or operational doc needs the reader to obtain an environment-specific value (an ID, mapping key, token-equivalent, &c. that differs across environments and isn't part of baseline or seed data), check first whether existing tooling already produces or can produce that value as part of its normal output. If it does, structure the documented workflow around that output: run the tool → read the values from its output → plug them back in → continue. Only fall back to "look it up in the admin UI" when no tooling path exists.
+
+**Why:** the reflex when writing "you need value X" is to point the reader at the external system that owns X. That works but costs context switches, makes the doc dependent on whatever the external UI looks like this week, and breaks when the reader doesn't have access to that UI. Tooling output as the source of truth has fewer moving parts, fewer stale screenshots, and the workflow becomes self-checking — if the value the tooling shows doesn't match what's expected, the discrepancy is visible in the same shell session.
+
+**How to apply:** at any setup step that says (or wants to say) "now go look up X in <admin UI>", ask: does any command we already document for this system surface X — even as part of error output, an "unmatched" / "diff" / "stale" report, a dry-run, or a list/inspect mode? If yes, restructure the step to use that command's output. The structure usually looks like: (1) run command — produces output listing the needed values; (2) update local data with those values; (3) re-run command — now succeeds. Honest about its own limits: when no tooling path exists, the admin-UI lookup is the right answer, not a fallback to apologize for.
+
 ## Refactoring
 
 - Refactor correctively (to fix a real problem) or when there's a clear benefit — not as routine hygiene or speculation about future needs.

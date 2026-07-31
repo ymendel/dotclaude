@@ -20,14 +20,6 @@ In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content li
 
 **How to apply:** When writing inside `<<'EOF'`, write content as-is. The single-quoted delimiter is the explicit "treat this as a string literal" signal, so escaping inside it always overshoots. If you find yourself reaching for a backslash inside a heredoc, check the opening — if it's `'EOF'`, don't. (The same caution applies in reverse to `<<EOF` without quotes, where backticks and dollar signs *do* need escaping if you want them literal.)
 
-## Surface env-specific values via tooling output
-
-When a setup or operational doc needs the reader to obtain an environment-specific value (an ID, mapping key, token-equivalent, &c. that differs across environments and isn't part of baseline or seed data), check first whether existing tooling already produces or can produce that value as part of its normal output. If it does, structure the documented workflow around that output: run the tool → read the values from its output → plug them back in → continue. Only fall back to "look it up in the admin UI" when no tooling path exists.
-
-**Why:** the reflex when writing "you need value X" is to point the reader at the external system that owns X. That works but costs context switches, makes the doc dependent on whatever the external UI looks like this week, and breaks when the reader doesn't have access to that UI. Tooling output as the source of truth has fewer moving parts, fewer stale screenshots, and the workflow becomes self-checking — if the value the tooling shows doesn't match what's expected, the discrepancy is visible in the same shell session.
-
-**How to apply:** at any setup step that says (or wants to say) "now go look up X in <admin UI>", ask: does any command we already document for this system surface X — even as part of error output, an "unmatched" / "diff" / "stale" report, a dry-run, or a list/inspect mode? If yes, restructure the step to use that command's output. The structure usually looks like: (1) run command — produces output listing the needed values; (2) update local data with those values; (3) re-run command — now succeeds. Honest about its own limits: when no tooling path exists, the admin-UI lookup is the right answer, not a fallback to apologize for.
-
 ## Copy off-disk state before overwriting it when a pending decision depends on it
 
 Before overwriting or discarding on-disk-only state — uncommitted working-tree changes, gitignored or untracked files, scratch output — that an open decision or a proposed next step depends on, save a copy aside first. Git won't recover it: `git checkout` / `cp`-to-restore reflexes assume the thing being clobbered lives in history, and this state doesn't. The sharpest trigger is overwriting the very artifact an option *you just proposed* would need — that action quietly kills your own proposal.
