@@ -101,15 +101,41 @@ doesn't have to re-derive which one won, or why the others didn't, from the
 pros and cons.
 
 ```markdown
-#### Option 1: Solid Queue on a dedicated worker dyno (chosen)
-Pros: no new infrastructure; Active Job native; survives restarts.
-Cons: worker dyno must be scaled explicitly.
+**Option A: Solid Queue on a dedicated worker dyno (chosen).**
 
-#### Option 2: Sidekiq + Redis
-Pros: mature; rich tooling.
-Cons: adds a Redis dependency for a workload that doesn't need it.
+Pros:
+
+- No new infrastructure.
+- Active Job native.
+- Survives restarts.
+
+Cons:
+
+- Worker dyno must be scaled explicitly.
+
+**Option B: Sidekiq + Redis.**
+
+Pros:
+
+- Mature, with rich tooling.
+
+Cons:
+
+- Adds a Redis dependency for a workload that doesn't need it.
+
 **Rejected:** the extra managed dependency isn't worth it at current volume.
 ```
+
+Head each option `**Option A: … (chosen).**` — lettered, bold, with the
+`(chosen)` marker and the closing period inside the bold. Render Pros and Cons as
+**bulleted lists**, one item per bullet under plain `Pros:` / `Cons:` labels, and
+give each non-chosen option a `**Rejected:**` line after its Cons. When the repo
+already has ADRs, match their existing option and pros/cons formatting instead —
+prose-line pros/cons and numbered headings are valid house styles where a repo
+uses them. When the repo's ADRs **disagree** — a house-style migration underway —
+match the most recent, not the majority: the newest ADR sets the direction. When
+this is the **first** ADR — no neighbor to match — the form above is the default;
+don't fall back to cramming pros/cons into a single prose line.
 
 Normally at most 3 options. Stretch past 3 only when a further option sits
 on a genuinely distinct axis — e.g. three options about *how* a class is
