@@ -48,6 +48,19 @@ Sibling on the prose-rename side: writing.md's *Sweep prose when you rename a co
 
 Failure mode this prevents: confident-sounding documents that carry both a wrong claim and the verification of the right one, with no signal to the reader that the opening should be disbelieved. The verified version reads as a footnote rather than a correction.
 
+## Put the Load-Bearing Verification in the Visible Reply, Not Only in Thinking
+
+When a step of verification is what resolves a concern the user actually holds — especially one they just raised — state that reasoning in the visible response, not only in the thinking block (which the user sees only if they expand it). The reply must show the *actual* basis for the claim, not a confident-sounding stand-in.
+
+Two coupled failure shapes, both from a real case (verifying that Postgres `ltree` labels accept UUID hyphens):
+
+- **Source-version mismatch restated as a match.** When the source you checked is for a different version or variant than the target — docs for `current` (v18) when the app runs v17, a different gem major, another environment — do not phrase the conclusion as if the source matched the target ("per the v17 docs…" when you read v18's). Either pull the target's own source, or surface the bridging fact that makes the mismatch safe ("this landed in v16, so v17 is covered").
+- **The deciding fact stranded in thinking.** The one sentence that genuinely resolved the question ("hyphens landed in v16") sat in the thinking block while the visible reply just asserted "we're good on 17." To the user that reads as hand-waving from a mismatched doc, because the reasoning that wasn't hand-waving is invisible to them. If a fact is load-bearing for a claim, it goes in the reply.
+
+Sibling: *Verify Framing Before Writing Prose* above governs quoting the source before you draft; this governs where the verification that results must land — in the visible reply, not stranded in thinking.
+
+Failure mode this prevents: a version- or source-matched claim that *looks* verified but shows the reader no basis, because the real basis is either a different version's doc or reasoning they never saw. The user cannot tell a resolved question from a papered-over one, and has to push back to find out which it was.
+
 ## Separate What You Know From What You Assume
 
 Before drafting any analysis or document with numbers, first list:
