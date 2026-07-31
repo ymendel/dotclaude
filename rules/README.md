@@ -45,7 +45,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`settings.md`** — Gotchas for `settings.json`: tilde vs. `$HOME` in path fields, `*` vs. `**` in permission globs, and backslash-escaped whitespace triggering permission dialogs.
 
-**`long-form-output.md`** — When a turn's output is long enough that the user would have to scroll back and forth in the conversation to re-read it, write it to a file and post a short pointer in the chat instead of dumping it inline. Covers what counts as "long enough", what doesn't need a file, and the file-plus-pointer pattern.
+**`long-form-output.md`** — Where content the user must read or decide on has to live so they reliably see it. Main case: long output goes to a file with a short pointer in chat, not dumped inline. Also covers two non-file cases — a decision-critical AskUserQuestion option and a claimed-visible finding — which belong in the chat message itself, not a clipped preview or ephemeral tool output.
 
 **`writing.md`** — User-specific writing preferences that supplement the `writing-clearly-and-concisely` skill: avoid violent metaphors and military or war-origin idioms (including "in anger"); emulate the user's voice when appropriate (register, archaic Latin abbreviations like `&c.`, `viz.`, `cf.`), without mirroring his lowercase prompting shorthand in formal output.
 

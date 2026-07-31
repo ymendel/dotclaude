@@ -1,8 +1,8 @@
 # Long-Form Output
 
-When a turn's output is long enough that the user would have to scroll back and forth in the conversation to re-read or compare sections, write it to a file and post a short pointer in the chat instead of dumping it inline.
+The principle: **content the user needs in order to read or decide must live where they reliably see it.**
 
-This started with long output, but the principle underneath is broader: **content the user needs in order to read or decide must live where they reliably see it.** When it's long, that means a file (below). When it's a claimed-visible finding or a decision-critical option, it means the chat message itself — never an ephemeral tool result or a preview pane that clips. The last two sections cover those non-file cases.
+The main case is long output: when a turn's output is long enough that the user would have to scroll back and forth in the conversation to re-read or compare sections, write it to a file and post a short pointer in the chat instead of dumping it inline. The two non-file cases — a decision-critical option and a claimed-visible finding — get their own sections near the end: those belong in the chat message itself, never in an ephemeral tool result or a preview pane that clips.
 
 ## What counts as long enough
 
