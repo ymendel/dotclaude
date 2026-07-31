@@ -52,3 +52,11 @@ Common cases where this trap shows up:
 - Caches (`Rails.cache`, Redis, fragment caches) — a record updates while a cached projection of it stays stale.
 - ENV vars / platform config vars — most platforms apply changes on process or dyno restart, not immediately to running processes.
 - Feature flag stores or configuration that snapshots at boot rather than re-reading at runtime.
+
+## Pasted terminal output may be redacted — a placeholder credential inverts the apparent result
+
+When the user pastes command output, secrets are often edited out before sharing — a real token replaced with a joke or placeholder value (`adtk_nicetry`, `adtk_nope`, `xxx`, `<token>`, `REDACTED`). Read a transparently-fake credential as a *redaction signal*, not as the literal value that ran. The trap is when the redacted credential flips what the output means: an obviously-fake token sitting next to a `200 OK` reads as "invalid token got through" (alarming) when the truth is "valid token was swapped out for the paste" (nothing wrong).
+
+**Why:** the model over-indexes on the alarming status line and under-weights that the credential is plainly not real. A genuine invalid-token test uses a *plausible-but-wrong* value, not a pun. `nicetry`/`nope` are tells that the user substituted them.
+
+**How to apply:** when a pasted result would be alarming *only if a specific credential in it were real*, and that credential looks placeholder/joke/redacted, ask the one-line question first — "did you redact those tokens?" — before mounting an expensive investigation (booting a repro server, a git-history dig). Still flag a genuinely alarming result (honesty.md's surface-doubts posture holds — don't stay silent on a possible auth bypass), but flag-and-ask is cheaper than flag-and-reproduce. This is the paste-redaction cousin of the "Validate a probe's detector" section above: here the "detector" is the pasted output, and a redacted value is a known way it lies.
