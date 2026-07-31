@@ -80,6 +80,10 @@ This is adjacent to "Do not mirror his prompting register" (in `rules/references
 
 Failure mode this prevents: speculative restructuring for an imagined agent reader, producing prose that reads as ghostwritten to the human reader and saves no real effort for the agent reader (who would have done fine with the prose).
 
+## Markdown authoring mechanics
+
+When producing markdown for a strict renderer — a committed doc, a README, a PR body, an IDE preview — a small set of fragile constructs (fenced code inside a list item, an inline fence marker in prose, tables holding block content, &c.) render differently across implementations or break outright, and markdown never errors to warn you. The full list, the why, and the formatting discipline are in `rules/references/writing/markdown-authoring.md`. Load it when generating markdown bound for a durable deliverable.
+
 ## Emulating the user's voice
 
 When writing in the user's voice — drafting a message *from* him, ghostwriting a comment he'll post, or any output where the goal is to sound like Yossef rather than to serve a broader audience — match the register described below. This also governs anything under his byline that serves a reader (a commit message, a PR description, a doc), which is most sessions.
