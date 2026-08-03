@@ -62,6 +62,8 @@ To pick the next number:
 
 **Gotcha:** duplicate numbers happen when branches are merged out of order. If you find two files with the same number already in the tree, note it to the user but don't try to renumber — renumbering breaks inbound links. Just use the next unused number.
 
+**Gaps are fine — don't renumber to close them.** A number reserved on an unmerged branch, or a draft that was parked or abandoned, leaves a gap in the sequence (0007, then 0010). That is expected: the number is an immutable identity, not an index into a dense array, so a gap is not a defect to repair. Never renumber a later ADR down to fill an earlier gap — it breaks the same inbound links (commits, PRs, cross-references) the duplicate case warns about, and it erases the history that a decision was once drafted there. The real hazard is the opposite case — a *collision*, two unmerged branches grabbing the same next number — which the duplicate-number gotcha above covers. When a gap reflects reserved-on-a-branch numbers, note them to the user so the jump reads as intentional rather than as a missing record. Failure mode this prevents: renumbering to make the sequence gapless, which dangles every reference to the moved ADR for zero functional gain.
+
 ## Filename format
 
 `NNNN-kebab-case-title.md` — derived from the title, under ~60 characters. Strip articles (`a`, `the`), drop punctuation, lowercase. Example: `0008-tour-data-sync.md`.
