@@ -19,6 +19,7 @@ The main case is long output: when a turn's output is long enough that the user 
 ## How to apply
 
 - Pick a sensible path inside the project (`docs/`, alongside related artifacts, `.claude/handoffs/` for handoffs, `.claude/reviews/` for code reviews). Don't create a new top-level directory.
+- When the file is one the user will *open and act on directly* — a rebase message sheet, a command list, anything they'll paste or run from their own terminal — put it one step from the project root where they can reach it (`.claude/`, which is globally gitignored, or a gitignored `tmp/`), not the session scratchpad. The scratchpad is the model's working directory; a deep `/private/tmp/claude-.../` path forces the user to copy a long string just to see what they were handed, and the bare repo root clutters the tree. Failure mode: an artifact meant *for the user* lands where only the model navigates comfortably, and the user is left asking "where is it?" before they can use it.
 - Write the file, then post a short pointer in the chat: filename, one to three sentences of framing, and the specific things to look at. The pointer goes in the chat, the content goes in the file.
 - If the output is genuinely throwaway / one-shot and unlikely to be re-read, ask before creating the file rather than defaulting to one.
 
