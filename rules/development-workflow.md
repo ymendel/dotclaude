@@ -84,6 +84,23 @@ Specific case: "block this PR", "comment on this PR", "label this PR", "approve 
 
 ## Documentation
 
+### Keep documentation current with the change that touches it
+
+When a change touches something that is or should be documented, update the documentation in the same change — not in a follow-up, not "later." Two triggers, both firing without being asked:
+
+- **The change alters something a doc already covers.** An env var's meaning or default shifts, a deployment step changes, a glossary term's definition moves, a config knob is renamed. The doc is now wrong until it's updated, and a confidently-wrong doc is worse than a missing one.
+- **The change introduces something that *should* be documented but isn't yet.** A new required env var, a new setup or deploy step, a new domain term, a new operational gotcha. The absence of an existing entry is not permission to skip — if a reader would need it, it needs a home.
+
+**Why:** people and agents arriving at the system need a central-ish place — the README, the setup doc, the glossary — that tells them what matters, rather than reconstructing it by grepping the codebase and digging through git history. Every fact that lives only in code or only in a commit message is a fact the next reader has to excavate. Documentation is the index that spares them the dig; a change that moves the code without moving the index silently degrades that index.
+
+**How to apply:** before considering a change done, ask two questions — *does this contradict something currently documented?* (if so, fix the doc) and *does this add something a newcomer would need and can't easily find?* (if so, document it). The README is the usual home and the usual miss — check it specifically. When unsure whether something rises to doc-worthy, prefer the central doc over leaving it for rediscovery.
+
+Sibling: honesty.md's *Rewrite the Prose When Verification Disagrees* is the narrower case — when a verification pass contradicts existing prose, fix the prose rather than layering the correction beside it. Same "the doc is now wrong, update the doc" shape; this rule generalizes it from *verification found a conflict* to *any change touched documented ground*.
+
+**Failure mode this prevents:** the code moves and the docs don't, so the README, setup guide, or glossary drifts into being confidently wrong or conspicuously incomplete. The cost lands on every future reader — and on the user, who otherwise keeps having to notice the omission and ask for the update by hand, the exact reminder-loop this rule exists to remove.
+
+### Source environment-specific values from tooling output
+
 When a setup or operational doc needs the reader to obtain an environment-specific value (an ID, mapping key, token-equivalent, &c. that differs across environments and isn't part of baseline or seed data), check first whether existing tooling already produces or can produce that value as part of its normal output. If it does, structure the documented workflow around that output: run the tool → read the values from its output → plug them back in → continue. Only fall back to "look it up in the admin UI" when no tooling path exists.
 
 **Why:** the reflex when writing "you need value X" is to point the reader at the external system that owns X. That works but costs context switches, makes the doc dependent on whatever the external UI looks like this week, and breaks when the reader doesn't have access to that UI. Tooling output as the source of truth has fewer moving parts, fewer stale screenshots, and the workflow becomes self-checking — if the value the tooling shows doesn't match what's expected, the discrepancy is visible in the same shell session.
