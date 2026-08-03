@@ -37,6 +37,13 @@ instead to get compact output:
 
 The Edit tool is **not** overridden by RTK — always use Edit (not `sed` via Bash) for
 in-file replacements. `sed -i` is error-prone on macOS and unnecessary when Edit exists.
+This covers **appending** too: to add to an existing file, Edit anchored on its last
+unique line (or Read-then-Write for a full rewrite) — never a shell redirect
+(`printf … >> file`, `echo … >> file`, `cat >> file`). The append case is the easy slip,
+because it reads as "just adding text" rather than "editing a file"; it is the latter. The
+tell is escaping content to survive the shell — the `'"'"'`-style apostrophe contortion, or
+backslash-escaping quotes/`$`/backticks — which the file tools never require. A shell
+redirect also routes through the permission gate the file tools sidestep.
 
 The same holds for *creating* a file: use the **Write tool**, not `cat > file`/heredoc via Bash.
 A Bash write routes file work through the permission gate Write sidesteps entirely — `cat` isn't
