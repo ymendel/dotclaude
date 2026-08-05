@@ -16,7 +16,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`code-style-ruby.md`** — Ruby and Rails conventions: instance-oriented design, no metaprogramming, Symbol#to_proc, aesthetic preferences, Rake task syntax, and verifying model names before scripting against them. Path-scoped to `*.rb`, `*.rake`, `*.erb`, `Gemfile`, and `Rakefile`.
 
-**`development-workflow.md`** — How work should be approached: planning vs. spikes, ADRs over proprietary plan modes, git discipline (small commits, specific staging, amend recent changes, draft PRs), review scope, refactoring policy, and commenting conventions.
+**`development-workflow.md`** — How work should be approached: planning vs. spikes, ADRs over proprietary plan modes, git discipline (small commits, specific staging, amend recent changes, draft PRs), durable references (reference by stable identity, not volatile locator — files, commits, ADRs, GitHub issues), review scope, refactoring policy, and commenting conventions.
 
 **`diagnosis.md`** — Diagnose before retrying. When a command fails or gives unexpected output, reason about why before issuing variants — including not routing around the user's shell configuration to silence a symptom. Includes specific cases for git tree-ish ambiguity and RTK diff filtering.
 
