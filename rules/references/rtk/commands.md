@@ -108,6 +108,22 @@ rtk init                # Add RTK instructions to CLAUDE.md
 rtk init --global       # Add RTK to ~/.claude/CLAUDE.md
 ```
 
+**Reading `rtk discover` output:** the "missed savings" totals are an upper bound — the tool reads
+pre-hook transcript commands, so commands the hook *did* rewrite still show up as if they ran
+un-RTK'd. The adoption-rate number is accurate (post-hook execution). The missed-savings total is
+not a measurement. Known upstream and extensively reported.
+
+## Installation and Troubleshooting
+
+```bash
+rtk --version         # Should show: rtk X.Y.Z
+rtk gain              # Should work (not "command not found")
+which rtk             # Verify correct binary
+```
+
+⚠️ **Name collision**: If `rtk gain` fails, you may have reachingforthejack/rtk (Rust Type Kit)
+installed instead.
+
 ## Token Savings Overview
 
 | Category | Commands | Typical Savings |
