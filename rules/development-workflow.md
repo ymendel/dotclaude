@@ -61,6 +61,8 @@ In any artifact with readers off your machine — PR description, ADR, issue, co
 
 Where the volatile locator is genuinely useful, pair it with the stable one: a SHA quoted alongside its subject line still resolves by meaning after the hash is gone.
 
+Naming an unreachable file is fine. Linking it is not. A file the reader can't open — private, gitignored, in a companion repo — is often still worth naming, and a code-span mention (`` `parked-ideas.md` ``) carries the information without promising a destination. A markdown link makes that promise and breaks it, and the reader learns nothing except that the document is wrong. So mention freely, and link only what `git ls-files` confirms.
+
 Failure mode this prevents: the reader follows the reference, finds nothing, and either loses the context it was meant to carry or has to ask. Most common with handoffs and punchlist files written under `.claude/` mid-session, then name-dropped in a PR body without the location qualifier.
 
 ## User's Independent Habits
