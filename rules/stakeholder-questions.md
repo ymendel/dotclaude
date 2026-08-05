@@ -44,25 +44,9 @@ When the question touches a concept that has both a project-internal name and an
 
 This is small but compounds. Describing concepts from scratch when the stakeholder already has a word for them reads as either condescending (you're explaining their own work back to them) or as missing the existing shared vocabulary (in which case the rest of the question is built on uncertain ground).
 
-## Worked example: temporal information on records
+## Worked examples
 
-When a record's state changes over time, the implementation choices are:
-
-1. No time tracking.
-2. A single timestamp per record (e.g., `updated_at`).
-3. A validity range per record (valid-from / valid-to).
-4. A full history of changes (audit log, event sourcing).
-
-Plus cross-cutting choices that apply regardless of which of the above is chosen: nullability, overlap rules, gap rules, edge handling.
-
-These are not the questions to ask. The behavior questions that point us toward the right implementation are:
-
-1. Do you need to see how things looked at a particular past time, or are you only ever concerned with what's valid right now?
-2. If you need history, do you need to operate on snapshots ("what was the state on March 1?") or on validity ranges ("this rate is in effect from X to Y")?
-3. Can two things apply at the same time? (i.e., are overlapping ranges meaningful?)
-4. Is something always in effect, or can there be a gap with nothing valid?
-
-The answers settle the implementation without asking the stakeholder to think about it. These also belong in the **Context** section of an ADR, feeding the Decision.
+Fully worked cases — an implementation menu, the behavior questions that settle it without putting the menu in front of the stakeholder, and where the answers land in an ADR — are in `rules/references/stakeholder-questions/worked-examples.md`. Load it when you are about to compose an outward question on a topic it covers, or when you want a model to imitate for a topic it doesn't. Currently one case: temporal information on records (history, snapshots vs. validity ranges, overlaps, gaps).
 
 ## Failure mode this prevents
 
