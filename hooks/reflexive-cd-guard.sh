@@ -26,11 +26,17 @@
 #   - A target the shell must expand at runtime (`$VAR`, `$(…)`, backticks) — we
 #     cannot resolve it, so we do not guess. Two exceptions are handled lexically
 #     below: the literal project-root env var, and the
-#     `$(git rev-parse --show-toplevel)` git-root idiom (never legitimate — it
-#     targets the root the shell is already in, and its `$(…)` form otherwise
-#     slips every guard onto an unavoidable approval prompt).
+#     `$(git rev-parse --show-toplevel)` git-root idiom (redundant while the shell
+#     sits at that root, and its `$(…)` form otherwise slips every guard onto an
+#     unavoidable approval prompt). Both are gated on the shell actually being at
+#     the project root — see the recovery carve-out below.
 #   - A `cd` into a subdirectory that does not exist — the real cd would fail and
 #     leave cwd unchanged, so there is no drift to prevent.
+#   - `cd <project-root>` when the shell is NOT already there — a RECOVERY, not a
+#     reflex. Several shapes pass by design (a target outside every guarded root,
+#     `cd ..`, `cd -`, an unresolvable runtime expansion), and any of them strands
+#     cwd for the rest of the session. Blocking the way back would make this guard
+#     trap the very drift it exists to warn about.
 #
 # Block mechanism is exit code 2 — the only hook signal that beats a matching
 # allow rule.
@@ -127,23 +133,44 @@ cwd=${CWD%/}
 block=false
 reason="root"
 
-# Lexical reflex checks (do not require the target to exist): cd to `.`, the
-# project-root env var, or the literal project-root / cwd path.
-if [ "$target" = "." ] \
-  || [ "$target" = '$CLAUDE_PROJECT_DIR' ] \
-  || [ "$target" = '${CLAUDE_PROJECT_DIR}' ] \
-  || { [ -n "$proj" ] && [ "$expanded" = "$proj" ]; } \
-  || { [ -n "$cwd" ] && [ "$expanded" = "$cwd" ]; }; then
+# Resolve both roots up front, because whether a cd to the project root is a
+# redundant reflex or a legitimate RECOVERY depends on where the shell actually
+# is. The guard's own premise — "you are already at the project root" — is not
+# always true: a cd that escaped this guard (one targeting a path outside every
+# guarded root, which passes by design) leaves cwd stranded elsewhere for the rest
+# of the session. `cd <project-root>` is then the only way back, so blocking it
+# unconditionally makes the guard trap the very drift it warns about.
+proj_real=$(cd "$proj" 2>/dev/null && pwd -P)
+cwd_real=$(cd "$cwd" 2>/dev/null && pwd -P)
+at_project_root=false
+[ -n "$proj_real" ] && [ "$cwd_real" = "$proj_real" ] && at_project_root=true
+
+# Always-redundant targets: a no-op no matter where the shell sits. Still worth
+# blocking from a stranded cwd, but the reason differs there — the shell is not at
+# the project root, so the default message's "already the project root" would be
+# false. Switch to `noop`, whose message says what is actually true and points at
+# the recovery.
+if [ "$target" = "." ] || { [ -n "$cwd" ] && [ "$expanded" = "$cwd" ]; }; then
+  block=true
+  [ "$at_project_root" = true ] || reason="noop"
+# Project-root targets — reflexive only when already there (see above).
+elif [ "$at_project_root" = true ] \
+  && { [ "$target" = '$CLAUDE_PROJECT_DIR' ] \
+    || [ "$target" = '${CLAUDE_PROJECT_DIR}' ] \
+    || { [ -n "$proj" ] && [ "$expanded" = "$proj" ]; }; }; then
   block=true
 fi
 
 # The `cd $(git rev-parse --show-toplevel)` idiom (any quoting) targets the git
-# root — already the shell's cwd, so never legitimate. Its `$(…)`/backtick form
-# makes the physical-path check below skip it, so without this clause it would
-# slip the guard entirely and force an unavoidable "cannot be statically
-# analyzed" approval prompt every time. Matched lexically (the target still
-# carries the substitution text at this point).
-if [ "$block" = false ] && [[ "$target" == *'git rev-parse --show-toplevel'* ]]; then
+# root, which while the shell sits at the project root is its own cwd — a no-op.
+# Its `$(…)`/backtick form makes the physical-path check below skip it, so without
+# this clause it would slip the guard entirely and force an unavoidable "cannot be
+# statically analyzed" approval prompt every time. Matched lexically (the target
+# still carries the substitution text at this point). Gated on `at_project_root`
+# for the same reason as the checks above: from a stranded cwd this idiom is one of
+# the ways back, and it is also what keeps the message below true whenever it fires.
+if [ "$block" = false ] && [ "$at_project_root" = true ] \
+  && [[ "$target" == *'git rev-parse --show-toplevel'* ]]; then
   block=true
   reason="gitroot"
 fi
@@ -159,12 +186,16 @@ if [ "$block" = false ]; then
   case "$target" in
     *'$'* | *'`'*) : ;; # runtime expansion — cannot resolve, do not guess
     *)
-      proj_real=$(cd "$proj" 2>/dev/null && pwd -P)
       # Resolve the target relative to the tool's cwd, following symlinks.
       resolved=$(cd "$cwd" 2>/dev/null && cd "$expanded" 2>/dev/null && pwd -P)
       if [ -n "$resolved" ]; then
         if [ -n "$proj_real" ] && [ "$resolved" = "$proj_real" ]; then
-          block=true
+          # Same recovery carve-out as the lexical check above. Spelled as a full
+          # `if` rather than a `&&` one-liner so the branch cannot leave a
+          # non-zero status as the enclosing block's result.
+          if [ "$at_project_root" = true ]; then
+            block=true
+          fi
         elif [ -n "$proj_real" ] && [[ "$resolved" == "$proj_real"/* ]]; then
           block=true
           reason="subdir"
@@ -188,6 +219,8 @@ if [ "$reason" = "gitroot" ]; then
   echo "reflexive-cd-guard: blocked. This \`cd\`s to \$(git rev-parse --show-toplevel) — the git root, which is already the Bash working directory and persists across calls, so the cd is redundant. Worse, the \$(…) substitution can't be statically analyzed, so it forces a manual approval prompt every time. Run the command directly; if it genuinely needs another directory, pass it explicitly (\`git -C <path>\`, an absolute path)." >&2
 elif [ "$reason" = "subdir" ]; then
   echo "reflexive-cd-guard: blocked. This command \`cd\`s into a project subdirectory, but the Bash working directory persists across calls, so it silently misdirects later cwd-relative tools with no error. To run something from another directory, use \`git -C <path>\` / an absolute path, or a reverting subshell \`(cd <dir> && <cmd>)\` — never a bare persistent cd." >&2
+elif [ "$reason" = "noop" ]; then
+  echo "reflexive-cd-guard: blocked. This \`cd\`s to the directory the shell is already in, so it is a no-op — and a \`cd …;\` with output redirection trips a path-resolution approval. Run the command directly. Note the working directory is NOT the project root right now, so a relative path resolves against \`$cwd\`; if you meant to return to the root, \`cd $proj\` is allowed." >&2
 elif [ "$reason" = "addeddir" ]; then
   echo "reflexive-cd-guard: blocked. This command \`cd\`s into an additional working directory (an --add-dir path or a settings.json additionalDirectories entry), but the Bash working directory persists across calls, so it silently misdirects later cwd-relative tools with no error — the exact drift that lands a command in the wrong repo. To run something there, use \`git -C <path>\` / an absolute path, or a reverting subshell \`(cd <dir> && <cmd>)\` — never a bare persistent cd." >&2
 else
