@@ -29,11 +29,15 @@ The directory is intentionally outside version control (the allowlist `.gitignor
 
 ## When to check
 
-When a question or task has plausibly accumulated cross-project wisdom — defaults for a new project of type X, a known quirk of tool Y, a pattern that's bit you before — check the relevant file in `~/.claude/notes/` before answering. Don't read the whole directory preemptively. Reach for it the same way you'd reach for a skill or rule when the topic is relevant.
+When a question or task has plausibly accumulated cross-project wisdom — defaults for a new project of type X, a known quirk of tool Y, a pattern that's bit you before — read `~/.claude/notes/README.md` before answering. It is a one-line-per-note index, so the whole directory's contents cost one read. Open the linked file only when the topic matches. Don't read the notes themselves preemptively. Reach for the index the same way you'd reach for a skill or rule when the topic is relevant.
+
+The index makes the *look* cheap — it cannot make the look happen. Like `parked-ideas.md`, this still depends on noticing that a topic might have accumulated something — the same recognition failure that hooks exist to route around. It is strictly better than judging 25-odd filenames from a directory listing, and it is not a structural guarantee.
 
 ## When to file
 
 When the project-notes recognition triggers fire (see `project-notes.md`) but the finding generalizes beyond the current project AND no upstream / template / external destination exists yet, file under `~/.claude/notes/`. Surface the filing briefly to the user — same one-line "filed under <path>" pattern as the project-notes skill uses.
+
+**Filing a new note means adding its line to `notes/README.md` in the same edit** — name plus a one-line hook, in the matching group. A note absent from the index is a note the *When to check* step above will not find, which defeats the filing. Adding to an existing note needs an index line only if the hook no longer covers what the file holds. Keep content out of the index — the note file is where substance lives.
 
 ## Failure mode this prevents
 
