@@ -88,12 +88,29 @@ if [ -n "$CLAUDE_ADDED_DIRS" ]; then
   IFS=':' read -r -a _split <<<"$CLAUDE_ADDED_DIRS"
   added_raw+=("${_split[@]}")
 fi
-SETTINGS="$HOME/.claude/settings.json"
-if [ -f "$SETTINGS" ]; then
+# The three settings scopes a shell hook can read, not just the global one: a
+# project may declare additionalDirectories in either project-level file, and a
+# declared-but-unread dir is a cd this guard lets through — the drift it exists to
+# stop. Insurance against that, not an observed pattern — the dir actually guarded
+# in this repo arrives via CLAUDE_ADDED_DIRS above.
+#
+# A fourth scope, managed/enterprise policy, is skipped: it can arrive as an MDM
+# plist or a server-delivered policy with no file to read, so no shell hook covers
+# it in general. There is no user-level settings.local.json — .local is
+# project-only.
+#
+# Unioned, not resolved by precedence: Claude Code lets a higher-precedence scope
+# override a lower one, so this can guard a dir that resolution would have dropped.
+# It over-guards, never under-guards — the right direction for a guard to err.
+for SETTINGS in \
+  "$HOME/.claude/settings.json" \
+  "${PROJECT%/}/.claude/settings.json" \
+  "${PROJECT%/}/.claude/settings.local.json"; do
+  [ -f "$SETTINGS" ] || continue
   while IFS= read -r _dir; do
     [ -n "$_dir" ] && added_raw+=("$_dir")
   done < <(jq -r '.permissions.additionalDirectories[]?' "$SETTINGS" 2>/dev/null)
-fi
+done
 added_real=()
 for _a in "${added_raw[@]}"; do
   _ae=${_a/#\~/$HOME}
