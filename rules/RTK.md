@@ -125,6 +125,21 @@ list a directory use `rtk ls <dir>` (or `rtk proxy find <dir>`, or Glob `docs/ad
 `rtk find docs/adr/` as "the files aren't here" and reaching for the gitignore or token-suppression
 explanations above, when neither applies.
 
+**`rtk grep` swallows some short flags — `-h` prints rtk's help instead of suppressing filenames,
+and exits 0 doing it.** rtk's own options shadow grep's, so `-h` (help), `-m` (max results) and
+`-t` (file type) never reach grep. `-l` is the exception that makes guessing unsafe: rtk defines it
+too (max line length) and yet it *does* reach grep, so which flags leak cannot be read off rtk's
+`--help`. Position counts as much as the flag — only a *leading* flag hits rtk's parser, and the
+same flag placed after the pattern and paths passes through and works. The exit code is what keeps
+this quiet, because the help path returns 0, so a chained `rtk grep -h … && <next>` runs on as
+though the search succeeded. Three fixes, cheapest first. Use the long form (`grep --no-filename`),
+which code-style.md wants anyway and rtk passes through untouched. Move the short flag after the
+positional args. Or go around the wrapper with `rtk proxy grep`. Verified on rtk 0.44.2 and for
+`grep` alone — other subcommands define their own short flags, so assume nothing about which of
+theirs leak. Failure mode this prevents: reading rtk's usage block as "I got the grep syntax wrong"
+and retyping variants when the flag was correct and never arrived — or taking the exit 0 for a
+successful search that found nothing.
+
 ## Golden Rule
 
 **Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
