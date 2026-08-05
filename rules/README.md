@@ -39,7 +39,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 **`rule-maintenance.md`** — Procedures for making corrections: where to edit skills and rules, YAML quoting requirements, feedback routing, permissions allow list, keeping `rules/README.md` up to date, and criteria for reviewing skills and rules.
 
 **`feedback.md`** — Overflow for rules and feedback that don't fit an existing rule file. Periodically reviewed for extraction into topic-specific files.
-**`RTK.md`** — Usage guide for RTK (Rust Token Killer), a token-optimized CLI proxy. Covers the hook scope limitation (Bash only, not built-in tools), the override for file/search operations, and command reference by workflow.
+**`RTK.md`** — Usage guide for RTK (Rust Token Killer), a token-optimized CLI proxy. Covers the hook scope limitation (Bash only, not built-in tools), the override for file/search operations, when not to reach for awk, and the golden rule plus its passthrough exceptions. Command tables and install troubleshooting are in `references/rtk/commands.md`; the `find`/`grep` empty-result traps are in `references/rtk/traps.md`, pointed at from the rule.
 
 **`tool-and-shell-safety.md`** — Operating the shell and file tools without silent misfires: don't reflexively `cd` into the working directory (gated by `reflexive-cd-guard.sh`), don't escape inside single-quoted heredocs, verify where an assembled Write path actually landed, and copy off-disk-only state before overwriting it when a pending decision depends on it.
 

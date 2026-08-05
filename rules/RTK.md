@@ -75,52 +75,15 @@ for that anyway. Do not retry `rtk git diff` variants expecting different output
 go through the same filter. `git show` cannot substitute: it only shows committed changes,
 not working tree differences.
 
-`rtk find` suppresses output the same way — fine for navigating ("does this directory have
-a README?"), wrong when an exact count or full list matters. Counting via
-`rtk find ... | wc -l` returns the *filtered* count and silently underreports the real one.
-When the answer feeds a quantitative check — file counts after a copy, an audit of every
-match, anything where a decision rides on the total — use `rtk proxy find` instead. Failure
-mode this prevents: a filtered `find | wc -l` looks authoritative and makes plausible-but-wrong
-counts feel like ground truth, leading to false alarms (or worse, missed real ones) when the
-delta between filtered and real is large.
-
-**`rtk find` also respects `.gitignore` — a distinct trap from the token-suppression above.**
-It omits gitignored paths entirely, not just some lines of output. In a repo that is
-gitignored-by-default (this repo, `dotclaude`, uses an allowlist `.gitignore` per ADR 0003 — only
-explicitly re-included paths are tracked), that means a `find` for anything *not* on the allowlist
-(a stray PDF, a scratch note, a downloaded asset dropped into the tree) comes back empty even
-though the file is sitting right there. The empty result reads as "file absent" when the truth is
-"file present but gitignored." When searching for a file that may not be tracked — and especially
-in an allowlist repo, where *most* files aren't — use `rtk proxy find` (raw `find`, no gitignore
-filtering) or the built-in Glob tool. Failure mode this prevents: concluding a file doesn't exist
-here (e.g. "it must be in the home directory") from an `rtk find` miss, when the hook silently
-rewrote `find`→`rtk find` and gitignore hid the file.
-
-**`rtk find` matches a glob *pattern*, not a directory — a third trap, upstream of both filters
-above.** `rtk find <pattern>` globs filenames (grouped by directory), like the built-in Glob tool. It
-is *not* real `find <dir>`, which lists a directory. So `rtk find docs/adr/` treats the directory
-path as a pattern, matches no file *named* that, and returns empty with exit 0 — even when the
-directory is full of tracked files. The hook makes it silent: a bare `find docs/adr/`, typed for
-real-find's listing behavior, gets rewritten to `rtk find docs/adr/` before anyone types `rtk`. To
-list a directory use `rtk ls <dir>` (or `rtk proxy find <dir>`, or Glob `docs/adr/*`). Reserve
-`rtk find` for filename globs like `rtk find '*.md'`. Failure mode this prevents: reading an empty
-`rtk find docs/adr/` as "the files aren't here" and reaching for the gitignore or token-suppression
-explanations above, when neither applies.
-
-**`rtk grep` swallows some short flags — `-h` prints rtk's help instead of suppressing filenames,
-and exits 0 doing it.** rtk's own options shadow grep's, so `-h` (help), `-m` (max results) and
-`-t` (file type) never reach grep. `-l` is the exception that makes guessing unsafe: rtk defines it
-too (max line length) and yet it *does* reach grep, so which flags leak cannot be read off rtk's
-`--help`. Position counts as much as the flag — only a *leading* flag hits rtk's parser, and the
-same flag placed after the pattern and paths passes through and works. The exit code is what keeps
-this quiet, because the help path returns 0, so a chained `rtk grep -h … && <next>` runs on as
-though the search succeeded. Three fixes, cheapest first. Use the long form (`grep --no-filename`),
-which code-style.md wants anyway and rtk passes through untouched. Move the short flag after the
-positional args. Or go around the wrapper with `rtk proxy grep`. Verified on rtk 0.44.2 and for
-`grep` alone — other subcommands define their own short flags, so assume nothing about which of
-theirs leak. Failure mode this prevents: reading rtk's usage block as "I got the grep syntax wrong"
-and retyping variants when the flag was correct and never arrived — or taking the exit 0 for a
-successful search that found nothing.
+**An empty or thin `rtk find` / `rtk grep` result is a wrapper artifact before it is an answer.**
+Four separate mechanisms in these two commands turn a real match into a clean-looking miss — token
+suppression, `.gitignore` filtering, a glob-vs-directory mismatch, and short flags consumed before
+they reach the tool. None of them errors, and two are documented to return exit 0 while producing
+nothing, so the result reads as the answer. **Load `rules/references/rtk/traps.md` before concluding
+a file or match isn't there, and before retrying with a different flag** — it maps each symptom to
+its mechanism and its escape (`rtk proxy …`, `rtk ls`, the built-in Glob tool, long-form flags).
+Failure mode this prevents: a filtered or gitignored miss is taken as ground truth, and the next
+step is built on "that file isn't here" or "nothing matches" when both are false.
 
 ## Golden Rule
 
@@ -171,5 +134,11 @@ heredoc, a quoted argument — has it silently removed, corrupting the command. 
 naive-string-manipulation family as the deny-substring trap (`settings.md`) and the two slips above;
 same mitigation — keep that literal substring out of the command text (pass via a file, reword).
 
-When you need an RTK command or flag not covered above, load the full reference (read it on demand): `rules/references/rtk/commands.md` (excluded from context).
+Two reference files carry the rest, both excluded from context and read on demand:
+
+- `rules/references/rtk/commands.md` — when you need an RTK command or flag not covered above, or
+  when rtk itself misbehaves: the install check, the `reachingforthejack/rtk` name collision, and
+  the `rtk gain` / `rtk discover` analytics along with how to read their output.
+- `rules/references/rtk/traps.md` — when `rtk find` or `rtk grep` returns an empty or surprising
+  result, per the section above.
 
