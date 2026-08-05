@@ -41,7 +41,7 @@ For a path reached via a symlink, every allow rule is checked against both the s
 
 ### Special case: `~/.claude → dotclaude/` on this machine
 
-The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/foo/SKILL.md` resolves to two paths whose only common segments are below the `skills/` (or `handoffs/`, &c.) directory — the symlink side anchors under `.claude/`, the target side under `dotclaude/`. Rules anchored on either of those top-level segments alone match only one path, so the allow rule fails and the prompt fires.
+The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/adr/SKILL.md` resolves to two paths whose only common segments are below the `skills/` (or `handoffs/`, &c.) directory — the symlink side anchors under `.claude/`, the target side under `dotclaude/`. Rules anchored on either of those top-level segments alone match only one path, so the allow rule fails and the prompt fires.
 
 Two separate allow rules each matching one side don't compose — pairing `Edit(~/.claude/**)` with `Edit(**/dotclaude/**)` does *not* silence. A *single* rule pattern must match both paths.
 

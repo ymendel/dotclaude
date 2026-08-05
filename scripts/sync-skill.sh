@@ -287,7 +287,7 @@ fi
 
 # Completeness check: script/code filenames mentioned in skill markdown that
 # don't ship inside the skill. Catches the "documented but not present" shape
-# — e.g. SKILL.md or setup.md references `foo.sh` but no foo.sh exists
+# — e.g. SKILL.md or setup.md references `validate.sh` but no validate.sh exists
 # anywhere in the skill directory. Distinct from the outward/inward dep check
 # above: that one is about deps *outside* the skill; this one is about
 # completeness *inside* it. COMPANIONS.md presence does not mute this — the
