@@ -4,7 +4,8 @@ Tooling for maintaining this repo's setup — keeping skills in sync with a
 separate team skills repo (`compare-skills.sh`, `sync-skill.sh` — see
 [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for the
 why), tracking which skills and agents actually get used (`usage-report.sh`),
-and verifying the declared prerequisites are present
+watching the always-loaded rule set for growth (`rules-floor.sh`), and
+verifying the declared prerequisites are present
 (`check-prerequisites.sh`). Also includes runtime workarounds for Claude Code
 bugs (`enospc-workaround.sh`).
 
@@ -142,6 +143,50 @@ Requires bash 4+ (associative arrays, `mapfile`, namerefs).
 
 - `0` Report produced.
 - `2` A configured path is missing or arguments are invalid.
+
+## `rules-floor.sh`
+
+Report the size of the always-loaded rule set, so growth is visible before it
+needs a trimming pass.
+
+```
+./scripts/rules-floor.sh [--record]
+```
+
+Prints every always-loaded rule file with its byte count and share of the
+total, then the delta against a recorded baseline. Rules from the private
+companion repo (`rules/private/`) are reported in a separate block — they load
+too, but they aren't this repo's to trim.
+
+The set is derived, not hard-coded: a `rules/*.md` counts as always-loaded when
+`settings.json`'s `claudeMdExcludes` doesn't match it and it carries no
+`paths:` frontmatter, the two mechanisms described in
+[`rules/rule-maintenance.md`](../rules/rule-maintenance.md)'s "How rules load".
+Excluding or path-scoping a new file needs no change here.
+
+### Bytes are a proxy
+
+The authoritative figure is the memory-files number from `/context` in a fresh
+session, which no script can reach — [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md)
+measured its before and after that way. Use this for the trend and to see which
+file is carrying the weight; confirm with `/context` around an actual pass.
+
+### The baseline
+
+`--record` writes the current total and today's date to
+`scripts/rules-floor.baseline`, and later runs report the delta against it.
+Re-record after a trimming pass, not after ordinary rule growth — the baseline
+is meant to answer "how much has accumulated since the last time this was
+looked at."
+
+An absolute total can't tell you anything on its own; a rule set is as big as
+it needs to be. The delta is the signal, and even then it only says *when to
+look*, never *what to do* — growth is often legitimate, and the fix ranges from
+compression to extraction to nothing at all.
+
+### Exit status
+
+- `0` always, including when `jq` is missing (it reports why and stops).
 
 ## `check-prerequisites.sh`
 
