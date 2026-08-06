@@ -59,10 +59,11 @@ Failure mode this prevents: both mistakes return something plausible rather than
 
 ## How Bash Command Patterns Match — `:*`, ` *`, and Word Boundaries
 
-Bash allow/deny rules match against the literal **command string** (not the Read/Edit gitignore path semantics above). Two facts that aren't obvious, per the [permissions docs](https://code.claude.com/docs/en/permissions):
+Bash allow/deny rules match against the literal **command string** (not the Read/Edit gitignore path semantics above). Three facts that aren't obvious — the first two per the [permissions docs](https://code.claude.com/docs/en/permissions), the third contradicting them:
 
 - **`:*` is exactly equivalent to a trailing ` *`, and both match end-of-string.** `Bash(ls:*)` and `Bash(ls *)` each match bare `ls` *and* `ls -la` — the trailing wildcard does **not** require an argument after the prefix. The space matters: `Bash(ls *)` enforces a word boundary (so it won't match `lsof`), while `Bash(ls*)` without the space does match `lsof`.
-- **Matching is literal, so short and long flag forms are distinct.** `-h` ≠ `--help`: the global help exemption `Bash(* --help *)` covers `--help` but not `-h`, which then falls through to whatever gates the command. A reason to prefer long-form flags at the gate — see code-style's long-form-flags rule.
+- **Matching is literal, so short and long flag forms are distinct.** `-h` ≠ `--help`, and `Bash(unzip -l:*)` covers `unzip -l` but not `unzip --list`. Whichever form an entry names is the only one it grants. A reason to prefer long-form flags at the gate — see code-style's long-form-flags rule.
+- **A leading `*` fires in a deny rule but not in an allow rule.** The docs say a wildcard "can appear at any position in the command, including at the beginning" and offer `Bash(* install)`. That holds for deny — `Bash(*sed -i*)` blocks a `grep` whose *pattern* merely contains the substring — but an allow rule is skipped unless anchored on the command name, the same way the docs say an unanchored allow glob in the *tool-name* position is skipped. So anchor every allow rule, and note that a cross-command exemption (one entry granting `--help` for everything) is not expressible: write per-command entries or accept the prompt. Testing this needs a *write-capable* probe, because the built-in read-only set below never prompts and its documented membership is partial ("These include …") — a clean `sort --help` proves nothing. Failure mode: a leading-`*` allow entry reads as a working grant, never fires, and a prompt on a command it appears to cover gets misdiagnosed as a pattern-shape subtlety.
 
 ## How Claude Code Matches Compound Commands
 

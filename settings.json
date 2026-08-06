@@ -1,8 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(* --help *)",
-      "Bash(* --version)",
       "Bash(./scripts/check-prerequisites.sh:*)",
       "Bash(./scripts/compare-skills.sh:*)",
       "Bash(./scripts/rules-floor.sh:*)",
