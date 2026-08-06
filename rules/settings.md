@@ -49,6 +49,14 @@ For one rule to cover both paths, the pattern needs a segment that appears in bo
 
 > **PreToolUse hook — future option.** When the prompt cost becomes load-bearing (the live case is session handoffs being interrupted mid-departure), a hook can intercept Edit/Write under specific paths, validate narrowly, and exit 0 to skip the prompt without broadening the global allow list. Sketch: check that the path is under `~/.claude/handoffs/` (or the canonical `dotclaude/.claude/handoffs/`), exit 0 to allow. Design properly when picked up.
 
+#### Resolving paths under `~/.claude`
+
+The symlink points at the repo *root*, so `~/.claude/projects` is `dotclaude/projects`, not `dotclaude/.claude/projects`. The repo separately carries an ordinary project-local `.claude/` (`handoffs/`, `reviews/`, `audits/`, `settings.local.json`), so both spellings can exist and look plausible. Resolve `~/.claude/X` by *dropping* the `.claude` segment, never by appending one.
+
+Inside `projects/`, each per-project directory is named by replacing every `/` in the project's absolute path with `-`, which is lossy: `-Users-alice-dev-shipping-tracker` is ambiguous between `…/dev/shipping/tracker` and `…/dev/shipping-tracker`. Encode a known path to find its directory, never decode a directory name into a path you then assert exists. To identify a directory's project, read the `cwd` field in its session `.jsonl` files.
+
+Failure mode this prevents: both mistakes return something plausible rather than erroring — a wrong-tree search comes back empty and reads as "no match", and a wrongly-decoded path reads as "the project moved and these transcripts are orphaned".
+
 ## How Bash Command Patterns Match — `:*`, ` *`, and Word Boundaries
 
 Bash allow/deny rules match against the literal **command string** (not the Read/Edit gitignore path semantics above). Two facts that aren't obvious, per the [permissions docs](https://code.claude.com/docs/en/permissions):
