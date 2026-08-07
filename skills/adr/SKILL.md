@@ -64,6 +64,14 @@ To pick the next number:
 
 **Gaps are fine — don't renumber to close them.** A number reserved on an unmerged branch, or a draft that was parked or abandoned, leaves a gap in the sequence (0007, then 0010). That is expected: the number is an immutable identity, not an index into a dense array, so a gap is not a defect to repair. Never renumber a later ADR down to fill an earlier gap — it breaks the same inbound links (commits, PRs, cross-references) the duplicate case warns about, and it erases the history that a decision was once drafted there. The real hazard is the opposite case — a *collision*, two unmerged branches grabbing the same next number — which the duplicate-number gotcha above covers. When a gap reflects reserved-on-a-branch numbers, note them to the user so the jump reads as intentional rather than as a missing record. Failure mode this prevents: renumbering to make the sequence gapless, which dangles every reference to the moved ADR for zero functional gain.
 
+## The index
+
+Many repos keep an index beside the records — a `docs/adr/README.md` carrying a table of number, title, status, and date. Where one exists, **it is part of every ADR change**: adding a record adds its row, and a status change updates that row in the same commit as the status line itself. An index that lags is worse than no index — it reports `Proposed` for a decision the repo has been running on for months, so the reader who consults it ends up worse off than the one who just listed the directory.
+
+**Write the reason for a gap into the index, not just into the conversation.** The Numbering section above says to note a reserved or abandoned number to the user so the jump reads as intentional. That note lives as long as the session does. The durable form is a short paragraph under the index table: which number is held, why, where its file lives if it lives anywhere, and — for an abandoned decision — that the number stays retired rather than reused, because closed PRs and tickets still cite it by that number. Then the next reader meets the gap and gets the answer without having to ask anyone who was there.
+
+Where no index exists, don't create one unprompted for a short, gapless sequence — it would only restate the filenames in a table. Offer one at the first gap — the moment the sequence stops explaining itself — or once the list has grown past roughly a screenful.
+
 ## Filename format
 
 `NNNN-kebab-case-title.md` — derived from the title, under ~60 characters. Strip articles (`a`, `the`), drop punctuation, lowercase. Example: `0008-tour-data-sync.md`.
@@ -192,8 +200,9 @@ When invoked:
 4. **Pick the next number.** Highest existing + 1, zero-padded to 4 digits.
 5. **Draft the ADR** with today's date and status `Proposed`. Fill every section with real content — don't leave placeholders. If you don't know something, ask the user before drafting rather than guessing. Only use `Accepted` for decisions that are already in use or being backfilled historically.
 6. **Write the file** at the computed path.
-7. **Report back** with the file path and a one-sentence summary of what was decided.
-8. **Invoke the `adr-refine` skill** on the file you just wrote. The draft is not done until it has survived a critique pass. Do not move on to implementation work between steps 7 and 8 — refinement comes first.
+7. **Update the index** if the repo keeps one — the new row, and a gap's explanation where this ADR's number leaves one. See *The index* above.
+8. **Report back** with the file path and a one-sentence summary of what was decided.
+9. **Invoke the `adr-refine` skill** on the file you just wrote. The draft is not done until it has survived a critique pass. Do not move on to implementation work between steps 8 and 9 — refinement comes first.
 
 ## Writing quality
 
@@ -220,13 +229,15 @@ If the user asks to document a decision that was already made:
 
 An ADR moves through states:
 
-- **Proposed** — the working state. The ADR has been drafted and refined (see Process step 8 — the draft is not done until it has survived a critique pass), but the decision hasn't been validated by working code yet. Edits are expected: implementation often surfaces gaps, contradictions, or constraints the draft missed, and those should feed back into the ADR while it's still Proposed. Re-refining a Proposed ADR after implementation reveals new information is normal.
+- **Proposed** — the working state. The ADR has been drafted and refined (see the refine step under *Process* — the draft is not done until it has survived a critique pass), but the decision hasn't been validated by working code yet. Edits are expected: implementation often surfaces gaps, contradictions, or constraints the draft missed, and those should feed back into the ADR while it's still Proposed. Re-refining a Proposed ADR after implementation reveals new information is normal.
 - **Accepted** — the decision has been validated by working code (or is being backfilled as a historical record). The ADR becomes effectively immutable; see *Updating an existing ADR* below.
 - **Superseded** / **Deprecated** — a later ADR has replaced or retired this one. Update the status line and add references; don't rewrite.
 
 Only flip `Proposed` → `Accepted` once the implementation has validated the decision. Don't accept prematurely just to mark the document "done" — that forfeits the ability to fix the ADR based on what implementation teaches you.
 
 When you flip to `Accepted`, that status-line change is the whole edit to the ADR. Record *what* validated the decision — the run, the measurement, the round-trip that exercised the premise — in the commit message that makes the flip, not in a block inside the ADR. A dated "validated on X by Y" narrative is a confirmation record: it belongs in git history — where the acceptance commit already sits — not in the ADR's decision prose. If the acceptance seems to need more than the status line to explain itself, that extra belongs in the commit body.
+
+"The whole edit" means the whole edit *to the ADR*. Where the repo keeps an index, the flip is two files — the ADR's status line and the index's row — in one commit. See *The index* above.
 
 ## Updating an existing ADR
 
@@ -239,6 +250,9 @@ Once an ADR is `Accepted`, it is effectively immutable. The only edits permitted
    - `**Status:** Accepted — amended 2026-05-21 (ADR 0029)`
    - `**Status:** Accepted — amended 2026-05-21 (ADR 0029), 2026-08-12 (ADR 0034)`
    - `**Status:** Accepted — amended (see Amendment sections below)` *(when the inline list gets unwieldy)*
+
+   Where the repo keeps an index, its row carries the same status, so it changes in the same commit. See *The index* above.
+
 2. **Reference additions in the body** when a later ADR only *partially* supersedes this one and a future reader needs to be pointed at the relevant new ADR. Do not rewrite the original reasoning to reflect the new state — that's what the new ADR is for.
 3. **Amendments appended as new sections** when a later ADR shifts the *facts surrounding* the decision (a column renamed, a join path changed, an index replaced) without changing the decision itself. Use the format:
 
