@@ -108,7 +108,8 @@
       "Bash(*gh release create*)",
       "Bash(*gh release delete*)",
       "Bash(*gh pr merge*)",
-      "Bash(*gh pr close*)",
+      "Bash(*gh pr close*--delete-branch*)",
+      "Bash(*gh pr close* -d*)",
       "Bash(*gh gist delete*)"
     ],
     "defaultMode": "acceptEdits",
