@@ -38,3 +38,21 @@ Before overwriting or discarding on-disk-only state — uncommitted working-tree
 This is not an always-do. Routine overwrites of regenerable or uninteresting files need no copy. It fires only when the on-disk-only state is load-bearing for a comparison or decision in play.
 
 **How to apply:** when about to overwrite or discard uncommitted/untracked/scratch state, ask whether any decision currently in play — especially an option you just offered — would want to read that exact state later. If yes, copy it to a scratch path first (project `tmp/`, the session scratchpad). This composes with `honesty.md`'s *Surface Doubts Your Own Correction Reveals* — both catch an action that undermines a position you just took. That rule catches it in prose, this one catches it in a destructive file operation.
+
+## A pipe hides the exit status of the command you actually care about
+
+In `cmd | grep …`, the shell reports **grep's** status, not `cmd`'s. So `cmd | grep -E "pass|fail" && git commit` commits whenever grep matched a line — including a line that says the run failed. The filter that made the output readable is the same thing that made the gate meaningless.
+
+It bites hardest where the piped command *is* the verification — a test suite, a linter, a CI script, a build. Those are exactly the commands worth piping, since their output is long and only a few lines matter.
+
+**How to apply:** when a command's exit status is load-bearing — anything gating a commit, a claim that a suite passed, or a decision about what to do next — either don't pipe it, or make the status visible. `set -o pipefail` at the front propagates the first failure, and `${PIPESTATUS[0]}` reads the original status after the fact — echoing it (`echo "exit=${PIPESTATUS[0]}"`) puts it where it can't be skimmed past. Never chain `&&` off a pipeline whose first element is the thing being tested.
+
+Failure mode this prevents: a red test run reads as green because the summary grep matched, the `&&` behind it fires anyway, and nothing in the visible output contradicts the report that says verified. This is `honesty.md`'s *Never Present Estimates as Measurements* arriving through a shell mechanism rather than a reasoning one.
+
+## Reverting a file discards every uncommitted change in it, not just the one you meant
+
+`git checkout -- <file>` and `git restore <file>` take the file back to the index or HEAD wholesale. When a file carries deliberate uncommitted work *and* something temporary — a planted test case, a debug line, a probe — reverting to undo the temporary part silently destroys the deliberate part too. Git offers no partial undo here and reports nothing, because discarding is exactly what was asked for.
+
+**How to apply:** remove the temporary edit the way you added it — with Edit, targeting the exact text — rather than reverting the file. Reach for `git checkout --` only when the file holds nothing you want to keep. When unsure whether it does, `git diff -- <file>` before discarding, which is cheap next to reconstructing lost work from memory.
+
+Failure mode this prevents: a revert aimed at a two-line probe takes an hour of unrelated editing with it, and because the command succeeded exactly as documented, the loss surfaces later — when the missing work is noticed downstream — rather than at the moment it happened. Sibling of the section above it: that one is about state a *pending decision* needs, this one about state you simply had not committed yet.
