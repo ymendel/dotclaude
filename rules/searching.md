@@ -22,9 +22,22 @@ Do not search, list, find, glob, or read anything under `~` / `$HOME` / `/Users/
 
 When a question is about an external gem, package, or tool (e.g., solid_queue, Rails, an npm package), fetch its documentation directly — do not spawn a search agent or search the local filesystem. External library docs live online, not in the project directory.
 
-## WebFetch vs curl
+## Fetching a page — trafilatura, curl, WebFetch
 
-WebFetch processes content through a small model and returns a summary — it cannot return verbatim content. Use WebFetch when you need to understand or extract information from a page. Use `rtk proxy curl -s <url>` when you need the raw content unchanged (e.g., a spec file, a config template, any file where exact text matters). If RTK filters the curl output, `rtk proxy curl` bypasses all filters.
+Pick by what the fetch is *for*. Don't default to one tool and verify afterward — the verification is weaker than the choice.
+
+- **Prose, explanation, an overview of a page** → `trafilatura --URL <url> --markdown`. Extracts the main content verbatim as markdown, discarding navigation, ads, and footers. Verbatim *and* compact, the combination the other two each give up half of.
+- **A snippet, a config, exact syntax, a spec file** → `rtk proxy curl -sL <url>`. Raw bytes, unchanged; `rtk proxy` bypasses all RTK filters. Go straight here when the payload *is* the code, for the reason in the first caveat below.
+- **A summary is genuinely what's wanted, or the page needs JavaScript or authentication** → WebFetch. It runs the page through a small model and cannot return verbatim content.
+
+Two caveats on trafilatura:
+
+- **It drops block code on some sites, silently** — no error, and the prose that comes back reads as the whole page. That's what makes the choice above an intent question rather than a fetch-then-verify one. Same shape as `RTK.md`'s empty-`rtk grep` trap.
+- **No JavaScript rendering, no authenticated pages.** Content that exists only after a client-side render is invisible to it, the same as to curl.
+
+**Most sub-agents can't run trafilatura** — it goes through Bash, which several of them don't carry. When delegating a fetch, pass the constraint or expect WebFetch (`agents.md`).
+
+`rules/references/searching/page-fetching.md` holds the measurements behind the code-drop caveat, a count-based check for when intent wasn't clear up front, and the per-agent fetch table. Load it before concluding a fetched page was complete, or before delegating a fetch that has to be verbatim.
 
 ## Prefer a tool's plain output over de-formatting its rendered output
 

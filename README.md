@@ -24,6 +24,7 @@ This is personal config, and it's going to reflect my preferences, workflows, an
 - **[gh](https://cli.github.com/)** — used in development workflow rules and expected for GitHub interactions.
 - **[Python 3](https://www.python.org/)** — runs the session-handoff scripts, and the `python`→`python3` rewrite hook targets it. Without it, handoff creation and loading fail and the rewrite hook no-ops.
 - **[uv](https://github.com/astral-sh/uv)** — runs the skill-architecture skill's validator and scaffolding scripts (`uv run …`). Needed only when authoring or validating skills — the allowlist and `uv-run-guard.sh` hook assume it for that path.
+- **[trafilatura](https://github.com/adbar/trafilatura)** — extracts a web page's main content as markdown, the first choice for reading a page under the searching rules (`uv tool install trafilatura`). Without it those fetches fall back to `curl` for raw HTML or WebFetch for a summary, both of which still work — you lose a compact verbatim option, not a capability.
 
 To verify these are on your `PATH`, run `./scripts/check-prerequisites.sh` — it warns on anything missing and never fails.
 

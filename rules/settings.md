@@ -192,3 +192,5 @@ Failure mode this prevents: writing a guard hook that returns `permissionDecisio
 - `WebSearch` for search use cases
 
 Before removing curl, verify whether `WebFetch` requires an explicit allow entry under `acceptEdits` mode, or prompts by default.
+
+Note that the two replacements above no longer cover the use case that motivated the entry. `searching.md` now routes page-reading to `trafilatura --URL`, and keeps curl for the case neither replacement serves — a snippet, a config, or exact syntax, where WebFetch's summarization loses the thing being fetched and trafilatura may drop it. So the reconsideration is narrower than it was: the question is whether curl can be scoped down now that it's the exact-text tool rather than the general-fetch one, not whether it can be swapped for WebFetch outright.

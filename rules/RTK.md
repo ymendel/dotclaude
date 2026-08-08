@@ -98,14 +98,14 @@ git add . && git commit -m "msg" && git push
 rtk git add . && rtk git commit -m "msg" && rtk git push
 ```
 
-**Exception — `python3` and `uv` pass through unchanged.** The golden rule holds for anything RTK
-can rewrite. A command with no RTK equivalent is *not* prefixed — `rtk rewrite` returns exit 1 and
-the command reaches the permission gate exactly as written. `python3` and `uv` are the live cases.
-So their allowlist entries take the **bare** form — `Bash(python3 *…)`, `Bash(uv run *…)` — never an
-`rtk python3 …` prefix, which would never match the string the gate actually sees. This is the same
-passthrough mechanism as the `cat "$(…)"` and heredoc-commit slips below (`rtk rewrite` exit 1 → bare
-command at the gate). The difference is that for `python3`/`uv` the bare form is *correct*, not a slip
-to route around. Mechanism confirmed by reading `hooks/rtk-rewrite.sh`.
+**Exception — `python3`, `uv`, and `trafilatura` pass through unchanged.** The golden rule holds for
+anything RTK can rewrite. A command with no RTK equivalent is *not* prefixed — `rtk rewrite` returns
+exit 1 and the command reaches the permission gate exactly as written. Those three are the live
+cases. So their allowlist entries take the **bare** form — `Bash(python3 *…)`, `Bash(uv run *…)`,
+`Bash(trafilatura --URL *…)` — never an `rtk python3 …` prefix, which would never match the string
+the gate actually sees. This is the same passthrough mechanism as the `cat "$(…)"` and heredoc-commit
+slips below (`rtk rewrite` exit 1 → bare command at the gate). The difference is that here the bare
+form is *correct*, not a slip to route around. Mechanism confirmed by reading `hooks/rtk-rewrite.sh`.
 
 ## Hook-Based Usage
 

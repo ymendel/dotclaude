@@ -6,7 +6,7 @@
 
 set -u
 
-DEPS=(rtk jq gh python3 uv)
+DEPS=(rtk jq gh python3 uv trafilatura)
 
 echo "Checking declared prerequisites (warns, does not fail):"
 

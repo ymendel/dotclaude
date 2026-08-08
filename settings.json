@@ -39,6 +39,7 @@
       "Bash(rtk read:*)",
       "Bash(rtk tail:*)",
       "Bash(rtk wc:*)",
+      "Bash(trafilatura --URL:*)",
       "Bash(unzip -l:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
