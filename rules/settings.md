@@ -115,6 +115,17 @@ Failure mode: dropping skill-related permissions into a project's `.claude/setti
 
 For paths in skill-related permissions, leading `**` lets a single global rule cover any project: `Write(**/.claude/handoffs/*.md)` matches a handoffs directory in every project the skill is used from.
 
+## The Offered Save Rule Is Not the Entry to Write
+
+The "Yes, and don't ask again for: …" option writes a rule generated from the command at hand, and it runs broader than the entry the situation calls for. Two observed shapes:
+
+- **Broader in pattern** — a `trafilatura --URL` fetch offered `trafilatura *`, which also grants `--crawl` and `--explore`, flags that walk whole sites. The right entry was `Bash(trafilatura --URL:*)`.
+- **Wrong in scope, and bundled** — a compound command offered one grant covering both its halves, scoped to the project it ran in, for a version check belonging in the global file.
+
+Read the offer as a signal that an entry is missing, not as the entry: take plain "Yes", then write the rule by hand where its scope belongs. The offer is still worth reading, since it shows the string the gate actually matched — what `rule-maintenance.md` says to build from.
+
+Failure mode this prevents: the offer is the path of least resistance at exactly the moment the goal is to get on with the work, so it is accepted unread — granting more than intended, in the wrong file, and indistinguishable afterward from a considered entry.
+
 ## Organizing the allow list
 
 Claude Code ignores the order of `allow` entries — the layout exists only for human scanning. Keep it so a reader can find an entry and knows where a new one goes:
