@@ -22,6 +22,17 @@ For example, probing whether a config file is read by setting an `env` var in it
 
 Specific case — a permission prompt is invisible in tool output, so "I got output" is not a detector for "it didn't prompt." An auto-allowed command and a command the user approved at a prompt return byte-identical results — nothing in the tool output distinguishes the two. So when probing whether a config change (sandbox mode, an allowlist entry, a permission mode) *suppresses* a prompt, output-presence is an implicit detector that can never fire negative correctly — every "ran clean, no prompt" conclusion drawn from seeing output is void. The only reliable detector is the user reporting "prompted" or "ran clean," one command at a time. The trap is worse than an uncalibrated detector: here the detector is structurally incapable of detecting the thing, so no calibration exists — the signal has to come from the user.
 
+Four outcomes are possible, and two leave a trace:
+
+- **Rejected** — an explicit error in the tool result.
+- **Approved with "don't ask again"** — a new entry in the repo's `.claude/settings.local.json`.
+- **Approved with a plain "Yes"** — nothing.
+- **Auto-allowed** — nothing.
+
+So the blind spot is one pair: plain-Yes and auto-allow. That makes a saved rule a *one-way* detector — its presence proves a prompt happened and its shape shows what string the gate matched, its absence proves nothing. Read `.claude/settings.local.json` before theorizing about why a command didn't prompt; the session transcript holds no per-call record, only the session's own `permissionMode`.
+
+The user's report carries the same blind spot, since a plain "Yes" leaves nothing behind for them either — "I was only prompted once" over-weights the prompts that offered a save. Treat it as evidence with a known skew, and when the answer matters ask for a fresh probe rather than theorizing on the recollection. Keep the probe to a single command with no pipe, redirect, or substitution: Claude Code evaluates each segment independently, so a pipeline leaves any prompt unattributable to the command under test.
+
 Prefer the authoritative source when it can answer directly. The actual question here was settled by the docs (the scope table lists no user-level `settings.local.json`), which made the empirical probe both inconclusive *and* unnecessary. When docs or spec can answer, reach for them before an empirical probe whose detector you'd have to calibrate anyway.
 
 Failure mode this prevents: reading a null result as a finding ("the file isn't read") when it only reflects an uncalibrated instrument — the quantitative-absence sibling of honesty.md's "Do Not Assert Absence Without Verifying."
