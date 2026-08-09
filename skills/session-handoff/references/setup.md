@@ -37,6 +37,8 @@ The CREATE and RESUME workflows run on demand. To also have the agent *proactive
 
 The script lives next to this file at `hooks/recent-handoff-notice.sh` in the skill directory. It checks `.claude/handoffs/` for a handoff modified within the last 7 days (single-level — `find -maxdepth 1` — which is what makes the `artifacts/` subdir convention safe) and, if found, emits a system reminder telling the agent to offer a resume on the first turn. Treat the in-skill copy as the single source of truth — don't paste a copy elsewhere, or the two drift (the reminder text carries behavioral instructions that get refined over time).
 
+The `-maxdepth 1` is joined by a second filter that is equally load-bearing: the `find` glob matches only the `YYYY-MM-DD-HHMMSS-` prefix that `create_handoff.py` generates and `list_handoffs.py` parses. That is what keeps `sort -r` honest, since lexical order equals chronological order only while every candidate carries the same fixed-width prefix. A file named anything else — `notes.md`, `artifacts-something.md`, a date without a time — sorts by its first character instead, outranking every real handoff and getting surfaced in their place. The cost is that such a file is not surfaced at all; `list_handoffs.py` still shows it, so the manual listing stays the complete view.
+
 To wire it up, add the hook to `~/.claude/settings.json` (or the project equivalent) under `hooks.SessionStart`. If you already have a `SessionStart` array, merge this entry into it rather than replacing it:
 
 ```jsonc

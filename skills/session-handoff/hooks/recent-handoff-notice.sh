@@ -3,7 +3,7 @@
 #
 # Output is read by the harness as a system reminder. Stays silent when:
 #  - .claude/handoffs/ does not exist
-#  - no .md files modified in the last 7 days
+#  - no timestamped handoff was modified in the last 7 days
 #
 # Pairs with the session-handoff skill — the model can invoke /session-handoff
 # to resume from the surfaced handoff.
@@ -13,8 +13,14 @@ set -e
 HANDOFF_DIR=".claude/handoffs"
 [ -d "$HANDOFF_DIR" ] || exit 0
 
-# Most recent .md handoff modified within the last 7 days.
-RECENT=$(find "$HANDOFF_DIR" -maxdepth 1 -name "*.md" -mtime -7 -type f 2>/dev/null \
+# Most recent handoff modified within the last 7 days.
+#
+# The glob is load-bearing, not cosmetic: `sort -r` orders lexically, which only
+# matches chronological order while every candidate carries the same fixed-width
+# YYYY-MM-DD-HHMMSS prefix. Don't relax it. See references/setup.md.
+RECENT=$(find "$HANDOFF_DIR" -maxdepth 1 \
+  -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]-*.md' \
+  -mtime -7 -type f 2>/dev/null \
   | sort -r \
   | head -1)
 
