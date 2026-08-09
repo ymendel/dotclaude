@@ -27,6 +27,7 @@ paths:
 - Prefer kwargs over positional args (exceptions: single arg, or leading positional + kwargs).
 - Prefer symbol keys in hashes. Convert at serialization boundaries.
 - Alphabetize attrs, kwargs, case branches, etc. when order doesn't matter.
+- Never indent methods under `private`. Put a blank line after the keyword and keep the private methods at the same indentation as the public ones. Beware the specific trap that produces the other form: `rubocop-rails-omakase` ships `Layout/IndentationConsistency` as `Enabled: false` with `EnforcedStyle: indented_internal_methods` sitting inert on the next line, so the indented style looks mandated by the linter and is not — `rubocop --show-cops Layout/IndentationConsistency` shows the resolved truth. Failure mode: reading a disabled cop's `EnforcedStyle` as a live rule, then writing the indented form to comply with a constraint that does not exist, and defending it as the linter's call.
 
 ## Rails
 
