@@ -48,7 +48,9 @@ When writing a new rule, include the failure mode it prevents — not just what 
 
 Dated observations, confirmation records ("Confirmed <date>: …"), and "here's the incident that motivated this" asides belong in the commit body that introduces or changes a rule — git history — not in the always-loaded rule prose. Keep the actionable directive and the failure-mode-it-prevents in the rule. Move the dated incident to the commit. This is ADR 0007's destination 3 (see [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md) for the full four-destination routing policy). The one nuance: where an incident carried reusable insight, keep a compressed, un-dated version of that insight in prose and move only the dated narrative to the commit.
 
-Failure mode this prevents: incident narratives accrete in always-loaded prose, growing the context floor with documentation of what happened rather than guidance on what to do.
+**The incident travels de-identified.** Most rule edits originate in another project, so the incident routed into the commit body arrives carrying that project's name, repo, file paths, and sometimes a client's. This repo is public. Keep the date, the mechanism, and what it cost; drop the identifiers, or generalize them ("that repository's own workflow" rather than the repo by name). This is `code-style.md`'s *Invent example values* applied to provenance rather than to example values — same trap, and the commit body is the channel that walks into it, because routing incidents there is exactly what the paragraph above asks for.
+
+Failure mode this prevents: incident narratives accrete in always-loaded prose, growing the context floor with documentation of what happened rather than guidance on what to do. And the correctly-routed ones carry a client or project identifier into public git history, where — unlike prose in a file — it can only be removed by rewriting published commits.
 
 ## Referencing skills and other rules
 
