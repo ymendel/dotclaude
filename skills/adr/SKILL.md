@@ -166,6 +166,33 @@ a motivation-only distinction reads as a real alternative, and a reader trying
 to tell the two apart finds no technical difference to grab, because there
 isn't one.
 
+### What belongs in the Decision, and what stays implementation
+
+*When to write an ADR* above decides whether a record is warranted at all.
+This decides which of the dozen sub-choices inside a warranted record earn
+a bullet, which is a different question and the easier one to get wrong —
+a record that is genuinely ADR-worthy still attracts every design detail
+settled along the way.
+
+The test: **does this constrain something outside the thing being built?**
+A choice that creates a file someone else must maintain, a failure mode
+another team's CI will hit, an interface a caller depends on, or a
+vocabulary the rest of the codebase must adopt is a decision. A choice
+that could be rewritten tomorrow without anyone downstream noticing is
+implementation, and belongs in the code, the plan, or a comment.
+
+Worked pair, from a token-compiler record: *"markers are classified in
+checked-in config and the tool stops rather than guessing"* is a decision,
+because it creates a config file derived apps must fill in and a failure
+mode their CI will hit. *"Names are kebab-cased and redundant segments
+collapse"* is implementation, rewritable in silence.
+
+Prefer the narrower record. Scope is not just tidiness — every extra
+decision is another thing that can be invalidated during implementation
+and drag the record's status back with it. Naming the open questions
+explicitly as out of scope lets them move without disturbing what was
+actually settled.
+
 ## Consequences
 
 What does this make easier, harder, or impossible? Every bullet must
