@@ -141,6 +141,12 @@ Read the relevant handoff document completely before taking any action.
 
 If handoff is part of a chain (has "Continues from" link), also read the linked previous handoff for full context.
 
+**Confirm it is a resume handoff before offering to resume.** Nothing in a handoff's filename or location records what *kind* of document it is. The `SessionStart` hook surfaces the newest timestamped file in `handoffs/` and `list_handoffs.py` lists them all, but neither can tell a resume handoff from something else that landed there: a brief written to *start* work rather than continue it, a note dropped in from a related effort, anything a person or another session chose to put where it would be seen. Such a document usually says so in its opening lines. When it does, follow what it asks for instead of offering to resume work that was never started, and do not treat its "Pending Work" or "Next Steps" as inherited state.
+
+**Weigh claims by how far the handoff travelled to reach you.** Every handoff is written to a different agent — same model, different session, nothing carried across but the document. What varies is distance: minutes and the same working directory at one end, another repo and another week and a different set of loaded rules at the other. The further it came, the less the author could assume, and the less able you are to cheaply re-derive anything doubtful.
+
+The practical consequence is citation. A handoff is a structured document, so it reads as verified whether or not it is, and an unsupported claim inherits that authority. When a load-bearing claim carries no file path, command, or verification note — especially where nearby claims do — treat that asymmetry as the tell and verify before building on it. Quote the source before restating a claim as a premise. The cost of getting this wrong compounds: a resumed session builds every subsequent step on the premise it inherited.
+
 ### Step 4: Verify Context
 
 Follow the checklist in [references/resume-checklist.md](references/resume-checklist.md):
