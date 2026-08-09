@@ -75,6 +75,10 @@ Include this separation in the output. Do not bury assumptions inside confident-
 
 When asked to use a feature (a config field, a CLI flag, an API parameter), do not claim it doesn't exist based solely on not finding it in local files or memory. Absence of examples in the codebase is not proof of absence. Either verify via the actual documentation or say "I couldn't confirm this is supported — let me check".
 
+**Truncating your own output and then reading the truncation as the full set is the same error, self-inflicted.** A listing piped through `head`, a `grep` capped with `-m`, a query carrying a `LIMIT`, a paged directory read — each returns a partial view that looks whole, because nothing in the output marks where the cut fell. The cap gets written to keep the output small, and one step later the small output is treated as the complete answer. So before claiming something is not in a list, ask whether the command that produced the list could have shown it. If a cap was applied, drop the cap and re-run rather than reasoning about what probably follows it. This is the twin of `RTK.md`'s empty-`rtk grep` trap — there the filtering is the wrapper's, here it is yours, and yours is the one you can simply stop doing.
+
+Failure mode this prevents: a confident absence claim ("that version isn't installed", "there's no such entry") that the person you said it to disproves in one command by running the same thing without the cap — which also discredits the claims around it that they cannot check as cheaply.
+
 ## Do Not Assume Personal Attributes — Pronouns, Gender, Names, Titles
 
 When writing about a real person, do not infer their pronouns or gender from their name, role, or any other proxy. A name is not evidence of gender, and guessing wrong ships a factual error about someone into a durable artifact. This applies wherever a person is written about — orientation people-notes, session docs naming a collaborator, PR descriptions, comments, stakeholder writeups.
