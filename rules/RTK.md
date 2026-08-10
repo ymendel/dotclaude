@@ -34,22 +34,12 @@ never touches the Bash gate.
 
 ### When not to use awk
 
-awk is fine for the genuine case it's built for — a per-line or per-field transformation
-where you need the line's *content* alongside a computed value (e.g. `awk '{ print length": "$0 }'`
-to see which commit-body lines exceed a wrap width and what they say). Reach for it only when
-no simpler tool covers the need. Three cases where it's the wrong reach:
-
-- **A dedicated tool already answers the question.** For a single number, prefer the
-  single-purpose tool: `wc -L` for the longest line's length, `wc -l` for a line count,
-  `grep -c` for a match count. `… | wc -L` beats `… | awk '{ if (length>m) m=length } END { print m }'`
-  for "is anything over 72?" — shorter, clearer, and `wc` has no destructive form so it's
-  safely allow-listed (`Bash(wc:*)`) — awk is not.
-- **In-file editing.** Same rule as `sed` above — use Edit, never `awk -i inplace` or an
-  awk-to-tempfile-and-move dance.
-- **Parsing structured formats.** Use a real parser (`jq` for JSON, &c.), not awk
-  field-splitting. This is the shell-pipeline echo of code-style's "parse with parser
-  libraries, not regex" — column-counting breaks on quoted delimiters, escapes, and
-  embedded newlines exactly where it matters.
+awk is fine for the case it's built for — a per-line or per-field transformation where the
+line's *content* is wanted alongside a computed value. Reach for it only when no simpler tool
+covers the need: a single number belongs to a single-purpose tool (`wc -L`, `wc -l`,
+`grep -c`), in-file editing to Edit, and a structured format to a real parser. Those three
+cases and why each one bites are in `rules/references/rtk/awk.md` — load it when about to
+write an awk expression, which is the moment the alternative is still cheap to take.
 
 Failure mode this prevents: reaching for awk by reflex on a task a single-purpose tool does
 in fewer characters and with less to get wrong — and, for parsing, building a fragile
