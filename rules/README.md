@@ -24,7 +24,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`honesty.md`** — Rules about factual claims: never present estimates as measurements, source every number, verify the framing of external systems and codebase concepts against the source before writing prose about them, separate verified facts from assumptions, don't optimize for looking helpful over being accurate. Applies extra scrutiny to any external-facing content.
 
-**`searching.md`** — How to pick the right tool and scope when looking something up: scoping searches to the known location, never searching locally for external library docs, and choosing between WebFetch and raw curl.
+**`searching.md`** — How to pick the right tool and scope when looking something up: scoping searches to the known location, staying out of the home directory apart from the installed-gem-source exception, never searching locally for external library docs, choosing between trafilatura, curl, and WebFetch, and preferring a tool's plain output over de-formatting its rendered output.
 
 **`self-improvement.md`** — Triggers for when to self-improve: user corrections, workarounds, failed commands, violated rules, and inconsistencies. Points to `rule-maintenance.md` for how to act on them.
 

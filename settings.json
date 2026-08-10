@@ -57,6 +57,8 @@
 
       "Read(//private/tmp/**)",
       "Read(//tmp/**)",
+      "Read(~/.gem/**)",
+      "Read(~/.rubies/**)",
       "Read(~/Library/Application Support/rtk/tee/*)",
 
       "Skill(*)",

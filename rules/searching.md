@@ -16,11 +16,21 @@ Do not search, list, find, glob, or read anything under `~` / `$HOME` / `/Users/
 
 **Why:** the user's home directory contains personal files, configuration, and unrelated projects. Reaching into it without explicit permission is a violation regardless of intent. The narrower "no home-dir search for library docs" rule below is one instance of this broader prohibition.
 
-**How to apply:** when constructing a search command, check the target path. If it starts with `~`, `$HOME`, or `/Users/yossef/` (or expands to one), stop and ask. Same for `Glob` patterns, `Read` targets, `Explore` agent prompts that mention home-dir paths, &c.
+**How to apply:** when constructing a search command, check the target path. If it starts with `~`, `$HOME`, or `/Users/yossef/` (or expands to one), stop and ask. Same for `Glob` patterns, `Read` targets, `Explore` agent prompts that mention home-dir paths, &c. The one standing exception is installed gem source — see below.
 
 ## Never search locally for external library documentation
 
 When a question is about an external gem, package, or tool (e.g., solid_queue, Rails, an npm package), fetch its documentation directly — do not spawn a search agent or search the local filesystem. External library docs live online, not in the project directory.
+
+## Reading installed gem source is the standing exception
+
+A *behavior* question about a dependency — what a method does with an unset key, whether a flag is honored, which branch a guard takes — is settled by the installed source, not by the docs. Read it. `Read(~/.gem/**)` and `Read(~/.rubies/**)` are granted in `settings.json` for exactly this, so it needs no ask, and it is what `honesty.md`'s *Verify Framing Before Writing Prose* requires when the claim is about a gem's internals.
+
+The boundary is the question, not the file. A documentation question still goes online per the section above: the docs say what a gem promises, the source says what the installed version does. So read the version the project has locked, and cite it with the file and line — `railties 8.1.3.1`, `lib/rails/application/configuration.rb:620-640` — because a claim read from gem source is only true of the version it was read from, which is `honesty.md`'s source-version mismatch in its most inviting form.
+
+Nothing else under `~` opens up. The grant covers those two gem trees; another ecosystem's installed source needs its own entry before it can be read the same way.
+
+Failure mode this prevents: the home-directory prohibition reads as absolute, so a question about what a gem *actually does* gets answered from its docs or from memory and ships as confident prose about internals — when the code that settles it is on disk, in a directory the settings already allow.
 
 ## Fetching a page — trafilatura, curl, WebFetch
 
