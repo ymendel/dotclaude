@@ -2,9 +2,15 @@
 
 > Not loaded in context by default. See `rules/development-workflow.md` for behavioral guidance.
 
-## Rewording a non-HEAD commit
+## Changing a non-HEAD commit
 
-To reword a non-HEAD commit, ask the user to run `git rebase -i` interactively. Scripted workarounds (GIT_EDITOR overrides, chained amends) are unreliable and cause cascading message corruption.
+Split by whether the change touches the *message* or only the *content*.
+
+**Rewording** — ask the user to run `git rebase -i` interactively. Scripted workarounds (GIT_EDITOR overrides, chained amends) are unreliable and cause cascading message corruption.
+
+**Folding content in** — do it yourself, no interactivity required. Stage the change, `git commit --fixup <target-sha>`, then `git rebase --autosquash <target-sha>^`. A `fixup!` commit keeps the target's message verbatim, so no editor is ever invoked, and `--autosquash` has worked outside `-i` since git 2.38. This is the case for "that hunk belongs in an earlier commit" — an allowlist entry the rule it implements arrived without, a file the commit should have carried.
+
+Failure mode this prevents: the reword restriction gets read as covering every non-HEAD change, so a mechanical fixup is handed back to the user as though it needed their hands — or worse, gets abandoned and the hunk lands as a stray follow-up commit that has to be explained.
 
 ## Splitting one file's changes across commits
 
