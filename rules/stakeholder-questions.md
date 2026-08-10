@@ -18,13 +18,11 @@ The pattern: rephrase the question until the words *the stakeholder uses to answ
 
 ## Communicating a requirement you own to implementers
 
-The rest of this rule covers *asking* a stakeholder about behavior when *they* own the requirements. The mirror image is just as load-bearing: when *you* own the requirement and are communicating it *down* to whoever implements (contractors, a vendor team, another engineer), specify the **behavior you want** and leave the **implementation** for them to work out. Same behavior-vs-implementation line, opposite direction — there it's a question going out, here it's a directive going out.
-
-Why the discipline matters in this direction too: the behavior is the durable interface, the implementation is downstream of it. If you hand implementers a mechanism ("set up a Heroku pipeline to promote staging to production"), you've made a technical choice that may not fit their stack, and you've coupled the outcome you actually want to one particular way of getting there. State the outcome instead ("a change is done when it's live in production and confirmed working") and let them propose the mechanism that fits. You keep ownership of *what* and *why*. They own *how*. This is the same split as a good ADR — Decision and Context are yours, the implementation detail is negotiable.
-
-This composes with **Match the stakeholder's vocabulary** below and with `naming.md`'s *Adopt the domain expert's term*: when you state the desired behavior, use the words the implementers already use for the concept, so the requirement lands in their vocabulary rather than imposing yours.
+The rest of this rule covers *asking* a stakeholder about behavior when *they* own the requirements. The mirror image is just as load-bearing: when *you* own the requirement and are communicating it *down* to whoever implements (contractors, a vendor team, another engineer), specify the **behavior you want** and leave the **implementation** for them to work out. Same behavior-vs-implementation line, opposite direction — there it's a question going out, here it's a directive going out. You keep *what* and *why*; they own *how*, and they state it in their own vocabulary.
 
 Concrete tells that you've slipped into dictating implementation: naming a specific tool, service, or pipeline; prescribing a data structure or storage scheme; specifying *the steps* rather than *the end state*. When you catch one, rewrite to the behavior it was meant to produce and add — if useful — "here are options we could consider, for you to weigh," explicitly provisional.
+
+`rules/references/stakeholder-questions/requirements-to-implementers.md` works the mechanism-versus-outcome contrast through a concrete case and covers landing the requirement in their vocabulary. Load it when drafting a requirement, statement of work, or hand-off brief for someone else to build.
 
 Failure mode this prevents: handing implementers a solution dressed as a requirement. They either follow it even though a better fit exists in their context, or they push back and the conversation re-litigates the mechanism instead of confirming the behavior — when the behavior was the only thing you actually needed to pin down.
 
@@ -69,10 +67,6 @@ When you can't see the behavior framing from where you sit, that's a signal to i
 
 When you need a fact, preference, or decision from someone who holds the answer and an open question isn't getting it, put your genuine best guess in front of them plainly and let them correct it. A concrete claim someone can disagree with pulls a correction where an open question pulls silence — "we're treating weekend orders as next-business-day fulfillment, correct?" gets fixed fast if it's wrong, where "how should we handle weekend orders?" gets a shrug. This is [Cunningham's Law](https://en.wikipedia.org/wiki/Cunningham%27s_Law) in its good-faith form — not stating something false to provoke, but floating a real best guess as bait for the right answer.
 
-Keep it honest. The guess is offered in good faith, and the audible-hedge habit (`rules/references/writing/voice.md`, "Keep factual-uncertainty hedges audible") still rides along — it reads as a guess, not a settled fact. The edge to watch is strawman drift: don't sharpen the guess into something you know is wrong to force a reaction. That tips the technique into the dishonest version of itself.
-
-Bound it to claims aimed at someone who can correct them — a stakeholder, client, or teammate who owns the ground truth. It does not license confident-wrong claims in analysis, numbers, or any output with no corrector on the other end, where a wrong claim just ships as wrong (that's honesty.md's territory).
-
-Companion to "Match the stakeholder's vocabulary" above — the "what we're currently calling X" hedge is the same instinct applied to terminology, where this applies it to facts and decisions.
+Three limits keep it honest: the guess reads as a guess (the audible-hedge habit still rides along), it is never sharpened into a strawman to force a reaction, and it is bound to claims aimed at someone who can actually correct them — it licenses nothing in analysis, in numbers, or in any output with no corrector on the other end. `rules/references/stakeholder-questions/correctable-best-guess.md` works each limit through; load it before using the technique somewhere the wrong version would do damage.
 
 Failure mode this prevents: hedging a question into an abstraction that asserts nothing — "how should we handle X, where applicable?" — safe, answerable with a shrug, surfacing no correction. The open question feels more honest, but it extracts less. A plainly-stated best guess gets the right answer faster precisely because it's disagreeable.
