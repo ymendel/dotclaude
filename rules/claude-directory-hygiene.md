@@ -16,13 +16,31 @@ Everything else goes in a subdirectory. A file that is neither named in that lay
 inside one of its directories is the thing this rule exists to prevent.
 
 Anything written to feed a single command — a commit message, a PR body, an issue body —
-goes in `.claude/scratch/`, not at top level, unless the user will open and act on it
-directly (`long-form-output.md` governs that call). Live PR bodies are the common
-exception worth hoisting, since they get re-read and re-edited across a PR's life; a
-`pr-bodies/` subdirectory serves them better than the top level does.
+goes in `.claude/scratch/`, not at top level. Live PR bodies are the common exception worth
+hoisting, since they get re-read and re-edited across a PR's life; a `pr-bodies/`
+subdirectory serves them better than the top level does.
 
 When a project's `.claude/` grows a directory its layout section doesn't mention, add the
 line rather than leaving the reader to infer what the directory is for.
+
+## `.claude/` versus the session scratchpad
+
+The session scratchpad is the model's working directory; `.claude/` is where the user can
+reach a file. So the question is who will open it.
+
+Anything the user will open and act on directly — a rebase message sheet, a command list,
+anything they will paste or run from their own terminal — goes one step from the project
+root, in `.claude/` or a gitignored `tmp/`. A deep `/private/tmp/claude-…/` path makes them
+copy a long string just to see what they were handed.
+
+When it isn't clear who the file is for, start it under `.claude/scratch/` anyway. Rescuing
+a file *out* of the scratchpad is a chore that has to be remembered and mostly isn't, while
+deleting one the user can see costs nothing. So only genuinely one-shot output — a commit
+message, an issue body — stays in the scratchpad.
+
+Failure mode this prevents: a file that only became worth keeping *after* it was written
+evaporates with the session, or an artifact meant *for the user* lands where only the model
+navigates comfortably and they are left asking "where is it?" before they can use it.
 
 ## What it gets named
 
