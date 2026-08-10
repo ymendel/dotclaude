@@ -28,6 +28,14 @@ The pull toward the loop is real — it looks like the tidier way to avoid repea
 
 Failure mode this prevents: a read-only batch that should have been invisible interrupts the user for approval, and does it at exactly the moment the work is meant to be running unattended.
 
+## Invoke a project script by the relative path its allow rule names
+
+Run `bin/rubocop`, `scripts/report.sh`, `bash scripts/floor.sh` — not the absolute path to the same file. Allow rules match the literal command string, so a grant written as `Bash(bash scripts/floor.sh)` does not cover `bash /Users/…/project/scripts/floor.sh`: same script, same effect, different string, and the gate asks. The absolute form is the natural reach right after working in another directory or reading a path out of a tool result, which is when it slips in. The shell's cwd is the project root and stays there, so the relative form always resolves.
+
+A companion to the two entries above it: those keep a dynamic argument out of the command so the gate can resolve it, this keeps the command name in the form the gate already knows. `agents.md` carries the same constraint for sub-agent prompts, which is where it bites hardest — but it applies to a command issued from here first.
+
+Failure mode this prevents: a routine, already-granted command interrupts the user for approval, and because the command is *correct* the prompt reads as a gap in the allow list rather than as a slip in how the command was written — so the fix attempted is a new allowlist entry that duplicates the one already there.
+
 ## A malformed path won't error in Write the way it does in the shell — verify where it landed
 
 File tools take absolute paths. Build each one clean from the project root. Don't splice a `../` segment into the middle. Such a path resolves differently depending on who handles it, and Write is the permissive one:
