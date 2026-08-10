@@ -107,6 +107,26 @@ the gate actually sees. This is the same passthrough mechanism as the `cat "$(�
 slips below (`rtk rewrite` exit 1 → bare command at the gate). The difference is that here the bare
 form is *correct*, not a slip to route around. Mechanism confirmed by reading `hooks/rtk-rewrite.sh`.
 
+### `rtk proxy` is an escape hatch, not a prefix
+
+The Golden Rule asks for `rtk`, not `rtk proxy`. Proxying bypasses every filter, so a reflexive
+`rtk proxy <cmd>` pays the prefix and collects none of the savings — the Golden Rule inverted while
+looking like compliance. Reach for it only with a reason to name: `rtk proxy git diff --no-ext-diff`
+per the diff guidance above, debugging RTK itself, or a case where a filter is known to hide what is
+needed (the Exception under *Built-in Tool Override*). "I wasn't sure" is not one of those reasons —
+an unfiltered read is what the built-in Read/Grep/Glob tools are for.
+
+**The tell that it is reflex rather than reason: `proxy` on a long-output command, paired with
+`head` or `tail` in the same command line.** That pairing turns the filtering off and then
+hand-rolls a cruder version of it, and the pipe it needs re-introduces the swallowed-exit-status
+trap — so a CI or test run gated on `&&` reports the filter's status, not the suite's. `rtk test
+<cmd>` and `rtk err <cmd>` filter the same output with no pipe at all and propagate the wrapped
+command's status, which is why `tool-and-shell-safety.md` now sends verification runs there.
+
+Failure mode this prevents: the prefix reads as the careful choice while doing the opposite of what
+it is for, and the verbosity it causes gets papered over with a pipe that quietly breaks the exit
+status the command was run to check.
+
 ## Hook-Based Usage
 
 All Bash tool calls are automatically rewritten by the Claude Code hook.
