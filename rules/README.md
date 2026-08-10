@@ -12,6 +12,8 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`agents.md`** — When to use each available agent type. Covers the distinction between `Explore` and `codebase-pattern-finder`, when to reach for `Plan`, when specialized agents beat `general-purpose`, when to parallelize (including the big-ADR-kickoff trigger), and when to delegate noisy reads to preserve main context.
 
+**`claude-directory-hygiene.md`** — Keeping a project's `.claude/` readable: which files belong at top level versus in a subdirectory, how transient artifacts (commit messages, PR bodies, issue drafts) are named, and the delete-when-the-content-lands-somewhere-permanent trigger that keeps them from accumulating.
+
 **`code-style.md`** — General code style: trailing newlines, simplicity, parser libraries over regex, naming, consistency.
 
 **`code-style-ruby.md`** — Ruby and Rails conventions: instance-oriented design, no metaprogramming, Symbol#to_proc, aesthetic preferences, Rake task syntax, and verifying model names before scripting against them. Path-scoped to `*.rb`, `*.rake`, `*.erb`, `Gemfile`, and `Rakefile`.
