@@ -71,14 +71,15 @@ Every commit message should explain **why**, not just **what**. The diff already
 - For supporting changes especially, document the rationale ("Increase session timeout to 120 minutes because Google OAuth token refresh requires longer-lived sessions")
 
 **Bad commit messages to avoid:**
-- "WIP", "wip", "work in progress"
 - "oops", "fix", "fix tests", "forgot this file"
 - "misc changes", "updates", "stuff"
 - Auto-generated squash messages that just list prior commits
 
+`WIP:` and `fixup!` are the deliberate exception, and `commit-message-guide` defines them. They mark a commit that is not final, so they have no place in a commit this skill has structured — but do not read them as defects in the unpushed history feeding into it.
+
 ## Rules
 
-- **Tests must pass at each commit.** Every commit should leave the codebase in a working state. Don't commit a refactor that breaks tests and then fix them in the next commit.
+- **Tests must pass at each commit this skill produces.** Every commit in the structured result should leave the codebase in a working state. Don't commit a refactor that breaks tests and then fix them in the next commit. This bar governs the commits produced here, not the unpushed checkpoints they may be built from — a checkpoint taken mid-cycle is allowed to be red, which is exactly why it has to be promoted rather than pushed.
 - **Don't mix concerns.** A refactoring commit should not sneak in new behavior. A feature commit should not reorganize unrelated code.
 - **Order matters.** Refactoring comes before the feature it enables. Supporting changes come after the feature they support.
 - **Smaller is better, but not artificially small.** A commit should be the smallest unit that is *complete and meaningful*. Don't split a single logical change across commits just to hit a count.

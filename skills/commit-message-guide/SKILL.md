@@ -38,6 +38,8 @@ fixup! feat(api): add support for webhook callbacks
 
 WIP and FIXUP commits skip all other requirements.
 
+These two are the vocabulary for a commit that is deliberately not final, and this guide defines them. Other skills that judge commit quality defer here rather than restating what a not-final commit looks like. Both belong to unpushed history: a WIP or FIXUP commit is expected to be squashed, amended, or promoted into a real commit before the branch is pushed, and every other bar in this guide applies to the result of that promotion rather than to the checkpoint.
+
 ## When creating commits
 
 If the work spans multiple concerns, use `purposeful-commits` first to structure the commits, then apply this guide to each individual message.
