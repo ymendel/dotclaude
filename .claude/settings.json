@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/check-prerequisites.sh:*)",
+      "Bash(./scripts/compare-skills.sh:*)",
+      "Bash(./scripts/rules-floor.sh:*)",
+      "Bash(./scripts/rules-sections.py:*)",
+      "Bash(./scripts/usage-report.sh:*)"
+    ]
+  }
+}

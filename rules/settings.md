@@ -115,6 +115,19 @@ Failure mode: dropping skill-related permissions into a project's `.claude/setti
 
 For paths in skill-related permissions, leading `**` lets a single global rule cover any project: `Write(**/.claude/handoffs/*.md)` matches a handoffs directory in every project the skill is used from.
 
+### A Bash grant for a project's own script has to live in project settings
+
+Read and Edit rules can be anchored to a project (`/path` is project-relative). Bash rules cannot — they match the literal command string, so the `./` in `Bash(./scripts/report.sh:*)` is two characters, not a path. A grant that *reads* as repo-specific therefore fires wherever that command string is typed, and a second repo with a same-named script gets its own script run unprompted. Generic names make this real rather than theoretical: `check-prerequisites.sh`, `usage-report.sh`, `deploy.sh`.
+
+Since the pattern can't carry the scope, the file has to. A repo's own script tooling belongs in that repo's committed `.claude/settings.json`. This repo does that, and its allowlist `.gitignore` carries a `!/.claude` plus `!/.claude/settings.json` pair to track that one file while leaving the rest of `.claude/` ignored.
+
+Two mechanics that decide how the three files interact, both from the [settings docs](https://code.claude.com/docs/en/settings):
+
+- **Permission rules merge across scopes rather than override.** Ordinary settings follow precedence (managed → command line → local → project → user), but permission rules from every scope all apply. An overlapping pattern in two files is additive, never shadowed — so revoking a grant means deleting it everywhere it appears, not overriding it in a higher-priority file.
+- **Project allow rules require the workspace-trust step; local ones don't.** A `settings.local.json` grant takes effect immediately "because this file is yours rather than the repository's". Moving a rule into `.claude/settings.json` — or committing the local file — puts it behind trust instead. That is the desirable direction for a repo other people clone, and it means a fresh clone prompts once rather than inheriting the grants silently.
+
+Failure mode this prevents: a grant written for one repo's script applies in every repo, and the surprise arrives as *another project's* script running with no prompt — the permission system bypassed by a rule that looked narrowly scoped.
+
 ## The Offered Save Rule Is Not the Entry to Write
 
 The "Yes, and don't ask again for: …" option writes a rule generated from the command at hand, and it runs broader than the entry the situation calls for. Two observed shapes:

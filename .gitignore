@@ -8,6 +8,13 @@
 # want to keep track of settings
 !/settings.json
 
+# and the project-scoped permissions for this repo's own scripts, which a Bash
+# pattern cannot anchor to a project on its own. Only that one file — the rest
+# of .claude/ (settings.local.json, handoffs, reviews, audits, scratch) stays
+# ignored by the catch-all above.
+!/.claude
+!/.claude/settings.json
+
 # and agents
 !/agents
 !/agents/**/*
