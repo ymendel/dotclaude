@@ -12,6 +12,19 @@ Split by whether the change touches the *message* or only the *content*.
 
 Failure mode this prevents: the reword restriction gets read as covering every non-HEAD change, so a mechanical fixup is handed back to the user as though it needed their hands — or worse, gets abandoned and the hunk lands as a stray follow-up commit that has to be explained.
 
+## Promoting a run of unpushed commits
+
+The practice this serves: commit often and small while work is unpushed, treating each commit as a checkpoint rather than a finished unit, then promote the run into real commits once the work reaches a good spot. Every promotion shape is scriptable without `git rebase -i`.
+
+- **Squash a contiguous run into one commit** — `git reset --soft <first-checkpoint>^`, then commit the collected tree with `git commit -F <file>`. This is the one-commit `reset --soft HEAD~1` recipe in `development-workflow.md` generalized to a range.
+- **Fold a stray hunk into an earlier commit** — see *Changing a non-HEAD commit* above.
+- **Split one checkpoint into two** — `git reset --soft <checkpoint>^` puts its whole tree back in the index; stage and commit in pieces from there. The within-a-single-file case is the section below.
+- **Reorder** — cherry-pick the checkpoints onto a fresh base in the order wanted, rather than moving them in place.
+
+Promotion *authors* messages rather than editing existing ones, which is why it never hits the reword restriction above — `reset --soft` writes a fresh commit and `--fixup` reuses its target's message verbatim. Only a commit that must keep its content and change nothing but its text needs the user.
+
+The promotion step is load-bearing, not cosmetic: a long run of unpromoted checkpoints is harder to review than a few good commits, so the practice only pays if promotion happens before anything is pushed. Once pushed, the run is history — leave it alone.
+
 ## Splitting one file's changes across commits
 
 To split a file's changes across commits, ask the user to run `git add -p` interactively. Once the partial stage is done, use plain `git add <file>` for any remaining hunks — no further interactivity needed. When the hunks aren't cleanly splittable (adjacent additions that collapse into one `git add -p` hunk, &c.), an alternative is to edit the file in-place to revert one change, commit the remaining one, then re-apply the reverted change for the next commit. Use this as a fallback when the changes are independent and the full text of both is recoverable from context — but verify the reverted state leaves the other change committable on its own, and don't reach for it when many hunks or files are in play (the manual juggling gets error-prone fast).
