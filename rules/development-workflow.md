@@ -51,18 +51,9 @@ Failure mode this prevents: with many rules loaded passively, applying them duri
 
 ### Durable references — reference by stable identity, not volatile locator
 
-In any artifact with readers off your machine — PR description, ADR, issue, commit message, handoff, shared skill content (SKILL.md, TODO.md, `references/`) — a reference has to survive both the machine it was written on and the history it was written against.
+In any artifact with readers off your machine — PR description, ADR, issue, commit message, handoff, shared skill content (SKILL.md, TODO.md, `references/`) — a reference has to survive both the machine it was written on and the history it was written against. Prefer the stable identity (a commit's subject line, an ADR's number, a GitHub URL, a tracked path) over the volatile locator (a bare SHA, a descriptive file path, a hand-built `owner/repo#NN`), and where the locator is genuinely useful, pair the two. Naming an unreachable file is fine; linking it is not — `git ls-files <path>` decides which one you are doing.
 
-| Referencing | Use | Not |
-|---|---|---|
-| a project file | a tracked path, checked with `git ls-files <path>` | anything under `.claude/`, which the user's `~/.gitignore` hides globally even in repos whose own `.gitignore` doesn't list it |
-| a commit | the subject line, or branch-plus-position ("the tip of `ym/graphify`") | a bare SHA, unless the commit is on `main` or otherwise merged — rebase, amend, and squash-on-merge all rewrite it |
-| an ADR | the number, "ADR 0005", or `[ADR 0005](docs/adr/0005-….md)` where a click-through is wanted | the bare file path, whose descriptive slug rots on rename |
-| a GitHub issue or PR | the full URL, which GitHub auto-shortens to the right form in context | a hand-built cross-repo `owner/repo#NN`, inert text everywhere else — a same-repo `#NN` typed by hand is fine |
-
-Where the volatile locator is genuinely useful, pair it with the stable one: a SHA quoted alongside its subject line still resolves by meaning after the hash is gone.
-
-Naming an unreachable file is fine. Linking it is not. A file the reader can't open — private, gitignored, in a companion repo — is often still worth naming, and a code-span mention (`` `parked-ideas.md` ``) carries the information without promising a destination. A markdown link makes that promise and breaks it, and the reader learns nothing except that the document is wrong. So mention freely, and link only what `git ls-files` confirms.
+`rules/references/development-workflow/durable-references.md` holds the per-case table and the reasoning behind each row. Load it while writing one of those artifacts when a reference's form is in question — most usefully before linking a path under `.claude/`, quoting a SHA, or pointing at another repo's issue.
 
 Failure mode this prevents: the reader follows the reference, finds nothing, and either loses the context it was meant to carry or has to ask. Most common with handoffs and punchlist files written under `.claude/` mid-session, then name-dropped in a PR body without the location qualifier.
 
