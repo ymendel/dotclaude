@@ -20,6 +20,14 @@ In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content li
 
 **How to apply:** When writing inside `<<'EOF'`, write content as-is. The single-quoted delimiter is the explicit "treat this as a string literal" signal, so escaping inside it always overshoots. If you find yourself reaching for a backslash inside a heredoc, check the opening — if it's `'EOF'`, don't. (The same caution applies in reverse to `<<EOF` without quotes, where backticks and dollar signs *do* need escaping if you want them literal.)
 
+## Batch repeated commands by repeating them literally, not with a loop variable
+
+When running the same command over several files, write the calls out — `rtk read a.json && rtk read b.json` — or issue them as separate tool calls in one message. Do not wrap them in a `for f in …; do … "$f"; done`. The permission gate matches the literal command string, and a loop body whose argument is `"$f"` names no path it can resolve, so a batch that would otherwise pass silently prompts instead. The loop is also the more fragile form: one unquoted expansion or a filename holding a space and the whole batch misfires.
+
+The pull toward the loop is real — it looks like the tidier way to avoid repeating yourself, and it saves round-trips against an interactive prompt where a human is typing. Neither applies to a programmatically issued command, which pays nothing for the repetition and pays an approval for the expansion. Sibling of the `cat "$(ls …)"` slip in `RTK.md`: same root, a dynamic argument the tooling around the command cannot see through, and same fix — resolve the paths first, then name them literally.
+
+Failure mode this prevents: a read-only batch that should have been invisible interrupts the user for approval, and does it at exactly the moment the work is meant to be running unattended.
+
 ## A malformed path won't error in Write the way it does in the shell — verify where it landed
 
 File tools take absolute paths. Build each one clean from the project root. Don't splice a `../` segment into the middle. Such a path resolves differently depending on who handles it, and Write is the permissive one:
@@ -45,7 +53,11 @@ In `cmd | grep …`, the shell reports **grep's** status, not `cmd`'s. So `cmd |
 
 It bites hardest where the piped command *is* the verification — a test suite, a linter, a CI script, a build. Those are exactly the commands worth piping, since their output is long and only a few lines matter.
 
-**How to apply:** when a command's exit status is load-bearing — anything gating a commit, a claim that a suite passed, or a decision about what to do next — either don't pipe it, or make the status visible. `set -o pipefail` at the front propagates the first failure, and `${PIPESTATUS[0]}` reads the original status after the fact — echoing it (`echo "exit=${PIPESTATUS[0]}"`) puts it where it can't be skimmed past. Never chain `&&` off a pipeline whose first element is the thing being tested.
+**How to apply:** when a command's exit status is load-bearing — anything gating a commit, a claim that a suite passed, or a decision about what to do next — don't pipe it. Never chain `&&` off a pipeline whose first element is the thing being tested.
+
+Reach for a wrapper that filters *without* a pipe, so there is no second status to confuse: `rtk test <cmd>` shows only failures plus the tail of the output, and `rtk err <cmd>` shows only errors and warnings. Both propagate the wrapped command's status in each direction, so `rtk test bin/ci && …` gates on the suite rather than on a filter. Redirecting to a file and reading it afterwards has the same property, at the cost of a second step.
+
+Reserve `${PIPESTATUS[0]}` for a pipeline that genuinely cannot be replaced, and expect it to interrupt: it is an expansion, so the permission gate cannot resolve it and has to ask — see *Batch repeated commands by repeating them literally* above for the same mechanism. Prescribing it as the default trades a silent wrong answer for a prompt on every verification run, which is why it sits last here rather than first.
 
 Failure mode this prevents: a red test run reads as green because the summary grep matched, the `&&` behind it fires anyway, and nothing in the visible output contradicts the report that says verified. This is `honesty.md`'s *Never Present Estimates as Measurements* arriving through a shell mechanism rather than a reasoning one.
 
