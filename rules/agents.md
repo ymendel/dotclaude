@@ -48,9 +48,13 @@ When delegating work whose *how* is governed by a rule the sub-agent won't see, 
 
 Another high-frequency case is the no-`cd` rule (tool-and-shell-safety.md's *Don't reflexively `cd` into the working directory*). A sub-agent starts in the project root but, not seeing that rule, prefixes commands with `cd <project-root>` — often paired with output redirection (`2>/dev/null`), which trips a security-approval prompt on *every* such call. Tell any Bash-running sub-agent it starts in the project root: don't `cd`, and never pair `cd` with output redirection.
 
+**Phrase that as where it starts, not as a prohibition to enforce.** A sub-agent handed a flat "never `cd`" may try to *guarantee* it rather than simply comply — one prefixed its command with `cd() { return 1; }` to make the call fail if anything reached for it. That is harmless in effect, since a shell function dies with the invocation that defined it, but it trips the `function_definition` security check and puts a prompt in front of the user for a command whose actual work was a read-only `grep`. Defining a function is also how a command gets shadowed for real, so the check is worth keeping and the prompt is worth not provoking. State the fact — "your shell starts in the project root, so paths are relative to it" — and leave the enforcement to the guard hook that already exists.
+
+**Say to invoke project scripts by their relative path.** Allow rules match the literal command string, so a project's `Bash(bin/rubocop*)` grant does not cover `/Users/…/project/bin/rubocop`. A sub-agent reaching for an absolute path — the natural move when it has been told which directory it is in — prompts for a command the project already allow-listed. One sentence in the spawning prompt ("run project scripts as `bin/<script>`, not by absolute path") avoids it.
+
 Don't dump the whole ruleset into every prompt — pass only the constraints the delegated work will actually exercise.
 
-Failure mode this prevents: delegating work assuming the sub-agent carries the same rules the main context does, then getting output (or, with RTK, a string of permission prompts) that violates a rule the agent never had a chance to follow. The rule exists. The gap is that it never reached the agent doing the work.
+Failure mode this prevents: delegating work assuming the sub-agent carries the same rules the main context does, then getting output (or, with RTK, a string of permission prompts) that violates a rule the agent never had a chance to follow. The prompts are the worse half, and the two phrasing lessons above are aimed squarely at them — the delegated work stops for approvals the user cannot evaluate, because they never saw the command composed and the reason it prompted is a property of the *prompt you wrote* rather than of the work being done. The rule exists. The gap is that it never reached the agent doing the work.
 
 ## Specialized Agents
 
