@@ -4,7 +4,8 @@ Tooling for maintaining this repo's setup — keeping skills in sync with a
 separate team skills repo (`compare-skills.sh`, `sync-skill.sh` — see
 [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for the
 why), tracking which skills and agents actually get used (`usage-report.sh`),
-watching the always-loaded rule set for growth (`rules-floor.sh`), and
+watching the always-loaded rule set for growth (`rules-floor.sh`, with
+`rules-sections.py` for per-section detail), and
 verifying the declared prerequisites are present
 (`check-prerequisites.sh`). Also includes runtime workarounds for Claude Code
 bugs (`enospc-workaround.sh`).
@@ -164,12 +165,20 @@ The set is derived, not hard-coded: a `rules/*.md` counts as always-loaded when
 [`rules/rule-maintenance.md`](../rules/rule-maintenance.md)'s "How rules load".
 Excluding or path-scoping a new file needs no change here.
 
-### Bytes are a proxy
+### Bytes are a proxy — and a calibrated one
 
 The authoritative figure is the memory-files number from `/context` in a fresh
 session, which no script can reach — [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md)
 measured its before and after that way. Use this for the trend and to see which
 file is carrying the weight; confirm with `/context` around an actual pass.
+
+The proxy has since been checked against `/context`'s per-file figures and holds
+at **~3.15 bytes per token**, with the byte ranking reproducing the token
+ranking. So a total here divides by ~3.15 for a token estimate. What `/context`
+counts that this doesn't: `CLAUDE.md`, the auto-memory index, and any
+path-scoped rule a session has pulled in by touching a matching file — so
+measure in a fresh session, before opening anything, if the two are to be
+compared.
 
 ### The baseline
 
@@ -187,6 +196,36 @@ compression to extraction to nothing at all.
 ### Exit status
 
 - `0` always, including when `jq` is missing (it reports why and stops).
+
+## `rules-sections.py`
+
+Report per-`##`-section byte sizes within the always-loaded rule files — the
+resolution `rules-floor.sh` doesn't give.
+
+```
+python3 scripts/rules-sections.py [file.md]
+```
+
+With no argument, lists every section at or over 1200 bytes across all
+always-loaded files, largest first, so a pass can start with the heaviest. Given
+one file, lists all of its sections in document order, which is the view for
+deciding what to do with a specific rule.
+
+Always-loaded is determined the same way `rules-floor.sh` determines it, so the
+two agree on which files count.
+
+### Size doesn't decide the action
+
+A heavy section may be all directive (leave it), restatement of its own opening
+(tighten it), or a lookup table (extract it to `rules/references/` per ADR
+0007's destination 4). Only reading it distinguishes those, and the measured
+lesson from the 2026-08-10 pass is that extraction estimates run about double
+what they deliver — the directive and its failure mode stay behind, and the
+triggered pointer costs bytes back.
+
+### Exit status
+
+- `0` on a report, non-zero only on an unreadable path.
 
 ## `check-prerequisites.sh`
 

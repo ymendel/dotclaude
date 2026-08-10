@@ -6,6 +6,12 @@
 # /context in a fresh session, which no script can reach; ADR 0007 measured
 # with that. Track the delta here, confirm with /context around a pass.
 #
+# The proxy is calibrated: measured against /context per-file figures, the ratio
+# is ~3.15 bytes per token and the byte ranking reproduces the token ranking.
+# Divide a total here by ~3.15 for tokens. See scripts/README.md.
+#
+# For per-section sizes within a file, see scripts/rules-sections.py.
+#
 # A file is always-loaded when it is a rules/*.md that settings.json's
 # claudeMdExcludes does not match and that carries no `paths:` frontmatter.
 # See rules/rule-maintenance.md "How rules load".
