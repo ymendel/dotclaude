@@ -4,13 +4,7 @@ paths: ["**/settings.json", "**/settings.local.json"]
 
 # settings.json
 
-Gotchas and conventions for Claude Code's `settings.json`.
-
-## Path Fields vs. Hook Commands
-
-Path fields (e.g. `additionalDirectories`) support `~/` tilde expansion but **not** `$HOME` variable expansion. Use `~/.claude`, not `$HOME/.claude`.
-
-Hook `command` strings are executed by bash, so `$HOME` works fine there.
+Gotchas and conventions for Claude Code's `settings.json`, in three groups: how a rule matches and why a command prompts, how to choose and organize entries, and hook mechanics.
 
 ## Permission Glob Patterns
 
@@ -30,32 +24,9 @@ Two pattern-shape gotchas the docs flag explicitly:
 
 ### Symlinks: rules check both paths
 
-Per the docs, verbatim:
+A path reached through a symlink is checked twice, against the link and against its target. An **allow** rule applies only when *both* match — so a rule naming one side silently prompts every time, with no signal that the symlink is why. A **deny** rule applies when *either* matches.
 
-> When Claude accesses a symlink, permission rules check two paths: the symlink itself and the file it resolves to. Allow and deny rules treat that pair differently: allow rules fall back to prompting you, while deny rules block outright.
->
-> - **Allow rules**: apply only when both the symlink path and its target match. A symlink inside an allowed directory that points outside it still prompts you.
-> - **Deny rules**: apply when either the symlink path or its target matches. A symlink that points to a denied file is itself denied.
-
-For a path reached via a symlink, every allow rule is checked against both the symlink and the target — the rule applies only if both match. Failure mode: a rule that names only the symlink path (or only the canonical target) silently produces prompts for every edit, with no signal that the rule "didn't fire" because of the symlink.
-
-### Special case: `~/.claude → dotclaude/` on this machine
-
-The dotclaude repo is the target of the `~/.claude` symlink. An edit reached as `~/.claude/skills/adr/SKILL.md` resolves to two paths whose only common segments are below the `skills/` (or `handoffs/`, &c.) directory — the symlink side anchors under `.claude/`, the target side under `dotclaude/`. Rules anchored on either of those top-level segments alone match only one path, so the allow rule fails and the prompt fires.
-
-Two separate allow rules each matching one side don't compose — pairing `Edit(~/.claude/**)` with `Edit(**/dotclaude/**)` does *not* silence. A *single* rule pattern must match both paths.
-
-For one rule to cover both paths, the pattern needs a segment that appears in both — e.g. `Edit(**/skills/**)` for skill edits, `Edit(**/handoffs/*.md)` for handoffs. The trade-off: these patterns also auto-match any `skills/` or `handoffs/` directory in any project, broader than the original intent. Default: accept the prompts as the cost.
-
-> **PreToolUse hook — future option.** When the prompt cost becomes load-bearing (the live case is session handoffs being interrupted mid-departure), a hook can intercept Edit/Write under specific paths, validate narrowly, and exit 0 to skip the prompt without broadening the global allow list. Sketch: check that the path is under `~/.claude/handoffs/` (or the canonical `dotclaude/.claude/handoffs/`), exit 0 to allow. Design properly when picked up.
-
-#### Resolving paths under `~/.claude`
-
-The symlink points at the repo *root*, so `~/.claude/projects` is `dotclaude/projects`, not `dotclaude/.claude/projects`. The repo separately carries an ordinary project-local `.claude/` (`handoffs/`, `reviews/`, `audits/`, `settings.local.json`), so both spellings can exist and look plausible. Resolve `~/.claude/X` by *dropping* the `.claude` segment, never by appending one.
-
-Inside `projects/`, each per-project directory is named by replacing every `/` in the project's absolute path with `-`, which is lossy: `-Users-alice-dev-shipping-tracker` is ambiguous between `…/dev/shipping/tracker` and `…/dev/shipping-tracker`. Encode a known path to find its directory, never decode a directory name into a path you then assert exists. To identify a directory's project, read the `cwd` field in its session `.jsonl` files.
-
-Failure mode this prevents: both mistakes return something plausible rather than erroring — a wrong-tree search comes back empty and reads as "no match", and a wrongly-decoded path reads as "the project moved and these transcripts are orphaned".
+This bites constantly here, because `~/.claude` is a symlink to the dotclaude repo and the two paths share no top-level segment: no rule anchored on `.claude/` or on `dotclaude/` covers both, and pairing two rules does not compose. `rules/references/settings/claude-symlink.md` carries the docs quote, the single-pattern workaround and its trade-off, and how to resolve a path under `~/.claude` (including the lossy `projects/` directory encoding). Load it when a rule that looks correct still prompts, or before resolving a `~/.claude/…` path to its real location.
 
 ## How Bash Command Patterns Match — `:*`, ` *`, and Word Boundaries
 
@@ -103,6 +74,18 @@ Workarounds when a legitimate command is caught:
 
 Failure mode this prevents: treating an unexpected denial as a broken deny rule or a tooling bug, and retrying variants, when the real cause is the command's *text* tripping a substring deny.
 
+## Paths With Spaces
+
+When constructing shell commands that reference paths containing spaces (e.g. `~/Library/Application Support/`), use `$HOME` with proper quoting instead of backslash-escaping. Claude Code's permission system triggers a separate confirmation dialog for any command containing backslash-escaped whitespace, regardless of allow-list rules.
+
+```bash
+# ❌ Triggers backslash-escaped whitespace warning
+rtk read "$(ls -t ~/Library/Application\ Support/rtk/tee/*.log | head -1)"
+
+# ✅ No warning — $HOME + quoted path
+rtk read "$(ls -t "$HOME/Library/Application Support/rtk/tee/"*.log | head -1)"
+```
+
 ## Project vs. Global Settings — Match Scope to Use
 
 When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:
@@ -117,16 +100,33 @@ For paths in skill-related permissions, leading `**` lets a single global rule c
 
 ### A Bash grant for a project's own script has to live in project settings
 
-Read and Edit rules can be anchored to a project (`/path` is project-relative). Bash rules cannot — they match the literal command string, so the `./` in `Bash(./scripts/report.sh:*)` is two characters, not a path. A grant that *reads* as repo-specific therefore fires wherever that command string is typed, and a second repo with a same-named script gets its own script run unprompted. Generic names make this real rather than theoretical: `check-prerequisites.sh`, `usage-report.sh`, `deploy.sh`.
+Read and Edit rules can be anchored to a project (`/path` is project-relative). Bash rules cannot — they match the literal command string, so the `./` in `Bash(./scripts/report.sh:*)` is two characters, not a path. A grant that *reads* as repo-specific fires wherever that string is typed, and a second repo with a same-named script — `check-prerequisites.sh`, `usage-report.sh` — gets its own script run unprompted. Since the pattern can't carry the scope, the file has to: a repo's own script tooling belongs in that repo's committed `.claude/settings.json`.
 
-Since the pattern can't carry the scope, the file has to. A repo's own script tooling belongs in that repo's committed `.claude/settings.json`. This repo does that, and its allowlist `.gitignore` carries a `!/.claude` plus `!/.claude/settings.json` pair to track that one file while leaving the rest of `.claude/` ignored.
+Two mechanics from the [settings docs](https://code.claude.com/docs/en/settings) decide how the three files interact. **Permission rules merge across scopes rather than override**, so an overlapping pattern in two files is additive and revoking a grant means deleting every copy. And **project allow rules require the workspace-trust step where local ones don't** — a `settings.local.json` grant applies immediately "because this file is yours rather than the repository's", so moving one into `.claude/settings.json` puts it behind trust, which is the right direction for a repo other people clone.
 
-Two mechanics that decide how the three files interact, both from the [settings docs](https://code.claude.com/docs/en/settings):
+Failure mode this prevents: a grant written for one repo's script applies in every repo, and the surprise arrives as *another project's* script running with no prompt.
 
-- **Permission rules merge across scopes rather than override.** Ordinary settings follow precedence (managed → command line → local → project → user), but permission rules from every scope all apply. An overlapping pattern in two files is additive, never shadowed — so revoking a grant means deleting it everywhere it appears, not overriding it in a higher-priority file.
-- **Project allow rules require the workspace-trust step; local ones don't.** A `settings.local.json` grant takes effect immediately "because this file is yours rather than the repository's". Moving a rule into `.claude/settings.json` — or committing the local file — puts it behind trust instead. That is the desirable direction for a repo other people clone, and it means a fresh clone prompts once rather than inheriting the grants silently.
+## Skill-Script Permissions — Frontmatter `allowed-tools` vs. settings.json
 
-Failure mode this prevents: a grant written for one repo's script applies in every repo, and the surprise arrives as *another project's* script running with no prompt — the permission system bypassed by a rule that looked narrowly scoped.
+A skill's script can be auto-allowed two ways, and they differ in *scope*:
+
+- **`settings.json` allow rule** — always in effect, no matter who invokes the script.
+- **Skill frontmatter `allowed-tools`** — in effect *only while that skill is active*. Per the [docs](https://code.claude.com/docs/en/skills), it "grants permission for the listed tools while the skill is active, so Claude can use them without prompting you for approval. It does not restrict which tools are available."
+
+Do not invert this. `allowed-tools` *pre-approves* — it is not "the only tools this skill may use." Every tool stays callable — listed ones just skip the prompt while the skill runs. The field that *restricts* is `disallowed-tools`, which removes tools from the pool while the skill is active.
+
+Choosing the home:
+
+- **Invoked only via explicit skill use** — frontmatter is cleaner, and it's portable: `allowed-tools` travels with the skill to other machines, repos, or plugins. A `settings.json` entry stays on this machine.
+- **Invoked directly, outside skill activation** — `settings.json`, because frontmatter won't cover it. Common cases: running `list_handoffs.py` on a "what handoffs exist" request, or `validate_mermaid.py` mid-doc-work — the skill isn't loaded that turn, so a frontmatter-only permission would prompt.
+- **Distributing a skill** — additive, not either/or: declare `allowed-tools` so the skill works standalone on a fresh machine, and keep the `settings.json` entry for local direct-invocation. Redundant allow is harmless — both just permit.
+
+Two more considerations:
+
+- **Project skills need trust first.** For a skill checked into a project's `.claude/skills/`, `allowed-tools` takes effect only after the workspace-trust dialog is accepted — "a skill can grant itself broad tool access." User-level skills under `~/.claude` aren't gated this way.
+- **Audit visibility.** `settings.json` keeps every auto-allow in one file. Frontmatter co-locates the permission with its skill but scatters the overall picture.
+
+Failure mode this prevents: moving a skill-script permission to frontmatter-only, on the assumption that "the skill covers it," silently reintroduces prompts for every direct or proactive invocation that happens when the skill isn't active — exactly the invocations that motivated the `settings.json` entry in the first place.
 
 ## The Offered Save Rule Is Not the Entry to Write
 
@@ -154,39 +154,11 @@ The split is deliberate: only *group assignment* needs a human, everything else 
 
 Failure mode this prevents: without recording the convention, the next reorg "helpfully" collapses the whole array into one mechanical sort, destroying the ecosystem grouping — scattering `rubydoc.info` away from `rubygems.org` and `*.github.io` away from `github.com`, the exact adjacencies the layout was built to create.
 
-## Skill-Script Permissions — Frontmatter `allowed-tools` vs. settings.json
+## Path Fields vs. Hook Commands
 
-A skill's script can be auto-allowed two ways, and they differ in *scope*:
+Path fields (e.g. `additionalDirectories`) support `~/` tilde expansion but **not** `$HOME` variable expansion. Use `~/.claude`, not `$HOME/.claude`.
 
-- **`settings.json` allow rule** — always in effect, no matter who invokes the script.
-- **Skill frontmatter `allowed-tools`** — in effect *only while that skill is active*. Per the [docs](https://code.claude.com/docs/en/skills), it "grants permission for the listed tools while the skill is active, so Claude can use them without prompting you for approval. It does not restrict which tools are available."
-
-Do not invert this. `allowed-tools` *pre-approves* — it is not "the only tools this skill may use." Every tool stays callable — listed ones just skip the prompt while the skill runs. The field that *restricts* is `disallowed-tools`, which removes tools from the pool while the skill is active.
-
-Choosing the home:
-
-- **Invoked only via explicit skill use** — frontmatter is cleaner, and it's portable: `allowed-tools` travels with the skill to other machines, repos, or plugins. A `settings.json` entry stays on this machine.
-- **Invoked directly, outside skill activation** — `settings.json`, because frontmatter won't cover it. Common cases: running `list_handoffs.py` on a "what handoffs exist" request, or `validate_mermaid.py` mid-doc-work — the skill isn't loaded that turn, so a frontmatter-only permission would prompt.
-- **Distributing a skill** — additive, not either/or: declare `allowed-tools` so the skill works standalone on a fresh machine, and keep the `settings.json` entry for local direct-invocation. Redundant allow is harmless — both just permit.
-
-Two more considerations:
-
-- **Project skills need trust first.** For a skill checked into a project's `.claude/skills/`, `allowed-tools` takes effect only after the workspace-trust dialog is accepted — "a skill can grant itself broad tool access." User-level skills under `~/.claude` aren't gated this way.
-- **Audit visibility.** `settings.json` keeps every auto-allow in one file. Frontmatter co-locates the permission with its skill but scatters the overall picture.
-
-Failure mode this prevents: moving a skill-script permission to frontmatter-only, on the assumption that "the skill covers it," silently reintroduces prompts for every direct or proactive invocation that happens when the skill isn't active — exactly the invocations that motivated the `settings.json` entry in the first place.
-
-## Paths With Spaces
-
-When constructing shell commands that reference paths containing spaces (e.g. `~/Library/Application Support/`), use `$HOME` with proper quoting instead of backslash-escaping. Claude Code's permission system triggers a separate confirmation dialog for any command containing backslash-escaped whitespace, regardless of allow-list rules.
-
-```bash
-# ❌ Triggers backslash-escaped whitespace warning
-rtk read "$(ls -t ~/Library/Application\ Support/rtk/tee/*.log | head -1)"
-
-# ✅ No warning — $HOME + quoted path
-rtk read "$(ls -t "$HOME/Library/Application Support/rtk/tee/"*.log | head -1)"
-```
+Hook `command` strings are executed by bash, so `$HOME` works fine there.
 
 ## Hook Output Semantics Vary By Hook Type
 
@@ -207,14 +179,3 @@ PreToolUse hooks do run on every tool call, allowlisted ones included — an all
 The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message. The safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
 
 Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule. The JSON `deny` field does not. (The docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
-
-## TODO: Reconsider `Bash(rtk curl:*)`
-
-`rtk curl:*` is currently in the allow list to support fetching documentation and web content. This is broad — it allows any curl command without URL restriction. Consider replacing with:
-
-- `WebFetch` (built-in tool, domain-restrictable via `WebFetch(domain:example.com)`)
-- `WebSearch` for search use cases
-
-Before removing curl, verify whether `WebFetch` requires an explicit allow entry under `acceptEdits` mode, or prompts by default.
-
-Note that the two replacements above no longer cover the use case that motivated the entry. `searching.md` now routes page-reading to `trafilatura --URL`, and keeps curl for the case neither replacement serves — a snippet, a config, or exact syntax, where WebFetch's summarization loses the thing being fetched and trafilatura may drop it. So the reconsideration is narrower than it was: the question is whether curl can be scoped down now that it's the exact-text tool rather than the general-fetch one, not whether it can be swapped for WebFetch outright.
