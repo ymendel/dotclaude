@@ -584,7 +584,7 @@ Max = 120 points
 - Concrete suggestions for improvement]
 ```
 
-**Pointing to fixes**: When you recommend improvements, send the author to the **skill-architecture** skill — its writing guide, templates, and structural patterns are where most issues this rubric surfaces actually get fixed. skill-architecture builds, skill-judge audits: together they form a build → judge → fix loop.
+**Pointing to fixes**: Ground each recommendation in the rubric's own dimensions — name the dimension, quote what is missing or vague, and show what a higher-scoring version would look like. If the **skill-architecture** skill is installed, send the author there as well, since its writing guide, templates, and structural patterns are where most of what this rubric surfaces actually gets fixed.
 
 ---
 
