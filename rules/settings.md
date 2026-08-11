@@ -63,6 +63,22 @@ Failure mode this prevents: reaching for a bash loop with command substitution o
 
 **The Bash sandbox does not fix this.** Even in its auto-allow mode, deny and ask rules are still enforced, and enforcing them requires resolving the command string — exactly what an unresolvable expansion prevents — so an expansion-bearing command still prompts whether the sandbox is enabled or not. The sandbox was evaluated and dropped rather than adopted. The only lever that changes the prompt is auto mode (the permission classifier), which trades the deterministic, audited allowlist for a probabilistic per-command classifier — declined for that reason. Treat expansion prompts as unavoidable and write expansion-free commands (split the loop into discrete commands) rather than reaching for a config fix that doesn't exist.
 
+## What `bypassPermissions` Actually Skips
+
+`--dangerously-skip-permissions` is equivalent to `--permission-mode bypassPermissions`, and the name oversells what it turns off. Per the [permission-modes docs](https://code.claude.com/docs/en/permission-modes), these controls "apply in every mode, including `bypassPermissions`":
+
+- deny rules and explicit ask rules, on every tool
+- the org `ask` setting on connector tools
+- the `requiresUserInteraction` marker
+
+So a deny entry keeps working under the flag. `Bash(*git push*)` still blocks a push, which is what makes the no-autonomous-push rule structural rather than a matter of the model remembering it. What the mode *does* newly permit is writes to protected paths, which the same docs say "are never auto-approved except in `bypassPermissions` mode."
+
+Read the surviving guarantee as exactly the deny list's enumeration, though, which is narrower than "destructive commands are blocked." The list names `rm -rf`, the `find` delete and exec flags, in-place `sed`, `git push`, hard reset, and the force-checkout family. It does not name plain `rm <file>`, `mv`, `chmod -R`, `truncate`, a redirect over an existing file, or a piped-to-shell download. Under the flag every one of those runs unprompted.
+
+Reach for `acceptEdits` before the flag when the goal is just to stop approving routine filesystem work. It auto-approves `mkdir`, `touch`, `rm`, `rmdir`, `mv`, `cp`, and `sed` on paths inside the working directory or `additionalDirectories`, and the documented process wrappers it sees through are `timeout`, `nice`, and `nohup` — so an `rtk`-prefixed form is outside that set even when the bare command is inside it.
+
+Failure mode this prevents: reasoning about the flag's blast radius from its name. Guessing too broad is what happened here, and it argues *for* the flag's guardrails in a way that collapses the moment anyone checks — while guessing too narrow invites turning it on believing the deny list covers more than it enumerates.
+
 ## Deny Patterns Match the Command String, Not the Invocation
 
 Deny rules (`Bash(*git push*)`, `Bash(*rm -rf*)`, `Bash(*find* -delete*)`) match the literal command **string**, with no understanding of what the command does. Any command whose text *contains* the denied substring is blocked — even when it performs no such action. The recurring bite: a `git commit -m '…'` whose message describes the denied pattern, an `echo` or `grep` that mentions it, or a command documenting the deny rules themselves.
