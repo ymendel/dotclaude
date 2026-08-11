@@ -65,6 +65,19 @@ Specific case: "review the current diff" or "review this" without a PR number me
 
 Specific case: "block this PR", "comment on this PR", "label this PR", "approve this PR", and similar requests about "this PR" / "this branch" / "this issue" without a number must trigger a state check (`gh pr list`, `git branch --show-current` + `gh pr list --head <branch>`) — even when an earlier turn in the same session named a specific PR. A salient antecedent does not survive a silent context-switch. Failure mode: a multi-action request (labels, blocking, comments) lands on the wrong PR, requiring retraction of the wrong-PR labels and comments while redoing the work on the right PR. The cost of the state check is one shell command. The cost of acting on the wrong antecedent is visible to reviewers.
 
+### `git branch --remotes` is a local cache, and a branch name is not a pull request
+
+Two distinct claims need two distinct commands, and neither is served by the `git branch` in the state-check bullet above:
+
+- **What exists on the remote** comes from `git ls-remote --heads origin`, which queries it. `git branch --remotes` (and `git branch --all`) prints remote-tracking refs — a cache last updated by whatever fetch happened most recently, and never pruned unless asked. A branch merged and deleted upstream stays listed locally indefinitely, so the stale entry reads exactly like a live branch. `git fetch --prune` reconciles it.
+- **Whether a pull request is open** comes from `gh pr list`. A branch name never carried that fact in either direction: a deleted branch may have had a merged PR, a live branch may have no PR at all, and a `dependabot/...` or `feature/...` prefix is a naming convention rather than evidence of anything on GitHub.
+
+Chaining the two leaps is what makes this bite — remote-tracking refs get read as remote state, then branch names get read as open PRs, and the output is a confident report of live pull requests that closed some time ago. Both leaps are invisible in the output, because the stale cache prints identically to a fresh one.
+
+**How to apply:** before describing anything as open, unmerged, or awaiting action on the remote, ask which command actually produced the claim. If the answer is `git branch` in any form, it did not — re-run against `git ls-remote` or `gh`. This is `honesty.md`'s *Do Not Assert Absence Without Verifying* inverted: there a capped local view is read as a complete one, here a stale local view is read as a current one, and in both the local surface is the convenient thing to hand.
+
+Failure mode this prevents: advice gets built on a race, a conflict, or a blocking PR that does not exist — and it is disproved by the user simply opening the repository's pull-request page, which discredits the surrounding claims they cannot check as cheaply.
+
 ## Reviewing
 
 - Stay within the requested scope — do not propose or make code changes unless asked. A review request is a read-only task unless the user explicitly says to fix what's found.
