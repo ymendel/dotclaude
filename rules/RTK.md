@@ -45,8 +45,35 @@ Failure mode this prevents: reaching for awk by reflex on a task a single-purpos
 in fewer characters and with less to get wrong — and, for parsing, building a fragile
 field-splitter that looks right on the sample and breaks on the first irregular row.
 
-Exception: use the built-in Read/Grep/Glob tools when full, unfiltered output is needed.
-Two concrete reasons this matters:
+### `sed` is not a line selector
+
+Selecting lines is grep's job. A range-print (`sed -n '/START/,$p'`, `sed -n '5,20p'`) reaches
+for a stream *editor* to do it, and the gate charges a read-only invocation exactly what it
+charges an editing one: `sed` carries no allow entry and sits outside the built-in read-only
+set, so every form of it asks, while `Bash(*sed -i*)` denies the in-place form outright. So the
+filter added to keep the output small is the thing that stops the run, which is the same shape
+as *Don't add shell machinery the task didn't ask for* in `tool-and-shell-safety.md`.
+
+Reach for the plain alternatives instead: `rtk grep` (with `-A`/`-B`/`-C` when surrounding
+context is what the range was really for), the built-in Grep tool for unfiltered matches, or
+simply printing the whole thing when it is short — a `--help` page or a config file usually
+is. Where a genuine transformation is needed, Edit does in-file changes and a real parser does
+structured formats, exactly as in the awk case above.
+
+The tell is a `-n` paired with a `p`: that combination means "suppress everything, then print
+the part I want", which is a selection dressed as an edit. When the goal really is editing,
+use Edit — never `sed -i`, which the tool-override section above already rules out and which
+is error-prone on macOS besides.
+
+Failure mode this prevents: a read-only inspection trips an approval prompt for a "write or
+execute" command, and because the *work* was harmless the prompt reads as an over-strict gate
+rather than as the wrong tool — so the fix that suggests itself is an allowlist entry for
+`sed`, granting the in-place editor to buy a line range grep would have returned unprompted.
+
+### When the filter hides what you need
+
+Exception to the override table above: use the built-in Read/Grep/Glob tools when full, unfiltered
+output is needed. Two concrete reasons this matters:
 
 - **Editing a file**: Edit requires exact string matching against file content. RTK's filtered
   output may truncate or omit lines, making it impossible to construct a valid `old_string`.
@@ -96,14 +123,50 @@ git add . && git commit -m "msg" && git push
 rtk git add . && rtk git commit -m "msg" && rtk git push
 ```
 
-**Exception — `python3`, `uv`, and `trafilatura` pass through unchanged.** The golden rule holds for
-anything RTK can rewrite. A command with no RTK equivalent is *not* prefixed — `rtk rewrite` returns
-exit 1 and the command reaches the permission gate exactly as written. Those three are the live
-cases. So their allowlist entries take the **bare** form — `Bash(python3 *…)`, `Bash(uv run *…)`,
-`Bash(trafilatura --URL *…)` — never an `rtk python3 …` prefix, which would never match the string
-the gate actually sees. This is the same passthrough mechanism as the `cat "$(…)"` and heredoc-commit
-slips below (`rtk rewrite` exit 1 → bare command at the gate). The difference is that here the bare
-form is *correct*, not a slip to route around. Mechanism confirmed by reading `hooks/rtk-rewrite.sh`.
+**Exception — `python3`, `uv`, `trafilatura`, `heroku`, and a project's own scripts pass through
+unchanged.** The golden rule holds for anything RTK can rewrite. A command with no RTK equivalent is
+*not* prefixed — `rtk rewrite` returns exit 1 and the command reaches the permission gate exactly as
+written. `python3`, `uv`, `trafilatura`, and `heroku` are the live external cases, and a repo's own
+entry points are the same class — **`bin/` binstubs as much as `scripts/`**: write `bin/rubocop …`,
+`bin/rails test …`, `bin/ci`, `./scripts/sync-skill.sh …`, never `rtk` in front of any of them. So
+their allowlist entries take the **bare** form — `Bash(trafilatura --URL:*)`,
+`Bash(heroku releases:*)`, `Bash(./scripts/sync-skill.sh *--dry-run)`, and the path-globbed
+`Bash(python3 *…)` / `Bash(uv run *…)` — never an `rtk python3 …` prefix, which would never match the
+string the gate actually sees. A project script or binstub entry also belongs in that project's
+`.claude/settings.json` rather than the user-level file, per `settings.md`, and it takes the
+boundary-enforcing `:*` or ` *` form — `Bash(bin/rubocop:*)`, not `Bash(bin/rubocop*)`, which also
+matches `bin/rubocop-daemon`. This is the same passthrough mechanism as the `cat "$(…)"` and
+heredoc-commit slips below (`rtk rewrite` exit 1 → bare command at the gate). The difference is that
+here the bare form is *correct*, not a slip to route around. Mechanism confirmed by reading
+`hooks/rtk-rewrite.sh`.
+
+**A binstub is the easier miss, and `rtk test` hides it for a while.** `bin/rails` and `bin/rubocop`
+read as ordinary commands the golden rule would cover, and the prefix-versus-wrapper distinction is
+what makes the mistake survivable long enough to be confusing: `rtk bin/rubocop …` is the wrong
+*prefix* form, while `rtk test bin/ci` is the right *wrapper* form — the one
+`tool-and-shell-safety.md` asks for on any verification run, because it filters without a pipe and
+propagates the wrapped command's status. Since `Bash(rtk test:*)` grants every wrapper invocation, a
+session can run several `rtk test bin/…` commands unprompted and then be surprised when a
+`rtk bin/rubocop …` asks. Nor does appending a pipe for brevity help: `bin/rubocop … | tail -5` is
+split per segment (`settings.md`) and bare `tail` carries no grant where `rtk tail:*` does, so the
+filter added to shorten the output is a second, independent reason the command stops — the
+grant-shaped reason alongside the swallowed-status one that *`rtk proxy` is an escape hatch* below
+covers.
+
+**The tell that a tool belongs on this list is a *standing* allowlist entry that keeps prompting
+anyway.** A granted command that still asks is evidence the gate is seeing a different string than
+the entry was written for, and the `rtk ` prefix is the likeliest reason. Settle it with `rtk rewrite
+'<the bare command>'` — exit 1 means the tool passes through, so write it bare and add it here rather
+than adding an `rtk`-prefixed allowlist entry that can never fire. Failure mode: the prompts get read
+as a missing grant, and the entry added to stop them duplicates one already present in the file.
+
+**No RTK command filters stdin.** `rtk read`, `rtk grep`, and `rtk find` take paths; `rtk test <cmd>`
+and `rtk err <cmd>` wrap a command. So piping a command's output into one — `<cmd> | rtk read
+/dev/stdin` — filters nothing while adding a segment the gate has to clear on its own and
+re-introducing the swallowed-exit-status trap. When a passthrough command's output runs long, wrap it
+in `rtk test` or `rtk err`, or redirect to a file and `rtk read` the file. Failure mode: the pipe
+reads as the compact-output habit applied correctly, so the prompt it causes gets diagnosed as a
+missing grant for the command at the head of the pipeline.
 
 ### `rtk proxy` is an escape hatch, not a prefix
 
