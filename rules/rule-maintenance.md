@@ -10,6 +10,8 @@ Procedures for correcting and updating the `~/.claude` configuration.
 
 If the issue can be traced back to a rule or CLAUDE.md, make the correction there. If no appropriate rule can be found, add to `rules/feedback.md`.
 
+Prefer relocating the correction to an action-keyed general rule over patching the site that failed. When a vague instruction at one call site produces a failure, the reflex is to expand that site with more prose — but a rule keyed on the *action* fires wherever the reflex shows up, while prose keyed on one site's phrasing fires only where it first bit. Leave a light pointer at the site and let the general rule carry the substance. Where even an action-keyed rule gets bypassed, the next rung is a hook rather than a third draft of the prose — see the special case below and [ADR 0004](../docs/adr/0004-rule-vs-hook-enforcement-split.md).
+
 If a skill was involved, find that skill's canonical path (Glob for the skill's name) before editing. All corrections must target that SKILL.md, never any other documentation.
 
 A special case: when a bypassed skill's trigger and content were already complete and it simply wasn't invoked, add *no prose* anywhere — a reminder only duplicates the always-visible description and shares the very failure mode that caused the miss (passively-loaded text going unconsulted). Edit prose only for a genuine gap (trigger doesn't match, or content is missing). If such a bypass recurs enough to need enforcement, reach for a `PreToolUse` hook (ADR 0004's rule-vs-hook split), not another note.
