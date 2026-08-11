@@ -14,6 +14,33 @@ Specific case: when `git diff` output looks summarized or processed (a "Changes"
 
 Related: when the command in question is asynchronous (a background Bash, a long-running task) and the symptom is *absent* output rather than wrong output, see "Distinguish 'in progress' from 'failed' before concluding failure" below — that case has its own diagnostic checks before reissuing.
 
+## A parse error at the end of a pipe is usually the failure of the command at its start
+
+A `--json` flag describes the *success* path. Most CLIs fall back to plain text on the error path — a
+wrong app or project name, an expired credential, an unknown flag — so `<cmd> --json | jq …` hands jq
+an English sentence, and jq reports what it honestly sees: `parse error: Invalid numeric literal at
+line 1, column 6`. That message names jq, cites a column, and says nothing about the command that
+actually failed, so the natural next move is to fix the jq expression — which cannot work, because
+the expression was never the problem.
+
+**How to apply:** when the last stage of a pipeline reports a parse or format error, re-run the first
+stage alone before touching the parser. Its own error message is usually sitting there in plain text.
+Reserve edits to the jq or parser expression for a case where the input is confirmed well-formed.
+
+Worked example: `heroku config --app <name> --json | jq 'keys'` reported `Invalid numeric literal` at
+column 6, and again at column 5 for a second app. Both app names were wrong; heroku printed a
+plain-text "couldn't find that app" error and jq choked on its first letter. Nothing was wrong with
+`keys`, and no amount of rewriting it would have helped.
+
+Sibling: `tool-and-shell-safety.md`'s *A pipe hides the exit status of the command you actually care
+about*. There the pipe hides a failure completely; here it relabels one as a different stage's fault.
+Both are the pipe misattributing a result — which is the reason to suspect the pipe before suspecting
+the stage the error names.
+
+Failure mode this prevents: an upstream failure gets diagnosed as a malformed parser expression, so
+the fixing effort lands on the one part of the pipeline that was working, and the real error — which
+the tool had already printed in plain English — is never read.
+
 ## Validate a probe's detector before trusting its negative
 
 When testing an unknown by observing a downstream signal — "is X loaded?" answered by "does Y appear?" — confirm the signal actually fires in a known-positive case before trusting a *negative* result. A null from an unvalidated detector can't distinguish "X is false" from "the detector would never have shown X anyway."
