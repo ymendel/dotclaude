@@ -36,6 +36,14 @@ A companion to the two entries above it: those keep a dynamic argument out of th
 
 Failure mode this prevents: a routine, already-granted command interrupts the user for approval, and because the command is *correct* the prompt reads as a gap in the allow list rather than as a slip in how the command was written — so the fix attempted is a new allowlist entry that duplicates the one already there.
 
+## Let the script's own header pick the runner
+
+Before running a script, read its opening lines for the runner it declares. A PEP 723 `# /// script` block with a `dependencies` list means `uv run`, a shebang names its interpreter, and a docstring `Usage:` line often states the invocation outright. Reaching for `python3` on a PEP 723 script fails at the first import of a declared dependency, and the allow rule that would have covered it names `uv run`, because that is the form the script was written for.
+
+The wrong runner costs twice over. It is un-granted, so it interrupts for approval, and it is non-functional, so the interruption buys a `ModuleNotFoundError`. The prompt arrives first, which is what makes this worth a rule — it reads as a missing allowlist entry, and the fix that suggests itself is granting the broken form, an entry that can never succeed and that sits in the list competing for attention with the working one.
+
+Sibling of the section above. That one keeps the *path* in the form the gate already knows, this one the *runner*. Same literal-string match, except here the script itself is the authority on which string is right.
+
 ## A malformed path won't error in Write the way it does in the shell — verify where it landed
 
 File tools take absolute paths. Build each one clean from the project root. Don't splice a `../` segment into the middle. Such a path resolves differently depending on who handles it, and Write is the permissive one:
