@@ -7,7 +7,7 @@
 Categories and examples for the "Avoid violent and military metaphors" rule:
 
 - **Overt violence**: "kill two birds with one stone", "take a stab at", "shoot down", "pull the trigger on", "bite the bullet".
-- **Military or war origins**: "boots on the ground", "rally the troops", "in the trenches", "battle-tested", "war room", "scorched earth", "marching orders", "war story".
+- **Military or war origins**: "boots on the ground", "rally the troops", "in the trenches", "battle-tested", "war room", "scorched earth", "marching orders", "war story", "blast radius".
 
 The "in anger" and "war story" specific-replacement directives stay in `writing.md` — they name particular high-frequency traps with prescribed alternatives, not just examples to check against.
 

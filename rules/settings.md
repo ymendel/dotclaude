@@ -77,7 +77,7 @@ Read the surviving guarantee as exactly the deny list's enumeration, though, whi
 
 Reach for `acceptEdits` before the flag when the goal is just to stop approving routine filesystem work. It auto-approves `mkdir`, `touch`, `rm`, `rmdir`, `mv`, `cp`, and `sed` on paths inside the working directory or `additionalDirectories`, and the documented process wrappers it sees through are `timeout`, `nice`, and `nohup` — so an `rtk`-prefixed form is outside that set even when the bare command is inside it.
 
-Failure mode this prevents: reasoning about the flag's blast radius from its name. Guessing too broad is what happened here, and it argues *for* the flag's guardrails in a way that collapses the moment anyone checks — while guessing too narrow invites turning it on believing the deny list covers more than it enumerates.
+Failure mode this prevents: reasoning about the flag's area of effect from its name. Guessing too broad is what happened here, and it argues *for* the flag's guardrails in a way that collapses the moment anyone checks — while guessing too narrow invites turning it on believing the deny list covers more than it enumerates.
 
 ## Deny Patterns Match the Command String, Not the Invocation
 
@@ -123,6 +123,23 @@ Read and Edit rules can be anchored to a project (`/path` is project-relative). 
 Two mechanics from the [settings docs](https://code.claude.com/docs/en/settings) decide how the three files interact. **Permission rules merge across scopes rather than override**, so an overlapping pattern in two files is additive and revoking a grant means deleting every copy. And **project allow rules require the workspace-trust step where local ones don't** — a `settings.local.json` grant applies immediately "because this file is yours rather than the repository's", so moving one into `.claude/settings.json` puts it behind trust, which is the right direction for a repo other people clone.
 
 Failure mode this prevents: a grant written for one repo's script applies in every repo, and the surprise arrives as *another project's* script running with no prompt.
+
+## Match a Grant's Breadth to the Command's Area of Effect
+
+Scope picks the *file* an entry lives in. Breadth picks how much of the command the *pattern* covers, and the question that decides it is not "is this command destructive" but **how far does a wrong invocation reach, and is it recoverable where it lands**. A command that writes is not automatically worth a prompt; a command that writes somewhere the current repo's history cannot reach usually is.
+
+Worked cases on either side of that line:
+
+- **A project's own linter — grant it whole.** `Bash(bin/rubocop:*)`, in that project's `.claude/settings.json`, covers `--autocorrect-all`, which rewrites files. But they are files in the repo being worked in: they show up in `git status`, they diff, and a checkout undoes them. The area of effect is the working tree already being watched.
+- **`Bash(./scripts/sync-skill.sh *--dry-run)` — anchored on the safe flag.** A real `--to-theirs` run overwrites a whole skill directory in *another* repo, deletions included, so the write lands where this repo's history is no help and where nobody is watching `git status`. The dry runs are worth granting; each real one is worth seeing.
+
+The general test: name where a wrong invocation lands, and who can undo it. Inside the current working tree and git-tracked → grant the command whole. Another repo, a remote, a gitignored or untracked path, someone else's inbox → anchor on the safe subcommand or flag and accept the prompt on the rest.
+
+Anchoring has a mechanical cost worth knowing before you reach for it. A pattern like `Bash(./scripts/sync-skill.sh *--dry-run)` matches on the string's *tail*, so the flag has to come last on every invocation or the grant silently misses and the command prompts anyway. Where a command has no single safe flag to anchor on — a linter whose read-only shape is the absence of a flag rather than the presence of one — anchoring is not expressible, and the choice collapses to grant-whole or prompt-always.
+
+This composes with the scope section above rather than substituting for it: a broad pattern in the right file is still broad, and a narrow one in the user-level file still fires in every repo that happens to type the same string.
+
+Failure mode this prevents: breadth gets decided by how destructive the command *sounds*. A linter that edits files reads as risky and gets anchored into uselessness, while a script named like ordinary project tooling reads as routine and gets granted whole — even though the second one is the one that writes outside the repo. The prompts then accumulate on the command that never needed them, and the standing grant sits on the one that did.
 
 ## Skill-Script Permissions — Frontmatter `allowed-tools` vs. settings.json
 
