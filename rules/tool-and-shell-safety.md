@@ -1,6 +1,6 @@
 # Tool and Shell Safety
 
-Operating the shell and the file tools without silent misfires — commands that trip an approval prompt, heredocs that ship stray escapes, writes that land somewhere other than intended, and destructive overwrites that can't be undone.
+Operating the shell and the file tools without silent mishaps — commands that trip an approval prompt, heredocs that ship stray escapes, writes that land somewhere other than intended, and destructive overwrites that can't be undone.
 
 ## Don't reflexively `cd` into the working directory
 
@@ -53,7 +53,7 @@ In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content li
 
 ## Batch repeated commands by repeating them literally, not with a loop variable
 
-When running the same command over several files, write the calls out — `rtk read a.json && rtk read b.json` — or issue them as separate tool calls in one message. Do not wrap them in a `for f in …; do … "$f"; done`. The gate flags the loop by its construct, reporting `Contains for_statement`, and that check reads the statement type rather than anything inside the body — so a batch that would otherwise pass silently prompts instead, and rewriting the loop to carry no `$f` buys nothing. The loop is also the more fragile form: one unquoted expansion or a filename holding a space and the whole batch misfires.
+When running the same command over several files, write the calls out — `rtk read a.json && rtk read b.json` — or issue them as separate tool calls in one message. Do not wrap them in a `for f in …; do … "$f"; done`. The gate flags the loop by its construct, reporting `Contains for_statement`, and that check reads the statement type rather than anything inside the body — so a batch that would otherwise pass silently prompts instead, and rewriting the loop to carry no `$f` buys nothing. The loop is also the more fragile form: one unquoted expansion or a filename holding a space and the whole batch breaks.
 
 `for_statement` joins `simple_expansion` (`settings.md`) and `function_definition` (`agents.md`) as parser-node names the gate reports as its reason. None of the three can be allowlisted, so in each case the fix is to write a different command rather than to add an entry.
 
@@ -90,7 +90,7 @@ So Write offers *less* protection than a shell command here, not more. After wri
 
 ## Copy off-disk state before overwriting it when a pending decision depends on it
 
-Before overwriting or discarding on-disk-only state — uncommitted working-tree changes, gitignored or untracked files, scratch output — that an open decision or a proposed next step depends on, save a copy aside first. Git won't recover it: `git checkout` / `cp`-to-restore reflexes assume the thing being clobbered lives in history, and this state doesn't. The sharpest trigger is overwriting the very artifact an option *you just proposed* would need — that action quietly kills your own proposal.
+Before overwriting or discarding on-disk-only state — uncommitted working-tree changes, gitignored or untracked files, scratch output — that an open decision or a proposed next step depends on, save a copy aside first. Git won't recover it: `git checkout` / `cp`-to-restore reflexes assume the thing being clobbered lives in history, and this state doesn't. The sharpest trigger is overwriting the very artifact an option *you just proposed* would need — that action quietly voids your own proposal.
 
 This is not an always-do. Routine overwrites of regenerable or uninteresting files need no copy. It fires only when the on-disk-only state is load-bearing for a comparison or decision in play.
 
