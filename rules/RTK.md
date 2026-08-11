@@ -75,6 +75,14 @@ its mechanism and its escape (`rtk proxy …`, `rtk ls`, the built-in Glob tool,
 Failure mode this prevents: a filtered or gitignored miss is taken as ground truth, and the next
 step is built on "that file isn't here" or "nothing matches" when both are false.
 
+**`gh` shows the same shape, so treat an empty `gh` result the same way.** `rtk gh issue view
+<n> --comments` returned nothing at all with exit 0, and so did `rtk proxy gh issue view <n>
+--comments` — `proxy` is no escape here. Appending `2>&1` to the same command returned the full
+issue immediately, so redirecting stderr is the cheap first move rather than a debugging step.
+This matters more than a missing `grep` match, because the empty result reads as *an issue with
+no body or no comments* — a claim about the artifact rather than about the tooling — and an issue
+or PR is exactly the kind of thing whose contents get summarized onward to other people.
+
 ## Golden Rule
 
 **Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
