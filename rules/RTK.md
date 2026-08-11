@@ -132,13 +132,14 @@ entry points are the same class — **`bin/` binstubs as much as `scripts/`**: w
 their allowlist entries take the **bare** form — `Bash(trafilatura --URL:*)`,
 `Bash(heroku releases:*)`, `Bash(./scripts/sync-skill.sh *--dry-run)`, and the path-globbed
 `Bash(python3 *…)` / `Bash(uv run *…)` — never an `rtk python3 …` prefix, which would never match the
-string the gate actually sees. A project script or binstub entry also belongs in that project's
-`.claude/settings.json` rather than the user-level file, per `settings.md`, and it takes the
-boundary-enforcing `:*` or ` *` form — `Bash(bin/rubocop:*)`, not `Bash(bin/rubocop*)`, which also
-matches `bin/rubocop-daemon`. This is the same passthrough mechanism as the `cat "$(…)"` and
-heredoc-commit slips below (`rtk rewrite` exit 1 → bare command at the gate). The difference is that
-here the bare form is *correct*, not a slip to route around. Mechanism confirmed by reading
-`hooks/rtk-rewrite.sh`.
+string the gate actually sees. Every such entry takes the boundary-enforcing `:*` or ` *` form —
+`Bash(bin/rubocop:*)`, not `Bash(bin/rubocop*)`, which also matches `bin/rubocop-daemon`. Which file
+it goes in is `settings.md`'s call and splits on what is being granted rather than on where the path
+points: a repo's *own* script goes in that repo's `.claude/settings.json`, while a binstub for a
+shared standard tool goes at user level with the tool itself. This is the same passthrough mechanism
+as the `cat "$(…)"` and heredoc-commit slips below (`rtk rewrite` exit 1 → bare command at the gate).
+The difference is that here the bare form is *correct*, not a slip to route around. Mechanism
+confirmed by reading `hooks/rtk-rewrite.sh`.
 
 **A binstub is the easier miss, and `rtk test` hides it for a while.** `bin/rails` and `bin/rubocop`
 read as ordinary commands the golden rule would cover, and the prefix-versus-wrapper distinction is
