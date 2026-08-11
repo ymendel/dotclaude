@@ -95,7 +95,7 @@ PATH_PATTERNS_SCRIPT_EOF_4
 
 ```bash
 # ❌ FRAGILE - assumes specific installation location
-bash ~/.claude/plugins/itp/scripts/my-script.sh
+bash ~/.claude/plugins/<plugin>/scripts/my-script.sh
 ```
 
 **Why it fails**: Marketplace plugins install to `~/.claude/plugins/marketplaces/<publisher>/<plugin>/`, not `~/.claude/plugins/<plugin>/`.
@@ -104,7 +104,7 @@ bash ~/.claude/plugins/itp/scripts/my-script.sh
 
 ```bash
 # ❌ BREAKS on other machines
-find /Users/terryli/.claude/skills -name "SKILL.md"
+find /Users/alice/.claude/skills -name "SKILL.md"
 cd /home/alice/projects
 ```
 

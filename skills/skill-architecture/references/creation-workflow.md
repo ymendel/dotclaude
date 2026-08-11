@@ -253,11 +253,9 @@ See [Workflow Patterns](./workflow-patterns.md) for practical examples and workf
 
 ---
 
-## User Conventions (Terry's Standards)
+## Skill Authoring Conventions
 
-<!-- Link to repo CLAUDE.md removed - not available in installed context -->
-
-When creating skills, follow conventions from `~/.claude/CLAUDE.md`:
+Conventions worth applying to every skill you create:
 
 ### Relative Paths for Skill Links
 
