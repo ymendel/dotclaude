@@ -72,17 +72,21 @@ This is the edit-artifact sibling of the two rules above: they catch stale *name
 
 Failure mode this prevents: a removal-driven edit leaves a "here's what you no longer need to do" paragraph that reads as out-of-place throat-clearing to anyone reading fresh, and betrays the document as patched rather than composed.
 
-## Don't state a count beside the thing it counts
+## Don't state a count apart from the members it counts
 
-When prose sits next to a list, set, or structure it describes, don't state its cardinality. Name the members, or say nothing. "Three retry strategies, each with its own backoff:" above three bullets tells the reader nothing the bullets don't already show, and the count is the one part of that sentence a later edit silently falsifies — adding a fourth gives no signal that a sentence three lines up has a stake in the change, because the author's attention and the reader's eye are both on the list. The same holds a level out: a comment above the block it annotates, a doc section above the table it introduces.
+When prose asserts how many of something there are, the count is the one part of the sentence a later edit silently falsifies, and it does so without any signal — the author's attention and the reader's eye are both on the members, never on the sentence tallying them.
+
+What decides the risk is whether the count and the members sit in the same edit unit. A lead-in bound to its list by a colon — "Two caveats on trafilatura:" above two bullets — is one unit: adding a third means editing the very block the count introduces, with the number in view the whole time. That form is sound, and it is the house style throughout these rules. The shape that rots is a count *referring back* to members named elsewhere. "Those three are the live cases," sitting two sentences after the three were named in flowing prose, survives the edit that adds a fourth untouched, because nothing about revising the earlier sentence brings the later one into view. There, name the members again or say nothing.
+
+The same split holds a level out: a comment directly above the block it annotates is one unit with it, while a comment counting things defined further down the file is not.
 
 It is worst in a record that reads as present tense. An ADR or a design doc states facts about the repo that a reader has no reason to doubt, so a stale count survives review indefinitely and is caught only by someone who stops to count.
 
 Where the number is genuinely load-bearing — "exactly two callers remain, both in the importer" — keep it and make it checkable: name them, or date the claim, so a reader can tell current from historical.
 
-Sibling: development-workflow.md's PR-description bullet bans CI status and test counts for a related but distinct reason. There the surface is remote and live — GitHub renders the checks — and the prose is a dead copy of it. Here the surface is adjacent, in the same file, and the prose miscounts it. Both resolve the same way: don't write the self-rotting line, rather than trying to keep it current.
+Sibling: development-workflow.md's PR-description bullet bans CI status and test counts for a related but distinct reason. There the surface is remote and live — GitHub renders the checks — and the prose is a dead copy of it. Here the surface is in the same file and the prose miscounts it — adjacency being the thing that exculpates rather than condemns. Both resolve the same way: don't write the self-rotting line, rather than trying to keep it current.
 
-Failure mode this prevents: a count reads as verified precision, so it is trusted rather than checked, and it survives every review after the edit that falsified it. The prose asserts something the reader could disprove by looking two lines down, which discredits the surrounding claims they cannot check as easily.
+Failure mode this prevents: a count reads as verified precision, so it is trusted rather than checked, and it survives every review after the edit that falsified it. Nothing marks the tally as older than what it tallies, and the members it refers to are far enough off that no reader has reason to go and count — which discredits the surrounding claims they cannot check as easily either.
 
 ## Don't over-engineer for the secondary audience
 
