@@ -34,6 +34,7 @@
       "Bash(rtk proxy:*)",
       "Bash(rtk rake:*)",
       "Bash(rtk read:*)",
+      "Bash(rtk rewrite:*)",
       "Bash(rtk tail:*)",
       "Bash(rtk test:*)",
       "Bash(rtk wc:*)",
