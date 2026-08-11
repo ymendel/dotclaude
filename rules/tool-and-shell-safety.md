@@ -14,6 +14,37 @@ The Bash working directory is set to the project root at session start and persi
 
 **Now gated:** `hooks/reflexive-cd-guard.sh` blocks both hazard shapes with exit 2 and a pointer back here, so this prose is the discoverable *why* while the gate steers toward `git -C`, an absolute path, or a reverting subshell. It deliberately lets several `cd` forms through, including the ones that can strand the cwd elsewhere — blocking the way back would have the guard trap the drift it exists to warn about. `rules/references/tool-and-shell-safety/cd-guard.md` has the full blocked-and-allowed breakdown; load it when the guard fires on a command that looks legitimate, or before changing the hook.
 
+## Don't add shell machinery the task didn't ask for
+
+Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
+a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
+it is built out of are the ones the gate cannot resolve. Two instances, both real:
+
+- **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
+  1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
+  forbidden form. The guard defeats itself: the gate reports `function_definition` (see *Batch
+  repeated commands* below), that node cannot be allowlisted, so a read-only `grep` or `curl` stops
+  for approval. Shadowing a command is also how one gets broken for real. `agents.md` documents
+  this slip in the *sub-agent* direction, as something a flatly-phrased "never `cd`" provokes in a
+  delegate; it applies at least as much here, where the rule is in context and visible. An
+  always-loaded prohibition is a reason to write a different command, never a mandate to build a
+  mechanism that blocks it — and the `cd` rule already has `hooks/reflexive-cd-guard.sh`, so
+  enforcement is the hook's job.
+- **A pipe plus `${PIPESTATUS[0]}` where the plain command would do.** Covered in full by *A pipe
+  hides the exit status* below, including why the expansion prompts and what to reach for instead.
+  The trap specific to this section is applying that apparatus to output that needed no filtering
+  at all — five lines through `tail -5`, and a status probe for a command whose status a bare run
+  reports by itself.
+
+The tell for both: the part that trips the gate is not the work, it is the scaffolding. Before
+adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
+of a short command, or a plain invocation that respects the rule rather than policing it.
+
+Failure mode this prevents: scaffolding added out of diligence converts an invisible call into a
+permission prompt, and the prompt arrives attached to a command whose actual work needed no
+approval — so it reads as a gap in the allow list rather than as a self-inflicted one, and the fix
+that suggests itself is a new allowlist entry for a construct that can never be granted.
+
 ## Don't escape inside single-quoted heredocs
 
 In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content literally — no parameter expansion, no command substitution, no backslash processing. Backticks, double-quotes, and dollar signs inside one don't need escaping. Doing so ships the literal backslash through to whatever consumes the heredoc.
