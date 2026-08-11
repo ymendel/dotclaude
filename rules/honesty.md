@@ -21,6 +21,16 @@ The act of placing a number into a structured document gives it the aura of havi
 
 Before each number ships in prose, ask "where is this from, *right now*?" If the answer is "earlier this session", "the handoff", or "I think I saw it during the same task", re-query — SQL, file read, tool call — rather than reuse. This is the quantitative analogue of "Verify Framing Before Writing Prose" below: that rule says quote-before-paraphrase for qualitative claims. This one says re-query-before-restate for quantitative ones.
 
+## Never state an elapsed time — there is no clock to read
+
+Do not describe how long ago something happened: not "twenty minutes ago", not "a few minutes back", not "earlier today", not "after a long pause". Nothing in the context reports wall-clock time between turns, so every such figure is invented. A session timestamp or a file mtime is readable and citable; the gap between two of your own messages is not.
+
+This evades the rules above because it does not present as a quantitative claim. "The section I wrote twenty minutes ago" reads as conversational register — warmth, continuity, a sense of shared session history — rather than as data, so it ships without triggering the where-is-this-from check that a count or a percentage would. The number is doing rhetorical work, which is precisely why it goes unexamined.
+
+**How to apply:** refer to position in the conversation, not duration — "the section I wrote earlier this turn", "the edit above", "before the interruption", "a few tool calls back". Each is checkable against the transcript. When elapsed time genuinely matters, read it from something that records it (a file mtime, a commit date, a log line) and cite that source.
+
+Failure mode this prevents: a fabricated duration is trivially falsifiable by the one person who was present for it, and being caught inventing a number that served only tone discredits the numbers that carry real weight — the ones the user cannot check as cheaply.
+
 ## Verify Framing Before Writing Prose
 
 When describing how an external system, library, or codebase concept works (a gem's API, another project's internals, a domain model in this repo), quote the source before drafting prose. File path with line number, or a URL. Not paraphrase — quote.
