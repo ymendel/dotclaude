@@ -17,6 +17,15 @@ Both hazard shapes of the reflex, when the `cd` leads the command:
 It resolves symlinks, so a `cd` through the `~/.claude → dotclaude` alias into a subdirectory is
 caught as well.
 
+Separately from the reflex, a command that **shadows `cd`** — `cd() { … }`, `function cd { … }`, or
+`alias cd=…` — anywhere in it, not only at the start. This is not a directory change but
+self-enforcement of the rule the guard already enforces, and it costs an approval prompt on a
+command whose real work is often read-only, because the gate reports `function_definition` and no
+allow rule can grant a parser node. The brace (or the `=`) is required to match, so a mere mention
+passes — `rtk grep "cd()"` is fine, a command carrying the full definition text is not. That is the
+deny-substring trade-off from `settings.md`: it over-blocks, and the workaround is to pass the text
+via a file.
+
 ## Passes, by design
 
 - a reverting subshell, `(cd <dir> && <cmd>)` — the sanctioned way to run from another directory.

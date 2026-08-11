@@ -38,6 +38,12 @@
 #     cwd for the rest of the session. Blocking the way back would make this guard
 #     trap the very drift it exists to warn about.
 #
+# Separately from the prefix hazards above, a command that SHADOWS `cd` — a
+# function definition or an alias — is blocked too. That is not a cd; it is
+# self-enforcement of the rule this hook exists to enforce, and it converts a
+# read-only command into an approval prompt. See the branch below for the
+# mechanism.
+#
 # Block mechanism is exit code 2 — the only hook signal that beats a matching
 # allow rule.
 
@@ -50,6 +56,28 @@ fi
 INPUT=$(cat)
 CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT")
 [ -z "$CMD" ] && exit 0
+
+# Shadowing `cd` — a function definition or an alias — is not a cd at all. It is
+# an attempt to enforce the rule this hook guards on oneself, and it backfires
+# twice: the permission gate reports `function_definition`, a parser node no
+# allow rule can grant, so a read-only command stops for approval; and shadowing
+# a builtin is how one gets broken for real. See tool-and-shell-safety.md's
+# "Don't add shell machinery the task didn't ask for".
+#
+# Checked BEFORE the leading-`cd` match below, which requires whitespace after
+# `cd` and so never sees `cd()`. Matched anywhere in the command, not just at the
+# start, since a shadow can follow a separator.
+#
+# Requiring the brace keeps a mere mention from tripping it — `rtk grep "cd()"`
+# passes. A command carrying the full definition text does not, which is the
+# deny-substring trade-off settings.md describes: over-block, then pass the text
+# via a file. That is how this branch's own tests are run.
+if [[ "$CMD" =~ (^|[[:space:]\;\&\|\(])cd[[:space:]]*\(\)[[:space:]]*\{ ]] \
+  || [[ "$CMD" =~ (^|[[:space:]\;\&\|\(])function[[:space:]]+cd([[:space:]]*\(\))?[[:space:]]*\{ ]] \
+  || [[ "$CMD" =~ (^|[[:space:]\;\&\|\(])alias[[:space:]]+cd= ]]; then
+  echo "reflexive-cd-guard: blocked. This shadows \`cd\` with a function or alias, which is not a directory change but an attempt to enforce the no-reflexive-cd rule on yourself. It backfires: the permission gate reports \`function_definition\`, which no allow rule can grant, so the command stops for approval even when its actual work is read-only — and shadowing a builtin is how one gets broken for real. Comply by writing the command without the forbidden form. Enforcement is this hook's job, not the command's." >&2
+  exit 2
+fi
 
 # Only act on a command that STARTS with `cd <something>` (after optional
 # leading whitespace). `rest` captures everything after the `cd `. A subshell
