@@ -15,10 +15,12 @@ names: the declared notes destinations, the settings files, and the subdirectori
 Everything else goes in a subdirectory. A file that is neither named in that layout nor
 inside one of its directories is the thing this rule exists to prevent.
 
-Anything written to feed a single command — a commit message, a PR body, an issue body —
-goes in `.claude/scratch/`, not at top level. Live PR bodies are the common exception worth
-hoisting, since they get re-read and re-edited across a PR's life; a `pr-bodies/`
-subdirectory serves them better than the top level does.
+Anything written to feed a single command and then discarded — a commit message, an issue
+body, a PR body posted once — does not belong here at all. It goes in the session
+scratchpad, for the reason the next section gives. What earns a place in `.claude/scratch/`
+is material the user may want to open: a draft to read back, a working file whose
+usefulness is not settled yet. Live PR bodies outgrow both, since they get re-read and
+re-edited across a PR's life, so give them a `pr-bodies/` subdirectory.
 
 When a project's `.claude/` grows a directory its layout section doesn't mention, add the
 line rather than leaving the reader to infer what the directory is for.
