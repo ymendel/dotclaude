@@ -45,7 +45,16 @@ Destinations:
 
 **If no destinations are declared**: don't invent paths. Surface the finding to the user with a one-line summary, and ask whether to declare destinations now or skip filing. If the user agrees to declare, follow *Declaring destinations* below.
 
-### Step 2: Determine destination type
+### Step 2: Check the tracker before treating the finding as new
+
+A declared destination is not the only place the finding may already live. Search the project's issue tracker before filing — `gh issue list` plus a grep of the titles is usually enough, and confirm an empty result rather than trusting it, since a filtered or wrapped `gh` invocation can return nothing while exiting clean.
+
+The destination check passing is what makes this easy to skip: grepping two or three local files and finding nothing reads as "not filed anywhere yet," which is a claim about those files restated as a claim about the project. The tracker is the surface those files cannot see, and it is where a finding of any consequence is likeliest to have been raised already.
+
+- **An open issue already covers it** — say so and point at the issue. Do not file a second copy in the same repo: the issue is the live artifact, visible to everyone, and a note in a gitignored file competes with it while ageing independently.
+- **An issue covers part of it** — write the note for the remainder alone and reference the issue number, so a reader lands on the live artifact rather than on the copy.
+
+### Step 3: Determine destination type
 
 If invoked explicitly with a destination in the user's message ("file this as cleanup debt"), use that. Otherwise route based on audience:
 
@@ -63,7 +72,7 @@ A single finding can map to multiple destinations — file in each that applies.
 
 The user makes the judgment call. The skill's job is to surface that the existing types don't fit, not to decide whether the finding warrants a new type.
 
-### Step 3: Produce the entry
+### Step 4: Produce the entry
 
 Use the per-destination template below. Three structural anchors are common across all three:
 
@@ -73,7 +82,7 @@ Use the per-destination template below. Three structural anchors are common acro
 
 Avoid: vague observations without a follow-on action; abstract "we should think about X" without naming X concretely; entries that don't survive being read by someone who doesn't know the current conversation.
 
-### Step 4: Write to the destination file
+### Step 5: Write to the destination file
 
 - **cleanup-debt** and **upstream-feedback**: append to the destination file as a new heading. Don't overwrite or rewrite adjacent entries.
 - **derived-template**: integrate into the existing document structure rather than tacking on a new section. Template docs are read top-to-bottom; new lessons should land where they fit topically, often next to the recommendation they qualify.

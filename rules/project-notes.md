@@ -21,7 +21,7 @@ The bar is *would this be lost if I don't file it somewhere outside the code or 
 When a trigger fires:
 
 1. **Recognize the moment** using the list above. Don't wait for the user to prompt.
-2. **Check project configuration** for declared notes destinations. Look in `CLAUDE.md`, `.claude/CLAUDE.md`, or any rule files imported from them via `@path` references. **Then read the destination files themselves**, not only the declaration naming them. A destination's name says what it collects; only its contents say whether this finding already has a home there. An existing entry may frame the same problem, hold the exact slot the finding belongs in (a candidate section awaiting instances, a proposed reference with a trap list), or record a prior decision that changes the routing.
+2. **Check project configuration** for declared notes destinations. Look in `CLAUDE.md`, `.claude/CLAUDE.md`, or any rule files imported from them via `@path` references. **Then read the destination files themselves**, not only the declaration naming them. A destination's name says what it collects; only its contents say whether this finding already has a home there. An existing entry may frame the same problem, hold the exact slot the finding belongs in (a candidate section awaiting instances, a proposed reference with a trap list), or record a prior decision that changes the routing. Then check the tracker, per *Check the tracker before filing anything as new* below — a destination check that passes is not evidence the finding is new.
 3. **If destinations are declared and the finding fits one**: invoke the `project-notes` skill, or — if the destination and shape are obvious — file directly and mention it.
 4. **If destinations are declared but the finding doesn't fit any of them**: read each candidate file before concluding that. A "doesn't fit" reported from a destination's name alone is an unverified claim about a file's contents, and it reads to the user as though the files were checked. Once the files have actually been read and the finding genuinely fits none of them, don't silently force-fit. Surface a three-way choice to the user:
     - File under the closest declared destination, naming it explicitly so the stretch is visible.
@@ -32,6 +32,16 @@ When a trigger fires:
 The skill carries the detail of how each step writes its output (file shape, append vs. integrate, prompts). The rule's job is recognition and routing decisions.
 
 Failure mode the read-the-destination step prevents: a routing question gets answered from the destinations' *names* plus whatever else is at hand — git history, the code, an earlier read of one destination — and the unread destination gets ruled out. The answer arrives as a confident "this one, not that one," or worse as a manufactured "it doesn't fit anywhere," when the unread file already proposed the very thing the finding belongs to. The user then has to supply from memory what reading the file would have shown, which is the opposite of what these files exist for. This is `honesty.md`'s *Do Not Assert Absence Without Verifying* applied to the notes destinations specifically — absence in what has been read is not absence in the file.
+
+## Check the tracker before filing anything as new
+
+A notes destination is not the only place a finding may already live. Before filing, search the project's issue tracker — `gh issue list` and a grep of the titles is usually enough, though an empty `gh` result is a wrapper artifact before it is an answer, so `RTK.md`'s `2>&1` note applies to the one check whose whole value rides on trusting a negative. A finding already raised as an issue must not be re-filed as a note in the same repo: the issue is the live artifact, it is visible to everyone rather than to one machine, and a second copy in a gitignored file competes with it while ageing independently.
+
+This is easy to skip precisely because the destination check *passes*. Grepping the declared destination files and finding nothing reads as "not filed anywhere yet," which is a claim about two or three local files restated as a claim about the project — the same *Do Not Assert Absence Without Verifying* trap as the paragraph above, one scope out. The tracker is the surface those local files cannot see, and it is where a finding of any consequence is likeliest to have been raised already, often by a different session on the same day.
+
+When an issue already covers it, say so and point at the issue instead of filing. When the issue covers only *part* of it, write the note for the remainder alone and reference the issue number, so a reader lands on the live artifact rather than on the copy.
+
+Failure mode this prevents: a finding gets filed as fresh debt while an open issue already tracks it — often a *better* version of it, naming consequences the filing missed. Nothing errors, both copies read as correct, and the duplication surfaces only when someone happens to read both. Worse, the finding is reported to the user as a discovery, so they are asked to decide something they had already settled.
 
 ## Relation to `self-improvement.md`
 
