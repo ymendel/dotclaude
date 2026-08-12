@@ -18,7 +18,7 @@ The Bash working directory is set to the project root at session start and persi
 
 Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
 a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
-it is built out of are the ones the gate cannot resolve. Two instances, both real:
+it is built out of are the ones the gate cannot resolve. Three instances, all real:
 
 - **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
@@ -30,13 +30,22 @@ it is built out of are the ones the gate cannot resolve. Two instances, both rea
   always-loaded prohibition is a reason to write a different command, never a mandate to build a
   mechanism that blocks it — and the `cd` rule already has `hooks/reflexive-cd-guard.sh`, so
   enforcement is the hook's job.
+- **A function definition for no reason at all.** The case above at least has an argument behind it.
+  This one has none: a stray `for_each() { :; };` or `cd() { :; };` in front of an ordinary `grep`,
+  defining something nothing calls, enforcing nothing, doing nothing. It costs exactly what the
+  deliberate version costs, because the gate reads the statement type rather than the intent —
+  `function_definition`, unallowlistable, and a read-only search stops for approval. So read what
+  sits in front of a command's first real word before sending it, and delete anything there that is
+  not part of the work. Having done it once is reason to check the next few commands rather than to
+  call it a one-off: the shape recurs within a session, and because it has no motive there is nothing
+  to notice yourself talking into.
 - **A pipe plus `${PIPESTATUS[0]}` where the plain command would do.** Covered in full by *A pipe
   hides the exit status* below, including why the expansion prompts and what to reach for instead.
   The trap specific to this section is applying that apparatus to output that needed no filtering
   at all — five lines through `tail -5`, and a status probe for a command whose status a bare run
   reports by itself.
 
-The tell for both: the part that trips the gate is not the work, it is the scaffolding. Before
+The tell in each case: the part that trips the gate is not the work, it is the scaffolding. Before
 adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
 of a short command, or a plain invocation that respects the rule rather than policing it.
 
