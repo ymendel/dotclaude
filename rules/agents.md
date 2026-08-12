@@ -40,6 +40,18 @@ Trigger examples:
 
 Failure mode this prevents: long sessions accumulate context from noisy reads that were only useful for extracting one or two facts. By the time the actually-important work arrives, the context window is full of incidental output and the model is operating with reduced headroom. Delegating noisy reads is cheap and preserves the runway for the real work.
 
+### A skill that inlines a reference library is for building the thing, not for deciding whether to
+
+Some skills carry a whole reference library and inline **all** of it on invocation — every language's SDK docs, every adjacent product surface, the full migration guide — not the one page the question needs. Their trigger text is written for the build case ("read this before writing the code"), and it matches just as readily on a *scoping* question, where the same volume buys a single fact. The `claude-api` skill is the recognizable instance; the shape is what to watch for, since which skills behave this way changes.
+
+So decide before calling, because there is nowhere else to put it: a skill invoked through `Skill` loads into the turn that calls it, and no flag redirects it. Ask what you would actually take away.
+
+- **A procedure you're about to follow** — writing the integration, running the migration, authoring the artifact. Invoke it; that is what it is for.
+- **A fact** — a current version or identifier, a limit, whether a feature exists. Check what is already in context first. The environment block, the project's own lockfile, and its docs routinely already hold it, and a fact in hand needs no skill at all.
+- **A fact that genuinely isn't at hand** — this is the delegation case above. Send an agent to absorb the library in its own context and hand back the sentence. Where standing instructions bar spawning an agent unprompted, ask for one; a single question costs less than the load.
+
+Failure mode this prevents: a question about *whether* to build something pulls in the library for *building* it, and nothing can unload it afterward. Because the trigger genuinely matched, the call reads as correct at the time and the cost is only visible later — as a context jump the user notices and has to ask about, in a session whose remaining headroom was the thing being spent.
+
 ## Sub-Agents Don't Inherit These Rules — Pass Constraints In The Prompt
 
 A spawned sub-agent (`Explore`, `general-purpose`, a specialized agent) runs with a stripped context. It does **not** inherit the rules loaded here — RTK tool conventions, code style, searching scope, naming. So a rule that would govern the sub-agent's actual work only takes effect if it's restated in the spawning prompt.
