@@ -21,6 +21,8 @@ The act of placing a number into a structured document gives it the aura of havi
 
 Before each number ships in prose, ask "where is this from, *right now*?" If the answer is "earlier this session", "the handoff", or "I think I saw it during the same task", re-query — SQL, file read, tool call — rather than reuse. This is the quantitative analogue of "Verify Framing Before Writing Prose" below: that rule says quote-before-paraphrase for qualitative claims. This one says re-query-before-restate for quantitative ones.
 
+**Where re-querying isn't possible, attribute the number or omit it.** A few figures can be read once and never refreshed from here — a `/context` usage percentage is the standing case, since only the user can run it and its output begins ageing the moment it prints. The re-query step has no equivalent for those, so the honest forms are attribution ("41% as of the reading earlier this session") or silence. Restating one bare presents a snapshot as the current state, and the error runs one way: the figure reads *lower* than the truth, because context only grows between compactions. Sibling of the elapsed-time rule below — that number has no instrument at all, this one has an instrument that cannot be re-read on demand.
+
 ## Never state an elapsed time — there is no clock to read
 
 Do not describe how long ago something happened: not "twenty minutes ago", not "a few minutes back", not "earlier today", not "after a long pause". Nothing in the context reports wall-clock time between turns, so every such figure is invented. A session timestamp or a file mtime is readable and citable; the gap between two of your own messages is not.
