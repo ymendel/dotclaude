@@ -147,6 +147,10 @@
           },
           {
             "type": "command",
+            "command": "$HOME/.claude/hooks/function-definition-guard.sh"
+          },
+          {
+            "type": "command",
             "command": "$HOME/.claude/hooks/uv-run-guard.sh"
           },
           {

@@ -49,6 +49,14 @@ The tell in each case: the part that trips the gate is not the work, it is the s
 adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
 of a short command, or a plain invocation that respects the rule rather than policing it.
 
+**Now gated for the function-definition shape:** `hooks/function-definition-guard.sh` blocks a
+definition in a Bash command with exit 2 and a pointer back here, per ADR 0004's rule-vs-hook split,
+after this prose was bypassed four times across two sessions. It keys on the character before the
+definition, so a definition following a separator is caught wherever it sits — and one immediately
+after an opening quote is not, which matches the gate rather than missing a case. Its header
+enumerates the shapes it knowingly over-blocks; read that before working around a block that looks
+wrong. The other two shapes above stay prose-only, having no comparable detector.
+
 Failure mode this prevents: scaffolding added out of diligence converts an invisible call into a
 permission prompt, and the prompt arrives attached to a command whose actual work needed no
 approval — so it reads as a gap in the allow list rather than as a self-inflicted one, and the fix
