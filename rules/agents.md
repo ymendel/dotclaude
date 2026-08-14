@@ -4,10 +4,21 @@
 
 Every spawned agent draws on the session and weekly token budgets. Those are separate from the
 context window and are the binding constraint: keeping the main context clean does not replenish
-them. A sub-agent pays a fixed cost — its own system prompt, its tool definitions, and its reading
-of whatever it was sent to read — and earns that back only because the noisy output never enters
-the main context and so is never re-sent on later turns. The trade wins when the output is large
-*and* many turns remain, and it loses when either is small.
+them.
+
+**The fixed cost of a spawn is around 70K tokens before the agent does any work**, and the rule set
+is the dominant term in it rather than the agent's own prompt or its tool definitions. A
+`general-purpose` agent that made zero tool calls and answered three questions about its own
+context came to 72,497 tokens, nearly all of it input — this file and its two dozen siblings, plus
+`CLAUDE.md`. Every agent that loads the hierarchy pays that, which is all of them but `Explore` and
+`Plan`.
+
+A spawn earns that back because the noisy output never enters the main context and so is never
+re-sent on later turns. That makes the comparison a product rather than a threshold: **tokens of
+noise avoided, times turns remaining, against ~70K.** A broad search early in a long session clears
+it comfortably. The same search on the last turn before stopping does not, and neither does a small
+read at any point — "the output is large" is not sufficient on its own, because a single large read
+is one turn's worth of savings against the whole fixed cost.
 
 That arithmetic is what breaks on a fan-out, which multiplies the fixed cost by the number of agents
 and earns back about what one agent would. **So one agent is the shape. Several is a request to make
