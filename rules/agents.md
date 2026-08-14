@@ -29,7 +29,10 @@ Within that ceiling the recognition triggers throughout this file are meant to f
 on. These shapes carry a standing authorization, so spawn a single agent for them without a
 per-session ask:
 
-- **Code review** — one `code-reviewer` sub-agent.
+- **Code review** — one `code-reviewer` sub-agent. Note what this is chosen *over*: `/code-review`
+  is a built-in multi-agent review, effort-scaled from `low` to `max` plus a cloud `ultra`. It
+  never fires on its own — only the user invokes it — so the single agent is the standing answer
+  and the panel is a deliberate escalation the user makes. Don't offer the escalation.
 - **Direction or design review** — one `architect-reviewer`. Whether an approach is right is a
   different question from whether code is correct, and the tell that it was wanted is a request
   aimed at `code-reviewer` carrying the framing by hand ("don't treat this as final", "review the
