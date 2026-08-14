@@ -32,6 +32,26 @@ A Bash write routes file work through the permission gate Write sidesteps entire
 allow-listed, so it prompts, and `rtk read` is read-only, no help for a write. Write, like Edit,
 never touches the Bash gate.
 
+**Emptying a file is the third form, and the one the two paragraphs above don't obviously name.**
+`: > file` and `> file` truncate rather than write, so neither "appending" nor "creating" reads as
+covering them, which is why the redirect is what gets reached for. It is still a write. Use the
+Write tool with empty content, or Edit to remove the lines that were the point — and reserve `rm`
+for a file that should be gone rather than emptied, which is a different intent and often the wrong
+one (an index file the tooling expects to exist wants truncating, not deleting).
+
+The gate makes this the costliest of the three forms. It splits a compound command per segment
+(`settings.md`) and names each segment by its command name, so a truncation riding along in an
+otherwise ordinary `rm … && … && ls …` reaches the prompt as a bare `:` — the shell's no-op
+builtin. The splitting is documented; the bare-`:` prompt is an observation from one such
+command. An allow-list
+entry for that can only ever be granting the redirect, because `:` does nothing on its own, so
+`Bash(:)` reads as harmless while being a standing grant to truncate any file on disk. Decline it
+wherever it is offered.
+
+Failure mode this prevents: the truncation form slips past a rule written around appending and
+creating, and the prompt it provokes then offers a permanent grant whose danger is invisible in the
+name it is offered under.
+
 ### When not to use awk
 
 awk is fine for the case it's built for — a per-line or per-field transformation where the
