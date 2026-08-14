@@ -10,7 +10,15 @@ Split by whether the change touches the *message* or only the *content*.
 
 **Folding content in** — do it yourself, no interactivity required. Stage the change, `git commit --fixup <target-sha>`, then `git rebase --autosquash <target-sha>^`. A `fixup!` commit keeps the target's message verbatim, so no editor is ever invoked, and `--autosquash` has worked outside `-i` since git 2.38. This is the case for "that hunk belongs in an earlier commit" — an allowlist entry the rule it implements arrived without, a file the commit should have carried.
 
-Failure mode this prevents: the reword restriction gets read as covering every non-HEAD change, so a mechanical fixup is handed back to the user as though it needed their hands — or worse, gets abandoned and the hunk lands as a stray follow-up commit that has to be explained.
+**Add `--autostash` when the working tree is dirty**, which it usually is, since the fixup is being folded in mid-session with other work still in progress. Rebase refuses to start against unstaged changes to tracked files, and that refusal is the common way this recipe stalls. The flag stashes and reapplies around the rebase, so unrelated in-flight edits come back untouched. Confirm they did rather than assuming: a stash that cannot reapply is left behind as an entry, which is the one case that puts work in the stash space the user otherwise avoids (`development-workflow.md` on branches over `git stash`).
+
+### Fixup or a new commit?
+
+Fixup when the target was **incomplete as authored** — the hunk was always meant to be in it and its absence was an oversight. A new commit when you **learned something after it landed**.
+
+The test is whether the earlier commit was *wrong* or merely *earlier*. Folding a later discovery backwards rewrites history to claim knowledge the commit did not have, and erases that the decision was taken without it — which is often the more useful half of the record. Repair belongs in the target. A record belongs after it.
+
+Failure mode this prevents: the reword restriction gets read as covering every non-HEAD change, so a mechanical fixup is handed back to the user as though it needed their hands — or worse, gets abandoned and the hunk lands as a stray follow-up commit that has to be explained. And in the other direction, `--fixup` gets reached for on anything touching an earlier commit's subject matter, quietly backdating discoveries into commits that predate them.
 
 ## Promoting a run of unpushed commits
 
