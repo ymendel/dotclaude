@@ -25,7 +25,9 @@ When a finding could go in two places, prefer the more specific one. A note abou
 - Free-form within each file. Append new entries at the bottom unless related material exists to group with.
 - Subdirectories are fine if a topic grows large enough to warrant them. This applies to any working-doc directory, not just `notes/` — when a topic in `ideas/`, `notes/`, or similar accumulates more than a couple of files, group them in a named subdirectory with a `README.md` frame rather than letting the flat directory sprawl.
 
-The directory is intentionally outside version control (the allowlist `.gitignore` in `dotclaude/` excludes anything not explicitly added). These are personal working notes, not configuration to ship.
+The directory is tracked, but not here. It lives in the private repo and is surfaced into this tree as `dotclaude/notes` → `<private-root>/notes`, a symlink that stays gitignored because dotclaude's allowlist `.gitignore` re-includes nothing that would cover it. So the notes get version history and cross-machine sync without unpublished personal material entering a public tree. See [ADR 0005](../docs/adr/0005-private-skills-separate-repo.md), whose 2026-07-13 amendment moved them there.
+
+The consequence worth carrying: these are personal working notes rather than configuration to ship, and the destination they are tracked in may itself gain a remote later. Sensitive material therefore does not belong in a note — it goes under a `private/` subdir, which that repo's `.gitignore` excludes wherever it appears. `sensitive-knowledge.md` governs the split.
 
 ## When to check
 
