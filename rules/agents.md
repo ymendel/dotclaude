@@ -130,7 +130,7 @@ Failure mode this prevents: the wrapper agent exists, is correct, and never runs
 
 Exactly two sub-agents run without the rules loaded here, and both are built-ins: `Explore` and `Plan` skip the entire CLAUDE.md hierarchy — `~/.claude/CLAUDE.md`, the `rules/` directory including its private symlinked files, `CLAUDE.local.md`, managed policy. Every other agent loads all of it, custom definitions in `agents/` and the built-in `general-purpose` alike. No frontmatter field moves an agent across that line.
 
-So a specialized agent's expertise arrives **on top of** this baseline rather than in competition with it. `rails-expert` has the code style. `code-reviewer` has the revert hazard and the staging rules. Do not restate a rule in a prompt to one of them, and do not treat their output as advice from somewhere the conventions don't reach.
+So a specialized agent's expertise arrives **on top of** this baseline rather than in competition with it. `postgres-pro` has the code style. `code-reviewer` has the revert hazard and the staging rules. Do not restate a rule in a prompt to one of them, and do not treat their output as advice from somewhere the conventions don't reach.
 
 The constraint-passing below is for `Explore` and `Plan` alone.
 
@@ -148,4 +148,6 @@ Failure mode this prevents, in both directions. Assume every agent is stripped a
 
 ## Specialized Agents
 
-When a task clearly matches a specialized agent (`rails-expert`, `postgres-pro`, `security-engineer`, etc.), name that one rather than `general-purpose` — domain specialization provides heuristics that generalist prompting won't replicate. Like the table above, this picks the agent for a delegation already agreed to; a clear domain match is not itself the reason to spawn one.
+When a task clearly matches a specialized agent — `postgres-pro` for PostgreSQL depth, `debugger` for root-cause work — name that one rather than `general-purpose`, since domain specialization provides heuristics that generalist prompting won't replicate. Like the table above, this picks the agent for a delegation already agreed to, and a clear domain match is not itself the reason to spawn one.
+
+`agents/` is deliberately small, and a domain not covered there is not an oversight to work around. Agents are kept at the point of need rather than in advance, so the answer to "there's no agent for this" is either to add one with a trigger path (see `agents/README.md`) or to proceed without one — never to stretch a nearby agent over ground it wasn't kept for.

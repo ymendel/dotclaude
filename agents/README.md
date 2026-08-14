@@ -1,77 +1,71 @@
 # Agents
 
-Specialized subagents invoked via the `Agent` tool (or directly by Claude when delegating). Each one exists because it brings something specific — a constrained toolset, a particular model choice, a domain focus, or a behavioral constraint that would be awkward to bake into a general prompt.
+Specialized subagents invoked via the `Agent` tool. Each one runs in its own context and does not
+see the current conversation, but it *does* load the full `CLAUDE.md` hierarchy — `~/.claude/CLAUDE.md`
+and every file in `rules/` — so an agent's expertise arrives on top of this repo's conventions rather
+than in competition with them. The built-in `Explore` and `Plan` agents are the exceptions that skip
+that load; nothing here does.
 
-## How they're used
+## What earns a place here
 
-Claude delegates to these when a task fits the agent's scope. You can also invoke them directly by name. Agents run with their own context. They don't inherit the current conversation.
+**A trigger path, not a domain match.** An agent only runs when something decides to delegate to it,
+and skills fire on description-match without any such decision. So an agent with no entry in
+`rules/agents.md` is unreachable in practice however well its description fits — it loses every race
+to a skill covering the same ground, and sits in the roster reading as configuration nobody needed.
+Every agent below is named by a standing authorization in that file or by its agent-selection table.
 
----
+**Kept at the point of need, not in advance.** Speculative agents were the failure this directory
+grew out of: 39 were added in April 2026, pruned to 24, and then largely unused. Stocking an agent
+for a domain that might come up trades a small permanent cost — a description in every session's
+system prompt, and a name to hold in mind — against a need that is only guessed at. The trade is
+worst in an unfamiliar domain, which is exactly where the reflex to stock up is strongest: an agent
+advising on ground you cannot evaluate is the riskiest one in the inventory, not the safest.
 
-## Code quality
+So when work arrives in a new domain, add an agent *then*. See *Adding one back* below.
 
-**`code-reviewer`** (opus) — Comprehensive review: correctness, security, best practices. Opus because review quality compounds — a weaker model misses subtle issues.
+**Judge a kept agent by recall, not authority.** These files are inherited checklists, and a long
+bulleted list gives no signal about whether it helps. The answerable question after a real run is
+"did this surface something I would not have listed" — which holds even in a domain you can't score
+for correctness. Whether its *recommendations* are right is a separate question, and not one to
+take on the agent's word.
 
-**`refactoring-specialist`** — Behavior-preserving transformation of poorly structured or duplicated code. The constraint "preserve all existing behavior" is load-bearing.
+## The agents
 
-**`debugger`** — Root cause diagnosis and bug fixes. Broad toolset so it can chase a bug wherever it leads.
+**`code-reviewer`** (opus) — Correctness, security, and best practices on a diff. Opus because review
+quality compounds. It carries write tools and uses them for probes — exercising a test, adding timing
+— which is legitimate, and it loads this repo's rules on reverting and staging, so the probe cleanup
+is bounded by them.
 
-## Architecture & design
+**`architect-reviewer`** (opus) — Evaluates design decisions, patterns, and technology choices at the
+macro level. The direction question, not the correctness one: reach for it when the ask is whether an
+approach is right. Distinct from the `adr` skill, which records a decision already taken.
 
-**`architect-reviewer`** (opus) — Evaluates system design decisions, architectural patterns, and technology choices at the macro level. Opus for the same reason as code-reviewer: the cost of a shallow architecture review is high.
+**`codebase-pattern-finder`** (read-only) — Finds existing implementations and usage examples.
+Documentarian only: it shows what exists without evaluating, critiquing, or recommending. That
+constraint is the whole point of it.
 
-**`api-designer`** — REST/GraphQL endpoint design, OpenAPI specs, authentication patterns, versioning strategies. Distinct from just "write an API" — this is about the design decisions.
+**`debugger`** — Root cause diagnosis. Kept for the shape rather than the domain — reproducing a
+failure needs Bash and throws off exactly the noisy output worth confining to another context.
 
-**`graphql-architect`** (opus) — Federation, distributed schemas, query performance across microservices. Specialized enough that it earns its own agent rather than folding into api-designer.
+**`postgres-pro`** — PostgreSQL depth: query optimization, configuration tuning, advanced features.
+The one domain agent kept, on the author's own ground rather than on a blind spot.
 
-## Infrastructure & reliability
+**`mermaid-diagram-specialist`** — Produces Mermaid diagrams, with the `mermaid-diagrams` skill named
+in its `skills:` frontmatter so the skill's full content preloads into the agent's context. The
+124K reference package lands in a window that ends when the agent returns, which is the entire reason
+this agent exists.
 
-**`devops-engineer`** — Infrastructure automation, CI/CD, containerization, and deployment workflows. The operational side of shipping.
+## Adding one back
 
-**`sre-engineer`** — SLOs, error budgets, fault-tolerant system design, incident response. Reliability engineering as a discipline, not just ops tasks.
+Nothing here was authored in this repo — every file is third-party MIT, from
+`VoltAgent/awesome-claude-code-subagents` or `softaworks/agent-toolkit` (ADR 0006, which also explains
+why agents carry repo-level attribution only and no per-agent notice). So adding and removing them is
+cheap in both directions.
 
-**`performance-engineer`** — Identifying and eliminating bottlenecks across application, database, and infrastructure layers. Cross-cutting by nature.
+- **Previously present** — `git show b150e69:agents/<name>.md` recovers any of the 39 originals,
+  including those pruned before this set.
+- **New** — take it from either upstream above, and add its author to the README's Appreciation
+  section if the upstream is not already credited there.
 
-## Data & databases
-
-**`database-administrator`** — High-availability architectures, replication, disaster recovery, production database operations. The infrastructure and ops angle.
-
-**`postgres-pro`** — PostgreSQL-specific: query optimization, configuration tuning, advanced features. The depth angle.
-
-## Security
-
-**`security-auditor`** (opus, read-only) — Systematic vulnerability analysis, compliance gap identification, evidence-based findings. Read-only tools are intentional — this agent assesses, it doesn't change things.
-
-**`security-engineer`** (opus) — Implementing security controls, zero-trust architecture, threat modeling, shifting security left. The implementation counterpart to security-auditor.
-
-## Testing & quality
-
-**`qa-expert`** — Test strategy, quality metrics, planning across the full development cycle. Broader than writing tests.
-
-**`test-automator`** — Building and integrating automated test frameworks and CI/CD test pipelines. The execution side.
-
-## Documentation & communication
-
-**`technical-writer`** (haiku) — API references, user guides, SDK docs, getting-started content. Haiku is appropriate here — documentation is about clarity, not reasoning depth.
-
-## Research & discovery
-
-**`codebase-pattern-finder`** — Finds existing implementations, usage examples, and patterns in a codebase. Critically: documentarian only. It shows what exists without evaluating, critiquing, or recommending. That constraint is the whole point.
-
-**`data-researcher`** — Discovers, collects, and validates data from multiple sources. Read-only toolset reinforces the "gather, don't modify" purpose.
-
-**`search-specialist`** — Targeted information retrieval across sources when precision matters more than synthesis.
-
-## Domain-specific
-
-**`rails-expert`** — Rails-idiomatic patterns, Hotwire, background jobs, Rails 7/8 version-awareness. Earns its place because Rails has strong conventions that generalist models often miss or work against.
-
-**`payment-integration`** (opus) — PCI compliance, fraud prevention, secure transaction processing. Opus because the cost of getting this wrong is not abstract.
-
-**`legacy-modernizer`** — Incremental migration strategies for systems that can't be rewritten wholesale. The "maintain business continuity" constraint shapes everything about how this works.
-
-**`git-workflow-manager`** (haiku) — Branching strategy design and merge management. Narrow, but "design a Git workflow for this team" is a real ask that benefits from focused guidance.
-
-## Diagrams
-
-**`mermaid-diagram-specialist`** — Creates Mermaid diagrams (flowcharts, sequence, ERD, C4, state, &c.) and delegates to the `mermaid-diagrams` skill for syntax reference.
+Either way, give it an entry in `rules/agents.md` in the same change. An agent added without one
+repeats the failure this directory was pruned to fix.

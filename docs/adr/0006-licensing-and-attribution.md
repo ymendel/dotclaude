@@ -1,7 +1,7 @@
 # ADR 0006: Licensing and Attribution
 
 **Date:** 2026-07-15
-**Status:** Accepted
+**Status:** Accepted — amended 2026-08-14 (see Amendment below)
 
 ## Context
 
@@ -215,6 +215,27 @@ that it happens.
   ship on their own. The asymmetry is deliberate and has a named revisit trigger
   (agents beginning to ship individually), so it is a documented choice rather than an
   inconsistency to trip over later.
+
+## Amendment — 2026-08-14
+
+The agent count this ADR states throughout is now historical. The directory was pruned
+from 24 agents to 6, keeping only those with a trigger path in `rules/agents.md`. The
+counts in Context and Decision above ("all 24 agents", "22 from `VoltAgent`, 2 from
+`softaworks/agent-toolkit`") describe the tree as it stood on 2026-07-15 and are left
+as written, since they are the state the decision was taken against.
+
+Nothing in the Decision changes. Both upstreams still supply kept agents, so both
+grants still matter and both remain credited in the README's Appreciation section. The
+repo-level-only tier still applies, for the same reason as before — the channels this
+repo runs still ship an agent only as part of the whole tree — and its revisit trigger
+(agents beginning to ship individually) is untouched.
+
+Two things the prune makes worth stating, because a smaller tree invites the wrong
+inference. Removing an agent does not narrow the grant this ADR gives, since it is
+repo-wide over what is tracked rather than an enumeration of files. And adding one back
+carries the same obligation it always did: a new agent from an uncredited upstream needs
+that upstream added to Appreciation, which is the whole per-agent obligation and is easy
+to skip precisely because no per-agent `ATTRIBUTION.md` exists to prompt for it.
 
 ## References
 
