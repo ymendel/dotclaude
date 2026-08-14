@@ -3,6 +3,8 @@
     "allow": [
       "Bash(bin/rubocop:*)",
       "Bash(brew info:*)",
+      "Bash(brew leaves:*)",
+      "Bash(brew list:*)",
       "Bash(brew search:*)",
       "Bash(bundle show:*)",
       "Bash(chmod +x:*)",
