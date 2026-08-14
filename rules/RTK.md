@@ -143,16 +143,27 @@ git add . && git commit -m "msg" && git push
 rtk git add . && rtk git commit -m "msg" && rtk git push
 ```
 
-**Exception — `python3`, `uv`, `trafilatura`, `heroku`, and a project's own scripts pass through
-unchanged.** The golden rule holds for anything RTK can rewrite. A command with no RTK equivalent is
-*not* prefixed — `rtk rewrite` returns exit 1 and the command reaches the permission gate exactly as
-written. `python3`, `uv`, `trafilatura`, and `heroku` are the live external cases, and a repo's own
+**Exception — `python3`, `trafilatura`, `heroku`, `brew`, and a project's own scripts pass
+through unchanged.** The golden rule holds for anything RTK can rewrite. A command with no RTK
+equivalent is *not* prefixed — `rtk rewrite` returns exit 1 and the command reaches the permission
+gate exactly as written. `python3`, `trafilatura`, `heroku` and `brew` are the live external
+cases, each confirmed by an exit-1 `rtk rewrite`, and a repo's own
 entry points are the same class — **`bin/` binstubs as much as `scripts/`**: write `bin/rubocop …`,
 `bin/rails test …`, `bin/ci`, `./scripts/sync-skill.sh …`, never `rtk` in front of any of them. So
 their allowlist entries take the **bare** form — `Bash(trafilatura --URL:*)`,
 `Bash(heroku releases:*)`, `Bash(./scripts/sync-skill.sh *--dry-run)`, and the path-globbed
-`Bash(python3 *…)` / `Bash(uv run *…)` — never an `rtk python3 …` prefix, which would never match the
-string the gate actually sees. Every such entry takes the boundary-enforcing `:*` or ` *` form —
+`Bash(python3 *…)` — never an `rtk python3 …` prefix, which would never match the
+string the gate actually sees.
+
+**`uv` is not on that list — it rewrites, and the exit code says so.** `rtk rewrite 'uv run x'`
+returns `rtk uv run x` with exit **3**, and the hook treats 3 as *rewrite and let Claude Code
+prompt* rather than as passthrough (`hooks/rtk-rewrite.sh`, whose `case` falls through on 3 with no
+early exit). So write `rtk uv run …`, and grant it in the `rtk`-prefixed form. A bare
+`Bash(uv run …)` entry can never fire, because the gate never sees a bare `uv`.
+
+Run `rtk rewrite '<the bare command>'` before adding any entry, and read the *exit code* rather than
+the output: 1 is passthrough and earns a bare grant, 3 is a rewrite that happens to want a prompt and
+earns an `rtk`-prefixed one. Both print something, which is what makes 3 easy to read as 1. Every such entry takes the boundary-enforcing `:*` or ` *` form —
 `Bash(bin/rubocop:*)`, not `Bash(bin/rubocop*)`, which also matches `bin/rubocop-daemon`. Which file
 it goes in is `settings.md`'s call and splits on what is being granted rather than on where the path
 points: a repo's *own* script goes in that repo's `.claude/settings.json`, while a binstub for a
