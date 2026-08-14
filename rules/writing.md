@@ -40,6 +40,29 @@ This is the sibling case to "plain labels over jargon shorthand" above: that rul
 
 Failure mode this prevents: corporate-policy jargon ships in writing under the user's byline where it reads as ghostwritten or unconsidered. The phrases are cheap to write because they don't require precision, which is exactly why they're worth catching.
 
+## Don't treat a design property as currency — no spending, budgets, or capital
+
+Never write that a decision "spends" a guarantee, that a recorded Positive is "spent", or that
+a record has budget or capital to draw on. The metaphor casts a property of the system as money,
+and the plain verbs are both shorter and more precise: a decision **gives up** a property, a
+claim **no longer holds** or **stops describing the system**, a guarantee **ends**, a constraint
+**is relaxed**, an invariant **is given up deliberately**.
+
+Literal consumption stays literal. Time, memory, money, and tokens are genuinely paid out, so
+"the time spent computing a checksum" or "a spawn spends the token budget" is description
+rather than metaphor. The test is whether something is actually being paid. A design property
+is not — nothing leaves an account when an ADR gives up "no object store".
+
+ADRs are where this concentrates, because an ADR is *about* tradeoffs and the currency framing
+feels apt there. It is the one place it does most damage: an ADR is read years later as a
+record of what was decided, and "this Positive is now spent" makes a reader work out which
+plain fact was meant. Say the fact.
+
+Failure mode this prevents: the metaphor reads as a considered turn of phrase rather than as
+jargon, so it survives a self-edit that would have caught "low-hanging fruit" — and because it
+scales so easily (spend, budget, cost, capital, dividend, pay down) one use seeds a whole
+register the next document inherits.
+
 ## Avoid words that collide with terms of art
 
 A word's meaning is decided by the reader's nearest context, not by the writer's intent. A word with a strong term-of-art meaning will be parsed as that term of art first, even when the surrounding sentence makes another sense structurally possible. The reader pays a cost: either spotting the collision (one re-parse) or missing it (silent misread). Either way, the word is wrong even if the dictionary defines what you meant.
