@@ -10,7 +10,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 ---
 
-**`agents.md`** — When to use each available agent type. Covers the distinction between `Explore` and `codebase-pattern-finder`, when to reach for `Plan`, when specialized agents beat `general-purpose`, when to parallelize (including the big-ADR-kickoff trigger), why a spawn spends the session and weekly token budgets and so gets offered rather than decided (with code review's standing single-agent authorization), which noisy reads are worth offering a delegation for, and which constraints to restate in a spawning prompt — since a sub-agent inherits none of these rules.
+**`agents.md`** — When to use each available agent type. Covers the distinction between `Explore` and `codebase-pattern-finder`, when to reach for `Plan`, when specialized agents beat `general-purpose`, when to parallelize (including the big-ADR-kickoff trigger), why one agent is the shape a fan-out has to be asked to exceed, which delegation shapes carry a standing authorization to spawn without asking, which noisy reads to route to one of them, and which constraints to restate in a spawning prompt — since a sub-agent inherits none of these rules.
 
 **`claude-directory-hygiene.md`** — Keeping a project's `.claude/` readable: which files belong at top level versus in a subdirectory, when a file belongs in `.claude/` at all rather than the session scratchpad, how transient artifacts (commit messages, PR bodies, issue drafts) are named, and the delete-when-the-content-lands-somewhere-permanent trigger that keeps them from accumulating. Owns file placement; `long-form-output.md` owns the file-versus-inline call.
 

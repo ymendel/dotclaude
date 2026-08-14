@@ -1,36 +1,44 @@
 # Agent Selection
 
-## Spawning spends the session and weekly budgets — ask before it, don't decide it
+## Delegate one agent freely — a fan-out is a request to make explicitly
 
 Every spawned agent draws on the session and weekly token budgets. Those are separate from the
 context window and are the binding constraint: keeping the main context clean does not replenish
 them. A sub-agent pays a fixed cost — its own system prompt, its tool definitions, and its reading
 of whatever it was sent to read — and earns that back only because the noisy output never enters
 the main context and so is never re-sent on later turns. The trade wins when the output is large
-*and* many turns remain; it loses when either is small. A fan-out multiplies the fixed cost by the
-number of agents and earns back about what one agent would.
+*and* many turns remain, and it loses when either is small.
 
-So the recognition triggers throughout this file stay, and the reflex to act on them does not. When
-one fires, put a one-line ask in front of the user — what would be sent, and to how many agents —
-rather than spawning. **One agent is the default shape. Several is a request to make explicitly,
-carrying a count, never a judgment call made quietly.** Most sessions also carry a harness
-instruction not to call the Agent tool unless the user asked, so the ask is what makes a delegation
-permitted as well as affordable.
+That arithmetic is what breaks on a fan-out, which multiplies the fixed cost by the number of agents
+and earns back about what one agent would. **So one agent is the shape. Several is a request to make
+explicitly, carrying a count, never a judgment call made quietly** — and a dynamic workflow, a
+reviewer panel, or a swarm across dimensions is not an upgrade to offer at all.
 
-**Standing authorization — code review.** Review goes to a single `code-reviewer` sub-agent. That
-request is already made and needs no per-session ask. It is also a ceiling rather than a floor: not
-a workflow, not a panel of reviewers, not a fan-out across review dimensions. Don't offer the
-orchestrated version as an upgrade.
+Within that ceiling the recognition triggers throughout this file are meant to fire *and* be acted
+on. These shapes carry a standing authorization, so spawn a single agent for them without a
+per-session ask:
 
-Failure mode this prevents: delegation gets justified on context grounds alone — the budget this
-file spent most of its length talking about — which makes an extra agent look free, because the
-resource it actually consumes is invisible from inside the session. The user finds out at the
-weekly limit, having never been asked about any individual spawn.
+- **Code review** — one `code-reviewer` sub-agent.
+- **A noisy read** — the high-volume-output section below, including its source-gathering and
+  library-inlining subsections.
+- **Codebase exploration whose output would be file dumps** — one `Explore` or
+  `codebase-pattern-finder`, per the table below.
+
+Anything outside those shapes gets a one-line ask naming what would be sent. So does anything above
+one agent, whatever the shape. Most sessions also carry a harness instruction not to call the Agent
+tool unless the user asked, and a standing authorization is what makes a delegation permitted as
+well as affordable — the request was made here rather than in the session.
+
+Failure mode this prevents: the two costs get collapsed into one policy. Gating every spawn on an
+ask suppresses the single delegation that pays for itself, putting the friction on the cheap case
+while the expensive one — the fan-out — is what needed the gate. Leaving both ungated inverts it,
+because an extra agent looks free when the resource it consumes is invisible from inside the
+session, and the user finds out at the weekly limit having never been asked.
 
 ## Codebase Exploration
 
-Three agents handle codebase work. This table settles *which* one a delegation names once the ask has
-been made — it is not itself a reason to spawn. Choose based on what you need back:
+Three agents handle codebase work. This table picks *which* one, within the standing authorization
+above for exploration whose output would be file dumps. Choose based on what you need back:
 
 | Goal | Agent |
 |------|-------|
@@ -42,11 +50,11 @@ been made — it is not itself a reason to spawn. Choose based on what you need 
 
 ## Planning
 
-The `Plan` subagent suits non-trivial implementations — offer it, per the budget section, rather than spawning it on your own read of "non-trivial". For decisions with long-term architectural impact, prefer ADRs over Claude Code's plan mode (EnterPlanMode) — see `rules/development-workflow.md`.
+The `Plan` subagent suits non-trivial implementations. Planning carries no standing authorization above, so offer it rather than spawning it on your own read of "non-trivial". For decisions with long-term architectural impact, prefer ADRs over Claude Code's plan mode (EnterPlanMode) — see `rules/development-workflow.md`.
 
 ## Parallelization
 
-This is a mechanic, not a license: it governs *how* to launch agents the user has already agreed to, never how many to launch. Once several are authorized, put them in a single message rather than sequentially so they run concurrently. Common cases: a code review alongside a security audit, or two separate subsystems explored at once — each of which is a count to have named in the ask.
+This is a mechanic, not a license: it governs *how* to launch agents the user has already agreed to, never how many to launch. Once several are authorized, put them in a single message rather than sequentially so they run concurrently. Common cases: a code review alongside a security audit, or two separate subsystems explored at once. A standing authorization covers one agent for its shape, never two of them together, so each of these is still a count to have named in the ask.
 
 ### Recognize big-ADR kickoffs
 
@@ -56,17 +64,19 @@ Trigger phrases worth treating as "big": "this touches a lot of places", "a refa
 
 Failure mode this prevents: jumping straight to drafting on a substantial ADR produces a thin or inferred Context section that has to be rewritten once implementation surfaces what was missed. Parallel scouting front-loads the verification the ADR needs anyway.
 
-## Noisy Output Is Worth An Ask, Not A Silent Spawn
+## Delegate A Noisy Read Rather Than Loading It
 
-When a tool call would dump high-volume output into the main context — large generated files, broad searches across many files, verbose test runs, long PR comment threads, full migration histories — and only a few facts are needed from it, that is the shape delegation is for: one `Explore` or `general-purpose` agent with a tight prompt asking for just those facts, burning its own context on the noise. Offer it in a sentence and let the user decide, per the budget section at the top of this file. The recognition is the valuable half and it belongs to you; the spend is theirs.
+When a tool call would dump high-volume output into the main context — large generated files, broad searches across many files, verbose test runs, long PR comment threads, full migration histories — and only a few facts are needed from it, that is the shape delegation is for: one `Explore` or `general-purpose` agent with a tight prompt asking for just those facts, burning its own context on the noise. This shape carries the standing authorization at the top of this file, so send it without asking first.
+
+What it does need is a *tight* prompt. A vague one pays the fixed cost and returns the noise anyway, which is the only way this shape loses — so name the facts wanted and the form to return them in.
 
 Trigger examples:
-- "When was the `users.email_verified_at` column added?" — worth an ask. The main context doesn't need 30 migrations loaded.
-- "What does the open PR review feedback say across these four PRs?" — worth an ask; one agent, returning a summary.
-- "Find every callsite of `LegacyJob` and summarize what they pass" — worth an ask; one agent, returning just the table.
-- **Source-gathering for prose.** When about to write prose describing how an external system or codebase concept works (per `honesty.md`'s framing rule), an `Explore` agent can gather the source quotes to draft from. Note when offering it that reading the source directly is often the cheaper answer — this one earns its keep when the sources are scattered across many files, not when they are three greps.
+- "When was the `users.email_verified_at` column added?" — delegate. The main context doesn't need 30 migrations loaded.
+- "What does the open PR review feedback say across these four PRs?" — delegate, one agent, returning a summary.
+- "Find every callsite of `LegacyJob` and summarize what they pass" — delegate, one agent, returning just the table.
+- **Source-gathering for prose.** When about to write prose describing how an external system or codebase concept works (per `honesty.md`'s framing rule), send an `Explore` agent to gather the source quotes to draft from. Reading the source directly is the cheaper answer when it is three greps — this earns its keep when the sources are scattered across many files.
 
-Failure mode this prevents: long sessions accumulate context from noisy reads that were only useful for extracting one or two facts, and by the time the important work arrives the window is full of incidental output. The correction is not to spawn on reflex — that trades a context problem for a token-budget one the user never agreed to — but to name the trade and let them take it.
+Failure mode this prevents: long sessions accumulate context from noisy reads that were only useful for extracting one or two facts, and by the time the important work arrives the window is full of incidental output. Gating this shape on an ask does not fix that — it puts a question in front of the user on the one delegation whose arithmetic already works, and the reflex under friction is to load the noise instead.
 
 ### A skill that inlines a reference library is for building the thing, not for deciding whether to
 
@@ -76,7 +86,7 @@ So decide before calling, because there is nowhere else to put it: a skill invok
 
 - **A procedure you're about to follow** — writing the integration, running the migration, authoring the artifact. Invoke it; that is what it is for.
 - **A fact** — a current version or identifier, a limit, whether a feature exists. Check what is already in context first. The environment block, the project's own lockfile, and its docs routinely already hold it, and a fact in hand needs no skill at all.
-- **A fact that genuinely isn't at hand** — this is the delegation case above. Send an agent to absorb the library in its own context and hand back the sentence. Where standing instructions bar spawning an agent unprompted, ask for one; a single question costs less than the load.
+- **A fact that genuinely isn't at hand** — this is the delegation case above, and the standing authorization covers it. Send an agent to absorb the library in its own context and hand back the sentence.
 
 Failure mode this prevents: a question about *whether* to build something pulls in the library for *building* it, and nothing can unload it afterward. Because the trigger genuinely matched, the call reads as correct at the time and the cost is only visible later — as a context jump the user notices and has to ask about, in a session whose remaining headroom was the thing being spent.
 
