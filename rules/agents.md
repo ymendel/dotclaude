@@ -30,6 +30,11 @@ on. These shapes carry a standing authorization, so spawn a single agent for the
 per-session ask:
 
 - **Code review** — one `code-reviewer` sub-agent.
+- **Direction or design review** — one `architect-reviewer`. Whether an approach is right is a
+  different question from whether code is correct, and the tell that it was wanted is a request
+  aimed at `code-reviewer` carrying the framing by hand ("don't treat this as final", "review the
+  direction"). It weighs an approach still in flight, where the `adr` skill records a decision
+  already taken.
 - **A noisy read** — the high-volume-output section below, including its source-gathering and
   library-inlining subsections.
 - **Codebase exploration whose output would be file dumps** — one `Explore` or
