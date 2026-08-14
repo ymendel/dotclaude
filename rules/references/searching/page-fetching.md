@@ -25,6 +25,21 @@ flag routes around it.
 Prose extraction on that same page was intact and compact: 623 KB of HTML in, 35 KB of markdown
 out.
 
+**That site drops tables as well as code, so treat the Claude docs as curl-only.** A fetch of the
+permissions page came back with its prose referring to "the table" that shows approval lifetimes,
+and no table anywhere in the output. Prose that *names* its missing figure is the lucky case — it
+announced the hole. A dropped table the surrounding prose never mentions leaves nothing behind at
+all, which is why the count check below cannot help here. Whenever the fetch is of Anthropic's own
+documentation, go straight to `rtk proxy curl -sL`.
+
+Confirmed against a second page, and the loss is worse than the formatting: the skills page's
+frontmatter reference renders 71 pipe-table rows under curl and **zero** under trafilatura, and four
+strings that appear only inside those cells are absent from the extraction entirely. So the cells are
+discarded rather than flattened, and nothing in the output marks where they were. The field names
+themselves still appear 11 times, from prose and YAML examples elsewhere on the page — which is the
+trap in miniature, since a search for a term the table defines still hits, and hits somewhere that
+never carried the definition.
+
 The practical consequence lives in `searching.md` — pick the tool by what the fetch is *for*, and
 go straight to curl when the payload is the code. What follows is the fallback for when that
 wasn't clear up front.
@@ -52,15 +67,17 @@ Its limits, which matter as much as the recipe:
 
 ## Why delegated fetches differ
 
-trafilatura runs through Bash, so a sub-agent can only use it if it has the Bash tool and is told
-to. Neither holds by default:
+trafilatura runs through Bash, so an agent can only use it with the Bash tool — and after the agent
+prune, the split is clean enough to state without a table.
 
-| Agent | Bash? | Practical fetch path |
-|---|---|---|
-| `search-specialist` | no | WebFetch / WebSearch only |
-| `data-researcher` | no | WebFetch / WebSearch only |
-| `Explore` | yes | capable, but won't reach for it unless the prompt says so |
+Every kept agent that can fetch at all has Bash, and every one of them loads these rules, so nothing
+needs passing in the prompt. `codebase-pattern-finder` and `mermaid-diagram-specialist` carry neither
+Bash nor WebFetch, which means they cannot fetch by any route — a fetch is not something to delegate
+to them, rather than something to work around.
 
-`agents.md` covers the general rule that a sub-agent inherits none of these rules and needs its
-constraints passed in the prompt. This is one of the cases where the constraint is worth passing —
-or worth accepting WebFetch's summary and not treating the result as verbatim.
+`Explore` is the one case needing a word in the prompt, and for the opposite reason: it has Bash and
+does *not* load these rules, so it will reach for WebFetch unless told otherwise. Say so when the
+result has to be verbatim, per `agents.md`.
+
+Should an agent ever be added that lacks Bash but carries WebFetch, that is the case where no prompt
+helps — widen its `tools:` or accept a summary and don't treat it as verbatim.
