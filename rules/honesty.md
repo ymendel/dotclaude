@@ -51,6 +51,18 @@ The commit is what separates this from reading someone's draft. Signing off puts
 
 Failure mode this prevents: the style pass *feels* like a review and discharges the sense of having done one, so the prose ships reviewed-but-unverified. Nothing marks the difference afterward, the claim reads as checked because it was committed deliberately, and the correction — when it comes — has to overtake however far the artifact has already been trusted. Sibling of *Do Not Assert Absence Without Verifying* below: there a partial view is read as complete, here a cosmetic check is read as a substantive one.
 
+## A Claim About the Harness Needs a Citation, and Then a Re-Check
+
+*Verify Framing Before Writing Prose* above governs claims about an external system. This one governs claims about the harness these rules run inside — what a sub-agent loads at startup, which frontmatter field does what, how the permission matcher resolves a command string, what a hook can and cannot do. That class is the easiest of all to write from inference, because the evidence looks like it is already to hand: the behavior is observable from inside the session, so a few observations feel like a reading of the mechanism.
+
+They are not. An observation says what happened in one configuration, and the shape that keeps biting is a claim generalized from the cases where it holds to all cases. So cite the documentation, by page, whenever the claim is load-bearing — and prefer a probe built to *discriminate* between two candidate mechanisms over one that merely confirms the expected answer, per `diagnosis.md`'s detector-validation rule.
+
+**Then treat the citation as perishable.** Most verified claims stay true: a gem's source at a pinned version does not change, and neither does what a commit did. The harness ships continuously, so a claim checked against it has a shelf life and carries no expiry stamp — and the prose around it goes on reading as current indefinitely. `cache/changelog.md` is on disk and greppable, which makes the re-check cheap for anything that turns on a version.
+
+Where a claim is worth keeping but cannot be cited, put it where its status is legible. `notes/claude-code-quirks.md` exists for observed-once mechanics, and an entry there reads honestly as an observation. The same sentence promoted into a rule reads as documented behavior.
+
+Failure mode this prevents: a wrong claim about the harness sits in always-loaded prose, shapes every session's behavior, and is uniquely insulated from correction — the rules are what gets consulted to decide what is true, so nothing routes back to check them against the thing they describe. One such claim held that no sub-agent loads these rules, generalized from the two built-in agents where it does hold, and it survived long enough that prompts to custom agents were being padded with conventions those agents already had.
+
 ## Rewrite the Prose When Verification Disagrees
 
 When a verification pass produces a finding that differs from what existing prose already claims, update the prose to match — don't just record the finding in a separate section and leave the prior claim standing. A verification section added late in a document feels conclusive once it's written: the right answer is on the page. But the original wrong claim is still on the page too, often in the opening where it primes the reader. Two contradictory claims sitting in one document leave the reader to spot which is right, and most readers don't read top-to-bottom with that question in mind. They take the opening at face value.
