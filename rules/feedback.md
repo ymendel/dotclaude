@@ -44,3 +44,24 @@ Failure mode this prevents: a section's worth of established guidance is silentl
 narrow new subheading. Because nothing about that guidance changed, it survives review and reads as
 deliberate to every reader afterward.
 
+## Offer a new mechanism before automating it
+
+When introducing a recurring behavior — a review checkpoint, a proactive suggestion, a hook, any
+trigger that could fire on its own — start by offering it, and let the user take or decline it each
+time. Automate later, once it has fired often enough that its shape is understood and the asking has
+become drudgery.
+
+The tension is between agency and drudgery, and it does not resolve the same way at both ends of a
+mechanism's life. Early on the offer *is* the point: it shows what the trigger recognized and what
+would happen next, which is how the user learns whether the recognition is any good. Later, after
+the answer has been yes many times, that same offer is friction carrying no information.
+
+"Should this be automatic?" is therefore a question to raise once a mechanism has proven itself, not
+while proposing it. And when a rule introduces a trigger, say which mode it is in, so nobody
+re-derives the answer every time it fires.
+
+Failure mode this prevents: a mechanism ships automatic because automatic is obviously better once
+it works, and the user never sees the trigger fire in order to judge it. What is lost is not control
+but understanding — a step that fires automatically on a recognition nobody inspected is
+indistinguishable from one that fires on a bad recognition.
+
