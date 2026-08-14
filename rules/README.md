@@ -22,7 +22,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`diagnosis.md`** — Diagnose before retrying. When a command fails or gives unexpected output, reason about why before issuing variants — including not routing around the user's shell configuration to silence a symptom. Includes specific cases for git tree-ish ambiguity and RTK diff filtering, plus the detector-validation rule — with the mechanics of probing whether a command prompts in `references/diagnosis/permission-prompt-probes.md`.
 
-**`honesty.md`** — Rules about factual claims: never present estimates as measurements, source every number, verify the framing of external systems and codebase concepts against the source before writing prose about them, separate verified facts from assumptions, don't optimize for looking helpful over being accurate. Applies extra scrutiny to any external-facing content.
+**`honesty.md`** — Rules about factual claims: never present estimates as measurements, source every number, verify the framing of external systems and codebase concepts against the source before writing prose about them, check the claims in prose you're committing on someone else's behalf rather than only its shape, separate verified facts from assumptions, don't optimize for looking helpful over being accurate. Applies extra scrutiny to any external-facing content.
 
 **`searching.md`** — How to pick the right tool and scope when looking something up: scoping searches to the known location, staying out of the home directory apart from the installed-gem-source exception, never searching locally for external library docs, choosing between trafilatura, curl, and WebFetch, and preferring a tool's plain output over de-formatting its rendered output.
 
