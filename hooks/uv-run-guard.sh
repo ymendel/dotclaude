@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 # uv-run-guard.sh — PreToolUse (Bash) security guard.
 #
-# The allowlist auto-approves `uv run *skills/skill-architecture/scripts/*.py*`
+# NOTE: that allowlist entry is currently DEAD and the validator prompts every
+# run. RTK rewrites `uv run …` to `rtk uv run …` (exit 3 = rewrite-and-prompt,
+# not passthrough — see rules/RTK.md), so the gate never sees a bare `uv` and a
+# bare `Bash(uv run …)` pattern cannot match. Making it live means respelling the
+# entry with the `rtk ` prefix, which is a deliberate security decision, not a
+# typo fix: it converts a grant that never fires into one that does, opening
+# exactly the surface this guard exists for. Decide it when the validator's
+# prompting is actually in the way. Everything below still works either way —
+# the regex matches `uv run -` in the rewritten string too.
+#
+# The allowlist entry is intended to auto-approve
+# `uv run *skills/skill-architecture/scripts/*.py*`
 # so the skill validator runs without a prompt. But `uv run` accepts options
 # BEFORE the script path — --with / --with-requirements / --index-url / --python,
 # etc. — that fetch and execute arbitrary code (install a hostile package, or
@@ -17,8 +28,10 @@
 # script's own args and stays safe.
 #
 # Scope: kept in sync with the `uv run *skills/skill-architecture/scripts/*.py*`
-# allowlist entry in settings.json. If that pattern broadens, broaden the path
-# match below to match, or the guard will stop covering the auto-allowed surface.
+# allowlist entry in settings.json — including its spelling, per the note above.
+# If that pattern broadens, or gains the `rtk ` prefix that would make it fire,
+# broaden the path match below to match, or the guard will stop covering the
+# surface the entry grants.
 
 if ! command -v jq &>/dev/null; then
   # Consistent with the other Bash hooks: without jq we cannot parse the input,
