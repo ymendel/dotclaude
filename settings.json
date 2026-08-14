@@ -2,6 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(bin/rubocop:*)",
+      "Bash(brew info:*)",
+      "Bash(brew search:*)",
       "Bash(bundle show:*)",
       "Bash(chmod +x:*)",
       "Bash(command -v:*)",
@@ -36,6 +38,7 @@
       "Bash(rtk rake:*)",
       "Bash(rtk read:*)",
       "Bash(rtk rewrite:*)",
+      "Bash(rtk stat:*)",
       "Bash(rtk tail:*)",
       "Bash(rtk test:*)",
       "Bash(rtk wc:*)",
