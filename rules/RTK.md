@@ -141,6 +141,19 @@ as the `cat "$(…)"` and heredoc-commit slips below (`rtk rewrite` exit 1 → b
 The difference is that here the bare form is *correct*, not a slip to route around. Mechanism
 confirmed by reading `hooks/rtk-rewrite.sh`.
 
+**`gh` splits down the middle, so the exception is per subcommand rather than per command.** The
+built-in subcommands rewrite — `rtk rewrite 'gh release list'` returns `rtk gh release list` — while
+a `gh` **extension** does not: `rtk rewrite 'gh stack list'` exits 1, so `gh stack …` reaches the
+gate bare, exactly like `heroku`. Write extensions unprefixed and give them bare allowlist entries
+(`Bash(gh stack:*)`), and keep `rtk gh …` for everything gh ships itself. Verified against
+`gh stack` (`github/gh-stack` v0.1.0, GitHub's stacked pull requests, public preview since
+2026-07-30) on 2026-08-13.
+
+The grants point the wrong way here, which is what makes it worth stating. `Bash(rtk gh:*)` covers a
+hand-written `rtk gh stack …`, so the incorrect form runs unprompted while the correct bare one has
+no entry and asks — the reverse of the standing-entry-keeps-prompting tell below. Read a prompt on
+`gh stack …` as the missing bare grant, not as a reason to reach back for the prefix.
+
 **A binstub is the easier miss, and `rtk test` hides it for a while.** `bin/rails` and `bin/rubocop`
 read as ordinary commands the golden rule would cover, and the prefix-versus-wrapper distinction is
 what makes the mistake survivable long enough to be confusing: `rtk bin/rubocop …` is the wrong
