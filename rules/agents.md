@@ -39,6 +39,9 @@ per-session ask:
   library-inlining subsections.
 - **Codebase exploration whose output would be file dumps** — one `Explore` or
   `codebase-pattern-finder`, per the table below.
+- **Root-cause diagnosis that needs reproduction** — one `debugger`. Rerunning a failing case,
+  bisecting it, and reading stack traces is the noisy-read shape wearing a different hat, and the
+  reproduction has to happen in some context regardless.
 - **Diagram production** — one `mermaid-diagram-specialist`, and don't invoke the
   `mermaid-diagrams` skill in-session instead. See *An agent that wraps a skill puts the library
   where it can be dropped* below for why the order matters.
@@ -149,5 +152,7 @@ Failure mode this prevents, in both directions. Assume every agent is stripped a
 ## Specialized Agents
 
 When a task clearly matches a specialized agent — `postgres-pro` for PostgreSQL depth, `debugger` for root-cause work — name that one rather than `general-purpose`, since domain specialization provides heuristics that generalist prompting won't replicate. Like the table above, this picks the agent for a delegation already agreed to, and a clear domain match is not itself the reason to spawn one.
+
+**`postgres-pro` needs its recognition stated, because nothing else fires it.** A PostgreSQL question deep enough that the answer changes what gets written — an index choice, a query rewrite, planner behaviour under real cardinality, a configuration knob — is one to offer it for rather than answer from general knowledge. An offer, not a spawn, per the ceiling at the top of this file. Note the boundary against the two Postgres *skills*, which fire on their own and cover schema design and Supabase-flavoured practice: reach for the agent when the question is how this database will actually behave, and let the skills have the question of how to shape a schema.
 
 `agents/` is deliberately small, and a domain not covered there is not an oversight to work around. Agents are kept at the point of need rather than in advance, so the answer to "there's no agent for this" is either to add one with a trigger path (see `agents/README.md`) or to proceed without one — never to stretch a nearby agent over ground it wasn't kept for.
