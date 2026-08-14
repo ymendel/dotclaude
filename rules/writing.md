@@ -63,6 +63,17 @@ jargon, so it survives a self-edit that would have caught "low-hanging fruit" �
 scales so easily (spend, budget, cost, capital, dividend, pay down) one use seeds a whole
 register the next document inherits.
 
+## Semicolons: the default is to not
+
+The always-loaded parenthetical below names semicolon avoidance among the voice markers and
+sends the detail to `rules/references/writing/voice.md`, which is loaded on demand. That is one
+lookup too many for the most frequently missed of them, so the default is stated here: in
+durable prose under the user's byline — a commit message, a PR body, an ADR, a doc, a code
+comment — split the sentence or use an em-dash instead of a semicolon. This has needed
+correcting more than once.
+
+In-session chat replies are exempt, per the scope note at the top of this file.
+
 ## Avoid words that collide with terms of art
 
 A word's meaning is decided by the reader's nearest context, not by the writer's intent. A word with a strong term-of-art meaning will be parsed as that term of art first, even when the surrounding sentence makes another sense structurally possible. The reader pays a cost: either spotting the collision (one re-parse) or missing it (silent misread). Either way, the word is wrong even if the dictionary defines what you meant.
