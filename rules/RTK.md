@@ -143,10 +143,10 @@ git add . && git commit -m "msg" && git push
 rtk git add . && rtk git commit -m "msg" && rtk git push
 ```
 
-**Exception — `python3`, `trafilatura`, `heroku`, `brew`, and a project's own scripts pass
+**Exception — `python3`, `trafilatura`, `heroku`, `brew`, `chmod`, and a project's own scripts pass
 through unchanged.** The golden rule holds for anything RTK can rewrite. A command with no RTK
 equivalent is *not* prefixed — `rtk rewrite` returns exit 1 and the command reaches the permission
-gate exactly as written. `python3`, `trafilatura`, `heroku` and `brew` are the live external
+gate exactly as written. `python3`, `trafilatura`, `heroku`, `brew` and `chmod` are the live external
 cases, each confirmed by an exit-1 `rtk rewrite`, and a repo's own
 entry points are the same class — **`bin/` binstubs as much as `scripts/`**: write `bin/rubocop …`,
 `bin/rails test …`, `bin/ci`, `./scripts/sync-skill.sh …`, never `rtk` in front of any of them. So
