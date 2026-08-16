@@ -17,6 +17,9 @@ Never include:
 - Test status ("All tests pass")
 - Time-related information (estimates, time spent)
 - AI authorship or attribution — no "Generated with Claude Code", Co-Authored-By tags, emojis, or tool attribution of any kind
+- Anything git doesn't track — a gitignored handoff, a scratch note, a local review file, a session's own working papers
+
+The untracked case is the one worth spelling out. A commit message is read from inside the repository's history, where those files do not exist, so a sentence accounting for one explains an absence to a reader who never saw a presence. It bites hardest when the sentence reports what was deliberately *left alone* there, because that reads as diligence while being unreadable to everyone but its author.
 
 ## Formatting
 

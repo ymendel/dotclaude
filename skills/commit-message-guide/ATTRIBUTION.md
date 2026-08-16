@@ -3,7 +3,8 @@
 This skill is adapted from the `commit-message-guide` skill in
 [alkofu/ai-tpk](https://github.com/alkofu/ai-tpk) (MIT License). The body's guidance and its
 exclusion list originate there; this version trims the format, type, and scope tables and extends the
-guidance (a `-m` wrapping note, WIP and FIXUP types, and a prior-state `feat`-versus-`fix` check).
+guidance (a `-m` wrapping note, WIP and FIXUP types, a prior-state `feat`-versus-`fix` check, and an
+untracked-files entry on the exclusion list).
 
 The upstream is MIT-licensed. Its notice, reproduced per the license's terms:
 
