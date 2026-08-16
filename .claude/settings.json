@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(./hooks/test/run-checks.sh:*)",
       "Bash(./scripts/check-prerequisites.sh:*)",
       "Bash(./scripts/compare-skills.sh:*)",
       "Bash(./scripts/rules-floor.sh:*)",
