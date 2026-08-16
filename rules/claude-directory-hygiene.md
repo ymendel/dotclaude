@@ -44,6 +44,20 @@ Failure mode this prevents: a file that only became worth keeping *after* it was
 evaporates with the session, or an artifact meant *for the user* lands where only the model
 navigates comfortably and they are left asking "where is it?" before they can use it.
 
+**A script you are about to run is not one-shot output, whatever its lifespan.** Its logic
+*is* the work, and the command that runs it reaches the permission gate as an opaque
+`python3 /private/tmp/claude-…/derive-thing.py` — a path and nothing else. The user is then
+asked to approve a step whose substance they cannot see, which is not an approval. So write
+any script under `.claude/scratch/` where they can open it, and say in the message what it
+computes before running it. The same holds for a config, a fixture, or a filter list a
+command reads: if the command's behaviour is decided by a file's contents rather than by
+its own arguments, the file has to be reachable.
+
+Failure mode this prevents: the reflex is to keep working files out of the project, which
+is right for output and wrong for input — a hidden script converts a reviewable command
+into an unreviewable one, and the user's only options are to approve blind or to stop the
+work and ask what it does.
+
 ## What it gets named
 
 Name the file for the work, not the tool: `commit-<slug>.txt`, `pr-body-<slug>.md`,
