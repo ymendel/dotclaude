@@ -50,6 +50,12 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 ### Unmarked options
 - {file:line} option with no `(chosen)` marker on the winner, or no **`Rejected:`** line on a loser → which marker it needs, and (for a rejected option) the reason to put on the line, drawn from its own cons
 
+### Duplicate options
+- {file:line} two options that land the system in the same place and differ only in motivation → which one absorbs the other, and the pros to fold into the merged option
+
+### Two axes in one list
+- {file:line} options answering two questions that don't constrain each other → the two `### Options considered: {axis}` headings to split them under, and which options go under each
+
 ### Hand-wavy language
 - {quoted phrase} → {why it's vague and what concrete version would look like}
 
@@ -80,7 +86,9 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 
 **Unmarked options.** In an `### Options` subsection, the chosen option must carry `(chosen)` after its name and every other option must carry a **`Rejected:`** line naming why it lost. Flag any option missing its marker — report it with file:line and, for a rejected option, the reason the line should give (drawn from that option's own cons). An options list where nothing is marked chosen, or where the rejected options don't say why, forces the reader to re-derive the outcome the author already knew.
 
-**Duplicate options.** Flag an options list only when two of its options are near-duplicates of the same choice — not for its length alone. Three is the normal ceiling, but a 4th option on a genuinely distinct axis is fine. The sharpest tell: two options that produce the **same technical end state** and differ only in **motivation** (one framed as a deliberate choice, the other as do-nothing inertia) are one option, not two — their differing justifications are two pros of the same option. Test each option against the others by end state, not by the story told about it; if two land the system in the same place, flag them to be merged, with each rationale folded into the merged option's pros. This is easy to miss precisely because the two read as distinct — a motivation-only distinction has the shape of a real alternative, so check for it deliberately rather than trusting that distinct-sounding options are distinct.
+**Duplicate options.** Flag an options list only when two of its options are near-duplicates of the same choice — not for its length alone. Three is the normal ceiling and it is soft: a 4th or 5th is fine where it is a genuinely distinct answer to the *same* question, and wrong where it restates an option already listed or varies one in a way that belongs in that option's cons. The sharpest tell: two options that produce the **same technical end state** and differ only in **motivation** (one framed as a deliberate choice, the other as do-nothing inertia) are one option, not two — their differing justifications are two pros of the same option. Test each option against the others by end state, not by the story told about it; if two land the system in the same place, flag them to be merged, with each rationale folded into the merged option's pros. This is easy to miss precisely because the two read as distinct — a motivation-only distinction has the shape of a real alternative, so check for it deliberately rather than trusting that distinct-sounding options are distinct.
+
+**Two axes in one list.** The mirror of the check above: that one flags a list with too many members, this one a list answering too many questions. Where the options answer two questions that do not constrain each other — how a thing is distributed, and how far its first version goes — the fix is to split the list rather than trim it, giving each axis its own `### Options considered: <axis>` heading and its own lettering from A. Two tells, either one enough: a `(chosen)` marker appearing twice in one list, or an option a reader could adopt *alongside* another rather than instead of it. Options on one axis are mutually exclusive, so if two could both be taken they were never alternatives to each other.
 
 **Hand-wavy language.** Flag hedging ("we might", "consider", "probably"), vague decisions ("use a background job system" without naming the library), and non-consequences ("more complex", "some risk"). Quote the phrase and suggest a concrete replacement.
 

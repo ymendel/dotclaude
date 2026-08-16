@@ -147,10 +147,23 @@ match the most recent, not the majority: the newest ADR sets the direction. When
 this is the **first** ADR — no neighbor to match — the form above is the default;
 don't fall back to cramming pros/cons into a single prose line.
 
-Normally at most 3 options. Stretch past 3 only when a further option sits
-on a genuinely distinct axis — e.g. three options about *how* a class is
-tracked plus a fourth about *which* inputs are allowed — not to pad the list
-with near-duplicates of the same choice.
+Normally at most 3 options, and the ceiling is soft. A fourth or fifth earns
+its place when it is a genuinely distinct answer to the *same* question — four
+token mechanisms, four things a template could ship for authentication. What
+disqualifies one is being a restatement of an option already listed, or a
+variation whose only difference belongs in that option's cons: "Option B but
+without the cache" is Option B with a drawback named, not a fourth option.
+
+A second *axis* is not a reason to lengthen the list — it is a reason to start
+a second one. When an ADR settles two questions that do not constrain each
+other — how a library is distributed, and how far its first version goes —
+give each its own `### Options considered: <axis>` heading and letter each
+list from A. The heading carries the axis, so no intro sentence goes beneath
+it. A single-axis ADR keeps the plain `### Options` heading — the longer form
+appears only where two lists have to be told apart. Failure mode this prevents:
+two orthogonal decisions get crammed into one lettered run, so the list reads
+as five answers to one question and the reader has to work out which options
+were ever alternatives to each other.
 
 The sharpest near-duplicate tell: two options that produce the **same
 technical end state** and differ only in **motivation** — one framed as a
