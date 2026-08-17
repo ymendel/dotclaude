@@ -19,15 +19,24 @@ This is personal config, and it's going to reflect my preferences, workflows, an
 
 ## Prerequisites
 
-- **[Claude Code](https://claude.ai/code)** — obviously
-- **[RTK](https://github.com/rtk-ai/rtk)** — the hooks and rules assume RTK is installed. Without it, the rewrite hook degrades gracefully (commands pass through unchanged), but you'll lose the token savings it provides and the RTK rules won't apply meaningfully.
-- **[jq](https://jqlang.github.io/jq/)** — required by the hooks. Without it they exit silently and their guards and rewrites are quietly skipped.
+Grouped by what an absence costs, since that varies more than the flat list used to suggest. [Claude Code](https://claude.ai/code) itself goes without saying.
+
+**Required — something stops working, and not always loudly:**
+
+- **[jq](https://jqlang.github.io/jq/)** — every `PreToolUse` hook parses its input with it. Without jq they all pass through, so the reflexive-cd guard, the function-definition guard and the uv-run guard are *off*, not merely quiet. Six of the seven exit in silence; `reflexive-cd-guard.sh` and the vendored `rtk-rewrite.sh` are the two that say anything.
+- **[Python 3](https://www.python.org/)** — runs the session-handoff scripts, `scripts/rules-sections.py`, and the skill validators, and the `python`→`python3` rewrite hook targets it. Without it, handoff creation and loading fail. Loud, at least.
+
+**Load-bearing — everything works, with friction you'll feel every session:**
+
+- **[RTK](https://github.com/rtk-ai/rtk)** — the hooks and rules assume it. Without it the rewrite hook passes commands through unchanged and warns, so nothing breaks — but a good share of the Bash allow rules are written in `rtk …` form and stop matching, which means approval prompts for commands you already granted. The lost token savings are the smaller half of this.
 - **[gh](https://cli.github.com/)** — used in development workflow rules and expected for GitHub interactions.
-- **[Python 3](https://www.python.org/)** — runs the session-handoff scripts, and the `python`→`python3` rewrite hook targets it. Without it, handoff creation and loading fail and the rewrite hook no-ops.
+
+**Optional — one path degrades, everything else is untouched:**
+
 - **[uv](https://github.com/astral-sh/uv)** — runs the skill-architecture skill's validator and scaffolding scripts (`uv run …`). Needed only when authoring or validating skills — the allowlist and `uv-run-guard.sh` hook assume it for that path.
 - **[trafilatura](https://github.com/adbar/trafilatura)** — extracts a web page's main content as markdown, the first choice for reading a page under the searching rules (`uv tool install trafilatura`). Without it those fetches fall back to `curl` for raw HTML or WebFetch for a summary, both of which still work — you lose a compact verbatim option, not a capability.
 
-To verify these are on your `PATH`, run `./scripts/check-prerequisites.sh` — it warns on anything missing and never fails.
+To verify these are on your `PATH`, run `./scripts/check-prerequisites.sh` — it reports each one with its tier, warns on anything missing, and never fails.
 
 ## Installation
 
