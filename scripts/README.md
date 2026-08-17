@@ -236,15 +236,21 @@ Verify the external prerequisites this config declares are installed.
 ```
 
 Checks each binary in the README's [Prerequisites](../README.md#prerequisites)
-ledger — RTK, `jq`, `gh`, `python3`, `uv` — against `PATH` and prints `ok` or
-`MISSING` per entry. It **warns and never fails** — every prerequisite degrades
-gracefully, so a missing one is a notice, not an error. It does not
-auto-install. The binary list (`DEPS`) is hard-coded to mirror the README
-ledger, so keep the two in sync when either changes.
+ledger against `PATH`, prints `ok` or `MISSING` per entry, and prints the tier
+alongside — required, load-bearing, or optional. It does not auto-install.
+
+Only the required tier gates the exit code. That cut is what gives the middle
+tier a behaviour of its own: load-bearing means reported but not gated, which is
+a checkable difference from the tier above rather than a matter of degree.
+
+The three tier arrays (`REQUIRED`, `LOAD_BEARING`, `OPTIONAL`) are hard-coded to
+mirror the README ledger, membership and tier both, so keep the two in sync when
+either changes.
 
 ### Exit status
 
-- `0` always. Missing prerequisites are warnings, not failures.
+- `0` when every required prerequisite is present, whatever else is missing.
+- `1` when a required prerequisite is missing.
 
 ## `enospc-workaround.sh`
 
