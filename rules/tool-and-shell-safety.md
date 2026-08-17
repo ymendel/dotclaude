@@ -134,3 +134,13 @@ Failure mode this prevents: a red test run reads as green because the summary gr
 **How to apply:** remove the temporary edit the way you added it — with Edit, targeting the exact text — rather than reverting the file. Reach for `git checkout --` only when the file holds nothing you want to keep. When unsure whether it does, `git diff -- <file>` before discarding, which is cheap next to reconstructing lost work from memory.
 
 Failure mode this prevents: a revert aimed at a two-line probe takes an hour of unrelated editing with it, and because the command succeeded exactly as documented, the loss surfaces later — when the missing work is noticed downstream — rather than at the moment it happened. Sibling of the section above it: that one is about state a *pending decision* needs, this one about state you simply had not committed yet.
+
+## Stop a backgrounded command once its output has been read
+
+A foreground command that exceeds its timeout is moved to the background, and its output goes on accruing to a file. Reading that file is what answers the question — and it is also the last moment anything will draw attention to the task, because a process that never exits never sends the completion notification that would. So the task can outlive the work it was part of by hours while every visible sign says the work is done.
+
+Some commands simply do not exit. A CLI that forks a detached update-check or telemetry child hands that child the pipeline's stdout, so the shell waits on a descriptor nobody will ever close, long after all four segments of a compound command have printed. Nothing errors, and the output file looks complete because it is.
+
+**How to apply:** when a backgrounded command's output has been read and the answer taken from it, stop the task (`TaskStop`) rather than leaving it. Where the command really is still working, *Distinguish "in progress" from "failed"* in `diagnosis.md` governs first — this is for the case where the output is complete and only the process is left.
+
+Failure mode this prevents: an orphaned shell holds a process tree for hours, and the user is the one who finds it, which puts them in the position of auditing leftovers they never created. It also erodes the background mechanism itself: a task list carrying stale entries makes a genuinely running task harder to pick out.
