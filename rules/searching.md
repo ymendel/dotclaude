@@ -10,6 +10,18 @@ When the exact path is known, use Read directly — do not use Glob. Globbing an
 
 Also: when the target path is a symlink, `find` may not follow it without a trailing slash. Use `find /path/to/symlink/ ...` (with trailing slash) to ensure the symlink is resolved.
 
+## Search tracked content with `git grep`, not a recursive filesystem grep
+
+When the question is whether something appears in a repository — a symbol, a reference, a string a decision rides on — reach for `git grep -n <pattern> -- <pathspec>`. It searches what the repo tracks. A recursive grep searches whatever happens to sit under that path on disk: gitignored build output, vendored dependencies, caches, and any app data a tool has parked there.
+
+The two failures compound. The irrelevant matches push the real ones down past whatever cap the wrapper applies, so the output is truncated — and a truncated result reads as the whole set, which is `honesty.md`'s *Do Not Assert Absence Without Verifying* self-inflicted. Meanwhile the matches that do survive are mostly from paths nobody asked about, so the handful that matter are buried among them rather than absent, which is harder to notice than an empty result.
+
+This config's own repo is the sharp case, because `~/.claude` is a symlink to it. A recursive grep from the root walks Claude Code's transcript store under `projects/`, which holds the text of every session in every project — so a symbol appearing a few times in tracked files comes back as hundreds of matches across dozens of transcript files, most of them this session quoting itself. The tell is a match count out of all proportion to the question, or a wrapper reporting skipped files.
+
+**How to apply:** default to `git grep` for anything tracked, and reserve a recursive filesystem grep for what is deliberately untracked — a gitignored notes destination, generated output being inspected. When a recursive grep returns far more than expected, re-run it as `git grep` rather than adding a cap, since the cap is what converts a noisy answer into a wrong one.
+
+Failure mode this prevents: an absence claim gets made over a partial view of a search that was never scoped to the tracked tree, and the correction arrives from whoever re-runs it properly — after the claim has already been written into something durable.
+
 ## Do not reach into the user's home directory unprompted
 
 Do not search, list, find, glob, or read anything under `~` / `$HOME` / `/Users/yossef/` outside the current project directory. This holds regardless of how narrow or fast the search would be, and regardless of whether the access is direct or delegated to a sub-agent. If a task plausibly needs something from there, ask — the user will say so explicitly when home-directory access is intended.
