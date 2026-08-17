@@ -130,6 +130,26 @@ This is adjacent to "Do not mirror his prompting register" (in `rules/references
 
 Failure mode this prevents: speculative restructuring for an imagined agent reader, producing prose that reads as ghostwritten to the human reader and saves no real effort for the agent reader (who would have done fine with the prose).
 
+## Don't announce that a point matters
+
+Never append a clause whose only work is to assert the importance of what precedes it: "the tradeoff, **and it's a real one**", "one caveat, **and it's the important one**", "a cost here, **and it's not small**". It reads as emphasis but carries nothing — it tells the reader to take the point seriously instead of giving them the reason to. It is also a strong LLM tell, which is what makes it worse than merely redundant in prose under a byline: it marks the text as machine-written to exactly the reader whose judgment the byline was meant to carry.
+
+Cut the clause and let the fact stand. "The tradeoff, and it's a real one: nvm's bin directory isn't on PATH until something loads it" becomes "What this means is that nvm's bin directory isn't on PATH until something loads it" — the consequence was always doing the persuading.
+
+The same tell wears other clothes: "importantly", "critically", "it's worth noting that", "make no mistake", a bolded **this matters**. Each substitutes a claim about significance for the significance itself. A point that needs flagging is a point that wasn't stated strongly enough, so rewrite the point rather than decorating it.
+
+Failure mode this prevents: the construction survives a self-edit because it reads as considered emphasis rather than as filler, and it is one of the few tells a reader can name on sight — so it discredits the surrounding prose, which may have been fine.
+
+## Keep the methodology out of the durable record
+
+A measurement's *result* belongs in a commit message, an ADR, or a PR body. How it was arrived at — "five runs each way", "measured back to back", "median of three", "verified with a positive control" — belongs in the chat where the work happened. The reader of the artifact wants the number and whether to trust it, and an honest hedge already carries that: "about 4.1s to about 2.7s" says the figure is approximate without narrating the procedure that made it so.
+
+This is not license to drop provenance where provenance is the claim. `honesty.md` still governs: a number a reader must be able to check keeps its citation, and an estimate is still labeled as one. The distinction is between *what a reader needs in order to judge the claim* and *what shows the author did the work*. The second is self-justification, and it reads as such.
+
+Sibling: development-workflow.md's PR-description bullet bans CI status and test counts for a different reason — there the prose is a dead copy of a live remote surface. Here nothing is duplicated. The methodology simply belonged to the conversation and got carried into the record on the way past.
+
+Failure mode this prevents: the durable artifact accretes evidence of diligence in place of statements of fact, a register shift the author then has to edit out by hand.
+
 ## Markdown authoring mechanics
 
 When producing markdown for a strict renderer — a committed doc, a README, a PR body, an IDE preview — a small set of fragile constructs (fenced code inside a list item, an inline fence marker in prose, tables holding block content, &c.) render differently across implementations or break outright, and markdown never errors to warn you. The full list, the why, and the formatting discipline are in `rules/references/writing/markdown-authoring.md`. Load it when generating markdown bound for a durable deliverable.
