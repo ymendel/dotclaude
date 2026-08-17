@@ -10,9 +10,9 @@
 
 set -u
 
-REQUIRED=(jq python3)
+REQUIRED=(jq python3 uv)
 LOAD_BEARING=(rtk gh)
-OPTIONAL=(uv trafilatura)
+OPTIONAL=(trafilatura)
 
 missing_required=0
 missing_other=0

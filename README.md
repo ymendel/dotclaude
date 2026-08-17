@@ -25,6 +25,7 @@ Grouped by how routinely an absence bites, since that varies more than the flat 
 
 - **[jq](https://jqlang.github.io/jq/)** — every `PreToolUse` hook parses its input with it. Without jq they all pass through, so the reflexive-cd guard, the function-definition guard and the uv-run guard are *off*, not merely quiet. Six of the seven exit in silence; `reflexive-cd-guard.sh` and the vendored `rtk-rewrite.sh` are the two that say anything.
 - **[Python 3](https://www.python.org/)** — runs the session-handoff scripts, `scripts/rules-sections.py`, and the skill validators, and the `python`→`python3` rewrite hook targets it. Without it, handoff creation and loading fail. Loud, at least.
+- **[uv](https://github.com/astral-sh/uv)** — the only working path to the Python test suite, since the system `python3` carries no pytest: `uv run --with pytest pytest skills/session-handoff/tests/`. It also runs the skill-architecture skill's validator and scaffolding scripts (`uv run …`), which is what `uv-run-guard.sh` guards. See [ADR 0008](docs/adr/0008-testing-convention-for-hooks-and-scripts.md) for why running the tests makes this required rather than optional.
 
 **Load-bearing — the absence stops or slows ordinary work, loudly:**
 
@@ -33,7 +34,6 @@ Grouped by how routinely an absence bites, since that varies more than the flat 
 
 **Optional — the absence shows only on a path you may never take:**
 
-- **[uv](https://github.com/astral-sh/uv)** — runs the skill-architecture skill's validator and scaffolding scripts (`uv run …`). Needed only when authoring or validating skills — the allowlist and `uv-run-guard.sh` hook assume it for that path.
 - **[trafilatura](https://github.com/adbar/trafilatura)** — extracts a web page's main content as markdown, the first choice for reading a page under the searching rules (`uv tool install trafilatura`). Without it those fetches fall back to `curl` for raw HTML or WebFetch for a summary, both of which still work — you lose a compact verbatim option, not a capability.
 
 To verify these are on your `PATH`, run `./scripts/check-prerequisites.sh` — it reports each one with its tier, and exits 1 if anything in the required tier is missing. A missing load-bearing or optional prerequisite is reported and leaves the exit code at 0.
