@@ -25,6 +25,12 @@ The untracked case is the one worth spelling out. A commit message is read from 
 
 Separate the subject from the body with a blank line, and wrap body lines at about 72 characters, the common git convention. If a repository's own history uses a different width, match that.
 
+**Read the target repository's own `git log` before drafting, and match it on more than width.** Body wrap is the axis people notice, but a repo's history also settles whether subjects carry a `type(scope):` marker and what the scopes are, whether bodies use first person, and how long a subject runs. `git log --oneline -20` and `git log -8 --format=%b` answer all of it in two commands.
+
+The axis that matters is the *repository being committed to*, not the project the session happens to be running in. A session working in one codebase and committing into another — a config repo, a shared template, a sibling tool — will otherwise carry the first codebase's register across, and the resulting message looks correct in isolation while diverging from every neighbour in the log. Per-project memory does not fix this, because the mismatch belongs to the pair rather than to either project: it recurs from every *other* project that commits into the same target.
+
+Failure mode this prevents: a run of commits lands with no marker, or with an `I` that reads as the repo owner because the commit carries their name, and the divergence is only spotted later by whoever reads the log as a whole — at which point correcting it means rewriting history that may already be pushed.
+
 `git commit -m '<text>'` does **not** wrap: a long single-string body ships as one unwrapped line, and because the commit still succeeds the defect is silent. To get wrapped paragraphs, either pass a body whose lines are already broken at ~72 (literal newlines inside the `-m` string are preserved) or write the message to a file and `git commit -F <file>`. Multiple `-m` flags create separate paragraphs but still don't wrap within one.
 
 ## Special commit types
