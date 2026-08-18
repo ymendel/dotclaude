@@ -58,6 +58,51 @@ is right for output and wrong for input — a hidden script converts a reviewabl
 into an unreviewable one, and the user's only options are to approve blind or to stop the
 work and ask what it does.
 
+**Inlining the script with `-e` satisfies that paragraph and fails on two others.** A
+`ruby -e '…'`, `python3 -c '…'` or `node -e '…'` carries its whole logic in the command
+string, so the reviewability argument above is answered — which is exactly why the form
+gets reached for, and why nothing in that paragraph fires on it. Two things still go wrong:
+
+- **It cannot be granted, only re-approved.** The only entry that would cover an inline
+  program is `Bash(ruby *)` — bare, since `RTK.md` lists these interpreters as passthrough —
+  which is a standing grant to run arbitrary code in that language. So the choices are a
+  prompt per invocation or an entry nobody should write, and the prompts arrive in a run of
+  near-identical commands, which is the shape most likely to get the broad one added just to
+  stop them. Same trap as `RTK.md`'s bare-`:` grant: the entry that would end the prompting
+  is the one that must be declined.
+
+  **A path-scoped entry is not the narrow alternative it reads as.**
+  `Bash(ruby .claude/scratch/*)` constrains almost nothing, on three counts: writing the
+  file it runs is itself granted, by `Edit(**/.claude/**)`; a Bash pattern matches the
+  command *string* rather than a path (`settings.md`'s pattern-matching section), so
+  `.claude/scratch/../../elsewhere.rb` satisfies it; and a Bash rule cannot be scoped to a
+  project, so any repo shipping that path is covered, including code neither of us wrote.
+  Against `settings.md`'s breadth test — how far a wrong invocation reaches — a general
+  interpreter has no bounded area of effect at all. So prefer the file form for what the
+  next bullet gives, and never on the grounds that the path makes it grantable.
+- **Its logic is gone the moment it scrolls past.** An inline program is not re-runnable
+  without retyping, has nowhere to put the judgement it encodes, and cannot be corrected —
+  the retype is where the second version quietly differs from the first.
+
+That second cost is worst when the program **produces a number that lands in a durable
+artifact.** A figure in a note, a plan or an ADR carries an implicit claim that it can be
+re-derived, and `honesty.md`'s *Re-query numbers at draft time* asks for exactly that
+later. An inline one-liner voids it: the number survives, its derivation does not, and any
+threshold or heuristic inside it — which is the part a reader would want to disagree with —
+was never written down at all. Two runs of the "same" one-liner can then disagree without
+anyone noticing which was wrong.
+
+**How to apply.** Reach for `-e` only for something whose output is read once and decides
+nothing that gets written down — a quick shape check, a one-off conversion. The moment a
+program is worth running twice, encodes a judgement, or feeds a figure into prose, it is a
+file under `.claude/scratch/` with its threshold stated in a header comment. Reference the
+file by path where the figure lands, so the next reader can re-run it rather than trust it.
+
+Failure mode this prevents: `-e` reads as the *more* transparent choice, so the drift into
+it is invisible — the visible-logic argument is genuinely satisfied while the grant story
+and the provenance story both quietly fail. The tell is having typed a near-identical
+one-liner twice, or having just quoted its output into a document.
+
 ## What it gets named
 
 Name the file for the work, not the tool: `commit-<slug>.txt`, `pr-body-<slug>.md`,
