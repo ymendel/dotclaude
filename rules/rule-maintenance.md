@@ -81,6 +81,10 @@ When the user approves a Bash permission prompt, ask whether it was a one-time c
 
 Craft the entry from the command string the gate *actually matched*, never from an inferred or speculative invocation. The string the permission gate sees is not always the form written into the Bash call — the RTK hook rewrites some commands and passes others through unchanged (see `RTK.md`'s Golden Rule exception and `settings.md` on how patterns match). Before adding a pattern, look at the literal command that prompted. If none was observed, don't add a "just in case" entry. Failure mode: building the pattern from how the command *would* be written rather than from the string the gate matched, producing an entry that silently duplicates an existing rule (dead weight) or never fires (a false grant).
 
+**Prompt frequency is not an argument for breadth.** A run of near-identical prompts reads as friction the allow list should remove, and the entry that would remove it is usually the broad one — a whole interpreter, a bare path glob, a whole tool. The interruption is doing work the user wants, being where they see what is about to run and stay the owner of the result, which outweighs an uninterrupted investigation. So report what is prompting and name the entry that would end it, but never offer that entry as a remedy for the volume. Where a genuinely narrow entry covers the case, propose it and say what it leaves prompting. The worked case is the inline-`-e` bullet in `claude-directory-hygiene.md`, where the only entry that would stop the prompts is a standing grant to run arbitrary code and the path-scoped alternative constrains almost nothing.
+
+Failure mode this prevents: the case for a grant gets built from how often the prompt fires rather than from what the grant would permit, and it arrives sounding like the removal of friction rather than the removal of a control.
+
 ## Skill and Rule Review Criteria
 
 When reviewing skills, rules, or their interactions, evaluate against these four concerns:
