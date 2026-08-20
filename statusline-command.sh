@@ -305,32 +305,27 @@ fi
 
 usage_text=""
 if [ "$show_usage" = "1" ]; then
-  # Try reading from cache first (written by Claude Usage app on each refresh)
+  # Values come from the Claude Usage app, which rewrites this cache on each
+  # refresh. There is deliberately no fallback fetch: the endpoint sits behind a
+  # Cloudflare managed challenge no headless client can clear, so a stale cache
+  # means the app has stopped — not something this script can retry.
   cache_file="$HOME/.claude/.statusline-usage-cache"
-  swift_result=""
+  utilization=""
+  resets_at=""
+  usage_stale=0
   if [ -f "$cache_file" ]; then
     cache_ts=$(grep "^TIMESTAMP=" "$cache_file" 2>/dev/null | cut -d= -f2)
-    now_ts=$(date +%s)
+    utilization=$(grep "^UTILIZATION=" "$cache_file" | cut -d= -f2)
+    resets_at=$(grep "^RESETS_AT=" "$cache_file" | cut -d= -f2)
     if [ -n "$cache_ts" ]; then
-      cache_age=$((now_ts - cache_ts))
-      if [ "$cache_age" -lt 300 ]; then
-        cache_util=$(grep "^UTILIZATION=" "$cache_file" | cut -d= -f2)
-        cache_reset=$(grep "^RESETS_AT=" "$cache_file" | cut -d= -f2)
-        if [ -n "$cache_util" ]; then
-          swift_result="${cache_util}|${cache_reset}"
-        fi
-      fi
+      cache_age=$(( $(date +%s) - cache_ts ))
+      [ "$cache_age" -ge 300 ] && usage_stale=1
+    else
+      usage_stale=1
     fi
   fi
 
-  # Fall back to swift script if cache is stale or missing
-  if [ -z "$swift_result" ]; then
-    swift_result=$(swift "$HOME/.claude/fetch-claude-usage.swift" 2>/dev/null)
-  fi
-
-  if [ $? -eq 0 ] && [ -n "$swift_result" ]; then
-    utilization=$(echo "$swift_result" | cut -d'|' -f1)
-    resets_at=$(echo "$swift_result" | cut -d'|' -f2)
+  if [ -n "$utilization" ]; then
 
     # Parse reset epoch once for shared use by pace marker and reset time display
       reset_epoch=""
@@ -455,10 +450,19 @@ if [ "$show_usage" = "1" ]; then
         fi
       fi
 
+      stale_marker=""
+      if [ "$usage_stale" = "1" ]; then
+        if [ "$color_mode" = "monochrome" ]; then
+          stale_marker=" (stale)"
+        else
+          stale_marker=" ${GRAY}⋯${RESET}${usage_color}"
+        fi
+      fi
+
       if [ "$show_usage_label" = "1" ]; then
-        usage_text="${usage_color}Usage: ${utilization}%${progress_bar}${reset_time_display}${RESET}"
+        usage_text="${usage_color}Usage: ${utilization}%${progress_bar}${reset_time_display}${stale_marker}${RESET}"
       else
-        usage_text="${usage_color}${utilization}%${progress_bar}${reset_time_display}${RESET}"
+        usage_text="${usage_color}${utilization}%${progress_bar}${reset_time_display}${stale_marker}${RESET}"
       fi
     else
       if [ "$show_usage_label" = "1" ]; then
