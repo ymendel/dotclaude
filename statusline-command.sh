@@ -485,15 +485,16 @@ if [ "$show_weekly" = "1" ] && [ "$show_usage" = "1" ]; then
   cache_file="$HOME/.claude/.statusline-usage-cache"
   weekly_util=""
   weekly_reset=""
+  weekly_stale=0
   if [ -f "$cache_file" ]; then
     cache_ts=$(grep "^TIMESTAMP=" "$cache_file" 2>/dev/null | cut -d= -f2)
-    now_ts=$(date +%s)
+    weekly_util=$(grep "^WEEKLY_UTILIZATION=" "$cache_file" | cut -d= -f2)
+    weekly_reset=$(grep "^WEEKLY_RESETS_AT=" "$cache_file" | cut -d= -f2)
     if [ -n "$cache_ts" ]; then
-      cache_age=$((now_ts - cache_ts))
-      if [ "$cache_age" -lt 300 ]; then
-        weekly_util=$(grep "^WEEKLY_UTILIZATION=" "$cache_file" | cut -d= -f2)
-        weekly_reset=$(grep "^WEEKLY_RESETS_AT=" "$cache_file" | cut -d= -f2)
-      fi
+      cache_age=$(( $(date +%s) - cache_ts ))
+      [ "$cache_age" -ge 300 ] && weekly_stale=1
+    else
+      weekly_stale=1
     fi
   fi
 
@@ -610,10 +611,19 @@ if [ "$show_weekly" = "1" ] && [ "$show_usage" = "1" ]; then
       fi
     fi
 
+    weekly_stale_marker=""
+    if [ "$weekly_stale" = "1" ]; then
+      if [ "$color_mode" = "monochrome" ]; then
+        weekly_stale_marker=" (stale)"
+      else
+        weekly_stale_marker=" ${GRAY}⋯${RESET}${weekly_color}"
+      fi
+    fi
+
     if [ "$show_weekly_label" = "1" ]; then
-      weekly_text="${weekly_color}Weekly: ${weekly_util}%${weekly_bar}${weekly_reset_display}${RESET}"
+      weekly_text="${weekly_color}Weekly: ${weekly_util}%${weekly_bar}${weekly_reset_display}${weekly_stale_marker}${RESET}"
     else
-      weekly_text="${weekly_color}${weekly_util}%${weekly_bar}${weekly_reset_display}${RESET}"
+      weekly_text="${weekly_color}${weekly_util}%${weekly_bar}${weekly_reset_display}${weekly_stale_marker}${RESET}"
     fi
   fi
 fi
