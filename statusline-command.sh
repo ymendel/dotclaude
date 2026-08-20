@@ -90,6 +90,33 @@ hex_to_ansi() {
   printf '\033[38;2;%d;%d;%dm' "$r" "$g" "$b"
 }
 
+# Render a cache age as a compact duration: 47s, 13m, 2h, 2h5m.
+format_cache_age() {
+  local seconds=$1
+
+  if [ "$seconds" -lt 60 ]; then
+    printf '%ds' "$seconds"
+  elif [ "$seconds" -lt 3600 ]; then
+    printf '%dm' "$((seconds / 60))"
+  else
+    local hours=$((seconds / 3600))
+    local minutes=$(((seconds % 3600) / 60))
+
+    if [ "$minutes" -eq 0 ]; then
+      printf '%dh' "$hours"
+    else
+      printf '%dh%dm' "$hours" "$minutes"
+    fi
+  fi
+}
+
+# How old the Claude Usage app's cache may get before a reading is shown with
+# its age appended. The app's refresh cadence is irregular and has been
+# observed running to tens of minutes, so expect this to be exceeded during
+# normal operation — the age is displayed precisely so the number can be
+# judged rather than this threshold trusted.
+cache_stale_after=300
+
 # Set colors based on mode
 RESET=$'\033[0m'
 
@@ -313,13 +340,14 @@ if [ "$show_usage" = "1" ]; then
   utilization=""
   resets_at=""
   usage_stale=0
+  usage_cache_age=""
   if [ -f "$cache_file" ]; then
     cache_ts=$(grep "^TIMESTAMP=" "$cache_file" 2>/dev/null | cut -d= -f2)
     utilization=$(grep "^UTILIZATION=" "$cache_file" | cut -d= -f2)
     resets_at=$(grep "^RESETS_AT=" "$cache_file" | cut -d= -f2)
     if [ -n "$cache_ts" ]; then
-      cache_age=$(( $(date +%s) - cache_ts ))
-      [ "$cache_age" -ge 300 ] && usage_stale=1
+      usage_cache_age=$(( $(date +%s) - cache_ts ))
+      [ "$usage_cache_age" -ge "$cache_stale_after" ] && usage_stale=1
     else
       usage_stale=1
     fi
@@ -452,10 +480,16 @@ if [ "$show_usage" = "1" ]; then
 
       stale_marker=""
       if [ "$usage_stale" = "1" ]; then
-        if [ "$color_mode" = "monochrome" ]; then
-          stale_marker=" (stale)"
+        if [ -n "$usage_cache_age" ]; then
+          stale_age=" $(format_cache_age "$usage_cache_age")"
         else
-          stale_marker=" ${GRAY}⋯${RESET}${usage_color}"
+          stale_age=""
+        fi
+
+        if [ "$color_mode" = "monochrome" ]; then
+          stale_marker=" (stale${stale_age})"
+        else
+          stale_marker=" ${GRAY}⋯${stale_age}${RESET}${usage_color}"
         fi
       fi
 
@@ -486,13 +520,14 @@ if [ "$show_weekly" = "1" ] && [ "$show_usage" = "1" ]; then
   weekly_util=""
   weekly_reset=""
   weekly_stale=0
+  weekly_cache_age=""
   if [ -f "$cache_file" ]; then
     cache_ts=$(grep "^TIMESTAMP=" "$cache_file" 2>/dev/null | cut -d= -f2)
     weekly_util=$(grep "^WEEKLY_UTILIZATION=" "$cache_file" | cut -d= -f2)
     weekly_reset=$(grep "^WEEKLY_RESETS_AT=" "$cache_file" | cut -d= -f2)
     if [ -n "$cache_ts" ]; then
-      cache_age=$(( $(date +%s) - cache_ts ))
-      [ "$cache_age" -ge 300 ] && weekly_stale=1
+      weekly_cache_age=$(( $(date +%s) - cache_ts ))
+      [ "$weekly_cache_age" -ge "$cache_stale_after" ] && weekly_stale=1
     else
       weekly_stale=1
     fi
@@ -613,10 +648,16 @@ if [ "$show_weekly" = "1" ] && [ "$show_usage" = "1" ]; then
 
     weekly_stale_marker=""
     if [ "$weekly_stale" = "1" ]; then
-      if [ "$color_mode" = "monochrome" ]; then
-        weekly_stale_marker=" (stale)"
+      if [ -n "$weekly_cache_age" ]; then
+        weekly_stale_age=" $(format_cache_age "$weekly_cache_age")"
       else
-        weekly_stale_marker=" ${GRAY}⋯${RESET}${weekly_color}"
+        weekly_stale_age=""
+      fi
+
+      if [ "$color_mode" = "monochrome" ]; then
+        weekly_stale_marker=" (stale${weekly_stale_age})"
+      else
+        weekly_stale_marker=" ${GRAY}⋯${weekly_stale_age}${RESET}${weekly_color}"
       fi
     fi
 
