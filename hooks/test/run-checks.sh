@@ -187,7 +187,23 @@ else
 fi
 
 echo
+echo "== reflexive-cd-guard: a token after the target does not hide it (exit 2)"
+# The target is cut at a command separator, which leaves anything between the path
+# and that separator glued to it — a redirect above all, and `cd <dir> 2>/dev/null`
+# is the shape the rule calls the loud hazard. A target carrying that text resolves
+# to nothing, so the physical-path check finds no guarded root and the guard falls
+# through to a pass. These are that gap: every one of them is a cd this guard
+# already blocks without the trailing token.
+rcd "subdir, redirect then semicolon" 2 "$PROJ" "cd $SUBDIR 2>/dev/null; ls"
+rcd "subdir, redirect then nothing"   2 "$PROJ" "cd $SUBDIR 2>/dev/null"
+rcd "project root, redirect"          2 "$PROJ" "cd $PROJ 2>/dev/null; ls"
+rcd "subdir, stdout redirect"         2 "$PROJ" "cd $SUBDIR >/dev/null && ls"
+rcd "quoted subdir"                   2 "$PROJ" "cd \"$SUBDIR\" && ls"
+rcd "quoted subdir, redirect"         2 "$PROJ" "cd \"$SUBDIR\" 2>/dev/null; ls"
+
+echo
 echo "== reflexive-cd-guard: leaves legitimate movement alone (exit 0)"
+rcd "outside the project, redirect"   0 "$PROJ" "cd $OUTSIDE 2>/dev/null; ls"
 rcd "reverting subshell"              0 "$PROJ" "(cd skills && ls)"
 rcd "cd out of the project"           0 "$PROJ" "cd .. && ls"
 rcd "cd outside the project"          0 "$PROJ" "cd $OUTSIDE && ls"
@@ -205,6 +221,7 @@ echo "== reflexive-cd-guard: additional working dirs (exit 2 unless noted)"
 export CLAUDE_ADDED_DIRS="$ADDED"
 rcd "cd into an added dir"            2 "$PROJ" "cd $ADDED && git status"
 rcd "cd into a subdir of an added dir" 2 "$PROJ" "cd $ADDED/nested && ls"
+rcd "added dir, redirect then semicolon" 2 "$PROJ" "cd $ADDED 2>/dev/null; git status"
 rcd "outside project and added dir"   0 "$PROJ" "cd $OUTSIDE && ls"
 rcd "subshell revert into added dir"  0 "$PROJ" "(cd $ADDED && git status)"
 unset CLAUDE_ADDED_DIRS

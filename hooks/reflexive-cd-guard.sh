@@ -101,12 +101,38 @@ fi
 # match newlines, so `rest` spans a multi-line command (a bare `cd <root>` on its
 # own line, then the real command underneath) — without cutting at the newline,
 # `target` would swallow the following lines and never match the project root.
-# Trim trailing whitespace and one surrounding quote pair.
+# Then trim trailing whitespace, which is what a cut at `&` or `;` leaves behind.
 target=${rest%%$'\n'*}
 target=${target%%[;&|]*}
 target=${target%"${target##*[![:space:]]}"}
-target=${target#[\"\']}
-target=${target%[\"\']}
+[ -z "$target" ] && exit 0
+
+# A separator is not the only thing that can follow the target. A redirect can —
+# `cd <dir> 2>/dev/null; …`, the very shape the rule calls the loud hazard — and so
+# can any other word. Cutting only at separators left that text glued to the path,
+# which then resolved to nothing, so the physical-path check below found no guarded
+# root and the guard fell through to a pass on the case it most wanted to catch.
+#
+# Three shapes, in order:
+#   - A quoted target may legitimately contain spaces, so it ends at its closing
+#     quote. This also strips the quotes, which is what the resolution below needs.
+#   - A target carrying a runtime expansion is left whole: it is unresolvable
+#     either way, and the lexical checks further down match against its full text
+#     (the `$(git rev-parse --show-toplevel)` idiom would not survive a cut at the
+#     first space).
+#   - Anything else ends at the first whitespace.
+case "$target" in
+  \"*)
+    target=${target#\"}
+    target=${target%%\"*}
+    ;;
+  \'*)
+    target=${target#\'}
+    target=${target%%\'*}
+    ;;
+  *'$'* | *'`'*) : ;;
+  *) target=${target%%[[:space:]]*} ;;
+esac
 [ -z "$target" ] && exit 0
 
 # `cd -` returns to the previous directory, not a subdir reflex — let it pass.
