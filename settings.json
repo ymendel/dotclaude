@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(bash -n:*)",
       "Bash(bin/rubocop:*)",
       "Bash(brew info:*)",
       "Bash(brew leaves:*)",
