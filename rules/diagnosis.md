@@ -71,6 +71,12 @@ Failure mode this prevents: a task that takes minutes (large remote API scan, lo
 
 Reaching for `/bin/ls`, `/usr/bin/grep`, or similar absolute paths to sidestep aliases or shell configuration is a smell. The user's shell setup is intentional. Bypassing it produces output that doesn't reflect their environment, may evade allowlists (since the allowlist matches the literal command string), and signals that something else is off. If a command isn't behaving as expected, diagnose why — don't route around the user's configuration.
 
+**A denied command is a decision, not an obstacle.** The strongest form of this is a `deny` entry in `settings.json`, and it is the one place where routing around is not a smell but a defeat of the thing itself. Deny patterns match the command *string*, so an equivalent spelling is always findable — `git update-ref -d refs/heads/spike` deletes a branch without ever matching `*git branch -D *`, and plumbing offers the same escape for most of the list. Never reach for one. When a command is denied, the action belongs to the user: say what would do it and stop.
+
+Two things make this worse than the alias case above. It defeats a control deliberately rather than by inattention, and nothing in the result marks it as having happened — the command succeeds and reports what any other successful command reports. Per [ADR 0004](../docs/adr/0004-rule-vs-hook-enforcement-split.md), the deny list exists to catch the *reflex* form of a destructive action, and no pattern set can enumerate the equivalents. That gap is closed here or not at all.
+
+Failure mode this prevents: the block reads as friction in the way of finishing the task, so the next command found is the one that gets past it — and the user discovers that their own guardrail was stepped over rather than respected, in a session where nothing looked wrong.
+
 ## Verify state at the layer that produces the behavior
 
 When changing a configuration value, verify the layer that *produces* the runtime behavior reflects the change — not only the layer that *stores* it. Many systems keep the same state in two places: a durable backing store (a DB row, a config file) and a runtime cache, in-memory schedule, or pre-boot snapshot that mediates actual behavior. Updating the backing store is often necessary but not sufficient.
