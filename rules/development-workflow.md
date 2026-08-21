@@ -18,6 +18,10 @@ Failure mode this prevents: with many rules loaded passively, applying them duri
 - Sometimes something has to be tried out as a "spike" to determine the proper path or the full shape of the problem.
 - When performing a spike, take note of learnings in a document.
 - When the spike is finished, remove everything but the document and use that as the basis of the plan.
+- **The write-up is a stage, not a permanent artifact.** The sequence runs: spike code, write-up, ADR (usually), real implementation. The code goes at stage two at the latest; the write-up becomes deletable at stage four, once everything in it has been handled or moved to a more-structured destination — an ADR, a note, a cleanup-debt entry with a revisit condition, a comment beside the code it constrains. "Outlives the code it describes" is not "lives permanently."
+- Before deleting a write-up, audit it against those destinations fact by fact and relocate what is genuinely orphaned. The orphans that matter are the ones whose trigger has not fired yet — a recommendation aimed at the phase *after* the one just finished has nothing tracking it, because the work it governs has not started. Also unlink it from anything that survives: an ADR citing the write-up needs its links removed and any figure it relied on carried inline, or the record stops supporting itself.
+
+Failure mode this prevents: the lifecycle's end goes unstated, so the write-up is defended as permanent long after its contents landed elsewhere — or deleted wholesale with the one un-relocated recommendation in it, which surfaces as a decision nobody records having made.
 
 ## Implementation
 
