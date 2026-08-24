@@ -45,6 +45,7 @@
       "Bash(rtk tail:*)",
       "Bash(rtk test:*)",
       "Bash(rtk wc:*)",
+      "Bash(shasum:*)",
       "Bash(trafilatura --URL:*)",
       "Bash(unzip -l:*)",
       "Bash(wc:*)",
