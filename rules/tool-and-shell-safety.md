@@ -18,7 +18,7 @@ The Bash working directory is set to the project root at session start and persi
 
 Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
 a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
-it is built out of are the ones the gate cannot resolve. Three instances, all real:
+it is built out of are the ones the gate cannot resolve. Four instances, all real:
 
 - **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
@@ -39,6 +39,17 @@ it is built out of are the ones the gate cannot resolve. Three instances, all re
   not part of the work. Having done it once is reason to check the next few commands rather than to
   call it a one-off: the shape recurs within a session, and because it has no motive there is nothing
   to notice yourself talking into.
+- **A variable assignment to avoid retyping a long string.** A `REF=origin/main; git show
+  $REF:lib/parser.rb` reads as the tidy way to run three commands against one ref, and it is the same
+  trade as the loop in *Batch repeated commands* below — nothing is saved, because a programmatically
+  issued command pays no keystrokes. The expansion alone would prompt, but an **unquoted** variable
+  followed by `:` or `[` is refused for a sharper reason, reported verbatim as `zsh $name[expr] /
+  $name:mod in bare concatenation — recursive eval`. zsh reads those as subscript and modifier syntax
+  that can expand to something evaluated again, and the analyzer checks that reading rather than the
+  shell actually running — so the prompt fires on a bash session where the string is inert
+  concatenation, and it fires in an ordinary command rather than only inside `[[ ]]`. A ref-and-path
+  argument is precisely that shape. Write the ref and the path out literally in each command, however
+  long.
 - **A pipe plus `${PIPESTATUS[0]}` where the plain command would do.** Covered in full by *A pipe
   hides the exit status* below, including why the expansion prompts and what to reach for instead.
   The trap specific to this section is applying that apparatus to output that needed no filtering
