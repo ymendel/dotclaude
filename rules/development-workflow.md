@@ -147,15 +147,11 @@ Everything here presumes a PR is the right artifact. On a personally-owned repo 
 
 ### Write fewer comments than feel warranted
 
-The bullets above say when to add a comment. This says when to stop. The drift runs one way: a comment on each method, then on each branch, then on each non-obvious line, until the prose outweighs the code — and a reader facing that skims all of it, including the one comment that recorded a real trap. Volume destroys the signal commenting exists to carry.
+The bullets above say when to add a comment. This says when to stop. The drift runs one way — a comment on each method, then each branch, then each non-obvious line — until a reader skims all of it, including the one comment that recorded a real trap. Deferring the tightening spreads it rather than postponing it, because *match the existing pattern* then has the next code match the density.
 
-Before keeping a comment, ask what a competent reader of this code would not already know from reading it. Keep a trap that cost real time to find, a decision plus why the obvious alternative lost, a constraint imposed from outside the file, and an ADR citation. Cut anything restating what the code says, any paraphrase of the method or variable name, narration of obvious steps, and the second comment making a point the first already made.
+Before keeping a comment, ask what a competent reader of this code would not already know from reading it. Keep a trap that cost real time to find, a decision plus why the obvious alternative lost, a constraint imposed from outside the file, an ADR citation. Cut anything restating what the code says, any paraphrase of a name, narration of obvious steps, and the second comment making the first's point. A comment longer than the code it introduces belongs in an ADR, a note, or the commit body with a one-line pointer left behind — which is the half of *prefer a reference to an ADR to inlining the full reasoning* above that most often gets dropped.
 
-Length is its own tell. A comment longer than the code it introduces is usually an explanation that belongs in an ADR, a note, or the commit body, with a one-line pointer left in the code — which is what *prefer a reference to an ADR to inlining the full reasoning* above already asks for, and is the part of that bullet most often dropped.
-
-This is also a machine-written tell, in the same family as announcing that a point matters (`writing.md`). A file where every method wears a three-line preamble reads as generated no matter how sound each individual comment is, and that impression attaches to the code as much as to the prose.
-
-Failure mode this prevents: every comment is defensible on its own, so nothing prompts a second look, and the density is only visible in aggregate. By the time somebody notices, the correction is a tightening pass across many files rather than restraint in one — and the pass has to re-judge each comment on the way through, which is the work that would have cost nothing at writing time.
+Failure mode this prevents: every comment is defensible on its own, so nothing prompts a second look and the density is visible only in aggregate. A file where every method wears a three-line preamble reads as generated however sound each comment is, and that impression attaches to the code as much as to the prose. By the time anyone notices, the correction is a tightening pass across many files that has to re-judge every comment on the way through — the work restraint would have cost nothing.
 
 ## Documentation
 
