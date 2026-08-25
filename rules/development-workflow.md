@@ -105,6 +105,18 @@ Chaining the two leaps is what makes this bite — remote-tracking refs get read
 
 Failure mode this prevents: advice gets built on a race, a conflict, or a blocking PR that does not exist — and it is disproved by the user simply opening the repository's pull-request page, which discredits the surrounding claims they cannot check as cheaply.
 
+### A state nobody here set is not evidence a command failed
+
+When a shared artifact — a pull request's draft status, an issue's labels, a branch's tip, a review's state — reads differently than the last write issued from here, the first candidate is that a person changed it, not that the command silently failed. The user acts on these without narrating it, per the top of this section, so the window between a write and the read that follows is exactly where a deliberate change lands.
+
+Reading a state does not establish its cause. `gh pr view --json isDraft` reports what is true now and says nothing about who made it true, so treating it as a verdict on an earlier command is an inference with no support behind it. The timeline settles it: `gh api repos/{owner}/{repo}/issues/{n}/timeline` records `ready_for_review`, `convert_to_draft`, label changes and closes, each with an actor and a timestamp. One call, and it separates the two cases the state cannot.
+
+A command issued from here appears in that timeline under the **user's** login, since it runs on their credentials. So the actor name does not distinguish an agent's action from theirs — match events against the commands actually run.
+
+**How to apply:** before correcting an unexpected state on a shared artifact, read the timeline. Prefer asking over reverting whenever the artifact is visible to other people, because a state that looks wrong is often somebody's decision, and correcting it is then undoing their work while reporting a fix. This is the outward-facing sibling of *Don't route around the user's configuration* in `diagnosis.md` — there a deliberate local setting gets bypassed, here a deliberate remote action gets reverted.
+
+Failure mode this prevents: a `--draft` flag is read as having failed, the pull request is converted back to draft, and the user — who had deliberately marked it ready — marks it ready a second time. The reverting command succeeds, so nothing signals that a decision was overridden, and the episode gets reported as a tool defect rather than as what it was.
+
 ## Reviewing
 
 - Stay within the requested scope — do not propose or make code changes unless asked. A review request is a read-only task unless the user explicitly says to fix what's found.
