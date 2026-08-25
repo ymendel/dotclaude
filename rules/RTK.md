@@ -230,6 +230,21 @@ in `rtk test` or `rtk err`, or redirect to a file and `rtk read` the file. Failu
 reads as the compact-output habit applied correctly, so the prompt it causes gets diagnosed as a
 missing grant for the command at the head of the pipeline.
 
+**`rtk test` re-parses its command, so a quoted argument does not survive the wrapper.** The command
+is handed to a shell a second time and the quoting is gone by then, so an argument containing spaces
+arrives at the wrapped command as one argv entry per word. Nothing reports a quoting problem,
+because whatever receives the strays decides how they present — a test runner that reads leftover
+positional arguments as file paths turns them into `cannot load such file`, naming a word from the
+middle of the pattern you were filtering on. Keep a wrapped command's arguments space-free, or run
+it bare and redirect to a file when one has to contain spaces. Verified for `rtk test`; `rtk err`
+and a plain rewritten command are unchecked. `notes/rtk-quirks.md` carries the two-line reproduction
+and the episode it cost.
+
+Failure mode this prevents: the wrapper gets reached for exactly where the rules send you — filtering
+a long verification run — and it corrupts the command it was added to make readable. The symptom
+names the wrapped tool rather than the wrapper, so the diagnosis goes to the tool's own flags — the
+one place the cause is not.
+
 ### `rtk proxy` is an escape hatch, not a prefix
 
 The Golden Rule asks for `rtk`, not `rtk proxy`. Proxying bypasses every filter, so a reflexive
