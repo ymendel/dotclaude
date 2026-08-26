@@ -56,8 +56,6 @@
       "Bash(python3 *skills/session-handoff/scripts/*.py*)",
       "Bash(uv run *skills/skill-architecture/scripts/*.py*)",
 
-      "Edit(**/.claude/**)",
-      "Edit(/.claude/**)",
       "Edit(//private/tmp/**)",
       "Edit(//tmp/**)",
 
