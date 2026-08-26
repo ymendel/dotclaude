@@ -26,7 +26,13 @@ Two pattern-shape gotchas the docs flag explicitly:
 
 A path reached through a symlink is checked twice, against the link and against its target. An **allow** rule applies only when *both* match — so a rule naming one side silently prompts every time, with no signal that the symlink is why. A **deny** rule applies when *either* matches.
 
-This bites constantly here, because `~/.claude` is a symlink to the dotclaude repo and the two paths share no top-level segment: no rule anchored on `.claude/` or on `dotclaude/` covers both, and pairing two rules does not compose. `rules/references/settings/claude-symlink.md` carries the docs quote, the single-pattern workaround and its trade-off, and how to resolve a path under `~/.claude` (including the lossy `projects/` directory encoding). Load it when a rule that looks correct still prompts, or before resolving a `~/.claude/…` path to its real location.
+This bites constantly here, because `~/.claude` is a symlink to the dotclaude repo and the two paths share no top-level segment: no rule anchored on `.claude/` or on `dotclaude/` covers both, and pairing two rules does not compose.
+
+**So address these files by their canonical path** — `dotclaude/rules/settings.md`, never `~/.claude/rules/settings.md`. The repo is the working directory, so the real path carries no link and the double-check never runs. This holds for the private tree too: an edit reached as `<private-root>/notes/…` goes through clean where the same edit through `~/.claude/notes/…` asks, even though that repo is an added directory rather than the primary one. No allow rule is involved on either side, which is why none of the entries that look like they should help ever did.
+
+The link form is the one always to hand — the environment block lists `~/.claude` as a working directory and this config refers to itself that way throughout — so the prompts read as a property of editing the config rather than as a consequence of how the path was written. That reading is what makes the habit durable, and it is wrong.
+
+`rules/references/settings/claude-symlink.md` carries the docs quote, the resolution rules for a path under `~/.claude` (including the lossy `projects/` directory encoding), and why the broad single-pattern allow rule it used to recommend is not needed. Load it before resolving a `~/.claude/…` path to its real location.
 
 ## How Bash Command Patterns Match — `:*`, ` *`, and Word Boundaries
 

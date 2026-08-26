@@ -27,14 +27,23 @@ silence the prompt. A *single* pattern has to match both paths.
 
 For one rule to cover both, the pattern needs a segment present in both — `Edit(**/skills/**)` for
 skill edits, `Edit(**/handoffs/*.md)` for handoffs. The trade-off is that these also auto-match any
-`skills/` or `handoffs/` directory in any project, broader than the intent. The standing default is to
-accept the prompts as the cost.
+`skills/` or `handoffs/` directory in any project, broader than the intent.
 
-> **PreToolUse hook — future option.** When the prompt cost becomes load-bearing (the live case is
-> session handoffs being interrupted mid-departure), a hook can intercept Edit/Write under specific
-> paths, validate narrowly, and exit 0 to skip the prompt without broadening the global allow list.
-> Sketch: check that the path is under `~/.claude/handoffs/` (or the canonical
-> `dotclaude/.claude/handoffs/`), exit 0 to allow. Design properly when picked up.
+**Neither that rule nor its trade-off is needed, because the symlink is optional.** The repo *is* the
+working directory, so every file in it has a canonical path with no link in it. Write
+`dotclaude/rules/settings.md` and the pair never arises. Confirmed in both directions: an edit reached
+through `~/.claude/notes/…` prompts, the same edit reached as `<private-root>/notes/…` does not, and
+no allow rule changed between them — so this is not a gap in the allow list to be patched but a choice
+about how the path gets written. The standing default recorded here used to be to accept the prompts
+as the cost, which quietly assumed the link path was the only way in.
+
+> **PreToolUse hook — superseded, kept for the reasoning.** This block proposed a hook intercepting
+> Edit/Write under specific paths and exiting 0, motivated by session handoffs being interrupted
+> mid-departure. Handoffs in this repo are reachable as `dotclaude/.claude/handoffs/`, which carries no
+> symlink, so the prompt it was designed around never fires. It also never addressed handoffs in *other*
+> projects: there `.claude/` is an ordinary directory and the prompt is the sensitive-directory gate, a
+> different mechanism that `notes/claude-code-quirks.md` records a hook as having been measured against
+> and failed to beat.
 
 ## Resolving a path under `~/.claude`
 
