@@ -146,6 +146,20 @@ Failure mode this prevents: a red test run reads as green because the summary gr
 
 Failure mode this prevents: a revert aimed at a two-line probe takes an hour of unrelated editing with it, and because the command succeeded exactly as documented, the loss surfaces later — when the missing work is noticed downstream — rather than at the moment it happened. Sibling of the section above it: that one is about state a *pending decision* needs, this one about state you simply had not committed yet.
 
+## An Edit revert and its restore have to cover the same span
+
+The section above sends a temporary change back out with Edit rather than `git checkout`, and that is right. The trap sits on that path: an Edit pair meant to be inverse round-trips only when both operate on the *same span*. Where the revert's `old_string` covers less than the restore's `new_string` puts back, every cycle nets the difference.
+
+The standing case is a comment. Reverting a modified line by matching the line alone leaves the comment above it untouched, and restoring by writing comment-plus-line back adds a copy that was never removed. Two red/green cycles later the file carries the comment three times over one line of code. Both Edits reported success, correctly — each matched exactly what it was told to match.
+
+**Nothing catches it.** A test suite is silent by construction about text carrying no behaviour, so the run stays green through every cycle — and green is the signal being watched, because observing the red/green transition is the entire point of the exercise. The suite is not a weak detector here, it is an incapable one — a full run, however many times it is repeated, says nothing whatever about the file's state.
+
+What makes it worth a rule rather than a shrug is that the exposure scales with rigour. Reverting code to observe an honest red is what test-first asks for when the code got written first, and it is the alternative to claiming a red nobody saw. So the more faithfully the discipline runs, the more cycles execute and the more copies stack up.
+
+**How to apply:** make the revert's match cover everything the restore will write back — the comment, the blank line, the whole hunk — so the two are genuine inverses. Then read the region back once the cycle finishes, rather than inferring its state from a green suite.
+
+Siblings in `feedback.md`: *Reproduce anchor lines byte-for-byte in an Edit* covers the text an Edit matches on, and *Inserting a block into markdown reparents what follows it* the text after it. Same shape in all three — the Edit reports success, and the damage sits outside whatever diff gets read.
+
 ## Stop a backgrounded command once its output has been read
 
 A foreground command that exceeds its timeout is moved to the background, and its output goes on accruing to a file. Reading that file is what answers the question — and it is also the last moment anything will draw attention to the task, because a process that never exits never sends the completion notification that would. So the task can outlive the work it was part of by hours while every visible sign says the work is done.
