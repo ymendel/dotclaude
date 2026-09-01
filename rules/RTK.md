@@ -138,7 +138,9 @@ held up on every occasion:
 - **Appending `2>&1` worked once and has since failed.** It returned the full issue on the occasion
   that first produced this note, and on a later one `rtk gh issue view <n> --comments 2>&1` returned
   nothing at all. So it is worth a try and worth nothing as a guarantee: a still-empty result after
-  adding it says nothing about the issue.
+  adding it says nothing about the issue. Keep it to output being *read here* — appending it to a
+  redirect that captures a payload writes the error text into the file instead, per
+  `tool-and-shell-safety.md`'s *Don't merge stderr into a file you intend to parse*.
 
 Read an empty result as the tooling until a data-mode call says otherwise. This matters more than a
 missing `grep` match, because the empty result reads as *an issue with no body or no comments* — a
@@ -146,6 +148,25 @@ claim about the artifact rather than about the tooling — and an issue or PR is
 thing whose contents get summarized onward to other people. It is also the check whose whole value
 rides on trusting a negative, which `project-notes.md` leans on when it asks for a tracker search
 before filing anything as new.
+
+**For an Actions job log, reach for `gh run view` rather than the raw API path.** Actions logs carry
+ANSI escape sequences from whatever ran inside them, and RTK declines to emit output containing
+them without `--allow-escape-sequences` — so `rtk gh api repos/{owner}/{repo}/actions/jobs/{id}/logs`
+stops with a refusal on stderr at exit 1, and `rtk proxy` is no escape. Reach for
+`--log-failed` first, which returns only the failed steps and is usually the whole question, and
+`--log` for the entire thing. `--job <id>` works on its own, so neither form needs a run id:
+
+```bash
+rtk gh run view --log-failed --job <job-id>
+rtk gh run view --log --job <job-id>
+```
+
+Two caveats `gh`'s own help volunteers, both platform-dependent rather than deterministic. Logs come
+as a zip by default, with a slower per-job API fallback when `gh` cannot associate jobs with their
+logs, and that fallback fails outright once more than 25 job logs are missing. Some lines cannot be
+tied to a step and appear under `UNKNOWN STEP`. This is a fact about the guard and about log content
+rather than an instance of `searching.md`'s data-mode preference, which points the other way here —
+the API is the data surface and `run view` is the rendered one.
 
 ## Golden Rule
 
