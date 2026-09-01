@@ -138,6 +138,20 @@ Reserve `${PIPESTATUS[0]}` for a pipeline that genuinely cannot be replaced, and
 
 Failure mode this prevents: a red test run reads as green because the summary grep matched, the `&&` behind it fires anyway, and nothing in the visible output contradicts the report that says verified. This is `honesty.md`'s *Never Present Estimates as Measurements* arriving through a shell mechanism rather than a reasoning one.
 
+## Don't merge stderr into a file you intend to parse
+
+`cmd > out.log 2>&1` puts the error channel *inside the artifact*. When the command fails, the file is neither absent nor empty — it holds a short error message, which is a perfectly plausible-looking file. Every grep against it then returns a confident negative about *content*, when the fact to report is that the command failed.
+
+Reproduced here: `ls <nonexistent> > merged.txt 2>&1` exited 1 and left 59 bytes of error text, while `ls <nonexistent> > clean.txt` exited 1 and left the file at 0 bytes with the error on the terminal where it belonged. The failure is loud in the second form and invisible in the first, and nothing about the first form's output says which happened.
+
+**How to apply:** redirect stdout alone when capturing data to parse — a downloaded log, an API response, a generated fixture — and check the exit status. Reserve `2>&1` for capturing a transcript somebody is going to read, where interleaving the two channels is the point. Then run `wc -c` on the artifact before grepping it: a payload that should be hundreds of kilobytes arriving at a hundred bytes settles the question at once, and that evidence is usually in hand several commands before anyone looks at it.
+
+This does not retract the `2>&1` suggestion in `RTK.md`'s empty-`gh`-result guidance, which `project-notes.md` leans on for the tracker check. Those are about making output *visible* in the terminal, where merging the channels is what surfaces a message that would otherwise be lost. Keep the two uses apart by purpose — `2>&1` to see something, stdout alone to store something. The tracker check is the sharp case, since its whole value rides on trusting a negative, so merging the channels there while capturing to a file makes that negative worthless.
+
+Sibling of the section above, one channel over: there the pipe discards the *exit status*, here the redirect discards the *distinction between output and error*. It also feeds `honesty.md`'s *Do Not Assert Absence Without Verifying*, since the resulting false negative is about file contents and reads exactly like a real miss.
+
+Failure mode this prevents: a failed fetch becomes a small file of error text rather than no file at all, and the greps that follow report findings about content the artifact never held. The command's exit status said so at the time, and the redirect is what made it easy not to look.
+
 ## Reverting a file discards every uncommitted change in it, not just the one you meant
 
 `git checkout -- <file>` and `git restore <file>` take the file back to the index or HEAD wholesale. When a file carries deliberate uncommitted work *and* something temporary — a planted test case, a debug line, a probe — reverting to undo the temporary part silently destroys the deliberate part too. Git offers no partial undo here and reports nothing, because discarding is exactly what was asked for.
