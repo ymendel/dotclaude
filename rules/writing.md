@@ -130,6 +130,41 @@ This is adjacent to "Do not mirror his prompting register" (in `rules/references
 
 Failure mode this prevents: speculative restructuring for an imagined agent reader, producing prose that reads as ghostwritten to the human reader and saves no real effort for the agent reader (who would have done fine with the prose).
 
+## Don't borrow these rules' register
+
+The always-loaded rule set is the largest body of prose in any session and the most recently read, and it has a house style: state the directive, give the failure mode it prevents, name the sibling rule it sits beside. That style is right *here*. Always-loaded text competes for attention against everything else loaded, so it has to say what goes wrong without it and how it relates to its neighbours, or it cannot be weighed against them at all. None of that holds for a code comment, a commit body, or a PR description, whose reader arrived looking for something specific and wants the fact rather than the case for the fact.
+
+What lets the register travel is that *capture the why, not the how* sets no limit. A how ends where the code says it. A why does not — every reason can be given a reason, and every rejected alternative can be given the argument that rejected it — so guidance that reads as a filter turns out to be a license, and this register is what fills the space it opens.
+
+Tells, all of them borrowed from this rule set:
+
+- a commit body that argues for the change rather than saying what it does and why
+- a `Failure mode:` clause, or a "Sibling:" cross-reference, anywhere that is not a rule
+- a paragraph on why the rejected alternative lost, when nobody proposed it
+- bolded lead-in phrases opening successive paragraphs of a commit body or PR description
+- section headings in a PR description for a change with a single concern
+
+Write the plain version instead: the fact, the constraint, then stop. Where reasoning genuinely needs an argument made at length, it has destinations — an ADR, a note — and a pointer left where the reader will meet it.
+
+Failure mode this prevents: the density gets imitated by default and each instance reads as careful work, because it matches the house style of the most authoritative prose in context. `code-style.md` asks for consistency with the nearest examples when in doubt, and in a session the nearest examples of *prose* are these files, so the instinct that is normally right argues for the wrong register here. Nothing in a self-edit flags it, because the output is consistent with the surrounding configuration.
+
+## Say it once, and pick where it lives
+
+One fact about one change clears several independent gates, each of them honestly. *Would a competent reader know this from the code?* — no, so it becomes a comment. *Do the subject and the diff convey the reason?* — no, so it becomes a commit body. *Is this current and useful to a reviewer?* — yes, so it goes in the PR description as well. Every gate is answered correctly on its own terms and none of them can see the other two, so the reader meets the same paragraph three times without any single decision having been wrong.
+
+Assign the fact to the reader who hits it, and leave the other artifacts a pointer or nothing:
+
+- A constraint that will trip whoever next edits a line goes in the comment beside it. That reader is not reading the history.
+- Why this approach rather than the one it displaced goes in the commit body, or in an ADR when the decision outlives the commit.
+- What to look at and in what order, and what was deliberately left out, goes in the PR description. A reviewer reads it once and then reads the diff.
+- Reasoning that several sites depend on goes in an ADR or a note, with a pointer from each site.
+
+The test for a second copy is whether a reader plausibly reaches the second artifact without passing the first. A comment's reader may never open the log, so a comment restating a commit body can be right. A reviewer reads the PR description and the commits both, which makes that the copy that most reliably fails — reasoning already carried by the commit bodies does not want restating above them.
+
+Point by stable identity when pointing at all: an ADR number, a tracked path, a heading. A comment pointing at a bare SHA is worse than the copy it replaced, per `development-workflow.md`'s durable references.
+
+Failure mode this prevents: each artifact is defensible alone and the aggregate is what the reader actually meets, so reviewing any one of them never surfaces the volume — and the repetition reads as thoroughness rather than as three copies of one paragraph. The copies then age at different rates, leaving a later reader who notices them disagreeing with no way to tell which is current. `honesty.md`'s *An Inherited Brief Is One Session's Summary* describes this same spread for a claim that is *wrong*, where it costs a correction sweep across files. Correct prose spreads by the identical mechanism with nothing at all to catch it.
+
 ## Don't announce that a point matters
 
 Never append a clause whose only work is to assert the importance of what precedes it: "the tradeoff, **and it's a real one**", "one caveat, **and it's the important one**", "a cost here, **and it's not small**". It reads as emphasis but carries nothing — it tells the reader to take the point seriously instead of giving them the reason to. It is also a strong LLM tell, which is what makes it worse than merely redundant in prose under a byline: it marks the text as machine-written to exactly the reader whose judgment the byline was meant to carry.
