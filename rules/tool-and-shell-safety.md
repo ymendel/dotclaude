@@ -18,7 +18,7 @@ The Bash working directory is set to the project root at session start and persi
 
 Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
 a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
-it is built out of are the ones the gate cannot resolve. Four instances, all real:
+it is built out of are the ones the gate cannot resolve. Five instances, all real:
 
 - **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
@@ -55,6 +55,18 @@ it is built out of are the ones the gate cannot resolve. Four instances, all rea
   The trap specific to this section is applying that apparatus to output that needed no filtering
   at all — five lines through `tail -5`, and a status probe for a command whose status a bare run
   reports by itself.
+- **A test-name filter written in regex the shell claims first.** An unquoted `-i
+  /expired_token|refunds_none|which_charges/` is read as a three-segment pipeline before anything
+  runs, so it fails at `refunds_none: command not found` — and the gate, which evaluates each segment
+  separately (`settings.md`), then offers a standing allow-list entry for two "commands" that are
+  regex fragments. That is what earns the rule: the failure is self-correcting, the grant is not. In
+  the approval dialog it reads as an ordinary unfamiliar tool, which is the dialog-legibility half of
+  `RTK.md`'s bare-`:` trap without its hazard — that entry silently grants truncation of any file,
+  where this one can never fire and is simply dead weight competing with real rules for attention.
+  Alternation and grouping are exactly the characters the shell takes for itself (`|`, `(`, `)`, `*`,
+  `?`, `>`, `&`), so quote the filter or drop it. Dropping it is usually the answer: one such filter
+  selected 2 of 43 tests in a file that runs in under two seconds, so running the whole file was
+  simpler, faster, and verified more.
 
 The tell in each case: the part that trips the gate is not the work, it is the scaffolding. Before
 adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
@@ -66,7 +78,7 @@ after this prose was bypassed four times across two sessions. It keys on the cha
 definition, so a definition following a separator is caught wherever it sits — and one immediately
 after an opening quote is not, which matches the gate rather than missing a case. Its header
 enumerates the shapes it knowingly over-blocks; read that before working around a block that looks
-wrong. The other two shapes above stay prose-only, having no comparable detector.
+wrong. The remaining shapes above stay prose-only, having no comparable detector.
 
 Failure mode this prevents: scaffolding added out of diligence converts an invisible call into a
 permission prompt, and the prompt arrives attached to a command whose actual work needed no

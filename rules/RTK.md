@@ -259,7 +259,11 @@ positional arguments as file paths turns them into `cannot load such file`, nami
 middle of the pattern you were filtering on. Keep a wrapped command's arguments space-free, or run
 it bare and redirect to a file when one has to contain spaces. Verified for `rtk test`; `rtk err`
 and a plain rewritten command are unchecked. `notes/rtk-quirks.md` carries the two-line reproduction
-and the episode it cost.
+and the episode it cost. A *metacharacter* in that argument is a separate mechanism this note does
+not cover: an unquoted `|` or `(` is claimed by the outer shell before rtk sees the command at all,
+so the wrapper's second parse never comes into it and a space-free argument is no protection. The
+consequence is worse than a split argv — see `tool-and-shell-safety.md`'s *Don't add shell machinery
+the task didn't ask for*.
 
 Failure mode this prevents: the wrapper gets reached for exactly where the rules send you — filtering
 a long verification run — and it corrupts the command it was added to make readable. The symptom
