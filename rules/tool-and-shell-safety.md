@@ -50,6 +50,14 @@ it is built out of are the ones the gate cannot resolve. Five instances, all rea
   concatenation, and it fires in an ordinary command rather than only inside `[[ ]]`. A ref-and-path
   argument is precisely that shape. Write the ref and the path out literally in each command, however
   long.
+
+  A **redirect target** is checked by a second, separate detector, so that `:`-and-`[` mechanism is
+  not the boundary: `> $S/pages-build.md` is refused as ``Redirect target concatenation contains $/`
+  — unanalyzable gap or substitution``, which fires on an unescaped `$` or backtick anywhere in the
+  target and on nothing else. Expect to want the variable here — the Bash tool asks for absolute
+  paths, absolute paths are long, and a variable is the obvious way to make them tolerable — and
+  write the path out anyway. `notes/claude-code-quirks.md` carries the generating code and why that
+  message is a legend rather than a quotation.
 - **A pipe plus `${PIPESTATUS[0]}` where the plain command would do.** Covered in full by *A pipe
   hides the exit status* below, including why the expansion prompts and what to reach for instead.
   The trap specific to this section is applying that apparatus to output that needed no filtering

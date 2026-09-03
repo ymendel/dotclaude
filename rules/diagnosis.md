@@ -12,6 +12,8 @@ Specific case: when RTK's diff output doesn't show a change that's known to exis
 
 Specific case: when `git diff` output looks summarized or processed (a "Changes" header, no `+`/`-` lines, "No syntactic changes" for non-empty diffs), the user has an external diff tool configured via `diff.external`. Pass `--no-ext-diff` to `git diff` / `git show` / `git log -p` to get the standard unified diff. This is the right escape hatch — it's a documented git flag, not a workaround around the user's config. Don't reach for `/usr/bin/git` or shell out to `diff` directly.
 
+Specific case: a permission-gate refusal that names characters is usually enumerating the class the analyzer rejects, not quoting what it found in the command. ``Redirect target concatenation contains $/` — unanalyzable gap or substitution`` fires on an unescaped `$` *or* a backtick, and the `/` is an "or" — so searching the command for a literal `$/` and a backtick finds nothing and reads as though the gate misfired. Before hunting for the characters a gate message shows, ask whether it is reporting the match or the class; only the first is checkable against what was run.
+
 Related: when the command in question is asynchronous (a background Bash, a long-running task) and the symptom is *absent* output rather than wrong output, see "Distinguish 'in progress' from 'failed' before concluding failure" below — that case has its own diagnostic checks before reissuing.
 
 ## A parse error at the end of a pipe is usually the failure of the command at its start
