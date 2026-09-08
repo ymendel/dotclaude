@@ -197,6 +197,18 @@ The split is deliberate: only *group assignment* needs a human, everything else 
 
 Failure mode this prevents: without recording the convention, the next reorg "helpfully" collapses the whole array into one mechanical sort, destroying the ecosystem grouping — scattering `rubydoc.info` away from `rubygems.org` and `*.github.io` away from `github.com`, the exact adjacencies the layout was built to create.
 
+## `minimumVersion` carries the version this config was last reconciled against
+
+The section above notes that JSON has no comments. `minimumVersion` is where that bites least, because on this machine the key has nothing to act on: Claude Code is installed as a Homebrew cask with no native build beside it, so there is no installation the auto-updater manages and no channel it can move. That leaves the key free to carry a note instead. It holds the Claude Code version this file was last checked against — repoint it when the config is next reconciled with a new build, and read a stale value as "nobody has verified these settings against anything newer."
+
+Two things about that premise. It is inferred from the absent native paths rather than from documentation, so it is a strong reading and not a certainty. And it is a property of *this* install, not of Homebrew in general — a machine with both a cask and a native build has an updater with something to manage, and the key stops being free. `notes/claude-code-setup.md` carries the evidence and the check to re-run after any change in install method.
+
+Do not read it as a live constraint, and do not delete it as dead configuration. Both readings are wrong in the same way: the key is doing documentation work that no other key in the file can do. It also stays safe in the case where a future install *is* native and the key becomes live, since a floor at the installed version only forbids going backwards.
+
+`autoUpdatesChannel` sits beside it and is inert for the same reason. Leave it — it records which channel is wanted if the install method ever changes.
+
+Failure mode this prevents: the pair reads as active update configuration, so a session either builds on a channel guarantee that is not in force, or tidies away the one marker saying how current the rest of the file is.
+
 ## Path Fields vs. Hook Commands
 
 Path fields (e.g. `additionalDirectories`) support `~/` tilde expansion but **not** `$HOME` variable expansion. Use `~/.claude`, not `$HOME/.claude`.
