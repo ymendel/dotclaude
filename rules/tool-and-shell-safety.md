@@ -40,7 +40,7 @@ it is built out of are the ones the gate cannot resolve. Six instances, all real
   call it a one-off: the shape recurs within a session, and because it has no motive there is nothing
   to notice yourself talking into.
 - **An invented command in front of the real one, with its error suppressed.** The same
-  motiveless shape as above, in the form the `function-definition-guard` hook cannot see: a
+  motiveless shape as above, in the one form of it no hook can detect: a
   `rtk provoke 2>/dev/null;` ahead of an ordinary `grep`, naming a subcommand that does not exist.
   Nothing is enforced and nothing is called — but unlike the function form there is no gate to stop
   it, so the only thing that would have surfaced it is the error, and the `2>/dev/null` is what threw
@@ -65,6 +65,28 @@ it is built out of are the ones the gate cannot resolve. Six instances, all real
   concatenation, and it fires in an ordinary command rather than only inside `[[ ]]`. A ref-and-path
   argument is precisely that shape. Write the ref and the path out literally in each command, however
   long.
+
+  **The motiveless variant is the same shape with none of the argument, and it is now gated.** A
+  `for_check=""; rtk wc -l file` assigns a name nothing references, so there is not even a retyping
+  case to weigh. `hooks/shell-machinery-guard.sh` blocks an assignment followed by a separator,
+  which covers both variants — the example above included. It deliberately leaves the *prefix* form
+  `FOO=bar cmd` alone, since that scopes the variable to one command and is ordinary shell; a
+  separator terminating the value is the whole distinction. Read a block as a prompt to write the
+  value out literally.
+
+  **The prefix form clears the guard and still costs a prompt**, so passing is not a recommendation.
+  An allow rule is anchored on the command name, and the assignment makes the string stop starting
+  with `rtk`, so `Bash(rtk ls:*)` no longer matches — the same mechanism that makes a
+  `GIT_SEQUENCE_EDITOR=…` prefix the sole reason its command asks. Observed on a
+  `FOO=bar rtk ls dir/ | rtk head -3`. Blocking it would be the wrong instrument, since that is the
+  allowlist's business rather than a guard's, but there is no reason to reach for it either.
+
+  Note what the gate does *not* do here, because it inverts the reasoning above. A plain assignment
+  is not among the parser nodes no allow rule can grant, and the changelog records assignments as
+  auto-approved but for one arithmetic-to-integer-variable case fixed in 2.1.252. So the motiveless
+  form costs no approval prompt — nothing interrupts, nothing errors, and the only reader who ever
+  sees it is whoever reads the command string. That silence is why it is gated despite resting on
+  fewer observations than the function form.
 
   A **redirect target** is checked by a second, separate detector, so that `:`-and-`[` mechanism is
   not the boundary: `> $S/pages-build.md` is refused as ``Redirect target concatenation contains $/`
@@ -95,13 +117,25 @@ The tell in each case: the part that trips the gate is not the work, it is the s
 adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
 of a short command, or a plain invocation that respects the rule rather than policing it.
 
-**Now gated for the function-definition shape:** `hooks/function-definition-guard.sh` blocks a
-definition in a Bash command with exit 2 and a pointer back here, per ADR 0004's rule-vs-hook split,
-after this prose was bypassed four times across two sessions. It keys on the character before the
-definition, so a definition following a separator is caught wherever it sits — and one immediately
-after an opening quote is not, which matches the gate rather than missing a case. Its header
-enumerates the shapes it knowingly over-blocks; read that before working around a block that looks
-wrong. The remaining shapes above stay prose-only, having no comparable detector.
+**Two of these shapes are gated:** `hooks/shell-machinery-guard.sh` blocks a function definition and
+an assignment-plus-separator with exit 2 and a pointer back here, per ADR 0004's rule-vs-hook split.
+The definition half followed this prose being bypassed four times across two sessions; the assignment
+half rests on one observation and a different argument, which that bullet and the hook's header both
+set out rather than letting the first justification look transferable.
+
+For the definition it keys on the character before the match, so one following a separator is caught
+wherever it sits — and one immediately after an opening quote is not, which tracks the gate rather
+than missing a case. The assignment check uses a narrower preceding set, excluding bare whitespace so
+`export FOO=bar; cmd` passes. The header enumerates what each half knowingly over-blocks; read it
+before working around a block that looks wrong.
+
+**The remaining shapes stay prose-only, and one of them provably cannot be gated.** The invented
+leading command is the case: the binary resolves, since only its subcommand is fabricated, so no
+does-this-command-exist test fires and covering it would mean embedding every tool's CLI surface.
+Reading the first segment before sending is the only check there is. Treat the three gated-versus-not
+shapes as a bounded family rather than a growing list — they enumerate the slots bash allows at the
+start of a statement while staying inert, which is what makes the gating worth doing instead of a
+treadmill.
 
 Failure mode this prevents: scaffolding added out of diligence converts an invisible call into a
 permission prompt, and the prompt arrives attached to a command whose actual work needed no

@@ -5,7 +5,7 @@
 #   ./hooks/test/run-checks.sh
 #
 # Every payload lives in this file rather than in a Bash command, because
-# function-definition-guard.sh and reflexive-cd-guard.sh both match their own
+# shell-machinery-guard.sh and reflexive-cd-guard.sh both match their own
 # trigger text: assembling these cases inline would block the test run itself.
 # That is also the escape both guards' messages recommend — put the script in a
 # file and run the file.
@@ -111,34 +111,34 @@ skipped() {
     skip=$((skip + 1))
 }
 
-fdg() { check function-definition-guard.sh "$@"; }
+smg() { check shell-machinery-guard.sh "$@"; }
 rcd() { check_at reflexive-cd-guard.sh "$@"; }
 rcd_says() { says reflexive-cd-guard.sh "$@"; }
 
-echo "== function-definition-guard: blocks a definition (exit 2)"
-fdg "leading posix definition"        2 'for_each() { :; }; git status'
-fdg "definition after a semicolon"    2 'git status; noop() { :; }'
-fdg "definition after &&"             2 'rtk ls && helper() { :; }'
-fdg "keyword form, no parens"         2 'function greet { echo hi; }'
-fdg "keyword form, with parens"       2 'function greet() { echo hi; }'
-fdg "shadowing a builtin"             2 'cd() { return 1; }; grep -r foo .'
-fdg "spaces around the parens"        2 'tidy ()  { :; }; ls'
-fdg "unclosed brace"                  2 'noop() {'
+echo "== shell-machinery-guard: blocks a definition (exit 2)"
+smg "leading posix definition"        2 'for_each() { :; }; git status'
+smg "definition after a semicolon"    2 'git status; noop() { :; }'
+smg "definition after &&"             2 'rtk ls && helper() { :; }'
+smg "keyword form, no parens"         2 'function greet { echo hi; }'
+smg "keyword form, with parens"       2 'function greet() { echo hi; }'
+smg "shadowing a builtin"             2 'cd() { return 1; }; grep -r foo .'
+smg "spaces around the parens"        2 'tidy ()  { :; }; ls'
+smg "unclosed brace"                  2 'noop() {'
 
 echo
-echo "== function-definition-guard: leaves ordinary commands alone (exit 0)"
-fdg "ordinary command"                0 'git status'
-fdg "reverting subshell"              0 '(cd /tmp && ls)'
-fdg "command substitution"            0 'echo "$(git rev-parse HEAD)"'
-fdg "mention without a brace"         0 "rtk grep 'parse_row()' ."
-fdg "mention in a commit message"     0 'git commit -m "document the foo() helper"'
-fdg "awk block, no parens"            0 "awk '{print \$1}' data.txt"
-fdg "find -exec braces"               0 'find . -name "*.sh" -exec ls {} \;'
-fdg "brace expansion"                 0 'mkdir -p src/{lib,test}'
-fdg "empty command"                   0 ''
+echo "== shell-machinery-guard: leaves ordinary commands alone (exit 0)"
+smg "ordinary command"                0 'git status'
+smg "reverting subshell"              0 '(cd /tmp && ls)'
+smg "command substitution"            0 'echo "$(git rev-parse HEAD)"'
+smg "mention without a brace"         0 "rtk grep 'parse_row()' ."
+smg "mention in a commit message"     0 'git commit -m "document the foo() helper"'
+smg "awk block, no parens"            0 "awk '{print \$1}' data.txt"
+smg "find -exec braces"               0 'find . -name "*.sh" -exec ls {} \;'
+smg "brace expansion"                 0 'mkdir -p src/{lib,test}'
+smg "empty command"                   0 ''
 
 echo
-echo "== function-definition-guard: an opening quote is not a separator (exit 0)"
+echo "== shell-machinery-guard: an opening quote is not a separator (exit 0)"
 # The guard fires on the single character before the definition, and a quote is
 # not in that set — so a definition sitting immediately after an *opening* quote
 # passes. That tracks the permission gate this hook exists to keep quiet: bash
@@ -147,24 +147,68 @@ echo "== function-definition-guard: an opening quote is not a separator (exit 0)
 # preceding character rather than as an exemption for quoted strings — the
 # section below is the same quoting with a separator ahead of the definition,
 # and it blocks.
-fdg "single-quoted definition"        0 "echo 'demo_fn() { :; }'"
-fdg "double-quoted definition"        0 'echo "demo_fn() { :; }"'
-fdg "definition inside bash -c"       0 "bash -c 'f() { :; }; f'"
-fdg "grep pattern with a brace"       0 "rtk grep 'parse_row() {' src/"
+smg "single-quoted definition"        0 "echo 'demo_fn() { :; }'"
+smg "double-quoted definition"        0 'echo "demo_fn() { :; }"'
+smg "definition inside bash -c"       0 "bash -c 'f() { :; }; f'"
+smg "grep pattern with a brace"       0 "rtk grep 'parse_row() {' src/"
 
 echo
-echo "== function-definition-guard: documented over-blocks (exit 2)"
+echo "== shell-machinery-guard: documented over-blocks (exit 2)"
 # The three shapes the hook's header enumerates as knowingly over-blocked: a
 # separator ahead of a quoted definition, and a heredoc body line that begins
 # one (a newline counts as whitespace). The gate would have stayed quiet for
 # each, so these are false positives accepted deliberately rather than behaviour
 # worth preserving — if the matching ever becomes quote-aware, all three flip to
 # exit 0 and these expectations are what should change.
-fdg "separator inside bash -c"        2 "bash -c 'echo hi; f() { :; }; f'"
-fdg "separator inside a grep pattern" 2 "rtk grep 'x; parse_row() {' src/"
-fdg "heredoc body line"               2 'rtk read /dev/stdin <<EOF
+smg "separator inside bash -c"        2 "bash -c 'echo hi; f() { :; }; f'"
+smg "separator inside a grep pattern" 2 "rtk grep 'x; parse_row() {' src/"
+smg "heredoc body line"               2 'rtk read /dev/stdin <<EOF
 helper() { :; }
 EOF'
+
+echo
+echo "== shell-machinery-guard: motiveless assignments (exit 2)"
+# The second shape the guard covers. A trailing separator is what makes it
+# scaffolding rather than a prefix assignment, so every case here carries one.
+smg "leading assignment, semicolon"   2 'for_check=""; rtk wc -l file'
+smg "leading assignment, &&"          2 'REF=origin/main && rtk git show $REF'
+smg "assignment after a command"      2 'rtk ls; TMP=/tmp; ls $TMP'
+smg "assignment after a pipe"         2 'rtk ls | COUNT=1; echo done'
+smg "unquoted value"                  2 'REF=origin/main; rtk git show HEAD'
+smg "quoted value with a space"       2 'MSG="a b"; echo done'
+smg "underscore-led name"             2 '_tmp=1; ls'
+
+echo
+echo "== shell-machinery-guard: a prefix assignment is legitimate (exit 0)"
+# `FOO=bar cmd` scopes the variable to that one command and carries no
+# separator. This is the boundary the whole assignment check rests on: the
+# preceding set excludes bare whitespace precisely so these pass.
+smg "prefix assignment"               0 'FOO=bar rtk ls'
+smg "prefix assignment, two vars"     0 'FOO=bar BAZ=qux rtk ls'
+# Regression: an earlier version required only that a separator appear SOMEWHERE
+# after the value, which these satisfy with a pipe or an && that has nothing to
+# do with the assignment. Caught by running the guard live, not by this suite.
+smg "prefix assignment then a pipe"   0 'FOO=bar rtk ls dir/ | rtk head -3'
+smg "prefix assignment then &&"       0 'FOO=bar rtk ls && rtk git status'
+smg "prefix assignment, quoted value" 0 'FOO="a b" rtk ls | rtk wc -l'
+smg "separator inside a quoted value" 0 'FOO="a; b" rtk ls'
+smg "export then a separator"         0 'export FOO=bar; rtk ls'
+smg "env prefix form"                 0 'env FOO=bar rtk ls'
+smg "assignment with nothing after"   0 'FOO=bar'
+smg "equals inside a query string"    0 'rtk curl "https://example.test/x?a=1&b=2"'
+smg "equals after a semicolon in a URL" 0 'rtk ls; rtk curl "https://example.test/x?a=1"'
+smg "equals in a commit message"      0 'rtk git commit -m "document the a=b default"'
+smg "long flag with a value"          0 'rtk grep --max-len=80 pattern .'
+smg "assignment inside a quote"       0 "rtk grep 'x=1' src/"
+
+echo
+echo "== shell-machinery-guard: assignment over-blocks (exit 2)"
+# The same quote-unaware trade-off the function form takes. Each of these would
+# have been fine; the gate stays quiet for all three. If the matching ever
+# becomes quote-aware these flip to exit 0 and these expectations are what
+# should change.
+smg "separator inside a grep pattern" 2 "rtk grep 'x; y=1;' src/"
+smg "subshell assignment"             2 '(FOO=1; rtk ls)'
 
 echo
 echo "== reflexive-cd-guard: redundant and misdirecting targets (exit 2)"
