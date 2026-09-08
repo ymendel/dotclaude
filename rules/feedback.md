@@ -133,3 +133,31 @@ Failure mode this prevents: a scoped request quietly becomes an audit of a clien
 result is offered back as extra value — which puts the user in the position of explaining that the
 access is a client's trust rather than a mandate, and leaves a record of that client's costs sitting
 in the user's own notes for no purpose.
+
+## One package manager owns the machine — never propose a tool's own installer
+
+Anything reasonably available from Homebrew is installed from Homebrew, and will not be installed
+another way. So a tool's native installer, a vendor update channel, or a curl-to-shell bootstrap is
+not an option to offer — not even when it ships newer versions, closes a security gap, or activates
+a setting that is otherwise inert. One package manager for the machine is the whole point: a tool
+installed outside it stops being visible to `brew` and acquires its own upgrade ritual to remember,
+which is the cost being avoided.
+
+**How to apply.** Where a missing feature or an unfixed bug traces to the formula or cask trailing
+upstream, the answer is to wait for it, and the useful output is naming precisely what the installed
+build lacks — so nothing gets designed against a capability that is not there yet. Say that the fix
+exists and is not available; do not follow it with the installer that would fetch it. Read a version
+gap as a fact to work within rather than a problem to solve.
+
+**This does not conflict with `code-style.md`'s always-use-latest-versions rule, and the boundary is
+the artifact.** That rule governs what a project declares — gems, packages, language versions — where
+the latest release is a choice made in a manifest and checking upstream is the whole job. This
+governs how *machine tooling* arrives, where the version is whatever the package manager offers and
+the only lever is which package manager. Nothing in the always-latest rule asks for a second install
+path, so the two never actually meet.
+
+Failure mode this prevents: a version lag gets diagnosed correctly and then answered with a change to
+how the tool is installed, which is the one remedy that was never available. The suggestion has to be
+declined every time it is made, and it reads as helpful rather than as re-litigating a settled
+preference — so it keeps coming back, since nothing in the diagnosis records that the obvious fix was
+already ruled out.
