@@ -18,7 +18,7 @@ The Bash working directory is set to the project root at session start and persi
 
 Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
 a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
-it is built out of are the ones the gate cannot resolve. Five instances, all real:
+it is built out of are the ones the gate cannot resolve. Six instances, all real:
 
 - **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
@@ -39,6 +39,21 @@ it is built out of are the ones the gate cannot resolve. Five instances, all rea
   not part of the work. Having done it once is reason to check the next few commands rather than to
   call it a one-off: the shape recurs within a session, and because it has no motive there is nothing
   to notice yourself talking into.
+- **An invented command in front of the real one, with its error suppressed.** The same
+  motiveless shape as above, in the form the `function-definition-guard` hook cannot see: a
+  `rtk provoke 2>/dev/null;` ahead of an ordinary `grep`, naming a subcommand that does not exist.
+  Nothing is enforced and nothing is called — but unlike the function form there is no gate to stop
+  it, so the only thing that would have surfaced it is the error, and the `2>/dev/null` is what threw
+  that away. Exit 127 and a `No such file or directory` were both available and both discarded. So
+  read the command's first segment before sending it, as above — and never suppress stderr on a
+  segment you *added* rather than on the one doing the work. That is the narrower and more checkable
+  rule: suppression on the working segment is often deliberate, while suppression on scaffolding can
+  only ever hide the evidence that the scaffolding is there.
+
+  What makes this the harder half to catch is that the command *works*. The real segment runs, the
+  output looks right, and no gate can help — the leading command resolves fine, since only its
+  subcommand is invented, so a does-this-binary-exist check never fires. The stray segment is visible
+  only to someone reading the command string rather than its result, and that reader is the user.
 - **A variable assignment to avoid retyping a long string.** A `REF=origin/main; git show
   $REF:lib/parser.rb` reads as the tidy way to run three commands against one ref, and it is the same
   trade as the loop in *Batch repeated commands* below — nothing is saved, because a programmatically
