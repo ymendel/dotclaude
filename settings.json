@@ -198,8 +198,10 @@
   },
   "effortLevel": "high",
   "showThinkingSummaries": true,
+  "workflowSizeGuideline": "small",
+  "workflowKeywordTriggerEnabled": false,
   "autoUpdatesChannel": "stable",
-  "minimumVersion": "2.1.92",
+  "minimumVersion": "2.1.236",
   "claudeMdExcludes": [
     "**/rules/README.md",
     "**/rules/references/**"
