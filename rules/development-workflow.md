@@ -107,6 +107,16 @@ Chaining the two leaps is what makes this bite — remote-tracking refs get read
 
 Failure mode this prevents: advice gets built on a race, a conflict, or a blocking PR that does not exist — and it is disproved by the user simply opening the repository's pull-request page, which discredits the surrounding claims they cannot check as cheaply.
 
+### A workflow's run history is evidence of that path, not of the operation
+
+Where a repository ships a workflow for an operation a person can also perform directly — a deploy, a promotion between tiers, a release — the run list answers *was this done through Actions*, and that gets reported as *was this done*. The user works these surfaces without narrating it, per the section above, and a promotion run directly against the platform creates no run at all.
+
+So the negative is the dangerous direction, and it arrives looking rigorous: the query was scoped to the right repository and the right workflow, it returned cleanly, and nothing in an empty run list hints that the operation has another path. Reach for the surface the operation actually writes to — the platform's own release or deployment history — and read Actions only when the question is genuinely about the pipeline.
+
+**How to apply:** before saying a deploy or promotion has not happened, name the surface the claim rests on. If it is a run list, a check run, or anything else GitHub renders, it cannot answer for work done outside GitHub — go to `heroku releases`, the provider's deployment list, or the running system itself. Same test the section above applies to remote state, one system over.
+
+Failure mode this prevents: an upstream tier is reported as not yet shipped, downstream work is planned and written around that, and the correction comes from whoever looks at the platform — after the wrong claim has already been repeated into a pull request body or a ticket.
+
 ### A state nobody here set is not evidence a command failed
 
 When a shared artifact — a pull request's draft status, an issue's labels, a branch's tip, a review's state — reads differently than the last write issued from here, the first candidate is that a person changed it, not that the command silently failed. The user acts on these without narrating it, per the top of this section, so the window between a write and the read that follows is exactly where a deliberate change lands.
