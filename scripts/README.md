@@ -3,7 +3,8 @@
 Tooling for maintaining this repo's setup — keeping skills in sync with a
 separate team skills repo (`compare-skills.sh`, `sync-skill.sh` — see
 [ADR 0001](../docs/adr/0001-skill-maintenance-via-parallel-repos.md) for the
-why), tracking which skills and agents actually get used (`usage-report.sh`),
+why), tracking which skills and agents actually get used (`usage-report.sh`)
+and how sessions actually ran (`session-meta-report.py`),
 watching the always-loaded rule set for growth (`rules-floor.sh`, with
 `rules-sections.py` for per-section detail), and
 verifying the declared prerequisites are present
@@ -144,6 +145,92 @@ Requires bash 4+ (associative arrays, `mapfile`, namerefs).
 
 - `0` Report produced.
 - `2` A configured path is missing or arguments are invalid.
+
+## `session-meta-report.py`
+
+Aggregate the per-session JSON that `/insights` leaves in
+`usage-data/session-meta/`, so a synthesis can read the trend rather than the
+whole-range totals the HTML report carries.
+
+```
+python3 scripts/session-meta-report.py [session-meta-dir]
+```
+
+Buckets sessions by ISO week and by project and prints counts and straight
+ratios — tool calls, error rate, error categories, interruptions per session,
+project mix, capability adoption, duration skew. It applies no thresholds and
+makes no judgements; reading the output is the synthesis author's job.
+
+Companion to `usage-report.sh`, and easy to confuse with it. That one counts
+**skill and agent invocations** and appends to a history file that outlives
+transcript rotation. This one describes **how sessions ran**, reading a cache
+`/insights` maintains incrementally — it adds a file the first time it sees a
+transcript and rewrites only the ones that changed. Whether an entry survives
+its own transcript rotating out is untested; the script's `RETENTION_EDGE`
+comment records the open question and the date it resolves.
+
+### The synthesis procedure
+
+Roughly monthly. `usage-data/README.md` maps the files; this is the method.
+
+1. **Run `/insights`.** It writes `usage-data/session-meta/*.json` and a dated
+   HTML report.
+2. **Establish coverage before reading any trend.** Run this script and read the
+   retention-check section: it prints the earliest sessions with their
+   last-touched dates, and the real edge is where start dates become continuous.
+   Set `RETENTION_EDGE` in the script to match — the trend sections drop
+   everything before it.
+3. **Check what the run actually produced.** The field-presence section lists the
+   keys present across all session files. The model-analysed fields — goal
+   achievement, satisfaction, friction type — are *not* in `session-meta`; they
+   exist only in the report's HTML and only when its LLM pass yields something.
+   Confirm with `grep -c 'class="empty"' usage-data/report-<date>.html`. **A count
+   above zero means re-run `/insights` before reading anything.** The analysis pass
+   fails silently — it reports a normal session count while every model-derived
+   section renders "No data", which reads like a finding rather than a failure.
+   This happened on 2026-09-09: the first run produced six empty sections and a
+   26.5K report, the re-run 36 minutes later produced none and a 68.4K one. Only if
+   a re-run reproduces the emptiness is it worth writing a mechanical-signal-only
+   synthesis, and then say so at the top rather than quietly changing what the
+   document measures.
+4. **Read weekly, not monthly.** A window that opens and closes mid-month makes
+   calendar buckets compare unequal spans.
+5. **Rule out the two cheap explanations before attributing any rate change.**
+   Project mix moving — the script prints per-week mix beside per-project error
+   rates — and configuration landing in the same period, via
+   `git log --since=<date> -- hooks/ settings.json rules/`. A step change points
+   at something landing; a drift usually doesn't.
+6. **Take skill and agent counts from `usage-data/usage-history.tsv`**, not from
+   the report. That track was built to survive rotation, and its own section
+   above explains why raw counts between runs aren't comparable while the trend
+   is.
+7. **Write `usage-data/insights-synthesis-<date>.md`.** Lead with coverage and any
+   missing layer. Separate measurement from inference. Where a finding needs
+   transcripts to diagnose, state the date it expires — that is the only class of
+   item here that cannot wait.
+
+### Reading notes that keep biting
+
+**The report's date range overstates its coverage.** It shows the span of session
+*start* times, and a long-lived session resumed weeks later keeps its original
+start date while its transcript stays fresh. The 2026-09-09 report claimed
+2026-05-01 to 2026-09-09 on the strength of three such survivors; the real window
+opened 2026-08-10.
+
+**Total hours is not working time.** Sessions are left open across days. In the
+2026-09-09 data the longest single session held 20% of all recorded minutes and
+the top ten held 41%, against a 161-minute median and a 300-minute mean. Cite the
+median, or cite messages and commits.
+
+**A rising error rate may be a guard working.** Hook blocks and permission
+rejections land in the same `tool_errors` count as genuine failures, so read the
+per-category breakdown. `User Rejected` falling while `Command Failed` rises is a
+different story from both rising together.
+
+### Exit status
+
+- `0` Report produced.
+- `1` No session JSON found under the target directory.
 
 ## `rules-floor.sh`
 
