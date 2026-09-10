@@ -189,6 +189,16 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/context-usage-notice.sh"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
