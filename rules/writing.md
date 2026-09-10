@@ -14,15 +14,17 @@ State what is true and move on. One clause of reasoning per sentence. Where a co
 
 Three tells, all of them one habit — never stating a fact without also stating why it counts:
 
-- **Words that announce importance.** "Load-bearing", "critical", "key", "the crux", "notably". Each asks the reader to weight a claim instead of giving them the reason to. Say what the thing does: "the assertion the test turns on", "the only caller left".
-- **A consequence clause appended to a fact.** "…and that bites", "…which is exactly the problem", "…and that is what makes it worse". The fact carried it already. Cut the clause.
+- **Words that announce importance.** "Load-bearing", "critical", "key", "the crux", "notably", "importantly", "it's worth noting that", "make no mistake", a bolded **this matters**. Each asks the reader to weight a claim instead of giving them the reason to. Say what the thing does: "the assertion the test turns on", "the only caller left".
+- **A consequence clause appended to a fact.** "…and that bites", "…and it's a real one", "…which is exactly the problem", "…and that is what makes it worse". The fact carried it already. Cut the clause.
 - **A semicolon.** The same move at the level of punctuation — it welds a claim to its justification inside one sentence. Use a full stop, an em-dash, or a comma with a linking word. This one has needed correcting more than once.
 
 A ban list catches these three and not the next three. Cut the habit instead.
 
+The rewrite is usually a deletion. "The tradeoff, and it's a real one: nvm's bin directory isn't on PATH until something loads it" becomes "nvm's bin directory isn't on PATH until something loads it" — the fact was always doing the persuading. A point that needs flagging is a point that wasn't stated strongly enough, so rewrite the point rather than decorating it.
+
 This applies in chat as well as in durable prose. The scope note above exempts chat from marker-level policing, because a stray semicolon in a reply costs the reader nothing. Length does cost him — a long reply gets read in full, tired, at whatever hour it arrives — so this rule carries no chat exemption.
 
-Failure mode this prevents: padded prose reads as careful, because every added clause is individually defensible — it usually *is* true that the point matters. The volume shows only in aggregate, by which time it reads as the house style rather than as something to edit out.
+Failure mode this prevents: padded prose reads as careful, because every added clause is individually defensible — it usually *is* true that the point matters. The volume shows only in aggregate, by which time it reads as the house style rather than as something to edit out. Under a byline it is worse than filler, because it is one of the few tells a reader can name on sight, and naming it discredits the prose around it.
 
 ## User slips don't redefine the rule
 
@@ -153,7 +155,7 @@ Tells, all of them borrowed from this rule set:
 - bolded lead-in phrases opening successive paragraphs of a commit body or PR description
 - section headings in a PR description for a change with a single concern
 
-Write the plain version instead: the fact, the constraint, then stop. Where reasoning genuinely needs an argument made at length, it has destinations — an ADR, a note — and a pointer left where the reader will meet it.
+Write the plain version instead, per *Say the fact and stop* above. Where reasoning genuinely needs an argument made at length, it has destinations — an ADR, a note — and a pointer left where the reader will meet it.
 
 Failure mode this prevents: the density gets imitated by default and each instance reads as careful work, because it matches the house style of the most authoritative prose in context. `code-style.md` asks for consistency with the nearest examples when in doubt, and in a session the nearest examples of *prose* are these files, so the instinct that is normally right argues for the wrong register here. Nothing in a self-edit flags it, because the output is consistent with the surrounding configuration.
 
@@ -173,16 +175,6 @@ The test for a second copy is whether a reader plausibly reaches the second arti
 Point by stable identity when pointing at all: an ADR number, a tracked path, a heading. A comment pointing at a bare SHA is worse than the copy it replaced, per `development-workflow.md`'s durable references.
 
 Failure mode this prevents: each artifact is defensible alone and the aggregate is what the reader actually meets, so reviewing any one of them never surfaces the volume — and the repetition reads as thoroughness rather than as three copies of one paragraph. The copies then age at different rates, leaving a later reader who notices them disagreeing with no way to tell which is current. `honesty.md`'s *An Inherited Brief Is One Session's Summary* describes this same spread for a claim that is *wrong*, where it costs a correction sweep across files. Correct prose spreads by the identical mechanism with nothing at all to catch it.
-
-## Don't announce that a point matters
-
-Never append a clause whose only work is to assert the importance of what precedes it: "the tradeoff, **and it's a real one**", "one caveat, **and it's the important one**", "a cost here, **and it's not small**". It reads as emphasis but carries nothing — it tells the reader to take the point seriously instead of giving them the reason to. It is also a strong LLM tell, which is what makes it worse than merely redundant in prose under a byline: it marks the text as machine-written to exactly the reader whose judgment the byline was meant to carry.
-
-Cut the clause and let the fact stand. "The tradeoff, and it's a real one: nvm's bin directory isn't on PATH until something loads it" becomes "What this means is that nvm's bin directory isn't on PATH until something loads it" — the consequence was always doing the persuading.
-
-The same tell wears other clothes: "importantly", "critically", "it's worth noting that", "make no mistake", a bolded **this matters**. Each substitutes a claim about significance for the significance itself. A point that needs flagging is a point that wasn't stated strongly enough, so rewrite the point rather than decorating it.
-
-Failure mode this prevents: the construction survives a self-edit because it reads as considered emphasis rather than as filler, and it is one of the few tells a reader can name on sight — so it discredits the surrounding prose, which may have been fine.
 
 ## Keep the methodology out of the durable record
 
