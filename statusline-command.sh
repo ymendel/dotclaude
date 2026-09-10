@@ -285,48 +285,70 @@ if [ "$show_profile" = "1" ] && [ -n "$profile_name" ]; then
   profile_text="${MAGENTA}${profile_name}${RESET}"
 fi
 
-# Context percentage calculation from current_usage tokens
+# Context percentage calculation from current_usage tokens.
+#
+# Parsed and cached before the display guard, deliberately. hooks/context-usage-notice.sh
+# reads the cache to tell Claude how full the window is, and that has to keep working when
+# SHOW_CONTEXT is switched off in statusline-config.txt — a display preference should not
+# silently disable a hook.
+session_id=$(echo "$input" | grep -o '"session_id":"[^"]*"' | sed 's/"session_id":"//;s/"$//')
+input_tokens=$(echo "$input" | grep -o '"input_tokens":[0-9]*' | head -1 | sed 's/"input_tokens"://')
+cache_create=$(echo "$input" | grep -o '"cache_creation_input_tokens":[0-9]*' | sed 's/"cache_creation_input_tokens"://')
+cache_read=$(echo "$input" | grep -o '"cache_read_input_tokens":[0-9]*' | sed 's/"cache_read_input_tokens"://')
+context_size=$(echo "$input" | grep -o '"context_window_size":[0-9]*' | sed 's/"context_window_size"://')
+
+[ -z "$input_tokens" ] && input_tokens=0
+[ -z "$cache_create" ] && cache_create=0
+[ -z "$cache_read" ] && cache_read=0
+
+context_pct=""
+if [ -n "$context_size" ] && [ "$context_size" -gt 0 ]; then
+  current_tokens=$((input_tokens + cache_create + cache_read))
+  context_pct=$((current_tokens * 100 / context_size))
+
+  # One file per session. Every session on this machine shares ~/.claude, so a single
+  # shared file would flip between concurrent sessions and the hook would read whichever
+  # rendered last. Old files are pruned on the first write of each session rather than on
+  # every render, which is far more frequent.
+  if [ -n "$session_id" ]; then
+    context_cache_file="$HOME/.claude/.context-usage/$session_id"
+    if [ ! -f "$context_cache_file" ]; then
+      mkdir -p "$HOME/.claude/.context-usage"
+      find "$HOME/.claude/.context-usage" -type f -mtime +2 -delete 2>/dev/null
+    fi
+    printf 'TIMESTAMP=%s\nCONTEXT_PCT=%s\nCONTEXT_TOKENS=%s\nCONTEXT_SIZE=%s\nCWD=%s\n' \
+      "$(date +%s)" "$context_pct" "$current_tokens" "$context_size" "$current_dir_path" \
+      > "$context_cache_file"
+  fi
+fi
+
 context_text=""
-if [ "$show_context" = "1" ]; then
-  input_tokens=$(echo "$input" | grep -o '"input_tokens":[0-9]*' | head -1 | sed 's/"input_tokens"://')
-  cache_create=$(echo "$input" | grep -o '"cache_creation_input_tokens":[0-9]*' | sed 's/"cache_creation_input_tokens"://')
-  cache_read=$(echo "$input" | grep -o '"cache_read_input_tokens":[0-9]*' | sed 's/"cache_read_input_tokens"://')
-  context_size=$(echo "$input" | grep -o '"context_window_size":[0-9]*' | sed 's/"context_window_size"://')
+if [ "$show_context" = "1" ] && [ -n "$context_pct" ]; then
+  # Determine color based on percentage
+  if [ "$context_pct" -le 50 ]; then
+    context_color="$CYAN"
+  elif [ "$context_pct" -le 75 ]; then
+    context_color="$YELLOW"
+  else
+    context_color="$LEVEL_9"
+  fi
 
-  [ -z "$input_tokens" ] && input_tokens=0
-  [ -z "$cache_create" ] && cache_create=0
-  [ -z "$cache_read" ] && cache_read=0
+  # Integer percentage for display
+  context_int=$context_pct
 
-  if [ -n "$context_size" ] && [ "$context_size" -gt 0 ]; then
-    current_tokens=$((input_tokens + cache_create + cache_read))
-    context_pct=$((current_tokens * 100 / context_size))
+  # Display as tokens or percentage
+  ctx_label=""
+  [ "$show_context_label" = "1" ] && ctx_label="Ctx: "
 
-    # Determine color based on percentage
-    if [ "$context_pct" -le 50 ]; then
-      context_color="$CYAN"
-    elif [ "$context_pct" -le 75 ]; then
-      context_color="$YELLOW"
+  if [ "$context_as_tokens" = "1" ]; then
+    if [ "$current_tokens" -ge 1000 ]; then
+      tokens_k=$((current_tokens / 1000))
+      context_text="${context_color}${ctx_label}${tokens_k}K${RESET}"
     else
-      context_color="$LEVEL_9"
+      context_text="${context_color}${ctx_label}${current_tokens}${RESET}"
     fi
-
-    # Integer percentage for display
-    context_int=$context_pct
-
-    # Display as tokens or percentage
-    ctx_label=""
-    [ "$show_context_label" = "1" ] && ctx_label="Ctx: "
-
-    if [ "$context_as_tokens" = "1" ]; then
-      if [ "$current_tokens" -ge 1000 ]; then
-        tokens_k=$((current_tokens / 1000))
-        context_text="${context_color}${ctx_label}${tokens_k}K${RESET}"
-      else
-        context_text="${context_color}${ctx_label}${current_tokens}${RESET}"
-      fi
-    else
-      context_text="${context_color}${ctx_label}${context_int}%${RESET}"
-    fi
+  else
+    context_text="${context_color}${ctx_label}${context_int}%${RESET}"
   fi
 fi
 
