@@ -2,7 +2,27 @@
 
 User-specific writing preferences that supplement the `writing-clearly-and-concisely` skill. These apply to prose, commit messages, PR descriptions, comments, and any other written output.
 
-These target durable output a reader will meet outside this session — sharpest for anything under the user's byline (a commit, a PR body, a ghostwritten message, a doc). They do **not** govern Claude's own conversational messages in-session, where the user has said his own register is fine and self-policing them wastes effort. So a semicolon (or any other flagged construct) in a chat reply is not a slip to correct — the same construct in durable prose is. Failure mode this prevents: treating an in-session chat message as if it were attributed output, and burning attention hunting flagged punctuation where the preference never applied.
+These target durable output a reader will meet outside this session — sharpest for anything under the user's byline (a commit, a PR body, a ghostwritten message, a doc). The **marker-level** preferences below — punctuation, archaic abbreviations, individual flagged phrases — do not govern Claude's own conversational messages in-session. The user has said his own register is fine there, and a stray semicolon in a chat reply costs him nothing to read.
+
+Length is the exception, and it runs the other way. *Say the fact and stop* below applies in chat too, because that cost lands on the reader rather than on the writer.
+
+Failure mode this prevents: reading the chat exemption as blanket permission, so replies grow to whatever length comes naturally — which is the one part of this file the user is exposed to on every single turn.
+
+## Say the fact and stop
+
+State what is true and move on. One clause of reasoning per sentence. Where a consequence genuinely needs saying it gets its own sentence, and most of the time it does not, because a reader holding the fact already holds the consequence.
+
+Three tells, all of them one habit — never stating a fact without also stating why it counts:
+
+- **Words that announce importance.** "Load-bearing", "critical", "key", "the crux", "notably". Each asks the reader to weight a claim instead of giving them the reason to. Say what the thing does: "the assertion the test turns on", "the only caller left".
+- **A consequence clause appended to a fact.** "…and that bites", "…which is exactly the problem", "…and that is what makes it worse". The fact carried it already. Cut the clause.
+- **A semicolon.** The same move at the level of punctuation — it welds a claim to its justification inside one sentence. Use a full stop, an em-dash, or a comma with a linking word. This one has needed correcting more than once.
+
+A ban list catches these three and not the next three. Cut the habit instead.
+
+This applies in chat as well as in durable prose. The scope note above exempts chat from marker-level policing, because a stray semicolon in a reply costs the reader nothing. Length does cost him — a long reply gets read in full, tired, at whatever hour it arrives — so this rule carries no chat exemption.
+
+Failure mode this prevents: padded prose reads as careful, because every added clause is individually defensible — it usually *is* true that the point matters. The volume shows only in aggregate, by which time it reads as the house style rather than as something to edit out.
 
 ## User slips don't redefine the rule
 
@@ -62,17 +82,6 @@ Failure mode this prevents: the metaphor reads as a considered turn of phrase ra
 jargon, so it survives a self-edit that would have caught "low-hanging fruit" — and because it
 scales so easily (spend, budget, cost, capital, dividend, pay down) one use seeds a whole
 register the next document inherits.
-
-## Semicolons: the default is to not
-
-The always-loaded parenthetical below names semicolon avoidance among the voice markers and
-sends the detail to `rules/references/writing/voice.md`, which is loaded on demand. That is one
-lookup too many for the most frequently missed of them, so the default is stated here: in
-durable prose under the user's byline — a commit message, a PR body, an ADR, a doc, a code
-comment — split the sentence or use an em-dash instead of a semicolon. This has needed
-correcting more than once.
-
-In-session chat replies are exempt, per the scope note at the top of this file.
 
 ## Avoid words that collide with terms of art
 
