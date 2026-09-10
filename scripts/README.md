@@ -339,6 +339,36 @@ either changes.
 - `0` when every required prerequisite is present, whatever else is missing.
 - `1` when a required prerequisite is missing.
 
+## `context-usage.sh`
+
+Report how full this session's context window is.
+
+```
+./scripts/context-usage.sh
+```
+
+`hooks/context-usage-notice.sh` reports the same figure automatically as it crosses
+60, 70, 80 and 90 percent. This is the deliberate read for a moment the bands do not
+cover — deep into a multi-file change at 40%, where resuming cold would already be
+expensive. `rules/development-workflow.md` covers when that judgment applies.
+
+The reading comes from `~/.claude/.context-usage/<session_id>`, which
+`statusline-command.sh` writes on every render from the `input_tokens`,
+`cache_creation_input_tokens`, `cache_read_input_tokens` and `context_window_size`
+fields Claude Code passes it. Nothing hands those fields to a hook or to a shell, so
+the statusline is the only source and this script is a reader, not a measurement.
+
+Identifying the session is the soft spot. A shell invocation is not given the session
+id the way a hook is, so the script matches on the working directory the statusline
+recorded and takes the most recent reading. Two sessions in one directory cannot be
+told apart, and that case is reported rather than resolved silently. So is a reading
+older than five minutes, which under-reports rather than over-reports because context
+only grows within a session.
+
+### Exit status
+
+- `0` always. Reports only — it never edits and never fails.
+
 ## `enospc-workaround.sh`
 
 Workaround for a Claude Code preflight ENOSPC false-positive on macOS
