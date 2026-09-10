@@ -55,6 +55,8 @@ Failure mode this prevents: the style pass *feels* like a review and discharges 
 
 A handoff, a start-work brief, a punchlist, a prior session's notes — anything arriving as *the* account of a codebase you have not read yet — is a summary written by someone mid-work, carrying their accumulated framing along with their facts. Read it for orientation. Do not build new claims on top of its claims without checking them first.
 
+**A comment in the code is one of these, and the least suspected.** A header block explaining why a file works as it does, or what some upstream fails to provide, is prose written mid-work like any brief — but it arrives as *the code*, which the rest of this config correctly teaches you to prefer over prose about the code. So it inherits the authority of the file it sits in while carrying none of the verification, and it is read at exactly the moment nobody is looking for a claim to check.
+
 The shape to watch for is not repeating an inherited claim, which is cheap to correct. It is **amplifying** one: taking a sentence from the brief and spreading it into code comments, a README, a gemspec, an ADR — each restatement making the claim more load-bearing and more expensive to unwind than it was when it arrived. By the time anyone pushes back, the correction is a sweep across files rather than an edit to one, and every copy reads as independently arrived at.
 
 So before a brief's claim becomes a *justification* for anything — a rule stated in a comment, a Context paragraph, a decision recorded as deliberate — settle it the way *Verify Framing Before Writing Prose* above asks. Most such claims are one command from settled: what a library actually ships, whether a constraint still holds after the move that prompted the handoff, whether a stated property is true of the current runtime rather than of an older one.
@@ -76,6 +78,18 @@ They are not. An observation says what happened in one configuration, and the sh
 Where a claim is worth keeping but cannot be cited, put it where its status is legible. `notes/claude-code-quirks.md` exists for observed-once mechanics, and an entry there reads honestly as an observation. The same sentence promoted into a rule reads as documented behavior.
 
 Failure mode this prevents: a wrong claim about the harness sits in always-loaded prose, shapes every session's behavior, and is uniquely insulated from correction — the rules are what gets consulted to decide what is true, so nothing routes back to check them against the thing they describe. One such claim held that no sub-agent loads these rules, generalized from the two built-in agents where it does hold, and it survived long enough that prompts to custom agents were being padded with conventions those agents already had.
+
+## Date a Claim About a System That Can Move
+
+A citation says where a claim came from. A date says when it was true, and only the second lets a later reader spot a stale claim without re-deriving it. So when prose asserts how an external system behaves — a vendor API, its published documentation, a service's defaults, another team's contract — record when it was checked, not only what it was checked against.
+
+The harness section above is this rule's sharpest instance rather than its whole scope. Its argument is that the harness ships continuously, and that holds for anything somebody else operates. A claim can be honestly quoted from a real measurement and go false a fortnight later when the other side changes, at which point nothing in the artifact separates it from a claim that still holds.
+
+Worst where the prose also tells the reader not to check. A file opening by declaring some upstream's documentation unreliable installs a standing instruction with no expiry, so the one habit that would catch the staleness is the habit it suppresses. Where that judgment is worth recording at all, date it too, and say what would settle it.
+
+The neighbours cover other halves of this and not this one. *Re-query numbers at draft time* is quantitative. *Verify Framing Before Writing Prose* governs the first draft and asks for a quote, which a claim like this already has. *Rewrite the Prose When Verification Disagrees* fires once a verification happens, and the failure here is that none ever does.
+
+Failure mode this prevents: a claim that was true when written reads as current indefinitely, and work gets built around behavior the other system has since changed or documented. Because the claim was honestly arrived at and correctly cited, every check aimed at fabrication passes it — and the cost lands as a workaround maintained against a problem that no longer exists.
 
 ## Rewrite the Prose When Verification Disagrees
 
