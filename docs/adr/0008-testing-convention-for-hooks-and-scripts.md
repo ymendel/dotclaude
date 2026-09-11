@@ -51,8 +51,8 @@ it shows the design survives adaptation instead of only replication.
 Those units now bracket a real range, which is what makes a repo-wide rule
 writable rather than an extrapolation from one file:
 
-- `function-definition-guard.sh` is pure text in, exit code out. No filesystem,
-  no settings, no environment. Its cases need no fixtures whatsoever.
+- `shell-machinery-guard.sh` is pure text in, exit code out. No filesystem, no
+  settings, no environment. Its cases need no fixtures whatsoever.
 - `reflexive-cd-guard.sh` resolves physical paths against the real filesystem,
   reads `permissions.additionalDirectories` from three separate settings files,
   and honours an environment variable the tool payload does not carry. Its cases
@@ -84,31 +84,42 @@ therefore reports PASS on every allow-case it holds, on a machine with no `jq`
 dependency the code under test is designed to tolerate.
 
 The cost of continuing not to decide is concrete and has a name.
-`reflexive-cd-guard.sh` is 264 lines and has been through five rounds of scope
+`reflexive-cd-guard.sh` is 290 lines and has been through five rounds of scope
 change, each arriving with new cases, and each re-verified by hand-recreating a
 scratch script from a working note. That cost was paid repeatedly, by one file,
 because nothing said when a test was owed.
 
-The inventory as it actually stands, counted 2026-08-17:
+The inventory as it actually stands, counted 2026-09-11:
 
 | Group | Files | Lines | Files with any test |
 |---|---|---|---|
-| `hooks/` | 7 | 571 | 2 |
-| `scripts/` top level | 7 | 1113 | 0 |
+| `hooks/` | 8 | 782 | 2 |
+| `scripts/` top level | 9 | 1412 | 0 |
 | Skill validators and generators | 4 | 1327 | 0 |
 | `session-handoff/scripts/` | 5 | 1374 | 4 |
 
-The counts are stated with a date because the previously written inventory was
-wrong in three ways that each mattered: it recorded the reflexive-cd guard at
-229 lines when it had grown to 264, it omitted two top-level scripts entirely
-(`rules-floor.sh` and `rules-sections.py`), and it treated `session-handoff` as
-tested when `check_staleness.py` — 408 lines, the second-largest script in that
-skill — has no pytest coverage at all. That script is documented in the skill's
-`SKILL.md`, listed in its script table, and granted its own allowlist entry, so
-it is thoroughly *described* while being entirely unchecked. The only thing
-resembling a test is a manual checkbox in an eval scenario. An inventory is the
-kind of artifact that reads as current indefinitely, so any bar keyed to it has
-to assume it is stale.
+The counts are stated with a date because every previously written version of
+this inventory was wrong by the time anyone read it. The version written for the
+first draft of this ADR recorded the reflexive-cd guard at 229 lines when it had
+grown to 264, omitted two top-level scripts entirely, and treated
+`session-handoff` as tested. Its successor, counted 2026-08-17, was correct that
+day and understated `hooks/` by a file and 211 lines within the month. So any bar
+keyed to an inventory has to assume the inventory is stale, which is the argument
+for keying the bar to a property of the code instead.
+
+The `session-handoff` row is the one worth reading twice. `check_staleness.py` —
+408 lines, the second-largest script in that skill — has no pytest coverage at
+all, while being documented in the skill's `SKILL.md`, listed in its script
+table, and granted its own allowlist entry. It is thoroughly *described* and
+entirely unchecked, and the only thing resembling a test is a manual checkbox in
+an eval scenario.
+
+The `hooks/` row grew by `context-usage-notice.sh`, a `Stop` hook added
+2026-09-10 that reports context usage at band crossings. It is Tier 1 by the
+definition below — it fires without being invoked and says nothing when it works
+— and it shipped with a comment at line 38 recording that it has no coverage,
+because the committed suite is scoped to `PreToolUse` Bash guards. That is the
+ratchet's case arriving before the ratchet exists.
 
 Three constraints apply regardless of which bar is chosen. `hooks/rtk-rewrite.sh`
 is vendored from RTK and pinned by a checksum, so its behaviour is not this
@@ -284,10 +295,10 @@ list when a `git commit` is about to run, and block with exit 2 when a Tier 1 or
 Tier 2 source path is staged and no corresponding test path is.
 
 - *Pros:* Uses the mechanism ADR 0004 established and this repo already runs
-  seven of, so it needs no install step and no new concept. It gates the model,
+  several of, so it needs no install step and no new concept. It gates the model,
   which is where the evidence points — the guard that absorbed five widenings did
-  so across sessions, and the function-definition guard caught four strays in two
-  sessions before it existed. The escape hatch requires no design: a change that
+  so across sessions, and `shell-machinery-guard.sh` was written because its
+  prose had been bypassed four times in two sessions. The escape hatch requires no design: a change that
   genuinely needs no test is one the author commits from their own terminal, so a
   false positive costs a sentence rather than a bypass flag.
 - *Cons:* Only sees commits made through the tool, so it is a partial gate by
@@ -356,15 +367,24 @@ non-zero rather than skipping the Python half, by the same rule as any other
 suite: a runner that reports success over a suite it could not execute is worse
 than one that refuses.
 
-Finally, **`uv` becomes a required prerequisite.** It was optional on the
-reasoning that only skill authoring goes through it. That reasoning does not
-survive this decision, because the existing pytest suite has exactly one working
-invocation and it runs through `uv` — the system `python3` carries no pytest. Once
-running the tests is ordinary work, and once the entry point above refuses to run
-without it, `uv`'s absence stops something broadly rather than on one path a
-reader may never take. So it moves two tiers rather than one, and the exit-code
-gate from the prerequisite decision earlier the same day now covers it. The README
-ledger and `scripts/check-prerequisites.sh` both change.
+Finally, **`uv` moves from optional to load-bearing.** It was listed as optional
+on the reasoning that only skill authoring goes through it, and that was already
+wrong before this ADR: `ascii-diagram-validator` declares
+`allowed-tools: Bash(uv run *)` and fires on description-match during ordinary
+work, so `uv`'s absence breaks a skill any session can invoke. The test suite
+adds a second such path — the existing pytest suite has exactly one working
+invocation and it runs through `uv`, since the system `python3` carries no
+pytest.
+
+Load-bearing rather than required, because the tiers are keyed to *whose* path an
+absence sits on, and the required tier's contract is an exit 1 from
+`scripts/check-prerequisites.sh`. Someone who clones this config to borrow rules
+and skills should not be told their machine is broken over a tool they need only
+for the suite. Load-bearing states the dependency honestly and leaves the exit
+code at 0. The safety the required tier would have bought is already specified
+above: `run-tests.sh` refuses to run rather than skipping the Python half, which
+catches the one reader who actually needs catching at the moment they need it.
+The README ledger and `scripts/check-prerequisites.sh` both change.
 
 What this ADR deliberately does not settle: whether the hook suite eventually
 splits per guard and where shared helpers live if it does, and whether the
@@ -385,7 +405,7 @@ convention.
 
 - **Positive:** A single entry point makes "everything still passes" one command
   rather than two invocations a reader has to know about, one of which needs a
-  tool the ledger called optional until this decision.
+  tool the ledger mis-tiered until this decision.
 
 - **Positive:** Gating the ratchet rather than writing it down means the
   convention does not depend on being remembered mid-change, which is the whole
@@ -412,12 +432,12 @@ convention.
   convention makes this visible rather than fixing it, and a reader should not
   mistake "no tests" for "not owed."
 
-- **Negative:** Making `uv` required is the harshest consequence here, and it
-  lands on people who get no benefit from it. Someone who clones this config to
-  borrow rules and skills will now see `./scripts/check-prerequisites.sh` exit 1
-  over a tool they need only to run tests they will never run. The tier is honest
-  about what this repo depends on and dishonest about what a borrower depends on,
-  and nothing in the current design distinguishes the two readers.
+- **Neutral:** The `uv` tier move records a dependency that already existed
+  rather than creating one. A borrower's exit code is unchanged, and the tool was
+  needed by `ascii-diagram-validator` before this decision was written — the
+  ledger simply said otherwise. What the move costs is that `uv` now appears
+  alongside RTK and `gh` as something the config assumes, which is a fair
+  description of a repo whose skills shell out to it.
 
 - **Negative:** The tier lists now exist twice — as prose in this ADR and as
   arrays in the gate hook — with nothing keeping them in agreement. This is the

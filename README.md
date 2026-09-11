@@ -23,14 +23,14 @@ Grouped by how routinely an absence bites, since that varies more than the flat 
 
 **Required — the absence breaks something broadly, and not always loudly:**
 
-- **[jq](https://jqlang.github.io/jq/)** — every `PreToolUse` hook parses its input with it. Without jq they all pass through, so the reflexive-cd guard, the function-definition guard and the uv-run guard are *off*, not merely quiet. Six of the seven exit in silence; `reflexive-cd-guard.sh` and the vendored `rtk-rewrite.sh` are the two that say anything.
+- **[jq](https://jqlang.github.io/jq/)** — every `PreToolUse` hook parses its input with it. Without jq they all pass through, so the reflexive-cd guard, the shell-machinery guard and the uv-run guard are *off*, not merely quiet. Only `reflexive-cd-guard.sh` and the vendored `rtk-rewrite.sh` say anything about it; the rest exit in silence.
 - **[Python 3](https://www.python.org/)** — runs the session-handoff scripts, `scripts/rules-sections.py`, and the skill validators, and the `python`→`python3` rewrite hook targets it. Without it, handoff creation and loading fail. Loud, at least.
-- **[uv](https://github.com/astral-sh/uv)** — the only working path to the Python test suite, since the system `python3` carries no pytest: `uv run --with pytest pytest skills/session-handoff/tests/`. It also runs the skill-architecture skill's validator and scaffolding scripts (`uv run …`), which is what `uv-run-guard.sh` guards. See [ADR 0008](docs/adr/0008-testing-convention-for-hooks-and-scripts.md) for why running the tests makes this required rather than optional.
 
 **Load-bearing — the absence stops or slows ordinary work, loudly:**
 
 - **[RTK](https://github.com/rtk-ai/rtk)** — the hooks and rules assume it. Without it the rewrite hook passes commands through unchanged and warns, so nothing breaks — but a good share of the Bash allow rules are written in `rtk …` form and stop matching, which means approval prompts for commands you already granted. The lost token savings are the smaller half of this.
 - **[gh](https://cli.github.com/)** — the development-workflow rules reach for it constantly: PR and issue state, review comments, the checks before a merge is called ready. Without it that whole surface is unreachable from a session, and there is no in-session fallback. `git` itself is untouched, so pushing and pulling still work.
+- **[uv](https://github.com/astral-sh/uv)** — runs three things: the `ascii-diagram-validator` skill's script, which any session can invoke; the skill-architecture skill's validator and scaffolding scripts, which is what `uv-run-guard.sh` guards; and the Python test suite, which has no other working invocation because the system `python3` carries no pytest. Without it the first of those fails wherever the skill fires. See [ADR 0008](docs/adr/0008-testing-convention-for-hooks-and-scripts.md) for the tier.
 
 **Optional — the absence shows only on a path you may never take:**
 
