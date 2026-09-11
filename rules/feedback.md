@@ -61,6 +61,27 @@ skill's product and trusted at that standard, while the checks it names were nev
 the result marks the gap, and the improvised version is persuasive in proportion to how well the
 skill was absorbed — the better the reading, the more the substitute looks like the real thing.
 
+## "Tell <name>" means message that session
+
+When the user says "tell dotclaude", "let rails-template know", "ask <name>" — where the name
+is a session rather than a person — that is an instruction to send a cross-session message.
+`ListAgents` resolves the name, `SendMessage` delivers it. It is not an instruction to record
+anything.
+
+The misreading is well-supported, which is why it needs saying. This config trains a strong
+reflex that something the user says gets routed into a rule, a note, or a memory, and the
+session names that come up most are repo names, because sessions get named after the work. So
+"tell dotclaude" parses cleanly as "file this in the dotclaude config", and the edit that
+follows looks like compliance.
+
+Resolve the name before deciding. A name matching a repo is still a session name in this
+construction. Where `ListAgents` shows no such session, say so and ask — the user can route it
+themselves, and a filing nobody requested is worse than a no-op.
+
+Failure mode this prevents: the message is never sent, the session it was meant for carries on
+without it, and the user finds out only if they go looking. Meanwhile something lands in a rule
+file on the strength of an instruction that was never about rules.
+
 ## Write a settled call into the artifact, not only into the message that reports it
 
 When work is split across sessions — a peer session in another repo, a delegate, a colleague's
