@@ -20,7 +20,7 @@ shipped pytest tests for its scripts while nothing else in the repo was tested
 at all. The parking note sharpened the premise before deferring it: that skill
 is not tested *because it has scripts*, but because its scripts are logic-dense
 and produce durable artifacts that are painful to get wrong. The generalization
-worth having is **complexity × blast radius × how silently it fails**, not "has
+worth having is **complexity × reach × how silently it fails**, not "has
 a script."
 
 What made the question answerable was not a decision but an accumulation. Two
@@ -129,28 +129,23 @@ pytest pytest`, because the system `python3` carries no pytest — which puts `u
 on the path of anyone running the tests. And there is no runner: the two suites
 that exist are invoked two different ways, neither discoverable from the other.
 
-### Options
+The bar splits on two axes that do not constrain each other: *which* units owe
+tests, and *when* those tests come due. Each gets its own list, because an answer
+to one can be adopted alongside any answer to the other.
 
-**1. Property tiering with a change ratchet (chosen).** Classify each executable
-unit by the sharpened premise — complexity × blast radius × how silently it
-fails — into a tier that says whether a test is owed. Separately, any unit in a
-tier that owes tests gains cases the next time it is modified, whether or not it
-has them today.
+### Options: which units owe tests
 
-- *Pros:* The tier answers "does this deserve a test" on a property of the code
-  rather than on whoever last had an opinion, and it puts the automatically-firing
-  silent-failure units at the top where the argument is strongest. The ratchet
-  answers the question the tier cannot, which is *when* — the five-widening
-  history of one guard is a case where the tier was obviously satisfied and the
-  work still never got scheduled. The two compose: the tier says what is owed,
-  the ratchet says when it comes due, and neither has to carry the other's job.
-  Existing untested code is not retroactively a defect, so the convention can be
-  adopted without a backlog attached to it.
-- *Cons:* Two mechanisms to remember rather than one, and the tiering is a
-  judgment call per unit rather than a mechanical test. The ratchet also fires on
-  the *modifier's* schedule, so a unit nobody touches keeps its exemption
-  indefinitely — which is the intended trade, but it means the largest untested
-  files stay untested precisely because they are stable.
+**1. Property tiering (chosen).** Classify each executable unit by the sharpened
+premise — complexity × reach × how silently it fails — into a tier that says
+whether a test is owed.
+
+- *Pros:* Answers "does this deserve a test" on a property of the code rather
+  than on whoever last had an opinion, and it puts the automatically-firing
+  silent-failure units at the top where the argument is strongest. Existing
+  untested code is not retroactively a defect, so the convention can be adopted
+  without a backlog attached to it.
+- *Cons:* A judgment call per unit rather than a mechanical test, so two readers
+  can place the same script differently.
 
 **2. Test everything executable.** Every hook, script, and validator in the repo
 owes a suite.
@@ -159,24 +154,64 @@ owes a suite.
   convenient tier to something inconvenient to test, and a reader never has to
   work out which bucket a new file falls into. It is also the only option whose
   compliance is mechanically checkable in one pass.
-- *Cons:* Roughly 4,400 lines across 23 files, most of which is either trivial
+- *Cons:* 4,895 lines across 26 files, most of which is either trivial
   (`notify-config-update.sh` is 4 lines) or vendored and not ours to guarantee.
   A rule that classifies a 4-line wrapper alongside a 596-line validator is
-  ceremony, and a bar nobody can meet is a bar nobody consults. Rejected because
-  the uniformity buys nothing the tiering does not, and costs a backlog that
-  would make the convention read as aspirational from the day it landed.
+  ceremony.
 
-**3. Keep it ad hoc — test what hurts, no standing rule.** Continue as the repo
-has been: a suite appears when someone is bitten badly enough.
+**Rejected:** the uniformity buys nothing the tiering does not, and costs a
+backlog that would make the convention read as aspirational from the day it
+landed.
+
+**3. No standing bar — test what hurts.** Continue as the repo has been: a suite
+appears when someone is bitten badly enough.
 
 - *Pros:* Zero ceremony, and it is honest about how the two existing suites
   actually came about. Nothing is owed, so nothing is overdue.
 - *Cons:* This is the status quo whose cost prompted the ADR. Its observed
-  outcome is one hook absorbing five rounds of manual re-verification while six
+  outcome is one hook absorbing five rounds of manual re-verification while seven
   others stayed untouched, and a 408-line script sitting untested inside the one
-  skill everybody believed was covered. The failure is not that the wrong things
-  got tested — it is that nothing recorded what was owed, so the answer was
-  re-derived from scratch each time and twice came out wrong. Rejected.
+  skill everybody believed was covered.
+
+**Rejected:** the failure is not that the wrong things got tested — it is that
+nothing recorded what was owed, so the answer was re-derived from scratch each
+time and twice came out wrong.
+
+### Options: when tests come due
+
+**1. A ratchet on the next change (chosen).** A unit in a tier that owes tests
+gains cases in the same change that introduces or modifies it, whether or not it
+has them today.
+
+- *Pros:* Answers the question the tier cannot. The five-widening history of one
+  guard is a case where the tier was obviously satisfied and the work still never
+  got scheduled. It also puts the cost at the moment somebody already has the
+  unit in their head, which is the cheapest it will ever be.
+- *Cons:* Fires on the *modifier's* schedule, so a unit nobody touches keeps its
+  exemption indefinitely — which is the intended trade, but it means the largest
+  untested files stay untested precisely because they are stable.
+
+**2. A backlog worked down up front.** Enumerate what the tiers say is owed and
+clear it before the convention is called adopted.
+
+- *Pros:* Closes the gap on a known date rather than an unknown one, and the
+  stable-code exemption disappears entirely.
+- *Cons:* Thousands of lines of it, against a tiering nobody has used once. It
+  front-loads the work at exactly the moment the tier assignments are least
+  tested.
+
+**Rejected:** the same objection as testing everything — a bar nobody can meet is
+a bar nobody consults.
+
+**3. Nothing — the tier says what is owed and never says when.** Leave scheduling
+to whoever feels the cost.
+
+- *Pros:* One mechanism to remember instead of two.
+- *Cons:* This is what the repo already had. The tier was plainly satisfied for
+  `reflexive-cd-guard.sh` through all five widenings and no committed test was
+  ever written.
+
+**Rejected:** the tier alone is the thing that already failed.
 
 ### Harness and layout (sub-decision)
 
@@ -294,13 +329,14 @@ at the cost of gating the owner.
 list when a `git commit` is about to run, and block with exit 2 when a Tier 1 or
 Tier 2 source path is staged and no corresponding test path is.
 
-- *Pros:* Uses the mechanism ADR 0004 established and this repo already runs
-  several of, so it needs no install step and no new concept. It gates the model,
-  which is where the evidence points — the guard that absorbed five widenings did
-  so across sessions, and `shell-machinery-guard.sh` was written because its
-  prose had been bypassed four times in two sessions. The escape hatch requires no design: a change that
-  genuinely needs no test is one the author commits from their own terminal, so a
-  false positive costs a sentence rather than a bypass flag.
+- *Pros:* Uses the mechanism ADR 0004 established and this repo already runs nine
+  of across four events, so it needs no install step and no new concept. It gates
+  the model, which is where the evidence points — the guard that absorbed five
+  widenings did so across sessions, and `shell-machinery-guard.sh` was written
+  because its prose had been bypassed four times in two sessions. The escape
+  hatch requires no design: a change that genuinely needs no test is one the
+  author commits from their own terminal, so a false positive costs a sentence
+  rather than a bypass flag.
 - *Cons:* Only sees commits made through the tool, so it is a partial gate by
   construction. It also needs the tier assignments in a form a script can read,
   which turns the tiers from prose into config and creates a second place they
@@ -311,44 +347,102 @@ Tier 2 source path is staged and no corresponding test path is.
 Adopt a two-part bar. A unit's **tier** says whether tests are owed, and the
 **ratchet** says when they come due.
 
-Tiers are assigned by the sharpened premise — complexity, blast radius, and how
+Tiers are assigned by the sharpened premise — complexity, reach, and how
 silently the unit fails:
 
 - **Tier 1, tests owed.** Anything that fires automatically without being
-  invoked, and anything that is dense deterministic input-to-output logic. This
-  is the hooks this repo owns, and the skill validators. The argument is
-  strongest here because a hook's failure mode is silence: it runs between intent
-  and execution, and a hook that has stopped working looks exactly like a hook
-  with nothing to say.
+  invoked, and anything that is dense deterministic input-to-output logic. The
+  argument is strongest here because a hook's failure mode is silence: it runs
+  between intent and execution, and a hook that has stopped working looks exactly
+  like a hook with nothing to say. **Tier 3's size floor wins over this** — a
+  hook with too little logic to carry a test is exempt however automatically it
+  fires.
 - **Tier 2, situational.** Units with real consequences on failure that are run
-  deliberately by a human who sees the outcome — `sync-skill.sh`, which copies
-  over files, and `init_skill.py`, which generates a tree. A human at the
-  keyboard is a weak check but not no check.
+  deliberately by a human who sees the outcome. A human at the keyboard is a weak
+  check but not no check.
 - **Tier 3, exempt.** Thin wrappers with too little logic to carry a test, and
-  vendored code. `hooks/rtk-rewrite.sh` is exempt by construction: it is pinned
-  by checksum and overwritten on upstream update, so its behaviour is not ours to
-  guarantee and a test against it would break on someone else's schedule.
+  vendored code. Vendored code is exempt by construction: it is overwritten on
+  upstream update, so its behaviour is not ours to guarantee and a test against
+  it would break on someone else's schedule.
+
+Every unit in the tree today is placed, because the gate below needs the
+assignments before it can run at all — leaving them to be judged as each unit
+comes up would leave the gate unimplementable:
+
+| Unit | Tier | Why |
+|---|---|---|
+| `hooks/reflexive-cd-guard.sh` | 1 | fires automatically, 290 lines, silent on pass |
+| `hooks/shell-machinery-guard.sh` | 1 | same, 161 lines |
+| `hooks/uv-run-guard.sh` | 1 | same, 57 lines, and it guards a deliberately-broad allow entry |
+| `hooks/python-rewrite.sh` | 1 | rewrites a command before it runs |
+| `hooks/context-usage-notice.sh` | 1 | fires automatically, reports nothing when it works |
+| `hooks/ensure-trailing-newline.sh` | 1 | mutates files without being invoked |
+| `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
+| `hooks/rtk-rewrite.sh` | 3 | vendored, pinned by checksum |
+| Skill validators and generators | 1 | dense deterministic logic; `init_skill.py` is 2, being human-run |
+| `scripts/sync-skill.sh` | 2 | copies files over others, human-run |
+| `scripts/compare-skills.sh` | 2 | reports a diff a human acts on |
+| `scripts/check-prerequisites.sh` | 2 | its exit code is a contract, and its branches need synthesised conditions |
+| `scripts/session-meta-report.py` | 2 | derives figures that land in durable artifacts |
+| `scripts/rules-floor.sh` | 2 | same, and it writes a baseline |
+| `scripts/rules-sections.py` | 2 | parses rule files for a report |
+| `scripts/usage-report.sh` | 2 | reads and summarises, no writes |
+| `scripts/context-usage.sh` | 2 | picks among per-session caches and reports staleness — more branching than its 82 lines suggest |
+| `scripts/enospc-workaround.sh` | 3 | 5 lines |
+| `session-handoff/scripts/` | 1 | dense logic producing durable artifacts; four of five already tested |
+
+A unit added later is tiered by the axis above, and the table gains a row in the
+same change.
 
 The ratchet: **a Tier 1 or Tier 2 unit gains test cases in the same change that
-modifies it.** Existing untested code is not retroactively a defect — the
-convention creates no backlog. What it forbids is the sixth widening of a unit
-that has already had five, verified by a script recreated from a note.
+introduces or modifies it.** "Introduces" is deliberate — a new Tier 1 unit owes
+cases on arrival, not on its second edit. Existing untested code is not
+retroactively a defect, so the convention creates no backlog. What it forbids is
+the sixth widening of a unit that has already had five, verified by a script
+recreated from a note.
 
 The ratchet is enforced by a gate, not by this prose. A new `PreToolUse` hook
 inspects the staged path list when a `git commit` is about to run and blocks with
-exit 2 when a Tier 1 or Tier 2 source path is staged with no test path alongside
-it. Tier membership therefore has to be readable by a script, so the hook carries
-the tier lists the way `check-prerequisites.sh` carries its prerequisite tiers —
-as arrays, kept in agreement with this ADR by nothing but attention. The gate sees
-only commits made through the tool, which makes committing from a terminal the
-escape hatch for a change that genuinely owes no test.
+exit 2 when a Tier 1 or Tier 2 source path is staged with no corresponding test
+path alongside it.
+
+**The gate registers in this repo's `.claude/settings.json`, not the root
+`settings.json`.** That distinction is sharper here than in an ordinary project:
+`~/.claude` is a symlink to this repo, so the root `settings.json` *is* the
+user-level settings file, and a gate registered there would fire on `git commit`
+in every project on the machine and block commits in unrelated repos against this
+repo's tier table. `.claude/settings.json` scopes it to this repo and is tracked,
+so a fresh clone is gated without an install step — which `settings.local.json`,
+being local-only, would not give. Narrowing the hook so it does not spawn on every
+Bash call is an implementation concern, recorded in the hook's own header rather
+than here.
+
+The gate needs the tier table as a *mapping* from source path to expected suite,
+not merely as membership lists, since which suite a unit owes now depends on its
+payload shape. It carries that the way `check-prerequisites.sh` carries its
+prerequisite tiers — as arrays, kept in agreement with this ADR by nothing but
+attention. The gate sees only commits made through the tool, which makes
+committing from a terminal the escape hatch for a change that genuinely owes no
+test.
 
 Suites are written as follows. A bash suite is an executable
-`<topic>/test/run-checks.sh` with local `check`-style helpers — the committed one
-has three, differing in what a case needs to supply — no framework, and no
-`set -e`, since a failing case must report and let the rest run. Python code
-keeps pytest, under the topic's own `tests/`. Two rules apply to both, and both
-were learned the hard way rather than reasoned out:
+`<topic>/test/run-<shape>.sh` with local `check`-style helpers — the committed
+`hooks/test/run-checks.sh` has three, differing in what a case needs to supply —
+no framework, and no `set -e`, since a failing case must report and let the rest
+run. Python code keeps pytest, under the topic's own `tests/`.
+
+**One suite per payload shape, not per topic.** The committed suite's helpers all
+synthesise a `PreToolUse` Bash payload on stdin; a `Stop` hook's input carries a
+`session_id` and no `tool_input` at all, so folding both into one file would put
+two disjoint helper sets under one shebang. `hooks/test/run-checks.sh` therefore
+stays what it is, and a `Stop`-shaped suite gets its own file beside it. Two
+consequences follow immediately rather than later: the entry point's discovery
+has to glob `*/test/run-*.sh` rather than the single filename, and the
+shared-helper question this ADR's harness option listed as an open cost comes due
+with the second suite rather than at some future split.
+
+Two rules apply to every suite, and both were learned the hard way rather than
+reasoned out:
 
 - **Assert on the human-readable output where the output is the product.** A
   guard's message is part of its contract, so a suite asserting only exit codes
@@ -360,7 +454,7 @@ were learned the hard way rather than reasoned out:
   with a message rather than reporting passes it never earned.
 
 Add `scripts/run-tests.sh` as the single entry point. It discovers every
-`*/test/run-checks.sh` and every topic `tests/` directory by convention rather
+`*/test/run-*.sh` and every topic `tests/` directory by convention rather
 than by a registered list, runs each, and exits non-zero if any suite fails. It
 must not read a suite's status through a pipe. Where `uv` is absent it exits
 non-zero rather than skipping the Python half, by the same rule as any other
@@ -422,9 +516,16 @@ convention.
   owner the escape hatch — but it means the ratchet's coverage depends on who is
   committing rather than on what is being committed.
 
-- **Neutral:** Tier assignment is a judgment call per unit. The three tiers name
-  the axis rather than mechanising it, so two readers could reasonably place
-  `usage-report.sh` differently.
+- **Neutral:** Tier assignment is a judgment call per unit. The table settles
+  every unit in the tree today, so the judgment is only owed on new ones — but
+  the three tiers name the axis rather than mechanising it, so two readers can
+  still reasonably place the next script differently.
+
+- **Negative:** An empty file satisfies the gate. It checks the staged path list,
+  which is what keeps it free of judgment, and that means `touch` plus `git add`
+  passes it. Content-checking is exactly the judgment ADR 0004 says to keep out
+  of a hook, so this is the cost of the mechanism rather than a defect in it —
+  but the gate proves a test path was staged, never that it asserts anything.
 
 - **Negative:** The ratchet exempts stable code permanently. `check_ascii_alignment.py`
   is 596 lines of Tier 1 logic and will stay untested for as long as nobody edits
@@ -439,12 +540,14 @@ convention.
   alongside RTK and `gh` as something the config assumes, which is a fair
   description of a repo whose skills shell out to it.
 
-- **Negative:** The tier lists now exist twice — as prose in this ADR and as
-  arrays in the gate hook — with nothing keeping them in agreement. This is the
+- **Negative:** The tier assignments now exist twice — as a table in this ADR and
+  as arrays in the gate hook — with nothing keeping them in agreement. This is the
   same drift hazard the prerequisite ledger already carries between the README and
-  `check-prerequisites.sh`, knowingly repeated, and it is worse here because a
-  stale tier list in the gate fails silently in the permissive direction: a unit
-  dropped from the array simply stops being gated.
+  `check-prerequisites.sh`, knowingly repeated, and it is worse here on two
+  counts. A stale entry fails silently in the permissive direction, since a unit
+  dropped from the array simply stops being gated. And the gate needs a mapping
+  from source path to expected suite rather than a membership list, so the second
+  copy carries more than the table does and can drift in more ways.
 
 - **Negative:** Two reporting formats remain. The entry point aggregates exit
   codes, not output, so a combined run prints one suite's PASS lines and
@@ -465,7 +568,7 @@ convention.
   `!/hooks/**/*` re-inclusion already tracks the suite path, so adding a bash
   suite needs no ignore change
 - [ADR 0007](0007-progressive-disclosure-for-rules.md) — the sub-decision
-  precedent this ADR's three option lists follow, and the routing policy that
+  precedent this ADR's five option lists follow, and the routing policy that
   keeps the dated counts above out of always-loaded rule prose
 - `hooks/test/run-checks.sh` — the committed suite over both guards, and the
   reference implementation of the `check`-style shape
@@ -478,6 +581,8 @@ convention.
 - `skills/session-handoff/tests/` — the pytest precedent that prompted the
   original question
 - `notes/testing-hooks-and-scripts.md` — the working note this decision is drawn
-  from, including the three convergences and the two hard-won suite rules
+  from, including the three convergences and the two hard-won suite rules. Named
+  rather than linked: `notes/` is a symlink into a private repo and gitignored
+  here, so the path resolves only on the author's machine
 - `README.md` and `scripts/check-prerequisites.sh` — the prerequisite ledger and
   check whose `uv` tier this decision changes
