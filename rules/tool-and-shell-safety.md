@@ -6,7 +6,7 @@ Operating the shell and the file tools without silent mishaps — commands that 
 
 The Bash working directory is set to the project root at session start and persists across calls. Do not prefix commands with `cd /path/to/project` — it is unnecessary, and a `cd` combined with output redirection (`cd ... 2>/dev/null; <command>`) trips a security approval rule ("path resolution bypass"), forcing the user to manually approve every such command.
 
-**Why:** the reflex tends to appear after working across multiple directories in one session (e.g. the project plus `~/.claude`), out of a wish to "be sure" of the cwd. But Read/Edit on a file elsewhere does not change the shell's cwd, and tool calls don't drift it. The `cd` adds nothing and costs an approval each time. This has recurred across sessions.
+The reflex appears after working across multiple directories in one session (e.g. the project plus `~/.claude`), out of a wish to "be sure" of the cwd. Read/Edit on a file elsewhere does not change the shell's cwd, and tool calls don't drift it.
 
 **A subtler consequence — silent wrong output, no approval prompt:** a `cd` into a *subdirectory of the project* (not just an unrelated dir) persists across calls the same way, and cwd-dependent tools then act on the wrong location without erroring — e.g. a handoff script writing relative to `os.getcwd()` lands its output in a subtree that the `SessionStart` hook and `list_handoffs.py` never scan (they see only the root), so nothing errors and the mistake is visible only by reading the tool's output path. This is distinct from the redirect/approval consequence above: that one is loud (an approval prompt), this one is silent.
 
@@ -24,12 +24,9 @@ it is built out of are the ones the gate cannot resolve. Six instances, all real
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
   forbidden form. The guard defeats itself: the gate reports `function_definition` (see *Batch
   repeated commands* below), that node cannot be allowlisted, so a read-only `grep` or `curl` stops
-  for approval. Shadowing a command is also how one gets broken for real. `agents.md` documents
-  this slip in the *sub-agent* direction, as something a flatly-phrased "never `cd`" provokes in a
-  delegate; it applies at least as much here, where the rule is in context and visible. An
-  always-loaded prohibition is a reason to write a different command, never a mandate to build a
-  mechanism that blocks it — and the `cd` rule already has `hooks/reflexive-cd-guard.sh`, so
-  enforcement is the hook's job.
+  for approval. Shadowing a command is also how one gets broken for real. An always-loaded
+  prohibition is a reason to write a different command, never a mandate to build a mechanism that
+  blocks it — and the `cd` rule already has `hooks/reflexive-cd-guard.sh`.
 - **A function definition for no reason at all.** The case above at least has an argument behind it.
   This one has none: a stray `for_each() { :; };` or `cd() { :; };` in front of an ordinary `grep`,
   defining something nothing calls, enforcing nothing, doing nothing. It costs exactly what the
@@ -81,12 +78,9 @@ it is built out of are the ones the gate cannot resolve. Six instances, all real
   `FOO=bar rtk ls dir/ | rtk head -3`. Blocking it would be the wrong instrument, since that is the
   allowlist's business rather than a guard's, but there is no reason to reach for it either.
 
-  Note what the gate does *not* do here, because it inverts the reasoning above. A plain assignment
-  is not among the parser nodes no allow rule can grant, and the changelog records assignments as
-  auto-approved but for one arithmetic-to-integer-variable case fixed in 2.1.252. So the motiveless
-  form costs no approval prompt — nothing interrupts, nothing errors, and the only reader who ever
-  sees it is whoever reads the command string. That silence is why it is gated despite resting on
-  fewer observations than the function form.
+  The motiveless form costs no approval prompt of its own — a plain assignment is auto-approved, so
+  nothing interrupts and nothing errors, and the only reader who sees it is whoever reads the
+  command string. That silence is why it is gated.
 
   A **redirect target** is checked by a second, separate detector, so that `:`-and-`[` mechanism is
   not the boundary: `> $S/pages-build.md` is refused as ``Redirect target concatenation contains $/`
@@ -118,24 +112,11 @@ adding a construct, ask what breaks if it is simply left out. Usually nothing �
 of a short command, or a plain invocation that respects the rule rather than policing it.
 
 **Two of these shapes are gated:** `hooks/shell-machinery-guard.sh` blocks a function definition and
-an assignment-plus-separator with exit 2 and a pointer back here, per ADR 0004's rule-vs-hook split.
-The definition half followed this prose being bypassed four times across two sessions; the assignment
-half rests on one observation and a different argument, which that bullet and the hook's header both
-set out rather than letting the first justification look transferable.
-
-For the definition it keys on the character before the match, so one following a separator is caught
-wherever it sits — and one immediately after an opening quote is not, which tracks the gate rather
-than missing a case. The assignment check uses a narrower preceding set, excluding bare whitespace so
-`export FOO=bar; cmd` passes. The header enumerates what each half knowingly over-blocks; read it
-before working around a block that looks wrong.
-
-**The remaining shapes stay prose-only, and one of them provably cannot be gated.** The invented
-leading command is the case: the binary resolves, since only its subcommand is fabricated, so no
-does-this-command-exist test fires and covering it would mean embedding every tool's CLI surface.
-Reading the first segment before sending is the only check there is. Treat the three gated-versus-not
-shapes as a bounded family rather than a growing list — they enumerate the slots bash allows at the
-start of a statement while staying inert, which is what makes the gating worth doing instead of a
-treadmill.
+an assignment-plus-separator with exit 2 and a pointer back here. Its header enumerates what each
+half knowingly over-blocks — read it before working around a block that looks wrong. The rest stay
+prose-only, and the invented leading command cannot be gated at all, since the binary resolves and
+only its subcommand is fabricated. Reading the first segment before sending is the only check there
+is.
 
 Failure mode this prevents: scaffolding added out of diligence converts an invisible call into a
 permission prompt, and the prompt arrives attached to a command whose actual work needed no
@@ -154,7 +135,7 @@ When running the same command over several files, write the calls out — `rtk r
 
 `for_statement` joins `simple_expansion` (`settings.md`) and `function_definition` (`agents.md`) as parser-node names the gate reports as its reason. None of the three can be allowlisted, so in each case the fix is to write a different command rather than to add an entry.
 
-The pull toward the loop is real — it looks like the tidier way to avoid repeating yourself, and it saves round-trips against an interactive prompt where a human is typing. Neither applies to a programmatically issued command, which pays nothing for the repetition and pays an approval for the construct. Cousin of the `cat "$(ls …)"` slip in `RTK.md`, with the same fix — resolve the paths first, then name them literally — though not the same root: that one prompts because an argument resolves only at runtime, this one because of the shape of the statement wrapping it.
+The pull toward the loop is real — it looks like the tidier way to avoid repeating yourself, and it saves round-trips against an interactive prompt where a human is typing. Neither applies to a programmatically issued command, which pays nothing for the repetition and pays an approval for the construct. Same fix as the `cat "$(ls …)"` slip in `RTK.md`: resolve the paths first, then name them literally.
 
 Failure mode this prevents: a read-only batch that should have been invisible interrupts the user for approval, and does it at exactly the moment the work is meant to be running unattended.
 
@@ -162,7 +143,7 @@ Failure mode this prevents: a read-only batch that should have been invisible in
 
 Run `bin/rubocop`, `scripts/report.sh`, `bash scripts/floor.sh` — not the absolute path to the same file. Allow rules match the literal command string, so a grant written as `Bash(bash scripts/floor.sh)` does not cover `bash /Users/…/project/scripts/floor.sh`: same script, same effect, different string, and the gate asks. The absolute form is the natural reach right after working in another directory or reading a path out of a tool result, which is when it slips in. The shell's cwd is the project root and stays there, so the relative form always resolves.
 
-A companion to the two entries above it: those keep a dynamic argument out of the command so the gate can resolve it, this keeps the command name in the form the gate already knows. `agents.md` carries the same constraint for sub-agent prompts, which is where it bites hardest — but it applies to a command issued from here first.
+`agents.md` carries the same constraint for sub-agent prompts, which is where it bites hardest.
 
 Failure mode this prevents: a routine, already-granted command interrupts the user for approval, and because the command is *correct* the prompt reads as a gap in the allow list rather than as a slip in how the command was written — so the fix attempted is a new allowlist entry that duplicates the one already there.
 
@@ -170,9 +151,7 @@ Failure mode this prevents: a routine, already-granted command interrupts the us
 
 Before running a script, read its opening lines for the runner it declares. A PEP 723 `# /// script` block with a `dependencies` list means `uv run`, a shebang names its interpreter, and a docstring `Usage:` line often states the invocation outright. Reaching for `python3` on a PEP 723 script fails at the first import of a declared dependency, and the allow rule that would have covered it names `uv run`, because that is the form the script was written for.
 
-The wrong runner costs twice over. It is un-granted, so it interrupts for approval, and it is non-functional, so the interruption buys a `ModuleNotFoundError`. The prompt arrives first, which is what makes this worth a rule — it reads as a missing allowlist entry, and the fix that suggests itself is granting the broken form, an entry that can never succeed and that sits in the list competing for attention with the working one.
-
-Sibling of the section above. That one keeps the *path* in the form the gate already knows, this one the *runner*. Same literal-string match, except here the script itself is the authority on which string is right.
+The wrong runner costs twice over. It is un-granted, so it interrupts for approval, and it is non-functional, so the interruption buys a `ModuleNotFoundError`. The prompt arrives first, so it reads as a missing allowlist entry, and the fix that suggests itself is granting a form that can never succeed.
 
 ## A malformed path won't error in Write the way it does in the shell — verify where it landed
 
@@ -191,7 +170,7 @@ Before overwriting or discarding on-disk-only state — uncommitted working-tree
 
 This is not an always-do. Routine overwrites of regenerable or uninteresting files need no copy. It fires only when the on-disk-only state is load-bearing for a comparison or decision in play.
 
-**How to apply:** when about to overwrite or discard uncommitted/untracked/scratch state, ask whether any decision currently in play — especially an option you just offered — would want to read that exact state later. If yes, copy it to a scratch path first (project `tmp/`, the session scratchpad). This composes with `honesty.md`'s *Surface Doubts Your Own Correction Reveals* — both catch an action that undermines a position you just took. That rule catches it in prose, this one catches it in a destructive file operation.
+**How to apply:** when about to overwrite or discard uncommitted/untracked/scratch state, ask whether any decision currently in play — especially an option you just offered — would want to read that exact state later. If yes, copy it to a scratch path first (project `tmp/`, the session scratchpad).
 
 ## A pipe hides the exit status of the command you actually care about
 
@@ -203,9 +182,9 @@ It bites hardest where the piped command *is* the verification — a test suite,
 
 Reach for a wrapper that filters *without* a pipe, so there is no second status to confuse: `rtk test <cmd>` shows only failures plus the tail of the output, and `rtk err <cmd>` shows only errors and warnings. Both propagate the wrapped command's status in each direction, so `rtk test bin/ci && …` gates on the suite rather than on a filter. Redirecting to a file and reading it afterwards has the same property, at the cost of a second step — and it is the form to reach for when an argument has to contain spaces, since `rtk test` re-parses its command and a quoted argument arrives at the wrapped command split into one entry per word (`RTK.md`).
 
-Reserve `${PIPESTATUS[0]}` for a pipeline that genuinely cannot be replaced, and expect it to interrupt: it is an expansion, so the permission gate cannot resolve it and has to ask — see *Batch repeated commands by repeating them literally* above for the same mechanism. Prescribing it as the default trades a silent wrong answer for a prompt on every verification run, which is why it sits last here rather than first.
+Reserve `${PIPESTATUS[0]}` for a pipeline that genuinely cannot be replaced, and expect it to interrupt: it is an expansion, so the permission gate cannot resolve it and has to ask.
 
-Failure mode this prevents: a red test run reads as green because the summary grep matched, the `&&` behind it fires anyway, and nothing in the visible output contradicts the report that says verified. This is `honesty.md`'s *Never Present Estimates as Measurements* arriving through a shell mechanism rather than a reasoning one.
+Failure mode this prevents: a red test run reads as green because the summary grep matched, the `&&` behind it fires anyway, and nothing in the visible output contradicts the report that says verified.
 
 ## Don't merge stderr into a file you intend to parse
 
@@ -215,9 +194,7 @@ Reproduced here: `ls <nonexistent> > merged.txt 2>&1` exited 1 and left 59 bytes
 
 **How to apply:** redirect stdout alone when capturing data to parse — a downloaded log, an API response, a generated fixture — and check the exit status. Reserve `2>&1` for capturing a transcript somebody is going to read, where interleaving the two channels is the point. Then run `wc -c` on the artifact before grepping it: a payload that should be hundreds of kilobytes arriving at a hundred bytes settles the question at once, and that evidence is usually in hand several commands before anyone looks at it.
 
-This does not retract the `2>&1` suggestion in `RTK.md`'s empty-`gh`-result guidance, which `project-notes.md` leans on for the tracker check. Those are about making output *visible* in the terminal, where merging the channels is what surfaces a message that would otherwise be lost. Keep the two uses apart by purpose — `2>&1` to see something, stdout alone to store something. The tracker check is the sharp case, since its whole value rides on trusting a negative, so merging the channels there while capturing to a file makes that negative worthless.
-
-Sibling of the section above, one channel over: there the pipe discards the *exit status*, here the redirect discards the *distinction between output and error*. It also feeds `honesty.md`'s *Do Not Assert Absence Without Verifying*, since the resulting false negative is about file contents and reads exactly like a real miss.
+This does not retract the `2>&1` suggestion in `RTK.md`'s empty-`gh`-result guidance. That one is about making output *visible* in the terminal, where merging the channels surfaces a message that would otherwise be lost. Keep the two uses apart by purpose — `2>&1` to see something, stdout alone to store something.
 
 Failure mode this prevents: a failed fetch becomes a small file of error text rather than no file at all, and the greps that follow report findings about content the artifact never held. The command's exit status said so at the time, and the redirect is what made it easy not to look.
 
@@ -227,7 +204,7 @@ Failure mode this prevents: a failed fetch becomes a small file of error text ra
 
 **How to apply:** remove the temporary edit the way you added it — with Edit, targeting the exact text — rather than reverting the file. Reach for `git checkout --` only when the file holds nothing you want to keep. When unsure whether it does, `git diff -- <file>` before discarding, which is cheap next to reconstructing lost work from memory.
 
-Failure mode this prevents: a revert aimed at a two-line probe takes an hour of unrelated editing with it, and because the command succeeded exactly as documented, the loss surfaces later — when the missing work is noticed downstream — rather than at the moment it happened. Sibling of the section above it: that one is about state a *pending decision* needs, this one about state you simply had not committed yet.
+Failure mode this prevents: a revert aimed at a two-line probe takes an hour of unrelated editing with it, and because the command succeeded exactly as documented, the loss surfaces later rather than at the moment it happened.
 
 ## An Edit revert and its restore have to cover the same span
 
@@ -237,11 +214,9 @@ The standing case is a comment. Reverting a modified line by matching the line a
 
 **Nothing catches it.** A test suite is silent by construction about text carrying no behaviour, so the run stays green through every cycle — and green is the signal being watched, because observing the red/green transition is the entire point of the exercise. The suite is not a weak detector here, it is an incapable one — a full run, however many times it is repeated, says nothing whatever about the file's state.
 
-What makes it worth a rule rather than a shrug is that the exposure scales with rigour. Reverting code to observe an honest red is what test-first asks for when the code got written first, and it is the alternative to claiming a red nobody saw. So the more faithfully the discipline runs, the more cycles execute and the more copies stack up.
+The exposure scales with rigour: reverting code to observe an honest red is what test-first asks for when the code got written first, so the more faithfully the discipline runs, the more cycles execute and the more copies stack up.
 
 **How to apply:** make the revert's match cover everything the restore will write back — the comment, the blank line, the whole hunk — so the two are genuine inverses. Then read the region back once the cycle finishes, rather than inferring its state from a green suite.
-
-The two sections below are the same family: one covers the text an Edit matches on, the other the text after it. In all three the Edit reports success, and the damage sits outside whatever diff gets read.
 
 ## Reproduce anchor lines byte-for-byte in an Edit
 
@@ -259,7 +234,7 @@ Markdown has no closing tags, so a heading owns everything down to the next head
 
 The damage occupies no diff lines. `git diff` reports only the insertion, and every reparented line is byte-identical, so reviewing the diff — the obvious check, and the one most likely to be run — cannot reveal it.
 
-**How to apply:** after inserting a block, read forward from it to the next heading of the same or higher level and ask whether that content still belongs under what it now sits beneath. When it doesn't, placing the new block at the *end* of the section usually fixes it without rewording anything. Sibling of the entry above: that one covers the text an Edit matches on, this one the text after it, and in both the Edit reports success while the damage sits where nobody looked.
+**How to apply:** after inserting a block, read forward from it to the next heading of the same or higher level and ask whether that content still belongs under what it now sits beneath. When it doesn't, placing the new block at the *end* of the section usually fixes it without rewording anything.
 
 Failure mode this prevents: a section's worth of established guidance is silently re-scoped under a narrow new subheading. Because nothing about that guidance changed, it survives review and reads as deliberate to every reader afterward.
 
@@ -271,4 +246,4 @@ Some commands simply do not exit. A CLI that forks a detached update-check or te
 
 **How to apply:** when a backgrounded command's output has been read and the answer taken from it, stop the task (`TaskStop`) rather than leaving it. Where the command really is still working, *Distinguish "in progress" from "failed"* in `diagnosis.md` governs first — this is for the case where the output is complete and only the process is left.
 
-Failure mode this prevents: an orphaned shell holds a process tree for hours, and the user is the one who finds it, which puts them in the position of auditing leftovers they never created. It also erodes the background mechanism itself: a task list carrying stale entries makes a genuinely running task harder to pick out.
+Failure mode this prevents: an orphaned shell holds a process tree for hours, and the user is the one who finds it — auditing leftovers they never created, in a task list where the stale entries hide the genuinely running one.
