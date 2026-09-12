@@ -82,9 +82,27 @@
 # four. Deliberate, not an oversight.
 #
 # What it matches, and why the preceding set is narrower than above:
-# start-of-string or one of `;&|(`, optionally followed by whitespace — NOT
-# bare whitespace, which the function form does accept. Whitespace would block
-# `export FOO=bar; cmd` and `env FOO=bar cmd`, both legitimate.
+# start-of-string or one of `;&|(` — NOT bare whitespace, which the function
+# form does accept. Whitespace would block `export FOO=bar; cmd` and
+# `env FOO=bar cmd`, both legitimate.
+#
+# After `;`, `&` or `|` the separator must be followed by at least one space,
+# and that requirement is what keeps a URL query string out. `&` is both a shell
+# separator and the delimiter between query parameters, and this matcher is not
+# quote-aware, so `curl "http://host/s?a=1&b=2&c=3"` presented `&b=2&` as an
+# assignment terminated by a separator and was blocked. Three parameters is the
+# floor — a two-parameter string ends without the trailing `&`, which is why the
+# two URL cases already in the suite passed while the shape kept firing live.
+# No query parameter is written with a space after its `&`, and no `gh api`,
+# `curl` or `wget` call has to be rewritten to clear the guard.
+#
+# `(` keeps the old no-whitespace form, since `(FOO=1; cmd)` is a real shape and
+# a parenthesis never appears in the URL case.
+#
+# Knowingly narrowed by the same change: `rtk ls;TMP=/tmp;ls $TMP`, scaffolding
+# written without spaces around its separators, now passes. Every observed
+# instance has spaced them, and buying that case back costs every multi-
+# parameter URL.
 #
 # A separator terminating the value is required, and it is the whole safety
 # margin. `FOO=bar cmd` is a *prefix* assignment, which scopes the variable to
@@ -136,6 +154,8 @@ keyword_form="(^|[[:space:]\;\&\|\(])function[[:space:]]+${name}([[:space:]]*\(\
 # from a separator, and followed by one. The preceding set deliberately excludes
 # bare whitespace so `export FOO=bar; cmd` and `env FOO=bar cmd` pass, and the
 # trailing separator is what distinguishes scaffolding from a prefix assignment.
+# `;&|` additionally require a space after them, which is what keeps a URL query
+# string from reading as an assignment — see the header.
 # The value has to be terminated BY the separator, not merely followed by one
 # somewhere downstream: `FOO=bar cmd | x` is a prefix assignment whose pipe is
 # nothing to do with the assignment, and an unanchored trailing separator
@@ -146,10 +166,14 @@ keyword_form="(^|[[:space:]\;\&\|\(])function[[:space:]]+${name}([[:space:]]*\(\
 # into a quoted value — matching `"a` in `FOO="a; b" cmd` and then reaching the
 # separator inside the quotes, which is the prefix form and legitimate.
 assign_value="(\"[^\"]*\"|'[^']*'|[^[:space:]\;\&\|\"']*)"
-assign_form="(^|[\;\&\|\(][[:space:]]*)${name}=${assign_value}[[:space:]]*[\;\&\|]"
+assign_form="(^|\([[:space:]]*|[\;\&\|][[:space:]]+)${name}=${assign_value}[[:space:]]*[\;\&\|]"
 
 if [[ "$CMD" =~ $assign_form ]]; then
-  echo "shell-machinery-guard: blocked. This command opens with a variable assignment followed by a separator — \`FOO=bar; cmd\` rather than the prefix form \`FOO=bar cmd\`, which scopes the variable to one command and is fine. Every observed instance has been scaffolding the task did not ask for: a name assigned once, referenced by nothing, in front of the command doing the work. Unlike a shell function this costs no permission prompt, so nothing else will surface it — which is the reason for the block rather than an argument against it. Write the command without it, and write the ref or path out literally however long it is; a programmatically issued command saves no keystrokes. If a value genuinely has to be computed and reused, write the script to a file with the Write tool and run the file. See tool-and-shell-safety.md, \"Don't add shell machinery the task didn't ask for\"." >&2
+  # Quote the matched fragment. The matcher scans the whole string rather than
+  # only its head, so a message claiming the command "opens with" an assignment
+  # sends the reader to the wrong end of a long command line — which cost one
+  # session a wrong first diagnosis and a bisect of the arguments.
+  echo "shell-machinery-guard: blocked at \`${BASH_REMATCH[0]}\`. That is a variable assignment followed by a separator — \`FOO=bar; cmd\` rather than the prefix form \`FOO=bar cmd\`, which scopes the variable to one command and is fine. Every observed instance has been scaffolding the task did not ask for: a name assigned once, referenced by nothing, in front of the command doing the work. Unlike a shell function this costs no permission prompt, so nothing else will surface it — which is the reason for the block rather than an argument against it. Write the command without it, and write the ref or path out literally however long it is; a programmatically issued command saves no keystrokes. If a value genuinely has to be computed and reused, write the script to a file with the Write tool and run the file. See tool-and-shell-safety.md, \"Don't add shell machinery the task didn't ask for\"." >&2
   exit 2
 fi
 

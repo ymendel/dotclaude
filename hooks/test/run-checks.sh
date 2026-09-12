@@ -112,6 +112,7 @@ skipped() {
 }
 
 smg() { check shell-machinery-guard.sh "$@"; }
+smg_says() { says shell-machinery-guard.sh "$@"; }
 rcd() { check_at reflexive-cd-guard.sh "$@"; }
 rcd_says() { says reflexive-cd-guard.sh "$@"; }
 
@@ -197,6 +198,21 @@ smg "env prefix form"                 0 'env FOO=bar rtk ls'
 smg "assignment with nothing after"   0 'FOO=bar'
 smg "equals inside a query string"    0 'rtk curl "https://example.test/x?a=1&b=2"'
 smg "equals after a semicolon in a URL" 0 'rtk ls; rtk curl "https://example.test/x?a=1"'
+# Three parameters is where the URL case actually bit, and the two cases above
+# are why it went unnoticed: with two parameters the second has no trailing `&`,
+# so the value is never terminated by a separator. From three on, every interior
+# parameter is `&name=value&` — an assignment reached from a separator and
+# terminated by one. The `&` is a real separator to the matcher and the quotes
+# are no escape, so this fired on any multi-parameter curl, wget or gh api call
+# until the preceding separator was made to require a following space.
+smg "three-parameter query string"    0 'rtk curl "https://example.test/x?a=1&b=2&c=3"'
+smg "four-parameter query string"     0 'rtk proxy curl -s --max-time 5 "http://localhost:3000/search?val1=84&val2=60&val3=20&val4=48"'
+smg "multi-parameter gh api path"     0 'rtk gh api "repos/o/r/issues?state=open&labels=bug&per_page=5"'
+smg "query string then a real pipe"   0 'rtk curl "https://example.test/x?a=1&b=2&c=3" | rtk wc -l'
+# Knowingly narrowed by that same change: scaffolding written with no space
+# after its separator now passes. Every observed instance has spaced them, and
+# buying this case back would cost every multi-parameter URL above.
+smg "unspaced mid-command assignment" 0 'rtk ls;TMP=/tmp;ls $TMP'
 smg "equals in a commit message"      0 'rtk git commit -m "document the a=b default"'
 smg "long flag with a value"          0 'rtk grep --max-len=80 pattern .'
 smg "assignment inside a quote"       0 "rtk grep 'x=1' src/"
@@ -209,6 +225,15 @@ echo "== shell-machinery-guard: assignment over-blocks (exit 2)"
 # should change.
 smg "separator inside a grep pattern" 2 "rtk grep 'x; y=1;' src/"
 smg "subshell assignment"             2 '(FOO=1; rtk ls)'
+
+echo
+echo "== shell-machinery-guard: the message points at what matched"
+# The matcher scans the whole string, so a message asserting the command "opens
+# with" an assignment sends the reader to the wrong end of a long command line.
+# Quoting the matched fragment is the contract — exit 2 is 2 whether the
+# explanation locates the match or invents a position for it.
+smg_says "names the matched fragment"  'TMP=/tmp;' "$PROJ" 'rtk ls; TMP=/tmp; ls $TMP'
+smg_says "no claim about opening"      'blocked at' "$PROJ" 'for_check=""; rtk wc -l file'
 
 echo
 echo "== reflexive-cd-guard: redundant and misdirecting targets (exit 2)"
