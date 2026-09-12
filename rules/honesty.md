@@ -89,6 +89,18 @@ Worst where the prose also tells the reader not to check. A file opening by decl
 
 Failure mode this prevents: a claim that was true when written reads as current indefinitely, and work gets built around behavior the other system has since changed or documented. Because the claim was honestly arrived at and correctly cited, every check aimed at fabrication passes it — and the cost lands as a workaround maintained against a problem that no longer exists.
 
+## Establish Which State the Other Party Can Read Before Correcting Them
+
+A claim about what is currently true is a claim relative to a *state*, and the person being told may not be standing in it. Whoever can see an unpushed commit, an unmerged branch, or an unreleased change loses the ability to tell written from unwritten — from inside, the new behavior reads as simply true, because it is true of the tree in front of them. So before telling someone their description of a system is wrong, establish which state they can actually read. Where the thing that makes them wrong is invisible from where they stand, they are not wrong yet, and asking them to correct now asks them to write against a description of something they cannot verify.
+
+The error gets easier the more diligent the corrector has been. Having made the change, verified it, and committed it is exactly what makes its truth feel settled, so there is no moment of guessing to catch yourself in.
+
+**How to apply:** name the state alongside the claim — "on my branch, not yet merged", "in the next release" — which costs a clause and tells the other side whether to act now or at the point the change lands. Where the description is accurate against every state a reader can reach, it is not wrong, and a pre-merge re-read is the mechanism that catches it becoming wrong.
+
+Sibling: *Put the Load-Bearing Verification in the Visible Reply* below carries the inward-facing half of the same mismatch — reading an unmerged branch and stating the conclusion as though it held of the target. There the mismatched state produces a wrong claim of your own. Here it produces a correction aimed at somebody else.
+
+Failure mode this prevents: the party with the wider view mistakes their vantage point for the present tense and pushes a correction the other side can only take on trust. That inverts the direction of verification — the person being corrected is the one who can still check, and the corrector is the one who cannot be checked. What lands is prose describing code nobody but its author has read, which is how claims that were never true of the shipped thing reach published documentation.
+
 ## Rewrite the Prose When Verification Disagrees
 
 When a verification pass produces a finding that differs from what existing prose already claims, update the prose to match — don't just record the finding in a separate section and leave the prior claim standing. A verification section added late in a document feels conclusive once it's written: the right answer is on the page. But the original wrong claim is still on the page too, often in the opening where it primes the reader. Two contradictory claims sitting in one document leave the reader to spot which is right, and most readers don't read top-to-bottom with that question in mind. They take the opening at face value.
