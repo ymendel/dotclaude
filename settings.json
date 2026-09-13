@@ -225,5 +225,7 @@
     "security-review": "user-invocable-only"
   },
   "skillListingBudgetFraction": 0.015,
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "crossSessionInbound": "accept",
+  "isolatePeerMachines": true
 }
