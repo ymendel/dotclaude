@@ -107,6 +107,22 @@ it is built out of are the ones the gate cannot resolve. Six instances, all real
   selected 2 of 43 tests in a file that runs in under two seconds, so running the whole file was
   simpler, faster, and verified more.
 
+  **Double quotes are not the fix for a backtick or a `$`.** They stop the characters above and
+  leave command substitution and expansion live, so a grep pattern written to find a markdown
+  literal — ``"`term`\|\bterm\b"`` — reaches the gate as an attempt to run `term` as a command, and
+  the prompt offers a standing grant for it. That grant is the dead-weight kind rather than the
+  dangerous kind, since no such command exists, but it reads in the dialog exactly like a real
+  tool. Observed once, on a command that also carried a pipe — so the per-segment split is what
+  surfaced the inner word as a command name, and a substitution standing alone may instead behave
+  as `settings.md` describes and offer nothing at all.
+
+  Read that pattern again, though, because the quoting is the second mistake. `\bterm\b` already
+  matches inside `` `term` `` — a backtick is not a word character — so the first alternative was
+  redundant before any shell saw it. That is the usual shape of this: the backtick gets reached for
+  to be precise about markdown, beside a word-boundary match that already covers the case. Drop the
+  alternative rather than single-quoting it, and keep single quotes for a pattern that genuinely
+  needs a `$` or a backtick.
+
 The tell in each case: the part that trips the gate is not the work, it is the scaffolding. Before
 adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
 of a short command, or a plain invocation that respects the rule rather than policing it.
