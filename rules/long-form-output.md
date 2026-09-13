@@ -2,7 +2,7 @@
 
 The principle: **content the user needs in order to read or decide must live where they reliably see it.**
 
-The main case is long output: when a turn's output is long enough that the user would have to scroll back and forth in the conversation to re-read or compare sections, write it to a file and post a short pointer in the chat instead of dumping it inline. The two non-file cases — a decision-critical option and a claimed-visible finding — get their own sections near the end: those belong in the chat message itself, never in an ephemeral tool result or a preview pane that clips.
+The main case is long output: when a turn's output is long enough that the user would have to scroll back and forth in the conversation to re-read or compare sections, write it to a file and post a short pointer in the chat instead of dumping it inline. The three non-file cases — a decision-critical option, a claimed-visible finding, and a relayed peer message — get their own sections near the end: those belong in the chat message itself, never in an ephemeral tool result, a preview pane that clips, or a surface that rendered before the user was looking.
 
 ## What counts as long enough
 
@@ -52,6 +52,20 @@ When claiming there's a finding to see — "the standout is X", "as the table ab
 **Why:** this has recurred — the user flags "another time you said there's something to see and I don't see it." The model treats its own tool output as if it were part of the conversation the user reads, but the user reads the *messages*. A claimed-visible finding whose data lives only in a tool result is, to the user, an assertion with no visible support.
 
 **How to apply:** when a tool call produces data a decision rides on, restate the load-bearing part in the message — a short markdown table, the ranked list, the specific numbers — even if it duplicates the tool output. The tool output is scratch. The message is the artifact. Sibling of the AskUserQuestion-preview lesson above (decision-critical detail must live where the user reliably sees it, not in a clipped preview) and of the long-output rule at the top of this file (which governs *where* long content goes — file vs. inline; this governs *not* offloading a visible claim onto ephemeral tool output at all).
+
+## Don't relay a peer message as though the user already read it
+
+A cross-session message lands whole in your context and thinly in the user's — recent builds collapse it to a one-line preview whose full text sits behind `Ctrl+O`, and even displayed in full it arrives mid-work, in a conversation the user is reading rather than watching. Assume they have not read it. The relay is the first and only telling.
+
+**Carry the substance, not the citation.** "The `widget-api` session finished the schema migration" informs. "I heard from `widget-api`" attributes and informs nobody. Attribution is worth one clause, never the whole sentence.
+
+**Restate on a later reference.** "As that session mentioned" points at something that may never have rendered. Name the claim again rather than pointing back at it.
+
+**Mark a relayed claim as the sender's, and as of when.** It is a copy of something somebody else owns and can revise, and nothing in the relay marks it provisional. Say whose it is and when it arrived, so a later correction reads as replacing a dated claim rather than contradicting a bare one.
+
+Sibling of *Don't point at tool output as a shared visible surface* above — the same mismatch one surface over. There the claim rides on a tool result the user may not have rendered. Here it rides on a message that rendered while they were reading something else.
+
+Failure mode this prevents: several messages arrive across a session, each gets relayed accurately in passing, and the user afterwards asks whether anything came in at all — having read every reply and retained none of the content. Nothing in the transcript looks wrong, so the gap surfaces only when they happen to ask.
 
 ## Failure mode this prevents
 
