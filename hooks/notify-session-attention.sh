@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+# notify-session-attention.sh — Notification hook. Says which session wants you.
+#
+# Registered with no matcher, so every notification type reaches this script and the branching
+# happens here. That is deliberate: a matcher on `permission_prompt` would silently drop any type
+# Claude Code adds later, where a generic fallback surfaces it the first time it fires.
+#
+# The routing:
+#   permission_prompt  → notify, "<project> · needs permission"
+#   idle_prompt        → silent. It is ~two thirds of all traffic and says only that a session
+#                        finished and you have not typed since, which is not a call for attention.
+#   anything else      → notify, naming the type, so an unfamiliar event is legible rather than
+#                        dressed up as a permission prompt.
+#
+# Every payload is appended to the log regardless of routing, including the silent ones. The type
+# vocabulary is only partly observed — `permission_prompt` and `idle_prompt` seen, the elicitation,
+# agent and quota families documented but never yet fired here — so the log is what will show the
+# rest arriving. `notes/claude-code-notification-hooks.md` carries the full vocabulary and the
+# timing rules.
+#
+# The label is `basename "$cwd"`. The payload carries no title and its `message` names no session,
+# so the working directory is the only human-readable key available, and it matches what an editor's
+# terminal tab already shows. Two sessions in one directory are indistinguishable here; `--name`
+# fixes that for `claude agents` and `ListAgents` but does not reach this payload.
+#
+# Timing is not this script's to control. `permission_prompt` only fires once you have not typed for
+# about six seconds, and `idle_prompt` about 60 seconds after a response — so the away-heuristic is
+# already applied upstream, and a notification arriving means the gate was cleared.
+#
+# Delivery is `osascript`, which needs nothing installed.
+
+# Overridable so a test run can be pointed at a scratch file rather than appending to the real log.
+LOG="${CLAUDE_NOTIFY_LOG:-$HOME/.claude/.notification-probe.jsonl}"
+SOUND="Submarine"   # blank for silent notifications
+
+# A hook must not print. osascript's own chatter would land in the session, so it is discarded —
+# the log is the record of what fired.
+#
+# TODO: prefer terminal-notifier when it is present, keeping this osascript path as the fallback so
+# a machine that lacks it still notifies. Two reasons, in order.
+#
+# It carries its own bundle, so it gets its own System Settings > Notifications entry — its own
+# alert style, icon, and Focus behaviour. osascript is unbundled and attributed to
+# com.apple.ScriptEditor2, so the only way to make these notifications persist rather than
+# auto-dismiss is to set *Script Editor*'s Alert Style to Persistent, which catches every unbundled
+# `display notification` on the machine. A separate entry is a setting you can aim.
+#
+# Its Notification grouping also keys on the app, so every session stacks under one Script Editor
+# group — the wrong key, since the thing worth separating is the project.
+#
+# And `-group` replaces an earlier notification carrying the same group id, so grouping by project
+# means a session's second prompt supersedes its first instead of stacking.
+#
+# Its click actions are not a reason: they can focus an editor but not a terminal tab inside it.
+# Install is `brew install terminal-notifier`, and the Brewfile line belongs in dotfiles rather than
+# here, being machine setup rather than Claude config.
+notify() {
+  local title=$1 body=$2
+  if [ -n "$SOUND" ]; then
+    osascript \
+      -e 'on run argv' \
+      -e 'display notification (item 1 of argv) with title (item 2 of argv) sound name (item 3 of argv)' \
+      -e 'end run' \
+      "$body" "$title" "$SOUND" >/dev/null 2>&1
+  else
+    osascript \
+      -e 'on run argv' \
+      -e 'display notification (item 1 of argv) with title (item 2 of argv)' \
+      -e 'end run' \
+      "$body" "$title" >/dev/null 2>&1
+  fi
+}
+
+INPUT=$(cat)
+
+[ -z "$INPUT" ] && exit 0
+
+if ! command -v jq &>/dev/null; then
+  # Consistent with the other hooks: without jq we cannot parse the input, so pass through.
+  exit 0
+fi
+
+# -c keeps one payload per line. A malformed payload is the interesting case rather than one to
+# discard, so record the bytes as they arrived and stop — there is nothing to route on.
+if ! STAMPED=$(jq -c --arg received_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  '. + {received_at: $received_at}' <<<"$INPUT" 2>/dev/null); then
+  printf 'UNPARSED %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$INPUT" >> "$LOG"
+  exit 0
+fi
+
+printf '%s\n' "$STAMPED" >> "$LOG"
+
+NOTIFICATION_TYPE=$(jq -r '.notification_type // empty' <<<"$INPUT")
+CWD=$(jq -r '.cwd // empty' <<<"$INPUT")
+
+# Without a type there is nothing to route on, and without a cwd there is no label worth showing.
+[ -z "$NOTIFICATION_TYPE" ] && exit 0
+[ -z "$CWD" ] && exit 0
+
+PROJECT=$(basename "$CWD")
+
+case "$NOTIFICATION_TYPE" in
+  idle_prompt)
+    ;;
+  permission_prompt)
+    notify "$PROJECT" "needs permission"
+    ;;
+  *)
+    notify "$PROJECT" "$NOTIFICATION_TYPE"
+    ;;
+esac
+
+exit 0
