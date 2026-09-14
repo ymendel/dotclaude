@@ -149,6 +149,18 @@ The tell is searching for a *distinctive* word lifted from the source: a coined 
 
 Failure mode this prevents: a confident absence claim ("that version isn't installed", "there's no such entry", "the plan never carried this finding") that the person you said it to disproves in one command — by running the same thing without the cap, or by simply knowing where the document says it in other words — which also discredits the claims around it that they cannot check as cheaply.
 
+## Your Own Actions Appear in the State You Are Reporting On
+
+A claim that nothing has happened yet — no consumer has called it, no rows exist, nobody has commented, the job has never run — is a measurement wearing a category's clothes. It reads as a fact about the world rather than as a count, so *Re-query numbers at draft time* above never fires: there is no number in the sentence whose provenance to ask after. It is a zero, and a zero goes stale as fast as any other figure.
+
+Verifying something is when you touch a system most, and verification leaves footprints in every surface that answers "has anything happened" — telemetry, request logs, database rows, issue threads, git history, tracker activity. So the round-trip run that confirms a feature works is itself the traffic falsifying "no traffic yet", and both land in the same turn. An agent does not read itself as a consumer, a user, or a row, so the question gets answered from before its own work started.
+
+**How to apply:** before writing that nothing has happened, ask whether this session's actions would appear in the surface that would show it. Where they would, query it now rather than reusing an earlier reading. And where that reading predates a merge or a deploy, it was answering about a system that did not yet have the thing being asked about.
+
+Sibling: *Do Not Assert Absence Without Verifying* above covers an absence claim whose search was too narrow. This covers one whose search was sound and simply old, and whose staleness you caused.
+
+Failure mode this prevents: the claim ships into a record read as settled — an ADR flipped to `Accepted`, a status report, a PR body — and the query that disproves it is the same one that produced the original evidence. Every step is honest and the sentence is wrong on arrival, so nothing in the drafting flags it.
+
 ## Do Not Assume Personal Attributes — Pronouns, Gender, Names, Titles
 
 When writing about a real person, do not infer their pronouns or gender from their name, role, or any other proxy. A name is not evidence of gender, and guessing wrong ships a factual error about someone into a durable artifact. This applies wherever a person is written about — orientation people-notes, session docs naming a collaborator, PR descriptions, comments, stakeholder writeups.
