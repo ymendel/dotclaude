@@ -27,6 +27,11 @@
 # about six seconds, and `idle_prompt` about 60 seconds after a response — so the away-heuristic is
 # already applied upstream, and a notification arriving means the gate was cleared.
 #
+# A desktop notification is the only channel there is. Marking the terminal tab instead would say
+# *which* session, which this cannot — but no hook-reachable sequence moves Zed's tab label. Bell,
+# OSC 0 and OSC 2 were each tried and measured; `notes/claude-code-notification-hooks.md` records
+# what happened so it is not re-attempted.
+#
 # Delivery is `osascript`, which needs nothing installed.
 
 # Overridable so a test run can be pointed at a scratch file rather than appending to the real log.
@@ -101,6 +106,7 @@ PROJECT=$(basename "$CWD")
 
 case "$NOTIFICATION_TYPE" in
   idle_prompt)
+    exit 0
     ;;
   permission_prompt)
     notify "$PROJECT" "needs permission"

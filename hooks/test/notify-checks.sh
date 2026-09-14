@@ -66,14 +66,18 @@ report() {
     fi
 }
 
-# run <payload> — feeds the hook, leaving the log in $LOG and the osascript calls in $CALLS.
+# run <payload> — feeds the hook, leaving the log in $LOG, the osascript calls in $CALLS, and the
+# hook's JSON output in $STDOUT. Capturing stdout also keeps a test run from ringing the real bell.
 run() {
     LOG="$WORK_DIR/log.jsonl"
     CALLS="$WORK_DIR/calls.txt"
+    STDOUT="$WORK_DIR/stdout.json"
     : > "$LOG"
     : > "$CALLS"
+    : > "$STDOUT"
     printf '%s' "$1" \
-        | PATH="$STUB_DIR:$PATH" OSASCRIPT_CALLS="$CALLS" CLAUDE_NOTIFY_LOG="$LOG" bash "$HOOK"
+        | PATH="$STUB_DIR:$PATH" OSASCRIPT_CALLS="$CALLS" CLAUDE_NOTIFY_LOG="$LOG" bash "$HOOK" \
+        > "$STDOUT"
 }
 
 payload() {
@@ -85,6 +89,12 @@ payload() {
 notified() { [ -s "$CALLS" ]; }
 logged_lines() { grep -c '' "$LOG"; }
 
+# The hook writes nothing to stdout. It briefly emitted `terminalSequence` there to mark the
+# terminal tab — a bell, then OSC 0, then OSC 2 — and none of the three moves Zed's tab label, so
+# all of it came back out. This guards against it creeping back in: stdout is a hook's decision
+# channel, and writing to it is never incidental.
+printed() { [ -s "$STDOUT" ]; }
+
 # A permission prompt notifies, labelled by the working directory's basename.
 run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
 if notified && grep -q 'shipping-tracker' "$CALLS" && grep -q 'needs permission' "$CALLS"; then
@@ -95,6 +105,9 @@ fi
 [ "$(logged_lines)" = 1 ] \
     && report true "permission_prompt is logged" \
     || report false "permission_prompt is logged" "expected 1 line, got $(logged_lines)"
+printed \
+    && report false "permission_prompt writes nothing to stdout" "stdout: $(cat "$STDOUT")" \
+    || report true "permission_prompt writes nothing to stdout"
 
 # Idle is the dominant type and says only that a session finished. Logged, never shown.
 run "$(payload idle_prompt /Users/alice/dev/shipping-tracker)"
@@ -104,6 +117,9 @@ notified \
 [ "$(logged_lines)" = 1 ] \
     && report true "idle_prompt is still logged" \
     || report false "idle_prompt is still logged" "expected 1 line, got $(logged_lines)"
+printed \
+    && report false "idle_prompt writes nothing to stdout" "stdout: $(cat "$STDOUT")" \
+    || report true "idle_prompt writes nothing to stdout"
 
 # An unrecognised type is surfaced rather than dropped, and names itself so it is not mistaken for
 # a permission prompt. The elicitation, agent and quota families have never fired here.
@@ -113,6 +129,9 @@ if notified && grep -q 'billing-api' "$CALLS" && grep -q 'elicitation_url_dialog
 else
     report false "unknown type notifies, naming the type" "captured: $(cat "$CALLS")"
 fi
+printed \
+    && report false "unknown type writes nothing to stdout" "stdout: $(cat "$STDOUT")" \
+    || report true "unknown type writes nothing to stdout"
 
 # A payload that cannot be parsed is recorded as-is rather than discarded — there is nothing to
 # route on, so it must not notify.
