@@ -7,6 +7,7 @@
       "Bash(./scripts/context-usage.sh:*)",
       "Bash(./scripts/rules-floor.sh:*)",
       "Bash(./scripts/rules-sections.py:*)",
+      "Bash(./scripts/run-tests.sh:*)",
       "Bash(./scripts/sync-skill.sh *--dry-run)",
       "Bash(./scripts/usage-report.sh:*)"
     ]
