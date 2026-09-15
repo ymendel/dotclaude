@@ -2,10 +2,10 @@
 # Checks over claude-dir-write-allow.sh, the PermissionRequest hook. Run it after touching that
 # script:
 #
-#   ./hooks/test/claude-dir-checks.sh
+#   ./hooks/test/run-permission-request.sh
 #
 # A third harness. run-checks.sh passes command strings to the PreToolUse guards, and
-# notify-checks.sh stubs osascript to assert a delivery — this hook takes a tool payload and answers
+# run-notification.sh stubs osascript to assert a delivery — this hook takes a tool payload and answers
 # with a decision object, so it needs neither shape.
 #
 # Both halves are asserted. The decision is read from stdout, which is this hook's only channel that
@@ -25,7 +25,7 @@
 # No framework, no `set -e` (a failing case must report, not abort), non-zero exit at the end.
 
 if ! command -v jq &>/dev/null; then
-    echo "claude-dir-checks: jq is required. The hook reads its payload with jq and would" >&2
+    echo "run-permission-request: jq is required. The hook reads its payload with jq and would" >&2
     echo "abstain on every case without it, so the abstain checks would report passes they" >&2
     echo "never earned. Bailing instead." >&2
     exit 1
@@ -35,7 +35,7 @@ TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK="$(cd "$TEST_DIR/.." && pwd)/claude-dir-write-allow.sh"
 
 if [ ! -x "$HOOK" ]; then
-    echo "claude-dir-checks: $HOOK is missing or not executable." >&2
+    echo "run-permission-request: $HOOK is missing or not executable." >&2
     exit 1
 fi
 

@@ -2,7 +2,7 @@
 # Checks over notify-session-attention.sh, the Notification hook. Run it after touching that
 # script:
 #
-#   ./hooks/test/notify-checks.sh
+#   ./hooks/test/run-notification.sh
 #
 # A second harness rather than cases inside run-checks.sh, which passes command strings to the
 # PreToolUse guards. This hook reads a session JSON payload and writes two side effects, so nothing
@@ -23,7 +23,7 @@
 # No framework, no `set -e` (a failing case must report, not abort), non-zero exit at the end.
 
 if ! command -v jq &>/dev/null; then
-    echo "notify-checks: jq is required. The hook passes through without it, so every" >&2
+    echo "run-notification: jq is required. The hook passes through without it, so every" >&2
     echo "check would report a pass it never earned. Bailing instead." >&2
     exit 1
 fi
@@ -32,7 +32,7 @@ TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK="$(cd "$TEST_DIR/.." && pwd)/notify-session-attention.sh"
 
 if [ ! -x "$HOOK" ]; then
-    echo "notify-checks: $HOOK is missing or not executable." >&2
+    echo "run-notification: $HOOK is missing or not executable." >&2
     exit 1
 fi
 

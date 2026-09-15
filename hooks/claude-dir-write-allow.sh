@@ -13,7 +13,7 @@
 # can replace this script, so all three keep their prompt. A `..` segment abstains for the same
 # reason — it would satisfy the `.claude/` test while resolving somewhere carved out.
 #
-# Approves or abstains, never denies. Checks live in hooks/test/claude-dir-checks.sh.
+# Approves or abstains, never denies. Checks live in hooks/test/run-permission-request.sh.
 
 INPUT=$(cat)
 
