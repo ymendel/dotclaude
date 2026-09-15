@@ -68,15 +68,11 @@ is a session rather than a person — that is an instruction to send a cross-ses
 `ListAgents` resolves the name, `SendMessage` delivers it. It is not an instruction to record
 anything.
 
-The misreading is well-supported, which is why it needs saying. This config trains a strong
-reflex that something the user says gets routed into a rule, a note, or a memory, and the
-session names that come up most are repo names, because sessions get named after the work. So
-"tell dotclaude" parses cleanly as "file this in the dotclaude config", and the edit that
-follows looks like compliance.
-
-Resolve the name before deciding. A name matching a repo is still a session name in this
-construction. Where `ListAgents` shows no such session, say so and ask — the user can route it
-themselves, and a filing nobody requested is worse than a no-op.
+The tell is that session names are usually repo names, since sessions get named after the work —
+so "tell dotclaude" parses cleanly as "file this in the dotclaude config", and the edit that
+follows looks like compliance. A name matching a repo is still a session name in this
+construction. Resolve it before deciding, and where `ListAgents` shows no such session, say so
+and ask: a filing nobody requested is worse than a no-op.
 
 Failure mode this prevents: the message is never sent, the session it was meant for carries on
 without it, and the user finds out only if they go looking. Meanwhile something lands in a rule
@@ -84,31 +80,20 @@ file on the strength of an instruction that was never about rules.
 
 ## Write a settled call into the artifact, not only into the message that reports it
 
-When work is split across sessions — a peer session in another repo, a delegate, a colleague's
-agent — none of them can read the others' transcripts. A decision taken in one is therefore
-invisible everywhere else until something durable carries it. Messages do not carry it: they are
-point-to-point, they arrive once, and the party who most needs the decision is often not the party
-who was messaged.
-
-So when a call gets settled, put it where the other side reads rather than where the other side was
-told. A PR description, an ADR, an issue body, a comment in the code — any of them is a surface both
-sides can consult unprompted and re-consult later. The message announcing the decision is fine, and
-it is not the record.
+Sessions cannot read each other's transcripts, so a decision taken in one is invisible everywhere
+else until something durable carries it. A message does not: it is point-to-point, arrives once, and
+the party who most needs the decision is often not the party who was messaged. **When a call gets
+settled, write it where the other side reads** — a PR description, an ADR, an issue body, a comment
+beside the code. Announcing it in a message as well is fine; that is not the record.
 
 **The claim half, which is the easier slip.** Not having received an answer is not the same as the
 question being unanswered, and only the first is knowable from inside one session. Report "I have
-not had an answer on X" rather than "X is still open" or "X is unanswered" — the second is a claim
-about somebody else's state that cannot be checked from here, and it is wrong precisely in the case
-that matters, where the decision was taken somewhere out of view. Both forms are equally actionable,
-so the accurate one costs nothing. This is `honesty.md`'s *Do Not Assert Absence Without Verifying*
-one scope out: there a partial search is read as a complete one, here an empty inbox is read as an
-undecided question.
+not had an answer on X" rather than "X is still open" — the second is a claim about somebody else's
+state, unverifiable from here and wrong in precisely the case that matters, where the call was made
+out of view. Both are equally actionable, so the accurate one costs nothing.
 
-**How to apply:** when a decision is made, ask which artifact a reader would have to open to learn
-it, and write it there in the same breath. When reporting status across a boundary, say what you
-know — what you sent, what came back — rather than characterising the state of a question you can
-only see one side of. When a peer's report and yours disagree about whether something is open, the
-side that made the call is authoritative and the artifact is what should have said so.
+When a peer's report and yours disagree about whether something is open, the side that made the call
+is authoritative, and the artifact is what should have said so.
 
 Failure mode this prevents: a question ricochets between sessions with the answer already in hand on
 one of them, and the user is asked to re-decide something they decided — which reads as not having
