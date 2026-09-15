@@ -22,15 +22,13 @@ A ban list catches these three and not the next three. Cut the habit instead.
 
 The rewrite is usually a deletion. "The tradeoff, and it's a real one: nvm's bin directory isn't on PATH until something loads it" becomes "nvm's bin directory isn't on PATH until something loads it" — the fact was always doing the persuading. A point that needs flagging is a point that wasn't stated strongly enough, so rewrite the point rather than decorating it.
 
-This applies in chat as well as in durable prose. The scope note above exempts chat from marker-level policing, because a stray semicolon in a reply costs the reader nothing. Length does cost him — a long reply gets read in full, tired, at whatever hour it arrives — so this rule carries no chat exemption.
-
 Failure mode this prevents: padded prose reads as careful, because every added clause is individually defensible — it usually *is* true that the point matters. The volume shows only in aggregate, by which time it reads as the house style rather than as something to edit out. Under a byline it is worse than filler, because it is one of the few tells a reader can name on sight, and naming it discredits the prose around it.
 
 ## User slips don't redefine the rule
 
 The "Avoid…" sections below name categories of phrases neither Claude nor the user should ship in writing. The user is steeped in industry usage and sometimes uses these phrases himself anyway. Do not read his usage as approval or license to mirror it. Flag it when he uses one in writing where the rule applies. Never adopt the phrase yourself because he did.
 
-Failure mode this prevents: if Claude treats a user slip as an updated norm, the rule erodes from inside. The category isn't "phrases the user never uses" — it's "phrases neither of us should ship in writing". Mirroring his usage collapses the distinction.
+Failure mode this prevents: if Claude treats a user slip as an updated norm, the rule erodes from inside. The category is "phrases neither of us should ship in writing", not "phrases the user never uses".
 
 ## Avoid violent and military metaphors
 
@@ -43,7 +41,7 @@ Two traps carry prescribed replacements, not just a flag:
 
 When unsure whether a phrase qualifies, prefer the literal alternative. The category is broader than the obvious cases — idioms that sound neutral today often have violent or military origins. Example lists of the common offenders (overt-violence idioms, military/war-origin phrases) are catalogued in `rules/references/writing/catalogs.md` — pull it up to check a specific phrase.
 
-Failure mode this prevents: these phrases pass casual review because they are industry-common, then ship in user-facing prose where they read as careless or aggressive. The point is not to debate any individual idiom. It is to default to plain language.
+Failure mode this prevents: these phrases pass casual review because they are industry-common, then ship in user-facing prose where they read as careless or aggressive.
 
 ## Prefer plain labels over jargon shorthand
 
@@ -52,15 +50,13 @@ When labeling phases, parts, or branches of a sequenced piece of work, use plain
 - **Plain words over jargon**: "phase" beats "arc". "Arc" is borderline corporate jargon and adds nothing over "phase".
 - **Descriptive labels over numbered ones**: "the reads phase" / "the mutations phase" beats "Phase 1" / "Phase 2". A number forces the reader to remember which is which. A descriptive label is self-explanatory every time it appears.
 
-Failure mode this prevents: jargon labels and bare-numbered labels both push cognitive load onto the reader without adding information. Plain descriptive labels keep the structure of the work readable without a glossary lookup.
+Failure mode this prevents: a bare number forces a glossary lookup on every appearance, and the reader carries it rather than the author.
 
 ## Avoid borrowed corporate-policy jargon
 
 Phrases borrowed from corporate or policy contexts survive on familiarity, not clarity. Indicative examples — not exhaustive, extend by analogy: "shovel-ready", "low-hanging fruit", "move the needle", "boil the ocean", "blue-sky", "swim lanes", "north star", "table stakes". Prefer the plain equivalent — "closer to ready" beats "shovel-ready", "easy wins" beats "low-hanging fruit", "the priority" beats "the north star". If you can't find a plain version quickly the phrase might be load-bearing. Usually it isn't, and the plain form is shorter besides.
 
-This is the sibling case to "plain labels over jargon shorthand" above: that rule covers labels for phases or parts. This one covers descriptive phrases and metaphors. Same underlying principle — words that survive on familiarity rather than information aren't doing work.
-
-Failure mode this prevents: corporate-policy jargon ships in writing under the user's byline where it reads as ghostwritten or unconsidered. The phrases are cheap to write because they don't require precision, which is exactly why they're worth catching.
+Failure mode this prevents: corporate-policy jargon ships in writing under the user's byline where it reads as ghostwritten or unconsidered.
 
 ## Don't treat a design property as currency — no spending, budgets, or capital
 
@@ -107,13 +103,11 @@ When you rename or restructure a code example in a document, sweep the surroundi
 
 Failure mode this prevents: a reader sees one name in the code example and a different name in the next section's prose, and either backtracks to find out where the second name came from or assumes it's a different production case. Either way, the document has silently asked the reader to do reconciliation work the author should have done.
 
-Sibling: honesty.md's *Rewrite the Prose When Verification Disagrees* covers the same shape on the verification side — when a check reveals the original was wrong, edit the prose rather than appending the correction. The shared discipline: when something in the document is now wrong, update the document. Don't layer the correction next to it.
-
 ## Don't reframe an edit as what's no longer there
 
 When you edit by removing or demoting something, don't leave prose that describes what's *not* happening or what the reader *doesn't* have to do. That framing is a reaction to the deleted content — it only parses for a reader who saw the prior version. A cold reader has no prior version, so "you don't have to name X up front" reads as answering a question nobody asked, and quietly signals the text was edited rather than written. State positively what *is* — the thing to do, the value on offer — and let the removed concern stay removed. If the positive form needs the old concept at all, define it in passing rather than negating it.
 
-This is the edit-artifact sibling of the two rules above: they catch stale *names* and stale *claims* left behind by an edit. This one catches stale *framing* — prose shaped by what used to be on the page. The shared tell: the sentence makes sense only against a version the reader never saw.
+The tell: the sentence makes sense only against a version the reader never saw.
 
 Failure mode this prevents: a removal-driven edit leaves a "here's what you no longer need to do" paragraph that reads as out-of-place throat-clearing to anyone reading fresh, and betrays the document as patched rather than composed.
 
@@ -129,15 +123,11 @@ It is worst in a record that reads as present tense. An ADR or a design doc stat
 
 Where the number is genuinely load-bearing — "exactly two callers remain, both in the importer" — keep it and make it checkable: name them, or date the claim, so a reader can tell current from historical.
 
-Sibling: development-workflow.md's PR-description bullet bans CI status and test counts for a related but distinct reason. There the surface is remote and live — GitHub renders the checks — and the prose is a dead copy of it. Here the surface is in the same file and the prose miscounts it — adjacency being the thing that exculpates rather than condemns. Both resolve the same way: don't write the self-rotting line, rather than trying to keep it current.
-
 Failure mode this prevents: a count reads as verified precision, so it is trusted rather than checked, and it survives every review after the edit that falsified it. Nothing marks the tally as older than what it tallies, and the members it refers to are far enough off that no reader has reason to go and count — which discredits the surrounding claims they cannot check as easily either.
 
 ## Don't over-engineer for the secondary audience
 
 When output is human-primary but machine-secondary — issue bodies, PR descriptions, ADRs, docs that other agents will read later for context — don't add bulleted or sectioned structure beyond what the human form naturally wants. Agents handle prose. The voice rule and the clarity rule already produce text both audiences can use. The temptation to "make it easier for an LLM to parse later" almost always produces listicle ceremony that the human form didn't need, which then has to be scrubbed during the voice pass.
-
-This is adjacent to "Do not mirror his prompting register" (in `rules/references/writing/voice.md`) — both correct for the wrong-audience tilt. That one says "the chat-prompting form isn't the writing form" — this one says "the agent-friendly form isn't a separate target from the human-readable form".
 
 Failure mode this prevents: speculative restructuring for an imagined agent reader, producing prose that reads as ghostwritten to the human reader and saves no real effort for the agent reader (who would have done fine with the prose).
 
@@ -174,15 +164,13 @@ The test for a second copy is whether a reader plausibly reaches the second arti
 
 Point by stable identity when pointing at all: an ADR number, a tracked path, a heading. A comment pointing at a bare SHA is worse than the copy it replaced, per `development-workflow.md`'s durable references.
 
-Failure mode this prevents: each artifact is defensible alone and the aggregate is what the reader actually meets, so reviewing any one of them never surfaces the volume — and the repetition reads as thoroughness rather than as three copies of one paragraph. The copies then age at different rates, leaving a later reader who notices them disagreeing with no way to tell which is current. `honesty.md`'s *An Inherited Brief Is One Session's Summary* describes this same spread for a claim that is *wrong*, where it costs a correction sweep across files. Correct prose spreads by the identical mechanism with nothing at all to catch it.
+Failure mode this prevents: each artifact is defensible alone and the aggregate is what the reader actually meets, so reviewing any one of them never surfaces the volume — and the repetition reads as thoroughness rather than as three copies of one paragraph. The copies then age at different rates, leaving a later reader who notices them disagreeing with no way to tell which is current.
 
 ## Keep the methodology out of the durable record
 
 A measurement's *result* belongs in a commit message, an ADR, or a PR body. How it was arrived at — "five runs each way", "measured back to back", "median of three", "verified with a positive control" — belongs in the chat where the work happened. The reader of the artifact wants the number and whether to trust it, and an honest hedge already carries that: "about 4.1s to about 2.7s" says the figure is approximate without narrating the procedure that made it so.
 
 This is not license to drop provenance where provenance is the claim. `honesty.md` still governs: a number a reader must be able to check keeps its citation, and an estimate is still labeled as one. The distinction is between *what a reader needs in order to judge the claim* and *what shows the author did the work*. The second is self-justification, and it reads as such.
-
-Sibling: development-workflow.md's PR-description bullet bans CI status and test counts for a different reason — there the prose is a dead copy of a live remote surface. Here nothing is duplicated. The methodology simply belonged to the conversation and got carried into the record on the way past.
 
 Failure mode this prevents: the durable artifact accretes evidence of diligence in place of statements of fact, a register shift the author then has to edit out by hand.
 
