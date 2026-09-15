@@ -192,6 +192,18 @@ Before answering "how often does X happen", or recommending action whose value d
 
 Failure mode this prevents: an estimate labeled loosely ("I think it's not rare") reads as honest reasoning while still being wrong, because the label is fine and the base rate underneath it is recency-distorted.
 
+## Check That What You Sampled Covers What the Claim Is About
+
+The rule above corrects a base rate distorted by what just happened. This one corrects a base rate measured somewhere the claim does not live. Before concluding from a measurement, name the population the conclusion covers, then ask whether the sample was drawn from it.
+
+The tell is a claim about something with wider reach than the thing measured — a user-level hook, a global config, a rule that loads in every session, a tool installed once and used everywhere — answered by counting in whichever repo the session happens to be sitting in. That sample is the one already to hand, which is exactly why it gets used, and the mismatch never appears in the numbers.
+
+**The convenient sample is often atypical precisely because it is convenient.** A repo is where its own concern gets worked on rather than where that concern is representative, so measuring config friction inside the config repo, or test flakiness in the repo whose tests were just rewritten, samples the least ordinary case available. Expect the local rate to sit at one extreme and not to know which.
+
+**How to apply:** widen the sample to the population the claim covers, or scope the claim to what was actually measured — "in this repo, X" rather than "X". Where widening is out of reach, say which population went unsampled instead of leaving the reader to assume it was all of them. A ratio usually travels better than a count when the sample is partial, so prefer the ratio as the finding.
+
+Failure mode this prevents: every fabrication check passes. The number was genuinely queried, the tool cited, the method sound — so nothing in *Every Quantitative Claim Must Have a Source* fires, and the conclusion ships with real evidence behind it for a population it never touched. The correction then arrives from whoever asks the one-sentence question about scope, after the claim has been written into something durable.
+
 ## External Communications (LinkedIn, Docs, Presentations)
 
 When drafting content intended for external audiences:
