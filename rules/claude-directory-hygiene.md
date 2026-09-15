@@ -73,7 +73,7 @@ gets reached for, and why nothing in that paragraph fires on it. Two things stil
 
   **A path-scoped entry is not the narrow alternative it reads as.**
   `Bash(ruby .claude/scratch/*)` constrains almost nothing, on three counts: writing the
-  file it runs is itself granted, by `Edit(**/.claude/**)`; a Bash pattern matches the
+  file it runs is itself granted, by `hooks/claude-dir-write-allow.sh`; a Bash pattern matches the
   command *string* rather than a path (`settings.md`'s pattern-matching section), so
   `.claude/scratch/../../elsewhere.rb` satisfies it; and a Bash rule cannot be scoped to a
   project, so any repo shipping that path is covered, including code neither of us wrote.
