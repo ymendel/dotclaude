@@ -128,3 +128,26 @@ how the tool is installed, which is the one remedy that was never available. The
 declined every time it is made, and it reads as helpful rather than as re-litigating a settled
 preference — so it keeps coming back, since nothing in the diagnosis records that the obvious fix was
 already ruled out.
+
+## Never resize a browser window you did not open
+
+Driving a browser means working inside an application the user is also using. Resizing a window that
+was already open changes their environment for a capture they did not ask for, and they meet it as
+their own window suddenly at phone width with nothing saying why.
+
+**Crop instead.** The `zoom` action takes a region and returns a tight image without touching
+anything on screen, which is what a narrower-than-viewport capture actually needs. Reach for it
+first rather than after a resize has already fired.
+
+**Ask for your own window at the start, because you cannot get one later.** `tabs_context_mcp` with
+`createIfEmpty` creates a new window with its own tab group — but the parameter is documented to
+have **no effect once an MCP tab group already exists**, and `tabs_create_mcp` only ever adds a tab
+to the existing group. So a window of your own is available before any group exists and not
+afterwards. Plan around that rather than hoping past it: once the group lives in the user's window,
+`resize_window` takes a `tabId` that must be in that group, so every resize available to you moves
+*their* window.
+
+Failure mode this prevents: the resize is invisible from inside the session. The screenshot comes
+back at whatever size it was going to be regardless, so nothing in the result reports that the
+user's window moved — and where the capture is then fixed by cropping anyway, the disruption bought
+nothing at all. The user notices; the agent does not.
