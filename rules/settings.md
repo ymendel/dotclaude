@@ -234,3 +234,31 @@ PreToolUse hooks do run on every tool call, allowlisted ones included — an all
 The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message. The safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
 
 Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule. The JSON `deny` field does not. (The docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
+
+## A Hook Matcher Is a Regex Tested Anywhere in the Tool Name
+
+Per the [hooks docs](https://code.claude.com/docs/en/hooks), a matcher on the regular-expression path uses `RegExp.prototype.test`, which "succeeds on a match anywhere in the value" — so `Edit` matches `NotebookEdit` as well as `Edit`, and `^Edit$` is what pins it to one tool. That is why the `Write|Edit` matchers already in this file are sufficient rather than incomplete.
+
+Two consequences when writing a new hook. Adding `NotebookEdit` beside `Edit` grants nothing, and the tool it silently pulls in carries its path in **`notebook_path`** rather than `file_path` — so a hook reading only `file_path` sees a pathless call and declines on notebooks without saying so. Read both fields, or anchor the matcher and mean it.
+
+Check a tool name still exists before listing it. `MultiEdit` was real in earlier versions and is absent from both the changelog and the current docs, so an alternative naming it can never fire — the dead-weight failure the leading-`*` allow rule has in the Bash-pattern section above.
+
+Failure mode this prevents: a matcher gets written as a defensive list of every plausible tool name, which reads as thorough while being partly redundant, partly dead, and quietly wrong for the one tool that uses a different field name. Nothing errors, and the hook looks broader than it is.
+
+## A `PermissionRequest` Hook Reaches Protected Paths, Which No Allow Rule Can
+
+`.claude/`, `.git/`, `.vscode/` and shell config files are **protected paths**: never auto-approved, not by an allow rule and not by `acceptEdits`, only by `bypassPermissions`. So an `Edit(**/.claude/**)` entry does not stop the prompts on a project's own `.claude/` directory, however correct its glob looks.
+
+**Nor does the grant the prompt itself offers.** A protected-path prompt offers "always allow access to `<dir>` from this project", which reads as a persistent project-scoped rule. Taken twice on the same command, it produced the identical prompt both times and wrote nothing to any settings file — the sharpest case of *The Offered Save Rule Is Not the Entry to Write* above, since here the offer is not merely too broad but inert. `notes/claude-code-quirks.md` carries the reproduction and the destinations checked.
+
+A `PermissionRequest` hook returning `decision.behavior: "allow"` does stop them. Verified 2026-09-15 against Claude Code 2.1.236 by one write into `.claude/scratch/`, which ran with the label **"Allowed by PermissionRequest hook"** — the user-visible confirmation, and the only detector available, since an auto-allowed call and an approved one are otherwise identical in tool output.
+
+Three mechanics that do not carry over from the section above:
+
+- **Only a `decision` object decides.** Per the [docs](https://code.claude.com/docs/en/hooks), a hook that exits 2 without one "leaves the permission flow unchanged, and its stderr is discarded" — the inverse of every blocking-direction guard in `hooks/`, so none of their shape transfers.
+- **Deny and ask rules are still evaluated**, so the push guard and the `rm -rf` guard stay untouchable whatever the hook returns. The hook only reaches what would otherwise prompt.
+- **The event firing is itself evidence Claude Code was about to ask**, because these hooks "run only when Claude Code is about to ask you for permission". A log line from the hook therefore distinguishes a suppressed prompt from a call that was never going to prompt.
+
+The live case is `hooks/claude-dir-write-allow.sh`, which approves `Edit`/`Write` under any `.claude/` and deliberately excludes `settings.json`, `settings.local.json`, and `.claude/hooks/`. Those carve-outs are load-bearing rather than tidy: a write to the first two can add allow rules and a write to the third can replace the hook, so approving them would let the hook widen its own reach at runtime. Keep any future decision hook unable to edit its own inputs.
+
+Failure mode this prevents: the prompts get diagnosed as a missing or malformed `Edit` glob, so the fix attempted is a broader path rule — which cannot work at any breadth, because rules are not the layer that gates a protected path. The entry then sits in the allow list reading like a working grant that never fires.
