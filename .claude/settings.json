@@ -11,5 +11,24 @@
       "Bash(./scripts/sync-skill.sh *--dry-run)",
       "Bash(./scripts/usage-report.sh:*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "${CLAUDE_PROJECT_DIR}/hooks/commit-ratchet-guard.sh"
+          },
+          {
+            "type": "command",
+            "if": "Bash(rtk git commit*)",
+            "command": "${CLAUDE_PROJECT_DIR}/hooks/commit-ratchet-guard.sh"
+          }
+        ]
+      }
+    ]
   }
 }
