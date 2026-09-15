@@ -53,19 +53,7 @@ When claiming there's a finding to see — "the standout is X", "as the table ab
 
 **How to apply:** when a tool call produces data a decision rides on, restate the load-bearing part in the message — a short markdown table, the ranked list, the specific numbers — even if it duplicates the tool output. The tool output is scratch. The message is the artifact. Sibling of the AskUserQuestion-preview lesson above (decision-critical detail must live where the user reliably sees it, not in a clipped preview) and of the long-output rule at the top of this file (which governs *where* long content goes — file vs. inline; this governs *not* offloading a visible claim onto ephemeral tool output at all).
 
-## Don't relay a peer message as though the user already read it
-
-A cross-session message lands whole in your context and thinly in the user's — recent builds collapse it to a one-line preview whose full text sits behind `Ctrl+O`, and even displayed in full it arrives mid-work, in a conversation the user is reading rather than watching. Assume they have not read it. The relay is the first and only telling.
-
-**Carry the substance, not the citation.** "The `widget-api` session finished the schema migration" informs. "I heard from `widget-api`" attributes and informs nobody. Attribution is worth one clause, never the whole sentence.
-
-**Restate on a later reference.** "As that session mentioned" points at something that may never have rendered. Name the claim again rather than pointing back at it.
-
-**Mark a relayed claim as the sender's, and as of when.** It is a copy of something somebody else owns and can revise, and nothing in the relay marks it provisional. Say whose it is and when it arrived, so a later correction reads as replacing a dated claim rather than contradicting a bare one.
-
-Sibling of *Don't point at tool output as a shared visible surface* above — the same mismatch one surface over. There the claim rides on a tool result the user may not have rendered. Here it rides on a message that rendered while they were reading something else.
-
-Failure mode this prevents: several messages arrive across a session, each gets relayed accurately in passing, and the user afterwards asks whether anything came in at all — having read every reply and retained none of the content. Nothing in the transcript looks wrong, so the gap surfaces only when they happen to ask.
+Relaying a *peer session's* message has the same shape one surface over, and lives in `cross-session.md` with the rest of the multi-session material.
 
 ## Failure mode this prevents
 
