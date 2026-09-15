@@ -232,6 +232,46 @@ different story from both rising together.
 - `0` Report produced.
 - `1` No session JSON found under the target directory.
 
+## `run-tests.sh`
+
+Find and run every test suite in the repo.
+
+```
+./scripts/run-tests.sh [--list]
+```
+
+The single entry point [ADR 0008](../docs/adr/0008-testing-convention-for-hooks-and-scripts.md)
+decides on. Its ratchet — a Tier 1 or Tier 2 unit gains cases in the same change
+that touches it — needs one command proving the rest still passes, and this is
+it. `--list` shows what discovery found without running anything.
+
+Needs bash, `jq` and `python3`. No `uv`, and no pytest.
+
+### Discovery does not trust the names
+
+Bash suites are `<topic>/test/run-<shape>.sh`. Globbing that pattern directly
+would silently skip a suite whose name drifted, and a skipped suite is
+indistinguishable from a passing one in the output. Both suites written after the
+ADR was drafted arrived misnamed, by two different authors. So this globs every
+`*/test/*.sh` and **refuses to run** when one does not match `run-*.sh`.
+
+`globstar` is on for the same reason — without it `**` stops at the first
+directory level, which hid `skills/session-handoff/tests` on the first run.
+
+### Exit status is a suite's own
+
+No suite is piped. Output goes straight through and `$?` is read immediately,
+because a filtered suite whose status comes from the filter is the trap
+`tool-and-shell-safety.md` warns about, and a test runner is the worst place to
+fall into it. A missing interpreter is refused rather than skipped: a skipped
+suite still leaves a green summary.
+
+### Exit status
+
+- `0` Every suite passed.
+- `1` A suite failed, no suites were found, or an interpreter is missing.
+- `2` A file in a test directory is not named `run-*.sh`.
+
 ## `measure-claude-dir-writes.sh`
 
 Report how often a Bash command writes to a `.claude/` path, and whether that
