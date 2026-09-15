@@ -108,7 +108,7 @@ keyed to an inventory has to assume the inventory is stale, which is the argumen
 for keying the bar to a property of the code instead.
 
 The `session-handoff` row is the one worth reading twice. `check_staleness.py` —
-408 lines, the second-largest script in that skill — has no pytest coverage at
+408 lines, the second-largest script in that skill — has no test coverage at
 all, while being documented in the skill's `SKILL.md`, listed in its script
 table, and granted its own allowlist entry. It is thoroughly *described* and
 entirely unchecked, and the only thing resembling a test is a manual checkbox in
@@ -124,10 +124,14 @@ ratchet's case arriving before the ratchet exists.
 Three constraints apply regardless of which bar is chosen. `hooks/rtk-rewrite.sh`
 is vendored from RTK and pinned by a checksum, so its behaviour is not this
 repo's to guarantee and a test against it would break on every upstream update.
-The existing pytest suite has exactly one working invocation, `uv run --with
-pytest pytest`, because the system `python3` carries no pytest — which puts `uv`
-on the path of anyone running the tests. And there is no runner: the two suites
-that exist are invoked two different ways, neither discoverable from the other.
+The existing Python suite carries both an `__init__.py` and a `conftest.py`
+doing the same `sys.path` setup, so it runs under stdlib `unittest` as well as
+pytest — and since the system `python3` carries no pytest, stdlib is the only one
+of the two that works here. `python3 -m unittest discover` runs all 55 cases,
+provided `--top-level-directory` names the package's *parent*; pointed at the
+tests directory itself, `__init__.py` never runs and every module fails to
+import. And there is no runner: the suites that exist are invoked different ways,
+none discoverable from the others.
 
 The bar splits on two axes that do not constrain each other: *which* units owe
 tests, and *when* those tests come due. Each gets its own list, because an answer
@@ -244,10 +248,25 @@ invoking the bash units as subprocesses.
 **Rejected:** it makes the cheapest-to-test units depend on the heaviest
 toolchain in the repo.
 
-**C. Plain bash per topic, pytest where the code is already Python (chosen).**
-A bash suite is an executable `<topic>/test/run-checks.sh` with a local
-`check`-style helper and no framework. Python code keeps pytest. Neither side
-gains a dependency it does not already have.
+**C. Plain bash per topic, stdlib `unittest` where the code is already Python
+(chosen).** A bash suite is an executable `<topic>/test/run-<shape>.sh` with a
+local `check`-style helper and no framework. Python code runs under
+`python3 -m unittest discover`. Neither side gains a dependency it does not
+already have — which is this option's whole argument, and the reason the Python
+half names stdlib rather than pytest.
+
+pytest is a Homebrew formula and could be installed, so the install route is not
+the objection. It buys nothing measurable: no test under `tests/` imports pytest
+or uses a pytest-only feature, so all 55 cases run identically either way, and
+adding it would make testing depend on a prerequisite whose absence turns the
+Python half off — the same failure this option's rejection of bats rests on. The
+tests keep a `conftest.py` mirroring their `__init__.py`, so pytest works for
+anyone who has it. Compatible, not required.
+
+Revisit if a test genuinely wants `parametrize` or fixtures and the unittest
+form is contorted, if a complex assertion needs better failure diffs than
+`assertEqual` gives, or if a second Python unit arrives with heavier needs than
+five scripts. None of those holds now.
 
 - *Pros:* This is what two independent arrivals already produced, across two
   repos and three differently-shaped units, and the second one adapted the shape
@@ -376,6 +395,7 @@ comes up would leave the gate unimplementable:
 | `hooks/uv-run-guard.sh` | 1 | same, 57 lines, and it guards a deliberately-broad allow entry |
 | `hooks/python-rewrite.sh` | 1 | rewrites a command before it runs |
 | `hooks/context-usage-notice.sh` | 1 | fires automatically, reports nothing when it works |
+| `hooks/claude-dir-write-allow.sh` | 1 | decides a permission without being invoked, and an abstention is indistinguishable from not running |
 | `hooks/ensure-trailing-newline.sh` | 1 | mutates files without being invoked |
 | `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
 | `hooks/rtk-rewrite.sh` | 3 | vendored, pinned by checksum |
@@ -388,6 +408,7 @@ comes up would leave the gate unimplementable:
 | `scripts/rules-sections.py` | 2 | parses rule files for a report |
 | `scripts/usage-report.sh` | 2 | reads and summarises, no writes |
 | `scripts/context-usage.sh` | 2 | picks among per-session caches and reports staleness — more branching than its 82 lines suggest |
+| `scripts/measure-claude-dir-writes.sh` | 2 | derives figures that land in durable artifacts, and its verb matching and session exclusion both decide the result |
 | `scripts/enospc-workaround.sh` | 3 | 5 lines |
 | `session-handoff/scripts/` | 1 | dense logic producing durable artifacts; four of five already tested |
 
@@ -429,7 +450,8 @@ Suites are written as follows. A bash suite is an executable
 `<topic>/test/run-<shape>.sh` with local `check`-style helpers — the committed
 `hooks/test/run-checks.sh` has three, differing in what a case needs to supply —
 no framework, and no `set -e`, since a failing case must report and let the rest
-run. Python code keeps pytest, under the topic's own `tests/`.
+run. Python code runs under stdlib `unittest`, in the topic's own `tests/` kept
+as an importable package so its `__init__.py` does the `sys.path` setup.
 
 **One suite per payload shape, not per topic.** The committed suite's helpers all
 synthesise a `PreToolUse` Bash payload on stdin; a `Stop` hook's input carries a
@@ -440,6 +462,18 @@ consequences follow immediately rather than later: the entry point's discovery
 has to glob `*/test/run-*.sh` rather than the single filename, and the
 shared-helper question this ADR's harness option listed as an open cost comes due
 with the second suite rather than at some future split.
+
+**The naming convention is therefore load-bearing, and it does not hold itself
+up.** The two suites written after this ADR was drafted both arrived as
+`<topic>-checks.sh`, by two different authors, neither of whom checked the name
+against the convention — so a glob-based runner would have reported green having
+run one suite of three. That is the same silence the Tier 1 argument rests on,
+one level up: a skipped suite and a passing suite are indistinguishable in the
+output. They have since been renamed to `run-notification.sh` and
+`run-permission-request.sh`, but the near-miss says discovery must not trust the
+names. **The entry point globs `*/test/*.sh` and fails on any file that does not
+match `run-*.sh`**, so a misnamed suite is a loud error rather than a silent
+omission.
 
 Two rules apply to every suite, and both were learned the hard way rather than
 reasoned out:
@@ -453,22 +487,33 @@ reasoned out:
   testing it must not inherit that posture. A `jq`-dependent suite exits non-zero
   with a message rather than reporting passes it never earned.
 
-Add `scripts/run-tests.sh` as the single entry point. It discovers every
-`*/test/run-*.sh` and every topic `tests/` directory by convention rather
-than by a registered list, runs each, and exits non-zero if any suite fails. It
-must not read a suite's status through a pipe. Where `uv` is absent it exits
-non-zero rather than skipping the Python half, by the same rule as any other
-suite: a runner that reports success over a suite it could not execute is worse
-than one that refuses.
+Add `scripts/run-tests.sh` as the single entry point. It discovers every topic
+`test/` and `tests/` directory by convention rather than by a registered list,
+runs each, and exits non-zero if any suite fails. It must not read a suite's
+status through a pipe. Where an interpreter is absent it exits non-zero rather
+than skipping that half, by the same rule as any other suite: a runner that
+reports success over a suite it could not execute is worse than one that
+refuses. Discovery globs `*/test/*.sh` rather than `run-*.sh` directly and
+**fails on any file in a test directory that does not match `run-*.sh`**, for
+the reason recorded above — a misnamed suite must be an error, never an
+omission. `**` needs `globstar`, without which discovery silently stops at the
+first directory level and misses a suite nested deeper.
 
-Finally, **`uv` moves from optional to load-bearing.** It was listed as optional
-on the reasoning that only skill authoring goes through it, and that was already
-wrong before this ADR: `ascii-diagram-validator` declares
+Finally, **`uv` stays load-bearing, on one leg rather than two.** It was listed
+as optional on the reasoning that only skill authoring goes through it, and that
+was already wrong before this ADR: `ascii-diagram-validator` declares
 `allowed-tools: Bash(uv run *)` and fires on description-match during ordinary
-work, so `uv`'s absence breaks a skill any session can invoke. The test suite
-adds a second such path — the existing pytest suite has exactly one working
-invocation and it runs through `uv`, since the system `python3` carries no
-pytest.
+work, so `uv`'s absence breaks a skill any session can invoke. That leg carries
+the tier on its own.
+
+The test suite is **not** a second such path, though an earlier draft of this
+ADR said it was. That claim assumed the Python suite's only working invocation
+ran through `uv`; it runs under stdlib `python3` instead, so the entry point
+names no `uv` dependency at all and a clone needs only bash, `jq` and `python3`
+to run everything. The route that would have needed `uv` —
+`uv run --with pytest pytest` — puts an option before the script path, which
+`hooks/uv-run-guard.sh` blocks by design because that shape fetches and executes
+arbitrary code.
 
 Load-bearing rather than required, because the tiers are keyed to *whose* path an
 absence sits on, and the required tier's contract is an exit 1 from
@@ -551,7 +596,7 @@ convention.
 
 - **Negative:** Two reporting formats remain. The entry point aggregates exit
   codes, not output, so a combined run prints one suite's PASS lines and
-  another's pytest dots. Anyone reading a failure still has to know which half of
+  another's unittest dots. Anyone reading a failure still has to know which half of
   the repo they are in.
 
 - **Negative:** The convention adds a step to every future hook or validator
@@ -578,7 +623,7 @@ convention.
   against the main branch", the latter still on an unmerged branch. Cited by
   commit subject because a bare SHA does not survive a rebase and the paths are
   not reachable from this repo.
-- `skills/session-handoff/tests/` — the pytest precedent that prompted the
+- `skills/session-handoff/tests/` — the Python precedent that prompted the
   original question
 - `notes/testing-hooks-and-scripts.md` — the working note this decision is drawn
   from, including the three convergences and the two hard-won suite rules. Named
