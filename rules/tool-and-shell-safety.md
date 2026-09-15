@@ -240,6 +240,8 @@ An Edit's `old_string` often extends past the text being changed to reach a uniq
 
 Edit reports success on any exact match, so a mangled anchor never surfaces as an error, and whether the damage shows depends entirely on the target format's tolerance. Git config trims whitespace around `=`, so clipping the trailing space off `logg = log --graph …` left the alias working and the edit looking clean; Makefiles, YAML, Python, and heredocs would each have broken instead.
 
+**Dropping an anchor entirely does surface, in the commit's own stat line.** Where the anchor was a whole line — a heading, a closing brace — omitting it from `new_string` deletes it, and `git show --stat` then reports a deletion on a change that should have been purely additive. So read any deletion count on an insertion as the tell, and check it before the commit rather than after. This is the one variant the diff can catch, which matters because the *reparenting* it causes cannot be seen there at all: every line that changed owner is byte-identical (see *Inserting a block into markdown reparents what follows it* above).
+
 **How to apply:** when `old_string` includes a line you aren't changing, copy it into `new_string` rather than retyping it. After editing a whitespace-sensitive format, read back the lines adjacent to the change, not just the changed ones.
 
 Failure mode this prevents: an edit silently alters a line it was never meant to touch, and nothing in the diff marks it as unintentional — or, in a tolerant format, it is never noticed and ships as an unexplained whitespace diff in an otherwise focused commit.
