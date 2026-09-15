@@ -359,7 +359,10 @@ Tier 2 source path is staged and no corresponding test path is.
 - *Cons:* Only sees commits made through the tool, so it is a partial gate by
   construction. It also needs the tier assignments in a form a script can read,
   which turns the tiers from prose into config and creates a second place they
-  can drift from this ADR.
+  can drift from this ADR. And it fires *before* the command runs, so a compound
+  `git add X && git commit` arrives with nothing staged and passes unexamined —
+  found on the gate's first live probe, and answered by requiring staging in a
+  separate tool call rather than by parsing `git add` out of the command string.
 
 ## Decision
 

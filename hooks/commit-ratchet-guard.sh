@@ -15,8 +15,17 @@
 # SCOPE, and what it deliberately cannot do. It sees only commits made through the tool, so a commit
 # from the user's own terminal is unaffected — which is the escape hatch by construction rather than
 # by a bypass flag, since a change that genuinely needs no test is one its author can commit
-# directly. It also reads the staged set at the moment the commit runs, so `git commit <path>` and
-# `-a` are not covered; both are outside how this repo commits.
+# directly. `git commit <path>` and `-a` are not covered either; both are outside how this repo
+# commits.
+#
+# STAGING MUST HAPPEN IN AN EARLIER TOOL CALL, and this is the sharp edge. PreToolUse fires BEFORE
+# the command runs, so `git add X && git commit` reaches this hook with X not yet staged: the index
+# is empty, the guard below returns 0, and the commit sails through. That was the repo's usual
+# commit shape when this gate was written, which would have made it blind to almost every real
+# commit while looking perfectly healthy. The answer is a workflow rule rather than shell parsing —
+# stage in one call, commit in the next — recorded in development-workflow.md and asserted in the
+# suite. Do not try to recover the staged set by parsing `git add` out of the command string; that
+# is a parser problem feeding a blocking decision.
 #
 # AN UNTIERED PATH BLOCKS TOO, which is the half the ADR did not originally specify. Every unit
 # added after the tier table was written failed to gain a row — three for three, across three

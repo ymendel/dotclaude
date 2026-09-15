@@ -165,6 +165,15 @@ fresh
 run
 permits 'an empty index is permitted'
 
+# The timing limitation, asserted rather than only described. PreToolUse fires before the command
+# runs, so a compound `git add X && git commit` arrives with X not yet staged and the gate cannot
+# see it. This case pins that as known behaviour: it is why development-workflow.md requires staging
+# in a separate tool call, and if it ever starts failing the gate has become able to see further
+# than it could, which is worth noticing rather than silently benefiting from.
+fresh
+run 'rtk git add hooks/claude-dir-write-allow.sh && rtk git commit -m combined'
+permits 'a compound stage-and-commit is invisible, because nothing is staged yet'
+
 # --- The untiered case, which is the half the three-for-three miss earned ----
 
 fresh
