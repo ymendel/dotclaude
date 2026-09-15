@@ -232,6 +232,48 @@ different story from both rising together.
 - `0` Report produced.
 - `1` No session JSON found under the target directory.
 
+## `measure-claude-dir-writes.sh`
+
+Report how often a Bash command writes to a `.claude/` path, and whether that
+traffic is repetitive.
+
+```
+./scripts/measure-claude-dir-writes.sh [--exclude-session <id>]
+```
+
+`.claude/` is a protected path, so a write there prompts however the allow list
+is written — only `bypassPermissions` or a `PermissionRequest` hook reaches it
+(see `rules/settings.md`). This exists to decide whether such a hook is worth
+building for Bash, which means whitelisting command shapes, which pays off only
+on repetitive traffic. So the distinct-strings line decides the question and the
+volume does not.
+
+Pass the current session's id to leave it out. A session spent probing
+permissions writes to `.claude/` far more than a working one, and including it
+inflates the very rate being measured.
+
+### What it counts, and what it can't
+
+Only write verbs (`rm`, `mv`, `cp`, `touch`, `mkdir`, …) and shell redirects
+into a `.claude/` path — reads via `rtk read` or `rtk grep` are allow-listed and
+never gated, so counting them would swamp the total. The verb list is
+deliberately generous, because over-counting argues *for* building the hook;
+a small or unrepetitive result is the trustworthy direction.
+
+It cannot tell whether any command actually prompted. A transcript records the
+command, not the permission outcome, and an auto-allowed call is byte-identical
+to an approved one — so the write count is an upper bound on prompts. The
+roughly-30-day retention window noted under `usage-report.sh` applies here too,
+making this a current rate rather than a lifetime total. Concurrent sessions in
+other projects are writing transcripts while it runs, so consecutive runs can
+differ by a write or two.
+
+### Exit status
+
+- `0` Report produced, including when nothing matched.
+- `1` `jq` missing, or no transcript directory.
+- `2` Unknown argument.
+
 ## `rules-floor.sh`
 
 Report the size of the always-loaded rule set, so growth is visible before it
