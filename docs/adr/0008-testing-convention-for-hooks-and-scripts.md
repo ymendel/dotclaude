@@ -395,6 +395,7 @@ comes up would leave the gate unimplementable:
 | `hooks/uv-run-guard.sh` | 1 | same, 57 lines, and it guards a deliberately-broad allow entry |
 | `hooks/python-rewrite.sh` | 1 | rewrites a command before it runs |
 | `hooks/context-usage-notice.sh` | 1 | fires automatically, reports nothing when it works |
+| `hooks/notify-session-attention.sh` | 1 | fires automatically, and routes some event types silently by design |
 | `hooks/claude-dir-write-allow.sh` | 1 | decides a permission without being invoked, and an abstention is indistinguishable from not running |
 | `hooks/ensure-trailing-newline.sh` | 1 | mutates files without being invoked |
 | `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
@@ -409,6 +410,8 @@ comes up would leave the gate unimplementable:
 | `scripts/usage-report.sh` | 2 | reads and summarises, no writes |
 | `scripts/context-usage.sh` | 2 | picks among per-session caches and reports staleness — more branching than its 82 lines suggest |
 | `scripts/measure-claude-dir-writes.sh` | 2 | derives figures that land in durable artifacts, and its verb matching and session exclusion both decide the result |
+| `scripts/run-tests.sh` | 1 | its failure mode is a false green: a suite it silently fails to discover reads exactly like a suite that passed |
+| `hooks/commit-ratchet-guard.sh` | 1 | fires automatically, and a gate that has stopped matching looks identical to a gate with nothing to block |
 | `scripts/enospc-workaround.sh` | 3 | 5 lines |
 | `session-handoff/scripts/` | 1 | dense logic producing durable artifacts; four of five already tested |
 
