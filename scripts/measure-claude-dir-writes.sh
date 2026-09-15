@@ -76,9 +76,15 @@ for transcript in "$PROJECTS"/*/*.jsonl; do
   [ -n "$EXCLUDE" ] && [ "$session" = "$EXCLUDE" ] && continue
   sessions_seen=$((sessions_seen + 1))
 
-  commands=$(jq -r 'try (.message.content[]?
+  # `-R` reads each line as a raw string and `fromjson?` yields nothing when it will not parse, so
+  # one malformed line costs that line rather than the rest of the file. Passing the file as a JSON
+  # *stream* instead — the obvious form — aborts jq on the first bad line, and since stderr is
+  # discarded here the whole session's commands vanish with no sign. A transcript truncated
+  # mid-write by a killed session is enough to trigger it.
+  commands=$(jq -rR 'fromjson?
+      | .message.content[]?
       | select(.type == "tool_use" and .name == "Bash")
-      | .input.command) catch empty' "$transcript" 2>/dev/null)
+      | .input.command' "$transcript" 2>/dev/null)
   [ -z "$commands" ] && continue
   total_bash=$((total_bash + $(printf '%s\n' "$commands" | grep -c '')))
 
