@@ -61,9 +61,8 @@ covers the need: a single number belongs to a single-purpose tool (`wc -L`, `wc 
 cases and why each one bites are in `rules/references/rtk/awk.md` — load it when about to
 write an awk expression, which is the moment the alternative is still cheap to take.
 
-Failure mode this prevents: reaching for awk by reflex on a task a single-purpose tool does
-in fewer characters and with less to get wrong — and, for parsing, building a fragile
-field-splitter that looks right on the sample and breaks on the first irregular row.
+Failure mode this prevents: for parsing especially, a fragile field-splitter that looks right
+on the sample and breaks on the first irregular row.
 
 ### `sed` is not a line selector
 
@@ -78,17 +77,15 @@ Reach for the plain alternatives instead: `rtk grep` (with `-A`/`-B`/`-C` when s
 context is what the range was really for), the built-in Grep tool for unfiltered matches, or
 simply printing the whole thing when it is short — a `--help` page or a config file usually
 is. Where a genuine transformation is needed, Edit does in-file changes and a real parser does
-structured formats, exactly as in the awk case above.
+structured formats.
 
 The tell is a `-n` paired with a `p`: that combination means "suppress everything, then print
 the part I want", which is a selection dressed as an edit. When the goal really is editing,
-use Edit — never `sed -i`, which the tool-override section above already rules out and which
-is error-prone on macOS besides.
+use Edit, never `sed -i`.
 
-Failure mode this prevents: a read-only inspection trips an approval prompt for a "write or
-execute" command, and because the *work* was harmless the prompt reads as an over-strict gate
-rather than as the wrong tool — so the fix that suggests itself is an allowlist entry for
-`sed`, granting the in-place editor to buy a line range grep would have returned unprompted.
+Failure mode this prevents: because the *work* was harmless the prompt reads as an over-strict
+gate rather than as the wrong tool, so the fix that suggests itself is an allowlist entry for
+`sed` — granting the in-place editor to buy a line range grep would have returned unprompted.
 
 ### When the filter hides what you need
 
@@ -98,10 +95,9 @@ output is needed. Two concrete reasons this matters:
 - **Editing a file**: Edit requires exact string matching against file content. RTK's filtered
   output may truncate or omit lines, making it impossible to construct a valid `old_string`.
   Always use the Read tool before editing — never `rtk read`.
-- **RTK filtering hides the relevant content**: RTK suppresses parts of output to save tokens.
-  If the information you need falls in the suppressed portion (e.g., a matching line that RTK
-  omitted from grep output), you'll miss it and make incorrect decisions based on incomplete
-  data. Use the built-in tool to get everything.
+- **RTK filtering hides the relevant content**: if what you need falls in the suppressed
+  portion — a matching line RTK omitted from grep output — you will never see it. Use the
+  built-in tool to get everything.
 
 `rtk git diff` suppresses diff content and shows only a stat-line summary. Before staging
 or committing — the dominant case — go directly to `rtk proxy git diff --no-ext-diff`.
@@ -131,9 +127,7 @@ held up on every occasion:
   `rtk gh issue view <n> --json number,title,body,comments` returned the whole issue where the
   plain and `2>&1` forms both returned nothing. To narrow the result, reach for `gh`'s own
   `--jq <expression>` rather than piping into `jq`: a pipe adds a segment for the permission gate
-  to clear and reports the filter's exit status in place of `gh`'s. This is also what
-  `searching.md`'s *Prefer a tool's plain output over de-formatting its rendered output* asks for
-  on its own terms — `gh`'s data mode rather than its display mode — so reach for it first rather
+  to clear and reports the filter's exit status in place of `gh`'s. Reach for it first rather
   than as a fallback.
 - **Appending `2>&1` worked once and has since failed.** It returned the full issue on the occasion
   that first produced this note, and on a later one `rtk gh issue view <n> --comments 2>&1` returned
@@ -164,9 +158,7 @@ rtk gh run view --log --job <job-id>
 Two caveats `gh`'s own help volunteers, both platform-dependent rather than deterministic. Logs come
 as a zip by default, with a slower per-job API fallback when `gh` cannot associate jobs with their
 logs, and that fallback fails outright once more than 25 job logs are missing. Some lines cannot be
-tied to a step and appear under `UNKNOWN STEP`. This is a fact about the guard and about log content
-rather than an instance of `searching.md`'s data-mode preference, which points the other way here —
-the API is the data surface and `run view` is the rendered one.
+tied to a step and appear under `UNKNOWN STEP`.
 
 ## Golden Rule
 
@@ -184,8 +176,7 @@ rtk git add . && rtk git commit -m "msg" && rtk git push
 **Exception — `python3`, `ruby`, `node`, `trafilatura`, `heroku`, `brew`, `chmod`, and a project's own scripts pass
 through unchanged.** The golden rule holds for anything RTK can rewrite. A command with no RTK
 equivalent is *not* prefixed — `rtk rewrite` returns exit 1 and the command reaches the permission
-gate exactly as written. `python3`, `ruby`, `node`, `trafilatura`, `heroku`, `brew` and `chmod` are
-the live external cases, each confirmed by an exit-1 `rtk rewrite`, and a repo's own
+gate exactly as written. Each of those is confirmed by an exit-1 `rtk rewrite`, and a repo's own
 entry points are the same class — **`bin/` binstubs as much as `scripts/`**: write `bin/rubocop …`,
 `bin/rails test …`, `bin/ci`, `./scripts/sync-skill.sh …`, never `rtk` in front of any of them. So
 their allowlist entries take the **bare** form — `Bash(trafilatura --URL:*)`,
@@ -205,22 +196,18 @@ earns an `rtk`-prefixed one. Both print something, which is what makes 3 easy to
 `Bash(bin/rubocop:*)`, not `Bash(bin/rubocop*)`, which also matches `bin/rubocop-daemon`. Which file
 it goes in is `settings.md`'s call and splits on what is being granted rather than on where the path
 points: a repo's *own* script goes in that repo's `.claude/settings.json`, while a binstub for a
-shared standard tool goes at user level with the tool itself. This is the same passthrough mechanism
-as the `cat "$(…)"` and heredoc-commit slips below (`rtk rewrite` exit 1 → bare command at the gate).
-The difference is that here the bare form is *correct*, not a slip to route around. Mechanism
-confirmed by reading `hooks/rtk-rewrite.sh`.
+shared standard tool goes at user level with the tool itself. Mechanism confirmed by reading
+`hooks/rtk-rewrite.sh`.
 
 **`gh` splits down the middle, so the exception is per subcommand rather than per command.** The
 built-in subcommands rewrite — `rtk rewrite 'gh release list'` returns `rtk gh release list` — while
 a `gh` **extension** does not: `rtk rewrite 'gh stack list'` exits 1, so `gh stack …` reaches the
 gate bare, exactly like `heroku`. Write extensions unprefixed and give them bare allowlist entries
 (`Bash(gh stack:*)`), and keep `rtk gh …` for everything gh ships itself. Verified against
-`gh stack` (`github/gh-stack` v0.1.0, GitHub's stacked pull requests, public preview since
-2026-07-30) on 2026-08-13.
+`gh stack` v0.1.0 on 2026-08-13.
 
-The grants point the wrong way here, which is what makes it worth stating. `Bash(rtk gh:*)` covers a
-hand-written `rtk gh stack …`, so the incorrect form runs unprompted while the correct bare one has
-no entry and asks — the reverse of the standing-entry-keeps-prompting tell below. Read a prompt on
+The grants point the wrong way here. `Bash(rtk gh:*)` covers a hand-written `rtk gh stack …`, so the
+incorrect form runs unprompted while the correct bare one has no entry and asks. Read a prompt on
 `gh stack …` as the missing bare grant, not as a reason to reach back for the prefix.
 
 **A binstub is the easier miss, and `rtk test` hides it for a while.** `bin/rails` and `bin/rubocop`
