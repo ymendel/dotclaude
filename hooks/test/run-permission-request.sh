@@ -43,19 +43,7 @@ WORK_DIR="$(mktemp -d)"
 cleanup() { [ -n "$WORK_DIR" ] && rm -rf "$WORK_DIR"; }
 trap cleanup EXIT
 
-pass=0
-fail=0
-
-report() {
-    if [ "$1" = true ]; then
-        pass=$((pass + 1))
-        printf 'PASS  %s\n' "$2"
-    else
-        fail=$((fail + 1))
-        printf 'FAIL  %s\n' "$2"
-        [ -n "$3" ] && printf '      %s\n' "$3"
-    fi
-}
+. "$(cd "$TEST_DIR/../.." && pwd)/test/_harness.sh"
 
 # run <payload> — feeds the hook, leaving its stdout in $STDOUT and the log in $LOG.
 run() {
@@ -187,5 +175,4 @@ done
     && report true "the hook never denies, only allows or abstains" \
     || report false "the hook never denies, only allows or abstains" "$denied of 4 denied"
 
-printf '\n%d passed, %d failed\n' "$pass" "$fail"
-[ "$fail" -eq 0 ] || exit 1
+summary || exit 1

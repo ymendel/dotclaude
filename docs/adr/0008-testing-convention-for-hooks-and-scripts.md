@@ -416,6 +416,7 @@ comes up would leave the gate unimplementable:
 | `scripts/run-tests.sh` | 1 | its failure mode is a false green: a suite it silently fails to discover reads exactly like a suite that passed |
 | `hooks/commit-ratchet-guard.sh` | 1 | fires automatically, and a gate that has stopped matching looks identical to a gate with nothing to block |
 | `scripts/enospc-workaround.sh` | 3 | 5 lines |
+| `test/_harness.sh` | 1 | every other suite's tally runs through it, so a miscount is silent in all of them at once |
 | `session-handoff/scripts/` | 1 | dense logic producing durable artifacts; four of five already tested |
 
 A unit added later is tiered by the axis above, and the table gains a row in the
@@ -453,7 +454,8 @@ committing from a terminal the escape hatch for a change that genuinely owes no
 test.
 
 Suites are written as follows. A bash suite is an executable
-`<topic>/test/run-<shape>.sh` with local `check`-style helpers — the committed
+`<topic>/test/run-<shape>.sh` that sources `test/_harness.sh` for its tally and
+reporting, and keeps its own `check`-style assertion helpers — the committed
 `hooks/test/run-checks.sh` has three, differing in what a case needs to supply —
 no framework, and no `set -e`, since a failing case must report and let the rest
 run. Python code runs under stdlib `unittest`, in the topic's own `tests/` kept
@@ -469,6 +471,17 @@ has to glob `*/test/run-*.sh` rather than the single filename, and the
 shared-helper question this ADR's harness option listed as an open cost comes due
 with the second suite rather than at some future split.
 
+**That cost has since been paid, at the sixth suite rather than the second.**
+`test/_harness.sh` carries the tally, the PASS/FAIL line and the summary that
+every suite had copied — plumbing that had already drifted into two shapes, a
+`report` in four suites and a differently-built `check` in the fifth. What stayed
+local is the part that was never shared: a `PreToolUse` payload on stdin, a
+transcript tree under a fake `HOME`, and a staged git index have no common
+fixture to factor out. The split is therefore tally-shared, assertion-local, and
+it is what keeps this option's rejection of bats honest — the duplication that
+argument dismissed as "~30 lines of plain bash" is now written once, with no
+dependency and no prerequisite whose absence would turn testing off.
+
 **The naming convention is therefore load-bearing, and it does not hold itself
 up.** The two suites written after this ADR was drafted both arrived as
 `<topic>-checks.sh`, by two different authors, neither of whom checked the name
@@ -480,6 +493,12 @@ output. They have since been renamed to `run-notification.sh` and
 names. **The entry point globs `*/test/*.sh` and fails on any file that does not
 match `run-*.sh`**, so a misnamed suite is a loud error rather than a silent
 omission.
+
+One exemption, added with the shared harness: a basename starting with `_` is
+skipped rather than refused, marking a file meant to be sourced. It is narrow
+deliberately — both observed drift cases were `<topic>-checks.sh` names, which
+are still refused, and nobody arrives at `_harness.sh` by accident. The guard
+keeps its whole reach over the shape that actually went wrong.
 
 Two rules apply to every suite, and both were learned the hard way rather than
 reasoned out:

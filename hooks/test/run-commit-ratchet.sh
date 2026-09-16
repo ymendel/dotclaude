@@ -33,19 +33,7 @@ WORK_DIR="$(mktemp -d)"
 cleanup() { [ -n "$WORK_DIR" ] && rm -rf "$WORK_DIR"; }
 trap cleanup EXIT
 
-pass=0
-fail=0
-
-report() {
-    if [ "$1" = true ]; then
-        pass=$((pass + 1))
-        printf 'PASS  %s\n' "$2"
-    else
-        fail=$((fail + 1))
-        printf 'FAIL  %s\n' "$2"
-        [ -n "$3" ] && printf '      %s\n' "$3"
-    fi
-}
+. "$(cd "$TEST_DIR/../.." && pwd)/test/_harness.sh"
 
 # fresh — a new empty git repo to stage into.
 fresh() {
@@ -183,6 +171,24 @@ blocks 'an untiered script under a watched directory is blocked'
 says 'not tiered and not exempt' 'the block says the file needs classifying'
 says 'TIERED or EXEMPT' 'the block names where to record the decision'
 
+# --- The shared test harness, which sits outside the watched directories ----
+#
+# test/ is not in WATCHED, so the harness is reached only by its TIERED row. Without that row it
+# would be neither tiered nor blockable — the one unit able to turn every suite's tally silent
+# while landing unexamined. These two cases are what hold the row in place.
+
+fresh
+stage test/_harness.sh
+run
+blocks 'the shared harness is tiered despite living outside a watched directory'
+says 'test/run-harness.sh' 'the block names the suite the harness owes'
+
+fresh
+stage test/_harness.sh
+stage test/run-harness.sh
+run
+permits 'staging the harness with its own suite satisfies the ratchet'
+
 fresh
 stage scripts/brand-new-report.py
 run
@@ -229,5 +235,4 @@ else
         "got $STATUS"
 fi
 
-printf '\n%d passed, %d failed\n' "$pass" "$fail"
-[ "$fail" -eq 0 ] || exit 1
+summary || exit 1

@@ -14,6 +14,11 @@
 # arrived misnamed, by two different authors. So this globs every `*/test/*.sh` and REFUSES to run
 # when one of them does not match `run-*.sh`, rather than quietly passing over it.
 #
+# ONE EXEMPTION: a basename starting with `_` is skipped, not refused. That is the marker for a
+# file meant to be sourced rather than run — `test/_harness.sh` is the only one today. It is narrow
+# deliberately, since both observed drift cases were `<topic>-checks.sh` names and those are still
+# refused; an accidental suite does not arrive underscore-prefixed.
+#
 # EXIT STATUS is a suite's own, never a filter's. No suite is piped: output goes straight through,
 # and `$?` is read immediately. `tool-and-shell-safety.md`'s pipe rule is the whole reason — a
 # filtered suite whose status comes from the filter is exactly the trap this repo warns about, and a
@@ -58,7 +63,13 @@ for candidate in */test/*.sh **/test/*.sh; do
     case " ${suites[*]} ${misnamed[*]} " in
         *" $candidate "*) continue ;;
     esac
-    if [[ "$(basename "$candidate")" == run-*.sh ]]; then
+    # A leading underscore is the "not a suite" marker — shared helpers meant to be sourced, not
+    # run. Exempted rather than refused, and kept narrow on purpose: both real drift cases were
+    # `<topic>-checks.sh` names, which still land in `misnamed` below. Nobody names a suite
+    # `_harness.sh` by accident, so this reopens none of the skipping the guard exists to stop.
+    if [[ "$(basename "$candidate")" == _* ]]; then
+        continue
+    elif [[ "$(basename "$candidate")" == run-*.sh ]]; then
         suites+=("$candidate")
     else
         misnamed+=("$candidate")

@@ -47,6 +47,11 @@
 !/docs
 !/docs/**/*
 
+# and the shared test harness the per-topic suites source. Top level because
+# hooks/test/ and scripts/test/ are peers and neither should own it.
+!/test
+!/test/**/*
+
 # and supporting files
 !README.md
 !LICENSE

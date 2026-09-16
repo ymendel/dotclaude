@@ -34,19 +34,7 @@ WORK_DIR="$(mktemp -d)"
 cleanup() { [ -n "$WORK_DIR" ] && rm -rf "$WORK_DIR"; }
 trap cleanup EXIT
 
-pass=0
-fail=0
-
-report() {
-    if [ "$1" = true ]; then
-        pass=$((pass + 1))
-        printf 'PASS  %s\n' "$2"
-    else
-        fail=$((fail + 1))
-        printf 'FAIL  %s\n' "$2"
-        [ -n "$3" ] && printf '      %s\n' "$3"
-    fi
-}
+. "$(cd "$TEST_DIR/../.." && pwd)/test/_harness.sh"
 
 # fresh — discard any previous fixture and start an empty transcript tree.
 fresh() {
@@ -221,5 +209,4 @@ run
     && report true 'a missing transcript directory exits 1' \
     || report false 'a missing transcript directory exits 1' "expected 1, got $STATUS"
 
-printf '\n%d passed, %d failed\n' "$pass" "$fail"
-[ "$fail" -eq 0 ] || exit 1
+summary || exit 1

@@ -51,9 +51,7 @@ else
     HAVE_ALIAS=false
 fi
 
-pass=0
-fail=0
-skip=0
+. "$PROJ/test/_harness.sh"
 
 # check <guard-script> <label> <expected-exit> <command-string>
 check() {
@@ -63,11 +61,9 @@ check() {
         | "$GUARD_DIR/$guard" >/dev/null 2>&1
     got=$?
     if [ "$got" = "$want" ]; then
-        printf 'PASS  %-46s exit=%s\n' "$label" "$got"
-        pass=$((pass + 1))
+        report true "$label"
     else
-        printf 'FAIL  %-46s want=%s got=%s\n' "$label" "$want" "$got"
-        fail=$((fail + 1))
+        report false "$label" "want exit=$want, got exit=$got"
     fi
 }
 
@@ -81,11 +77,9 @@ check_at() {
         | "$GUARD_DIR/$guard" >/dev/null 2>&1
     got=$?
     if [ "$got" = "$want" ]; then
-        printf 'PASS  %-46s exit=%s\n' "$label" "$got"
-        pass=$((pass + 1))
+        report true "$label"
     else
-        printf 'FAIL  %-46s want=%s got=%s\n' "$label" "$want" "$got"
-        fail=$((fail + 1))
+        report false "$label" "want exit=$want, got exit=$got"
     fi
 }
 
@@ -98,17 +92,10 @@ says() {
     out=$(jq -n --arg c "$cmd" --arg w "$cwd" '{tool_input:{command:$c}, cwd:$w}' \
         | "$GUARD_DIR/$guard" 2>&1 >/dev/null)
     if [[ "$out" == *"$want"* ]]; then
-        printf 'PASS  %-46s msg\n' "$label"
-        pass=$((pass + 1))
+        report true "$label"
     else
-        printf 'FAIL  %-46s msg lacked %s\n' "$label" "$want"
-        fail=$((fail + 1))
+        report false "$label" "message lacked '$want'"
     fi
-}
-
-skipped() {
-    printf 'SKIP  %-46s %s\n' "$1" "$2"
-    skip=$((skip + 1))
 }
 
 smg() { check shell-machinery-guard.sh "$@"; }
@@ -251,8 +238,8 @@ if [ "$HAVE_ALIAS" = true ]; then
     rcd "symlink-alias subdir"        2 "$PROJ" "cd $HOME/.claude/skills && rtk grep x ."
     rcd "symlink-alias project root"  2 "$PROJ" "cd ~/.claude && ls"
 else
-    skipped "symlink-alias subdir" "~/.claude does not resolve to this repo"
-    skipped "symlink-alias project root" "~/.claude does not resolve to this repo"
+    report_skip "symlink-alias subdir" "~/.claude does not resolve to this repo"
+    report_skip "symlink-alias project root" "~/.claude does not resolve to this repo"
 fi
 
 echo
@@ -325,10 +312,4 @@ rcd_says "stranded: says cwd is not root"  "NOT the project root"     "$OUTSIDE"
 rcd_says "stranded: names the way back"    "$PROJ"                    "$OUTSIDE" "cd ."
 rcd_says "at root: git-root message"       "git root"                 "$PROJ" 'cd $(git rev-parse --show-toplevel)'
 
-echo
-if [ "$skip" -gt 0 ]; then
-    echo "$pass passed, $fail failed, $skip skipped"
-else
-    echo "$pass passed, $fail failed"
-fi
-[ "$fail" -eq 0 ]
+summary

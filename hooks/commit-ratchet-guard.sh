@@ -82,6 +82,7 @@ TIERED=(
   "scripts/session-meta-report.py|scripts/tests/"
   "scripts/sync-skill.sh|scripts/test/run-sync-skill.sh"
   "scripts/usage-report.sh|scripts/test/run-usage-report.sh"
+  "test/_harness.sh|test/run-harness.sh"
 )
 
 # Tier 3 — thin wrappers and vendored code, exempt by the ADR's own reasoning.
