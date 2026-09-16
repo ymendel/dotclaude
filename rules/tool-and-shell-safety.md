@@ -198,9 +198,11 @@ It bites hardest where the piped command *is* the verification — a test suite,
 
 Reach for a wrapper that filters *without* a pipe, so there is no second status to confuse: `rtk test <cmd>` shows only failures plus the tail of the output, and `rtk err <cmd>` shows only errors and warnings. Both propagate the wrapped command's status in each direction, so `rtk test bin/ci && …` gates on the suite rather than on a filter. Redirecting to a file and reading it afterwards has the same property, at the cost of a second step — and it is the form to reach for when an argument has to contain spaces, since `rtk test` re-parses its command and a quoted argument arrives at the wrapped command split into one entry per word (`RTK.md`).
 
+**Then don't pipe the wrapper either.** `rtk test bin/ci | rtk tail -10` hands back the exact problem the wrapper was reached for: the pipeline reports the filter's status, and the propagation that made `rtk test` the right answer is gone. The pull is that the wrapper still prints a header and a couple of trailing lines, so trimming them reads as tidiness rather than as discarding an exit status — which is what carries it past a rule written about `proxy | tail`. The wrapper has already filtered. Take its output whole, and read a `| tail` or `| head` on a command chosen for its exit status as the tell.
+
 Reserve `${PIPESTATUS[0]}` for a pipeline that genuinely cannot be replaced, and expect it to interrupt: it is an expansion, so the permission gate cannot resolve it and has to ask.
 
-Failure mode this prevents: a red test run reads as green because the summary grep matched, the `&&` behind it fires anyway, and nothing in the visible output contradicts the report that says verified.
+Failure mode this prevents: a red test run reads as green because the summary grep matched, the `&&` behind it fires anyway, and nothing in the visible output contradicts the report that says verified. Piping the wrapper fails one step later and more quietly: the status is simply absent rather than wrong, so the next move is to go hunting for a pass/fail signal in the log the wrapper had already summarized — and that hunt is where scaffolding gets built, for a question that was answered before the pipe was added.
 
 ## Don't merge stderr into a file you intend to parse
 
