@@ -144,20 +144,31 @@ write_raw contract.txt 'text'
 run_on "$TARGET"
 expect_eq "$STATUS" 0 'the ordinary append path also exits 0'
 
-# --- A known gap, asserted so a fix is loud ---------------------------------
+# --- Binary content the old description-matching missed ---------------------
 #
-# The skip matches `file` output against binary|image|executable|archive|compressed|media. Content
-# that `file` cannot classify is reported as plain `data`, which matches none of those — so a file
-# of raw bytes is treated as text and gains a trailing newline. Measured: a file of four NUL-ish
-# bytes plus ASCII reports as `data` here.
+# The skip used to match `file` output against binary|image|executable|archive|compressed|media,
+# which left two holes this section pins shut. Content `file` cannot classify is reported as plain
+# `data`, matching none of those; and a SQLite database is described as "SQLite 3.x database",
+# which also matches none of them. Both were appended to. The second is the one that corrupts —
+# SQLite checks its file size against its page count.
 #
-# This asserts what the hook DOES, not what it should do. The fixture is 10 bytes and comes back as
-# 11: the newline is appended to content that is not text. If the pattern gains `data` or the check
-# moves to something like `grep -qI`, this case fails and that is the intended signal — the header
-# claims it "skips binary files", and today that claim holds only for content `file` recognises.
+# Widening the word list was the wrong fix: adding `data` would have caught both and broken JSON,
+# which `file` calls "JSON data". The check asks whether the content is text instead.
 
 write_raw opaque.bin '\000\001\002\003binary'
 run_on "$TARGET"
-expect_eq "$(bytes_of "$TARGET")" 11 'KNOWN GAP: unrecognised binary content is treated as text'
+expect_eq "$(bytes_of "$TARGET")" 10 'unrecognised binary content is skipped, not appended to'
+
+# The SQLite magic is enough for the case: 16 bytes of header, NUL included, which is what makes it
+# binary. A real database is not needed and would make this suite depend on sqlite3 being installed.
+write_raw fixture.db 'SQLite format 3\000'
+run_on "$TARGET"
+expect_eq "$(bytes_of "$TARGET")" 16 'a SQLite database is skipped rather than having a byte appended'
+
+# The counterpart that must NOT be skipped. `file` calls this "JSON data", so a `data`-matching
+# pattern would have stopped fixing newlines on every JSON file in the repo.
+write_raw config.json '{"key":"value"}'
+run_on "$TARGET"
+expect_eq "$(bytes_of "$TARGET")" 16 'a JSON file is still treated as text and gains its newline'
 
 summary || exit 1
