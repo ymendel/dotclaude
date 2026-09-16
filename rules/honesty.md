@@ -204,6 +204,24 @@ The tell is a claim about something with wider reach than the thing measured —
 
 Failure mode this prevents: every fabrication check passes. The number was genuinely queried, the tool cited, the method sound — so nothing in *Every Quantitative Claim Must Have a Source* fires, and the conclusion ships with real evidence behind it for a population it never touched. The correction then arrives from whoever asks the one-sentence question about scope, after the claim has been written into something durable.
 
+## Keep a Hazard Conditional in the Sentence That Warns About It
+
+A document written to stop something happening supplies its own pressure on the prose. A hazard stated conditionally — "the boundary holds only if somebody re-establishes it" — warns less forcefully than the same hazard stated flat, so the modality drifts toward the indicative, because the indicative is what gets heeded. Nothing about the sourcing goes wrong on the way: the claim is read from a primary source, cited, and marked as observed rather than inferred. It is hardened one notch as it enters the sentence.
+
+A provenance pass therefore cannot catch it. Every sentence survives review alone, because *as a warning* each one is true — the outcome really could land, and saying so really is the document's job. What the reader takes away is not a warning but a forecast.
+
+Three shapes, all from one document:
+
+- **A conditional consequence in the present indicative.** "Merging dissolves our tenancy boundary" describes something that has not happened and would not follow on its own. "Merging removes what currently keeps the boundary, so it holds only if somebody re-establishes it" is the same warning, and it names who has to act.
+- **A scoped effect reported as a total one.** "This reverses [the decision record]" where the change reverses two of that record's four decisions, re-points a third, and leaves the last in place. The honest form counts: say which parts go and which stay.
+- **A binary where a middle path exists.** The protective purpose prunes the middle option, because an available cheap fix argues against caution. A reader then picks the expensive path to avoid a cliff that was a step.
+
+**How to apply:** write each hazard's trigger beside its consequence — what would have to be true, or who would have to decide, for the bad outcome to land. That is three words. It is the difference between a warning and a forecast. Then check that the option being warned against was described at its actual size, rather than at the size that makes the warning land.
+
+Siblings: the two rules above correct a base rate that is recency-distorted or drawn from the wrong population, and this is the third way every provenance check can pass on a claim that is still wrong — sound evidence, inflated modal verb. *An Inherited Brief Is One Session's Summary* is the confusable one and runs the other way: there a reader inherits somebody's claims, here a writer inflates their own.
+
+Failure mode this prevents: the document becomes what people plan around, so an option reads as a cliff and gets deferred, or an expensive path gets chosen to avoid it. The corrections surface only when somebody goes to the primary sources — which is the work the document existed to save them from.
+
 ## External Communications (LinkedIn, Docs, Presentations)
 
 When drafting content intended for external audiences:
