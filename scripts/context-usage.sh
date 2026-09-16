@@ -56,12 +56,24 @@ tokens=$(grep '^CONTEXT_TOKENS=' "$reading" | cut -d= -f2)
 size=$(grep '^CONTEXT_SIZE=' "$reading" | cut -d= -f2)
 stamp=$(grep '^TIMESTAMP=' "$reading" | cut -d= -f2)
 
-case "$pct$tokens$size$stamp" in
-  '' | *[!0-9]*)
-    echo "The most recent reading is malformed. Delete $reading and let the statusline rewrite it."
-    exit 0
-    ;;
-esac
+# Checked per field rather than over the four concatenated. An absent field contributes an empty
+# string, so `42` + `` + `` + `<stamp>` stays all digits and passes a combined test — then reports
+# "0K of 0K tokens" as though it were a reading. The field boundaries are what carry the
+# information, and joining the values throws them away.
+all_numeric() {
+  local value
+  for value in "$@"; do
+    case "$value" in
+      '' | *[!0-9]*) return 1 ;;
+    esac
+  done
+  return 0
+}
+
+if ! all_numeric "$pct" "$tokens" "$size" "$stamp"; then
+  echo "The most recent reading is malformed. Delete $reading and let the statusline rewrite it."
+  exit 0
+fi
 
 age=$(($(date +%s) - stamp))
 printf 'Context usage: %s%% (%sK of %sK tokens), recorded %ss ago.\n' \

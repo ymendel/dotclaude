@@ -203,26 +203,25 @@ TIMESTAMP=1'
 run
 silent 'a non-numeric percentage is silent'
 
-# A field that is absent rather than malformed is NOT caught. The guard concatenates the four values
-# and rejects the result if it is empty or holds a non-digit — but an absent field contributes an
-# empty string, so `60` + `120000` + `` + `<stamp>` is still all digits and passes. The notice is
-# then built with an empty size and prints "of 0K tokens".
+# An absent field is rejected, not just a malformed one. The guard checks each field separately for
+# exactly this: concatenating the four would let an absent one contribute an empty string, leaving
+# `60` + `120000` + `` + `<stamp>` all digits and passing — and the notice would print "of 0K
+# tokens" as though the cache had been read.
 #
-# Asserted as current behaviour, with a fresh timestamp so the staleness check cannot mask it. An
-# earlier version of this case used TIMESTAMP=1 and passed for that reason instead, which is exactly
-# the false green this suite exists to avoid.
+# The timestamp is fresh so the staleness check cannot silence this first and make the case pass for
+# a reason it does not name. An earlier version used TIMESTAMP=1 and did exactly that.
 fresh
 cache_raw "CONTEXT_PCT=60
 CONTEXT_TOKENS=120000
 TIMESTAMP=$(date +%s)"
 run
-spoke 'KNOWN GAP: a cache with an absent field is reported rather than rejected'
+silent 'a cache with an absent field is silent'
 case "$OUT" in
-    *'of 0K tokens'*) report true 'KNOWN GAP: the absent field prints as zero' ;;
-    *) report false 'KNOWN GAP: the absent field prints as zero' "output was: $OUT" ;;
+    *'0K'*) report false 'an absent field never prints as zero' "output was: $OUT" ;;
+    *) report true 'an absent field never prints as zero' ;;
 esac
 
-# A field present but non-numeric IS caught, which is the half the guard does cover.
+# The non-numeric half, which the concatenated form also caught.
 fresh
 cache_raw "CONTEXT_PCT=60
 CONTEXT_TOKENS=120000

@@ -178,20 +178,17 @@ saw 'malformed' 'a non-numeric percentage is reported as malformed'
 saw 'sess-a' 'the malformed report names the file to delete'
 expect_eq "$STATUS" 0 'a malformed reading still exits 0'
 
-# A field that is ABSENT is not caught, unlike one that is present and non-numeric. The guard
-# concatenates the four values and rejects only an empty or non-digit result, so an absent field
-# contributes nothing and `42` + `` + `` + `<stamp>` stays all digits. The reading is then printed
-# with zeroes. hooks/context-usage-notice.sh carries the identical guard and the identical gap.
-#
-# Asserted as current behaviour so closing it fails here loudly. The zeroes are the tell a reader
-# would notice; the script does not flag it.
+# An absent field is rejected, not just a malformed one. The guard checks each field separately for
+# exactly this: concatenating the four would let absent ones contribute empty strings, leaving
+# `42` + `` + `` + `<stamp>` all digits and passing — and the reading would print "0K of 0K tokens"
+# as though it were real. hooks/context-usage-notice.sh carries the same guard and the same case.
 fresh
 reading_raw sess-a "CWD=$HERE
 CONTEXT_PCT=42
 TIMESTAMP=$(date +%s)"
 run
-saw '0K of 0K tokens' 'KNOWN GAP: absent fields print as zero rather than being rejected'
-did_not_see 'malformed' 'KNOWN GAP: absent fields are not reported as malformed'
+saw 'malformed' 'a reading with an absent field is reported as malformed'
+did_not_see '0K of 0K' 'an absent field is never printed as a zero reading'
 
 # An empty cache file records no CWD, so it matches no directory and the fallback picks it up as the
 # newest reading anywhere — at which point every field is empty, the concatenation is empty, and the

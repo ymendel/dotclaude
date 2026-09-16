@@ -71,9 +71,16 @@ CACHE_TS=$(grep '^TIMESTAMP=' "$CACHE_FILE" | cut -d= -f2)
 
 # Every field has to be a number before anything is reported. A partial or malformed cache
 # should produce silence, not a notice built from an empty string.
-case "$CONTEXT_PCT$CONTEXT_TOKENS$CONTEXT_SIZE$CACHE_TS" in
-  '' | *[!0-9]*) exit 0 ;;
-esac
+#
+# Checked per field rather than over the four concatenated. An absent field contributes an empty
+# string, so `60` + `120000` + `` + `<stamp>` stays all digits and passes a combined test — then
+# prints "of 0K tokens". The field boundaries are what carry the information, and joining the
+# values throws them away.
+for value in "$CONTEXT_PCT" "$CONTEXT_TOKENS" "$CONTEXT_SIZE" "$CACHE_TS"; do
+  case "$value" in
+    '' | *[!0-9]*) exit 0 ;;
+  esac
+done
 
 [ $(($(date +%s) - CACHE_TS)) -gt "$CACHE_MAX_AGE" ] && exit 0
 
