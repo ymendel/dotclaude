@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(./hooks/test/run-*.sh)",
       "Bash(./hooks/test/run-checks.sh:*)",
       "Bash(./scripts/check-prerequisites.sh:*)",
       "Bash(./scripts/compare-skills.sh:*)",
@@ -9,7 +10,9 @@
       "Bash(./scripts/rules-sections.py:*)",
       "Bash(./scripts/run-tests.sh:*)",
       "Bash(./scripts/sync-skill.sh *--dry-run)",
-      "Bash(./scripts/usage-report.sh:*)"
+      "Bash(./scripts/test/run-*.sh)",
+      "Bash(./scripts/usage-report.sh:*)",
+      "Bash(./test/run-harness.sh)"
     ]
   },
   "hooks": {
