@@ -6,9 +6,25 @@ How to pick the right tool and scope when looking something up.
 
 When searching for a file or pattern, start from the most specific known directory — not a broad ancestor. Searching from a parent directory is slower, noisier, and risks touching unintended paths. If the search fails, widen incrementally.
 
-When the exact path is known, use Read directly — do not use Glob. Globbing an already-known path adds noise and signals uncertainty that isn't there.
+When the exact path is known, use Read directly — do not use Glob. Globbing an already-known path signals uncertainty that isn't there. It is the cheapest spelling of a wider reflex — see *Don't search for what you already have* below.
 
 Also: when the target path is a symlink, `find` may not follow it without a trailing slash. Use `find /path/to/symlink/ ...` (with trailing slash) to ensure the symlink is resolved.
+
+## Don't search for what you already have
+
+Before constructing a search, ask whether the answer is already in the session. A path that appeared in a tool result, a filename the user typed, a location an earlier command printed — each of those is in hand, and searching for it again spends a call to re-derive what is already known. Read it or quote it directly.
+
+The tell is constructing a path rather than copying one: a pattern, a `find`, or an `ls | head -1` whose output could be quoted from earlier in the conversation.
+
+Three spellings, and they do not cost the same:
+
+- **Glob on a known path.** A wasted call that reads as uncertainty about a path you are not uncertain about. *Scope searches to the known location* above covers it.
+- **Shell rediscovery** — an `ls | head -1`, a `find`, a command substitution producing a path an earlier tool result already supplied. `command_substitution` is one of the node types the permission gate cannot resolve (`settings.md`), so this one interrupts for approval, and what the user is asked to approve is a command whose entire purpose is recovering something that was never lost.
+- **A sub-agent** sent after a location the spawning context holds. `agents.md` prices a spawn at around 70K tokens before the agent does any work, which makes this the most expensive of the three by a wide margin.
+
+Watch for the second and third mid-recovery, when something else has already gone wrong and the information needed to get back on track looks missing. Re-read before re-deriving — it scrolled past rather than never existing.
+
+Failure mode this prevents: the rediscovery is indistinguishable from an ordinary search. It is a correct command, competently written, answering a question that had an answer, so nothing about it looks wrong from inside the session. What the user meets is an approval prompt or a spawn they cannot evaluate without reconstructing what was already known — and in the sub-agent case the cost is paid before any work begins.
 
 ## Search tracked content with `git grep`, not a recursive filesystem grep
 
