@@ -35,11 +35,13 @@
 #   - On resume, Claude Code replays saved hook text for past turns rather than re-running,
 #     so an old percentage sits in scrollback. Turns after the resume fire live.
 #
-# TODO: no test coverage. hooks/test/run-checks.sh is scoped to the PreToolUse Bash
-# guards and its harness passes command strings, which does not fit a Stop hook reading
-# session JSON and a cache file — covering this needs a second harness. Band crossing,
-# repeat suppression and the jump case were checked by hand on 2026-09-10. The
-# malformed-cache and stale-cache paths have never been exercised.
+# Covered by hooks/test/run-checks.sh's Stop-shaped sibling, hooks/test/run-stop.sh — a second
+# harness, as the shape required: run-checks.sh passes command strings to a PreToolUse guard, and
+# this reads session JSON and a cache file. It points HOME at a fixture so the percentages are
+# known rather than whatever the running session is at. The malformed-cache and stale-cache paths,
+# which had only ever been reasoned about, are exercised there — as is the corrupt-band-file
+# recovery, whose failure mode is the worst available here: permanent silence in a hook whose
+# normal state is silence.
 #
 # The full design, the open questions, and the calibration state live in a working note
 # under ideas/, which is not tracked in this repo.
