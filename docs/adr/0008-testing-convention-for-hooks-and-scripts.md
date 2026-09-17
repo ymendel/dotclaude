@@ -400,6 +400,7 @@ comes up would leave the gate unimplementable:
 | `hooks/context-usage-notice.sh` | 1 | fires automatically, reports nothing when it works |
 | `hooks/notify-session-attention.sh` | 1 | fires automatically, and routes some event types silently by design |
 | `hooks/claude-dir-write-allow.sh` | 1 | decides a permission without being invoked, and an abstention is indistinguishable from not running |
+| `hooks/notify-permission-context.sh` | 1 | fires automatically, and anything it printed would be read as a permission decision |
 | `hooks/ensure-trailing-newline.sh` | 1 | mutates files without being invoked |
 | `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
 | `hooks/rtk-rewrite.sh` | 3 | vendored, pinned by checksum |
@@ -461,15 +462,25 @@ no framework, and no `set -e`, since a failing case must report and let the rest
 run. Python code runs under stdlib `unittest`, in the topic's own `tests/` kept
 as an importable package so its `__init__.py` does the `sys.path` setup.
 
-**One suite per payload shape, not per topic.** The committed suite's helpers all
-synthesise a `PreToolUse` Bash payload on stdin; a `Stop` hook's input carries a
-`session_id` and no `tool_input` at all, so folding both into one file would put
-two disjoint helper sets under one shebang. `hooks/test/run-checks.sh` therefore
-stays what it is, and a `Stop`-shaped suite gets its own file beside it. Two
-consequences follow immediately rather than later: the entry point's discovery
-has to glob `*/test/run-*.sh` rather than the single filename, and the
-shared-helper question this ADR's harness option listed as an open cost comes due
-with the second suite rather than at some future split.
+**One suite per helper set, which is usually one per payload shape.** The
+committed suite's helpers all synthesise a `PreToolUse` Bash payload on stdin; a
+`Stop` hook's input carries a `session_id` and no `tool_input` at all, so folding
+both into one file would put two disjoint helper sets under one shebang.
+`hooks/test/run-checks.sh` therefore stays what it is, and a `Stop`-shaped suite
+gets its own file beside it. Two consequences follow immediately rather than
+later: the entry point's discovery has to glob `*/test/run-*.sh` rather than the
+single filename, and the shared-helper question this ADR's harness option listed
+as an open cost comes due with the second suite rather than at some future split.
+
+The shape is a proxy for the helper set rather than the criterion itself, and the
+two come apart once a shape has more than one hook on it. `PermissionRequest`
+now has two: `claude-dir-write-allow.sh` answers with a decision object read from
+stdout, and `notify-permission-context.sh` decides nothing and is read from a
+file it leaves behind. They share no fixture, no invocation and no assertion, so
+they are `run-permission-request.sh` and `run-permission-request-context.sh`.
+Shape names are therefore a prefix rather than a unique key. The runner is
+unaffected — its guard requires `run-*.sh` and nothing narrower, because what it
+exists to catch is a suite silently skipped, not a suite named beside a sibling.
 
 **That cost has since been paid, at the sixth suite rather than the second.**
 `test/_harness.sh` carries the tally, the PASS/FAIL line and the summary that
