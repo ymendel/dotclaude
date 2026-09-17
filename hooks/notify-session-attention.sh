@@ -6,11 +6,17 @@
 # Claude Code adds later, where a generic fallback surfaces it the first time it fires.
 #
 # The routing:
-#   permission_prompt  → notify, "<project> · needs permission"
+#   permission_prompt  → notify, "<project> · needs a response"
 #   idle_prompt        → silent. It is ~two thirds of all traffic and says only that a session
 #                        finished and you have not typed since, which is not a call for attention.
 #   anything else      → notify, naming the type, so an unfamiliar event is legible rather than
 #                        dressed up as a permission prompt.
+#
+# "needs a response" rather than "needs permission": `permission_prompt` also covers
+# `AskUserQuestion` and `ExitPlanMode`, which the docs class as tools that "require user
+# interaction" and which Claude Code delivers through the permission flow. No sub-type separates a
+# question from a gate — MCP elicitation got `elicitation_dialog` and `elicitation_url_dialog` of
+# its own, and this did not — so any label naming permission is wrong for a share of the traffic.
 #
 # Every payload is appended to the log regardless of routing, including the silent ones. The type
 # vocabulary is only partly observed — `permission_prompt` and `idle_prompt` seen, the elicitation,
@@ -109,7 +115,7 @@ case "$NOTIFICATION_TYPE" in
     exit 0
     ;;
   permission_prompt)
-    notify "$PROJECT" "needs permission"
+    notify "$PROJECT" "needs a response"
     ;;
   *)
     notify "$PROJECT" "$NOTIFICATION_TYPE"

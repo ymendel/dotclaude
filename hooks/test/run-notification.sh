@@ -85,11 +85,18 @@ printed() { [ -s "$STDOUT" ]; }
 
 # A permission prompt notifies, labelled by the working directory's basename.
 run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
-if notified && grep -q 'shipping-tracker' "$CALLS" && grep -q 'needs permission' "$CALLS"; then
+if notified && grep -q 'shipping-tracker' "$CALLS" && grep -q 'needs a response' "$CALLS"; then
     report true "permission_prompt notifies, titled by project"
 else
     report false "permission_prompt notifies, titled by project" "captured: $(cat "$CALLS")"
 fi
+# The type covers AskUserQuestion and ExitPlanMode as well as a permission gate, and nothing in the
+# payload separates them — so a label claiming permission is wrong for a share of the traffic. This
+# asserts the absence because that is the whole defect: the old label read correctly on every
+# payload a test could construct, since the payload is identical either way.
+grep -qi 'permission' "$CALLS" \
+    && report false "permission_prompt label does not claim permission" "captured: $(cat "$CALLS")" \
+    || report true "permission_prompt label does not claim permission"
 [ "$(logged_lines)" = 1 ] \
     && report true "permission_prompt is logged" \
     || report false "permission_prompt is logged" "expected 1 line, got $(logged_lines)"
