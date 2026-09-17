@@ -23,6 +23,31 @@ A plain "Yes" leaves nothing behind for the user either, so "I was only prompted
 the prompts that offered a save. Treat a recollection as evidence with a known skew, and when the
 answer matters, ask for a fresh probe rather than theorizing on the recollection.
 
+## The notification is not the detector it looks like
+
+A `Notification` hook on `permission_prompt` is the obvious instrument, because it observes without
+needing the user to report anything. It is wrong in both directions.
+
+**False positives.** The type covers more than a permission gate. `AskUserQuestion` and
+`ExitPlanMode` are delivered through the permission flow — the hooks docs class them as tools that
+"require user interaction" and say Claude Code offers them only where a permission host can receive
+the prompt — so a multiple-choice question fires `permission_prompt` exactly as a gated `Bash` call
+does. Nothing in the payload separates them, and no sub-type exists: MCP elicitation has
+`elicitation_dialog` and `elicitation_url_dialog`, this has nothing. So a fired notification does not
+establish that a command was gated.
+
+**False negatives.** It fires only after about six seconds of not typing, each keystroke defers it,
+and answering inside that window means it never fires at all. A probe run attentively is the case
+least likely to produce the signal.
+
+**`PermissionRequest` is the clean one.** The docs scope it to the moment Claude Code is about to
+ask, it carries `tool_name` and `tool_input`, and a hook that returns no `decision` object leaves the
+flow unchanged — so it observes without deciding. One exclusion: it does not fire for a sandboxed
+command's network request, which reaches `permission_prompt` only.
+
+This does not reopen the plain-Yes blind spot above. `PermissionRequest` separates *prompted* from
+*never going to prompt*; it still says nothing about which answer the user gave.
+
 ## Shaping a probe that attributes cleanly
 
 One command, with no pipe, redirect, or command substitution. Claude Code evaluates each segment of a
