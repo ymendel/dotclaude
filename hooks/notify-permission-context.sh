@@ -72,6 +72,29 @@ case "$TOOL" in
     DESCRIPTOR="writes: ${DETAIL##*/}"
     [ -z "$DETAIL" ] && DESCRIPTOR="writes a file"
     ;;
+  mcp__*)
+    # `mcp__<server>__<tool>`, per the hooks docs, which gloss these the way this renders them —
+    # "Memory server's create entities tool" for `mcp__memory__create_entities`. The prompt dialog
+    # shows a title the server advertises ("honeycomb — Get Dataset Tool"); that title is not in
+    # this payload, so the name is all there is to work from.
+    #
+    # Split on the DOUBLE underscore. A plugin-sourced server carries single underscores inside its
+    # own segment — `mcp__plugin_my-plugin_db__query` is the docs' own example — so splitting on `_`
+    # would cut the server name in half.
+    REST=${TOOL#mcp__}
+    case "$REST" in
+      *__*)
+        # Underscores become spaces in the tool half only. The server half is an identifier and
+        # stays verbatim, which is the whole reason for splitting on `__` rather than `_`.
+        MCP_SERVER=${REST%%__*}
+        MCP_TOOL=${REST#*__}
+        DESCRIPTOR="calls: $MCP_SERVER ${MCP_TOOL//_/ }"
+        ;;
+      *)
+        DESCRIPTOR="calls: ${REST//_/ }"
+        ;;
+    esac
+    ;;
   *)
     DESCRIPTOR="$TOOL"
     ;;

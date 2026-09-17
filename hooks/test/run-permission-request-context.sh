@@ -108,6 +108,25 @@ records "an unlisted tool falls through to its own name" \
     s7 WebFetch '{"url":"https://example.com"}' \
     "WebFetch"
 
+# MCP tools arrive as `mcp__<server>__<tool>`, which is readable but not written for a human. The
+# docs gloss them the way this renders them: "Memory server's create entities tool".
+records "an MCP tool is split into server and tool" \
+    s12 mcp__honeycomb__get_dataset '{"environment_slug":"production"}' \
+    "calls: honeycomb get dataset"
+
+# The split is on the double underscore, because a plugin-sourced server carries single underscores
+# inside its own segment — this name is the docs' own example. Splitting on `_` would render it
+# "plugin my-plugin db query", cutting the server identifier into three words.
+records "a plugin-sourced server keeps its own underscores" \
+    s13 mcp__plugin_my-plugin_db__query '{}' \
+    "calls: plugin_my-plugin_db query"
+
+# A name with no second `__` is not the documented shape; render what there is rather than
+# splitting the server against itself.
+records "an mcp name with no tool half does not double its server" \
+    s14 mcp__honeycomb '{}' \
+    "calls: honeycomb"
+
 # --- Shape of the record -------------------------------------------------------
 
 # A newline in the payload would make the reader, which reads one line, see a second record.
