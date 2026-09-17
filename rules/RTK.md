@@ -210,6 +210,22 @@ The grants point the wrong way here. `Bash(rtk gh:*)` covers a hand-written `rtk
 incorrect form runs unprompted while the correct bare one has no entry and asks. Read a prompt on
 `gh stack …` as the missing bare grant, not as a reason to reach back for the prefix.
 
+**`git` splits the same way, and it is the one that bites, being used constantly.** rtk rewrites the
+subcommands it has a filter for and passes the rest through, with no signal either way. Measured
+2026-09-17: `status`, `log`, `diff`, `show`, `add`, `branch` and `stash` return exit 0, while
+`grep`, `ls-files` and `blame` exit 1 and reach the gate bare. `Bash(rtk git:*)` covers only the
+first group, so a bare `git grep …` asks however many git entries the allow list holds.
+
+The tell is already in `settings.json`: every bare `Bash(git <sub>:*)` entry there —
+`check-ignore`, `init`, `ls-remote`, `remote`, `switch`, `symbolic-ref` — is a passthrough
+subcommand, each added after its own prompt, with nothing recording why those and not others.
+`git grep` is the seventh. So read a prompt on a git subcommand as this split rather than as a gap
+in the git grants, settle it with `rtk rewrite '<the bare command>'`, and write any new entry bare.
+
+Failure mode this prevents: `git` reads as the most thoroughly covered command in the file, so a
+prompt on one of its subcommands looks like a bug in the allow list rather than a subcommand on the
+other side of a line nothing marks.
+
 **A binstub is the easier miss, and `rtk test` hides it for a while.** `bin/rails` and `bin/rubocop`
 read as ordinary commands the golden rule would cover, and the prefix-versus-wrapper distinction is
 what makes the mistake survivable long enough to be confusing: `rtk bin/rubocop …` is the wrong
