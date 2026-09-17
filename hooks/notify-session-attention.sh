@@ -6,7 +6,10 @@
 # Claude Code adds later, where a generic fallback surfaces it the first time it fires.
 #
 # The routing:
-#   permission_prompt  → notify, "<project> · needs a response"
+#   permission_prompt  → notify, "<project> · <what the prompt is for>", or "· needs a response"
+#                        when notify-permission-context.sh left nothing to name. That script is the
+#                        PermissionRequest half of this pair and its header carries why the work is
+#                        split across two events.
 #   idle_prompt        → silent. It is ~two thirds of all traffic and says only that a session
 #                        finished and you have not typed since, which is not a call for attention.
 #   anything else      → notify, naming the type, so an unfamiliar event is legible rather than
@@ -103,6 +106,7 @@ printf '%s\n' "$STAMPED" >> "$LOG"
 
 NOTIFICATION_TYPE=$(jq -r '.notification_type // empty' <<<"$INPUT")
 CWD=$(jq -r '.cwd // empty' <<<"$INPUT")
+SESSION=$(jq -r '.session_id // empty' <<<"$INPUT")
 
 # Without a type there is nothing to route on, and without a cwd there is no label worth showing.
 [ -z "$NOTIFICATION_TYPE" ] && exit 0
@@ -110,12 +114,41 @@ CWD=$(jq -r '.cwd // empty' <<<"$INPUT")
 
 PROJECT=$(basename "$CWD")
 
+# Reads and consumes what notify-permission-context.sh left for this session, echoing a descriptor
+# or nothing. Consuming is what keeps the directory bounded: a record is written per prompt but read
+# at most once, so what accumulates is one file per session whose prompt went unanswered past the
+# six-second gate, and the next prompt in that session overwrites it.
+#
+# The staleness window rejects a record left by a prompt that was answered promptly — no
+# notification fires inside six seconds, so that file is still sitting there when a later prompt
+# notifies without having written one. The only prompt that reaches here without a record is a
+# sandboxed command's network request, which PermissionRequest does not fire for.
+consume_context() {
+  local dir="${CLAUDE_PERMISSION_CONTEXT_DIR:-$HOME/.claude/.permission-context}"
+  local file="$dir/$SESSION" written descriptor
+
+  [ -n "$SESSION" ] || return 0
+  [ -f "$file" ] || return 0
+
+  read -r written descriptor < "$file"
+  rm -f "$file"
+
+  # A record whose first field is not a number is not one of ours; treat it as no record at all.
+  case "$written" in
+    '' | *[!0-9]*) return 0 ;;
+  esac
+
+  [ $(($(date -u +%s) - written)) -le 60 ] || return 0
+  printf '%s' "$descriptor"
+}
+
 case "$NOTIFICATION_TYPE" in
   idle_prompt)
     exit 0
     ;;
   permission_prompt)
-    notify "$PROJECT" "needs a response"
+    CONTEXT=$(consume_context)
+    notify "$PROJECT" "${CONTEXT:-needs a response}"
     ;;
   *)
     notify "$PROJECT" "$NOTIFICATION_TYPE"

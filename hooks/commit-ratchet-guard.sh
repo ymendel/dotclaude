@@ -71,6 +71,7 @@ TIERED=(
   "hooks/ensure-trailing-newline.sh|hooks/test/run-post-tool-use.sh"
   "hooks/notify-session-attention.sh|hooks/test/run-notification.sh"
   "hooks/claude-dir-write-allow.sh|hooks/test/run-permission-request.sh"
+  "hooks/notify-permission-context.sh|hooks/test/run-permission-request-context.sh"
   "hooks/commit-ratchet-guard.sh|hooks/test/run-commit-ratchet.sh"
   "scripts/run-tests.sh|scripts/test/run-test-runner.sh"
   "scripts/measure-claude-dir-writes.sh|scripts/test/run-measure-writes.sh"

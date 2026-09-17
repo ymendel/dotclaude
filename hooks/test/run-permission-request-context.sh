@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+# Checks over notify-permission-context.sh, the PermissionRequest hook that records what a pending
+# prompt is for. Run it after touching that script:
+#
+#   ./hooks/test/run-permission-request-context.sh
+#
+# A second suite on the PermissionRequest shape, beside run-permission-request.sh. ADR 0008's
+# one-suite-per-shape line was written when no shape had two hooks; what the shape was standing in
+# for is the helper set, and these two share none of it. That one answers with a decision object and
+# is read from stdout; this one decides nothing and is read from a file it leaves behind.
+#
+# BOTH HALVES ARE ASSERTED, and the silent half is the one that matters: a PermissionRequest hook
+# that emits anything Claude Code reads as a decision would start approving or denying prompts, and
+# in a session that cannot prompt — a background subagent — a malformed answer denies the call
+# outright. So every case checks stdout is empty, not only that the record is right.
+#
+# Fixtures are invented sessions and paths, never this machine's. The context directory is pointed
+# at a temp tree by CLAUDE_PERMISSION_CONTEXT_DIR so a run never writes to the real one.
+#
+# No framework, no `set -e` (a failing case must report, not abort), non-zero exit at the end.
+
+if ! command -v jq &>/dev/null; then
+    echo "run-permission-request-context: jq is required. The hook abstains without it, so every" >&2
+    echo "case would record a pass it never earned. Bailing instead." >&2
+    exit 1
+fi
+
+TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HOOK="$(cd "$TEST_DIR/.." && pwd)/notify-permission-context.sh"
+
+if [ ! -x "$HOOK" ]; then
+    echo "run-permission-request-context: $HOOK is missing or not executable." >&2
+    exit 1
+fi
+
+WORK_DIR="$(mktemp -d)"
+cleanup() { [ -n "$WORK_DIR" ] && rm -rf "$WORK_DIR"; }
+trap cleanup EXIT
+
+. "$(cd "$TEST_DIR/../.." && pwd)/test/_harness.sh"
+
+CONTEXT_DIR="$WORK_DIR/context"
+
+# run <payload> — feeds the hook, leaving its stdout in $STDOUT.
+run() {
+    STDOUT="$WORK_DIR/stdout.txt"
+    rm -rf "$CONTEXT_DIR"
+    : > "$STDOUT"
+    printf '%s' "$1" | CLAUDE_PERMISSION_CONTEXT_DIR="$CONTEXT_DIR" bash "$HOOK" > "$STDOUT"
+}
+
+# payload <session> <tool> <tool_input-json>
+payload() {
+    jq -nc --arg session "$1" --arg tool "$2" --argjson input "$3" \
+        '{hook_event_name: "PermissionRequest", session_id: $session,
+          tool_name: $tool, tool_input: $input}'
+}
+
+# descriptor <session> — the record's text, with the epoch field dropped.
+descriptor() {
+    [ -f "$CONTEXT_DIR/$1" ] || { printf '<no record>'; return; }
+    cut -d' ' -f2- < "$CONTEXT_DIR/$1"
+}
+
+silent() { [ ! -s "$STDOUT" ]; }
+
+# records <label> <session> <tool> <input-json> <want> — one descriptor assertion plus the silence
+# assertion that has to hold on every path.
+records() {
+    run "$(payload "$2" "$3" "$4")"
+    expect_eq "$(descriptor "$2")" "$5" "$1"
+    silent \
+        && report true "$1 — writes nothing to stdout" \
+        || report false "$1 — writes nothing to stdout" "stdout: $(cat "$STDOUT")"
+}
+
+# --- The descriptors -----------------------------------------------------------
+
+records "AskUserQuestion names the first question's header" \
+    s1 AskUserQuestion '{"questions":[{"header":"Auth method","question":"Which one?"}]}' \
+    "asks: Auth method"
+
+records "AskUserQuestion falls back to the question when the header is absent" \
+    s2 AskUserQuestion '{"questions":[{"question":"Which database?"}]}' \
+    "asks: Which database?"
+
+records "Bash names the command" \
+    s3 Bash '{"command":"bin/rails db:migrate"}' \
+    "runs: bin/rails db:migrate"
+
+records "Write names the basename, not the whole path" \
+    s4 Write '{"file_path":"/Users/alice/dev/shipping-tracker/config/routes.rb"}' \
+    "writes: routes.rb"
+
+# NotebookEdit carries notebook_path where Edit and Write carry file_path, so a hook reading only
+# file_path records a pathless write without saying so.
+records "NotebookEdit reads notebook_path" \
+    s5 NotebookEdit '{"notebook_path":"/Users/alice/dev/analysis/orders.ipynb"}' \
+    "writes: orders.ipynb"
+
+records "ExitPlanMode is named without reading its input" \
+    s6 ExitPlanMode '{}' \
+    "wants to leave plan mode"
+
+# An unlisted tool still beats the generic label, so it falls through to its own name rather than
+# being dropped.
+records "an unlisted tool falls through to its own name" \
+    s7 WebFetch '{"url":"https://example.com"}' \
+    "WebFetch"
+
+# --- Shape of the record -------------------------------------------------------
+
+# A newline in the payload would make the reader, which reads one line, see a second record.
+records "a newline in the command is cut at the first line" \
+    s8 Bash '{"command":"first line\nsecond line"}' \
+    "runs: first line"
+
+run "$(payload s9 Bash "$(jq -nc --arg c "$(printf 'x%.0s' {1..300})" '{command:$c}')")"
+[ "$(descriptor s9 | wc -c)" -le 81 ] \
+    && report true "a long command is capped" \
+    || report false "a long command is capped" "got $(descriptor s9 | wc -c) bytes"
+
+run "$(payload s10 Bash '{"command":"rtk git status"}')"
+[[ "$(head -c 20 "$CONTEXT_DIR/s10")" =~ ^[0-9]+\  ]] \
+    && report true "the record opens with an epoch the reader can compare" \
+    || report false "the record opens with an epoch the reader can compare" \
+        "got: $(head -c 20 "$CONTEXT_DIR/s10")"
+
+# --- Abstaining ----------------------------------------------------------------
+
+# Each of these must leave no record AND no stdout. The second half is why they are worth having:
+# an abstain that printed an empty decision object would be a decision.
+abstains() {
+    run "$2"
+    [ -z "$(ls -A "$CONTEXT_DIR" 2>/dev/null)" ] \
+        && report true "$1" \
+        || report false "$1" "wrote: $(ls -A "$CONTEXT_DIR")"
+    silent \
+        && report true "$1 — writes nothing to stdout" \
+        || report false "$1 — writes nothing to stdout" "stdout: $(cat "$STDOUT")"
+}
+
+abstains "a payload with no session_id records nothing" \
+    "$(jq -nc '{hook_event_name:"PermissionRequest", tool_name:"Bash", tool_input:{command:"ls"}}')"
+
+abstains "a payload with no tool_name records nothing" \
+    "$(jq -nc '{hook_event_name:"PermissionRequest", session_id:"s11", tool_input:{}}')"
+
+abstains "unparseable input records nothing" "not json at all"
+
+abstains "empty input records nothing" ""
+
+# The session id becomes a filename, so a traversal in it must not place the record elsewhere.
+abstains "a session id containing a slash records nothing" \
+    "$(payload "../escaped" Bash '{"command":"ls"}')"
+
+summary

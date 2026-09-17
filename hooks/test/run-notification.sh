@@ -64,8 +64,20 @@ run() {
     : > "$CALLS"
     : > "$STDOUT"
     printf '%s' "$1" \
-        | PATH="$STUB_DIR:$PATH" OSASCRIPT_CALLS="$CALLS" CLAUDE_NOTIFY_LOG="$LOG" bash "$HOOK" \
+        | PATH="$STUB_DIR:$PATH" OSASCRIPT_CALLS="$CALLS" CLAUDE_NOTIFY_LOG="$LOG" \
+          CLAUDE_PERMISSION_CONTEXT_DIR="$CONTEXT_DIR" bash "$HOOK" \
         > "$STDOUT"
+}
+
+# The half notify-permission-context.sh writes. Pointed at the temp tree so a run never reads or
+# deletes a real session's record — the hook consumes what it reads, so an unscoped run would
+# destroy the context of whatever session is waiting on a prompt right now.
+CONTEXT_DIR="$WORK_DIR/context"
+
+# context <session> <age-in-seconds> <descriptor> — plant a record as if the other hook wrote it.
+context() {
+    mkdir -p "$CONTEXT_DIR"
+    printf '%s %s\n' "$(( $(date -u +%s) - $2 ))" "$3" > "$CONTEXT_DIR/$1"
 }
 
 payload() {
@@ -153,5 +165,59 @@ run "$(jq -n '{session_id: "check", hook_event_name: "Notification",
 notified \
     && report false "payload without cwd does not notify" "captured: $(cat "$CALLS")" \
     || report true "payload without cwd does not notify"
+
+# --- Reading what the PermissionRequest half left ------------------------------
+
+# The pair's whole point: a fresh record names the prompt instead of the generic label.
+context check 2 "asks: Auth method"
+run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
+grep -q 'asks: Auth method' "$CALLS" \
+    && report true "a fresh record names the prompt" \
+    || report false "a fresh record names the prompt" "captured: $(cat "$CALLS")"
+
+# Consumed, not just read. Leaving it would let the next prompt in this session — the sandboxed
+# network request that writes no record — inherit a descriptor belonging to something else.
+[ -f "$CONTEXT_DIR/check" ] \
+    && report false "the record is consumed" "still present" \
+    || report true "the record is consumed"
+
+# Older than the window: the notification fires about six seconds after the request, so a record
+# this old belongs to a prompt that was answered before it could fire.
+context check 600 "runs: bin/rails db:migrate"
+run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
+grep -q 'needs a response' "$CALLS" \
+    && report true "a stale record falls back to the generic label" \
+    || report false "a stale record falls back to the generic label" "captured: $(cat "$CALLS")"
+[ -f "$CONTEXT_DIR/check" ] \
+    && report false "a stale record is cleared too" "still present" \
+    || report true "a stale record is cleared too"
+
+# A record whose first field is not an epoch is not one of ours, and must not be read as a
+# descriptor with the age check silently passing on a comparison against nothing.
+mkdir -p "$CONTEXT_DIR"
+printf 'garbage runs: something\n' > "$CONTEXT_DIR/check"
+run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
+grep -q 'needs a response' "$CALLS" \
+    && report true "a record with no epoch falls back to the generic label" \
+    || report false "a record with no epoch falls back to the generic label" "captured: $(cat "$CALLS")"
+
+# No record at all is the sandboxed-network case, which PermissionRequest never sees.
+rm -rf "$CONTEXT_DIR"
+run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
+grep -q 'needs a response' "$CALLS" \
+    && report true "no record falls back to the generic label" \
+    || report false "no record falls back to the generic label" "captured: $(cat "$CALLS")"
+
+# An idle_prompt stays silent whatever is sitting in the context directory, and leaves the record
+# for the permission prompt it belongs to.
+context check 2 "asks: Auth method"
+run "$(payload idle_prompt /Users/alice/dev/shipping-tracker)"
+notified \
+    && report false "idle_prompt ignores a record" "captured: $(cat "$CALLS")" \
+    || report true "idle_prompt ignores a record"
+[ -f "$CONTEXT_DIR/check" ] \
+    && report true "idle_prompt leaves the record alone" \
+    || report false "idle_prompt leaves the record alone" "record was consumed"
+rm -rf "$CONTEXT_DIR"
 
 summary || exit 1

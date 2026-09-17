@@ -179,6 +179,14 @@
             "command": "$HOME/.claude/hooks/claude-dir-write-allow.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/notify-permission-context.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [

@@ -102,6 +102,23 @@ stage hooks/claude-dir-write-allow.sh hooks/test/run-permission-request.sh
 run
 permits 'a tiered hook staged with its suite is permitted'
 
+# Two hooks share the PermissionRequest shape and one suite name is a prefix of the other, so a
+# prefix match anywhere in the obligation check would let either clear the other. It is an exact
+# comparison for a file entry and a prefix only for a directory one — asserted here because the
+# names make the wrong behaviour look plausible, and because nothing about a wrongly-cleared
+# obligation is visible at the moment it is cleared.
+fresh
+stage hooks/claude-dir-write-allow.sh hooks/test/run-permission-request-context.sh
+run
+blocks 'the longer sibling suite does not clear the shorter one'
+says 'hooks/test/run-permission-request.sh' 'the block still names the suite actually owed'
+
+fresh
+stage hooks/notify-permission-context.sh hooks/test/run-permission-request.sh
+run
+blocks 'the shorter sibling suite does not clear the longer one'
+says 'hooks/test/run-permission-request-context.sh' 'the block names the context suite'
+
 # Several units share one suite, so staging that suite clears all of them at once.
 fresh
 stage hooks/reflexive-cd-guard.sh hooks/shell-machinery-guard.sh hooks/test/run-checks.sh
