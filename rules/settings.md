@@ -173,10 +173,11 @@ Failure mode this prevents: moving a skill-script permission to frontmatter-only
 
 ## The Offered Save Rule Is Not the Entry to Write
 
-The "Yes, and don't ask again for: …" option writes a rule generated from the command at hand, and it runs broader than the entry the situation calls for. Two observed shapes:
+The "Yes, and don't ask again for: …" option writes a rule generated from the command at hand, and it usually runs broader than the entry the situation calls for — though not always, which is the third shape below. Three observed shapes:
 
 - **Broader in pattern** — a `trafilatura --URL` fetch offered `trafilatura *`, which also grants `--crawl` and `--explore`, flags that walk whole sites. The right entry was `Bash(trafilatura --URL:*)`.
 - **Wrong in scope, and bundled** — a compound command offered one grant covering both its halves, scoped to the project it ran in, for a version check belonging in the global file.
+- **Too narrow to work at all.** A pipeline whose segments are separately evaluated can have more than one segment lacking a rule, and the offer names one of them. `git grep … | grep … | head -40` offered `git grep *`, which leaves `head -40` still ungranted — so accepting it does not stop the prompt, and the next identical command asks again on a different segment. Count the unmatched segments before reading an offer as sufficient, since the dialog names one whatever the number is.
 
 Read the offer as a signal that an entry is missing, not as the entry: take plain "Yes", then write the rule by hand where its scope belongs. The offer is still worth reading, since it shows the string the gate actually matched — what `rule-maintenance.md` says to build from.
 
