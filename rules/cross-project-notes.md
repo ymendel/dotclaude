@@ -41,6 +41,16 @@ When the project-notes recognition triggers fire (see `project-notes.md`) but th
 
 **Filing a new note means adding its line to `notes/README.md` in the same edit** — name plus a one-line hook, in the matching group. A note absent from the index is a note the *When to check* step above will not find, which defeats the filing. Adding to an existing note needs an index line only if the hook no longer covers what the file holds. Keep content out of the index — the note file is where substance lives.
 
+## "Park it" means file it
+
+When the user parks something — "let's park this", "set that aside", "not now", "we'll come back to it" — that is an instruction to record it, not to hold it. File it before moving on. Parking happens mid-thread, so the context that makes the finding worth keeping is at its peak right then and thin a few turns later.
+
+The exception is a short-fuse reminder carrying nothing durable — "remind me in ten minutes" — which genuinely is a hold. The test is whether the thing would still be worth knowing next week.
+
+**Name the destination rather than assuming it.** There are several: this file's `~/.claude/notes/`, `ideas/` for parked development threads (`parked-ideas.md`), a project's declared notes destinations (`project-notes.md`), an ADR, the tracker. A parking instruction almost never says which one, and the routing is where these go wrong far more often than the filing does. Read the candidate destinations before choosing, per `project-notes.md` — a parked thread usually belongs *inside* an existing file rather than in a new one, and only that file's contents show it.
+
+Failure mode this prevents: parking reads as a scheduling decision rather than a filing one, so the thread is dropped and the session moves on with nothing written down. Nothing errors. The cost surfaces later as the same investigation run twice, or as the user having to ask "was there anything worth recording from that" — which puts the recall burden back exactly where parking was meant to take it from.
+
 ## Failure mode this prevents
 
 Without this destination, cross-project lessons either (a) get force-fit into project memory where they die with the project, (b) get force-fit into rules where they pollute behavioral guidance with topical content, or (c) evaporate. The notes directory is the explicit "this is durable, non-behavioral, cross-project knowledge" slot that those three failure modes route around.
