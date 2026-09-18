@@ -44,6 +44,21 @@ Failure mode this prevents: a file that only became worth keeping *after* it was
 evaporates with the session, or an artifact meant *for the user* lands where only the model
 navigates comfortably and they are left asking "where is it?" before they can use it.
 
+**"Who will open it" has a third answer — another session — and the scratchpad cannot serve
+it.** That path is keyed to a session id, so a peer cannot reach it: invisibly, rather than
+inconveniently. A commit message drafted for *this* session to run is one-shot output and
+stays in the scratchpad as above. One drafted for a different session to commit is not,
+because the reasoning that belongs in a commit body lives only in the session that made the
+edit — hand over the diff alone and the provenance, the incident, and the rejected
+alternative that `rule-maintenance.md` routes there are simply gone. That file goes under
+`.claude/scratch/`, and the *committing* session deletes it once the commit lands, since the
+authoring session never observes that moment. The deletion trigger below transfers with the
+file.
+
+Failure mode this prevents: the body is written where only its author can read it, so the
+session that commits either re-derives the reasoning from a diff or ships without it. The
+message was drafted correctly and the commit succeeds, so nothing marks what was lost.
+
 **A script you are about to run is not one-shot output, whatever its lifespan.** Its logic
 *is* the work, and the command that runs it reaches the permission gate as an opaque
 `python3 /private/tmp/claude-…/derive-thing.py` — a path and nothing else. The user is then
