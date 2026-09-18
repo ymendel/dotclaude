@@ -37,6 +37,33 @@ command -v jq &>/dev/null || exit 0
 
 jq -e . >/dev/null 2>&1 <<<"$INPUT" || exit 0
 
+# THE SUGGESTIONS LOG answers the one question the descriptor below cannot. `permission_suggestions`
+# is the only documented input field this hook does not read, and the open question is whether the
+# MCP title the dialog shows ("honeycomb — Get Dataset Tool") rides in it — the tool name is all the
+# descriptor has to work from, and it renders `calls: honeycomb get dataset` instead.
+#
+# A separate file from the descriptor record, deliberately. That one is per-session, overwritten by
+# the next prompt, and deleted by the reader once used; this is append-only and nothing consumes it.
+#
+# EVERY parseable request is logged, including those carrying no suggestions, which record `null`.
+# Logging only the ones that carry the field would leave a later absence ambiguous between "that
+# tool never prompted" and "it prompted and carried nothing" — and distinguishing those two is the
+# entire reason for the log.
+#
+# Growth is unbounded by decision rather than by oversight: these are log lines, and rotation is
+# available if the size ever matters. Same call as `.notification-probe.jsonl`.
+#
+# Appended to a file, never printed. Emitting anything on stdout would make this observer a
+# decision-maker, which is what the suite's silence assertions exist to catch.
+SUGGESTIONS_LOG="${CLAUDE_PERMISSION_SUGGESTIONS_LOG:-$HOME/.claude/.permission-suggestions.jsonl}"
+
+jq -c --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '{at: $at,
+      session_id: (.session_id // null),
+      tool_name: (.tool_name // null),
+      permission_suggestions: (.permission_suggestions // null)}' \
+    <<<"$INPUT" >> "$SUGGESTIONS_LOG" 2>/dev/null
+
 SESSION=$(jq -r '.session_id // empty' <<<"$INPUT")
 TOOL=$(jq -r '.tool_name // empty' <<<"$INPUT")
 

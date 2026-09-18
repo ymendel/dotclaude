@@ -41,12 +41,23 @@ trap cleanup EXIT
 
 CONTEXT_DIR="$WORK_DIR/context"
 
-# run <payload> — feeds the hook, leaving its stdout in $STDOUT.
+# run <payload> — feeds the hook, leaving its stdout in $STDOUT and its suggestions line in
+# $SUGGESTIONS_LOG.
+#
+# BOTH env vars must be set on every invocation. CLAUDE_PERMISSION_SUGGESTIONS_LOG defaults to the
+# real log in $HOME, so a run that forgot it would append this suite's invented fixtures to the file
+# the MCP-title question is meant to be answered from — poisoning the data rather than losing it,
+# which is the worse failure of the two.
 run() {
     STDOUT="$WORK_DIR/stdout.txt"
+    SUGGESTIONS_LOG="$WORK_DIR/suggestions.jsonl"
     rm -rf "$CONTEXT_DIR"
     : > "$STDOUT"
-    printf '%s' "$1" | CLAUDE_PERMISSION_CONTEXT_DIR="$CONTEXT_DIR" bash "$HOOK" > "$STDOUT"
+    : > "$SUGGESTIONS_LOG"
+    printf '%s' "$1" \
+        | CLAUDE_PERMISSION_CONTEXT_DIR="$CONTEXT_DIR" \
+          CLAUDE_PERMISSION_SUGGESTIONS_LOG="$SUGGESTIONS_LOG" \
+          bash "$HOOK" > "$STDOUT"
 }
 
 # payload <session> <tool> <tool_input-json>
@@ -172,5 +183,54 @@ abstains "empty input records nothing" ""
 # The session id becomes a filename, so a traversal in it must not place the record elsewhere.
 abstains "a session id containing a slash records nothing" \
     "$(payload "../escaped" Bash '{"command":"ls"}')"
+
+# --- The suggestions log -------------------------------------------------------
+
+# This log exists to settle whether the MCP title the dialog shows rides in
+# `permission_suggestions`. It is separate from the descriptor record above: that one is
+# per-session and consumed, this one is append-only and nothing deletes it.
+
+run "$(jq -nc '{hook_event_name:"PermissionRequest", session_id:"s15", tool_name:"Bash",
+                tool_input:{command:"ls"},
+                permission_suggestions:[{type:"addRules", rules:[{toolName:"Bash"}]}]}')"
+expect_eq "$(jq -c '.permission_suggestions' < "$SUGGESTIONS_LOG")" \
+    '[{"type":"addRules","rules":[{"toolName":"Bash"}]}]' \
+    "a request carrying suggestions logs them verbatim"
+
+# Absence is logged as null rather than skipped. A missing line would leave a later reader unable to
+# tell "that tool never prompted" from "it prompted and carried nothing", which is the distinction
+# the log is for.
+run "$(payload s16 Bash '{"command":"ls"}')"
+expect_eq "$(jq -c '.permission_suggestions' < "$SUGGESTIONS_LOG")" "null" \
+    "a request carrying no suggestions logs null, not nothing"
+
+expect_eq "$(jq -r '.tool_name' < "$SUGGESTIONS_LOG")" "Bash" \
+    "the logged line carries the tool name"
+
+# One line per request, so the file stays readable with `jq -c` per line rather than as one document.
+run "$(payload s17 Bash '{"command":"ls"}')"
+expect_eq "$(wc -l < "$SUGGESTIONS_LOG" | tr -d ' ')" "1" \
+    "one request writes exactly one line"
+
+# The silence invariant has to survive the new write. An observer that started printing would begin
+# deciding prompts, and in a session that cannot prompt a malformed answer denies the call.
+silent \
+    && report true "logging suggestions writes nothing to stdout" \
+    || report false "logging suggestions writes nothing to stdout" "stdout: $(cat "$STDOUT")"
+
+# An MCP payload is the case the log was added for, so assert it survives the round trip rather than
+# trusting that it looks like the others.
+run "$(jq -nc '{hook_event_name:"PermissionRequest", session_id:"s18",
+                tool_name:"mcp__honeycomb__get_dataset", tool_input:{environment_slug:"production"},
+                permission_suggestions:[{type:"addRules",
+                                         rules:[{toolName:"mcp__honeycomb__get_dataset"}]}]}')"
+expect_eq "$(jq -r '.tool_name' < "$SUGGESTIONS_LOG")" "mcp__honeycomb__get_dataset" \
+    "an MCP request logs its full tool name"
+
+# Unparseable input must not append a line either — the log is fed from a jq filter over the payload,
+# so a parse failure there would otherwise write a malformed record the reader cannot skip past.
+run "not json at all"
+expect_eq "$(wc -c < "$SUGGESTIONS_LOG" | tr -d ' ')" "0" \
+    "unparseable input logs nothing"
 
 summary
