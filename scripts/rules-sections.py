@@ -61,4 +61,8 @@ def main():
     print(f"\n{len(rows)} sections at or over 1200 bytes, {sum(r[0] for r in rows)} bytes total")
 
 
-main()
+# Guarded so the module can be imported without running. Its suite loads it by file path —
+# the hyphen in the filename rules out an import statement — and `exec_module` runs the
+# module body, so an unguarded call here would scan rules/ on every test run.
+if __name__ == "__main__":
+    main()
