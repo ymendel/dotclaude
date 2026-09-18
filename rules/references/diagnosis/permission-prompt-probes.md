@@ -48,6 +48,19 @@ command's network request, which reaches `permission_prompt` only.
 This does not reopen the plain-Yes blind spot above. `PermissionRequest` separates *prompted* from
 *never going to prompt*; it still says nothing about which answer the user gave.
 
+**An MCP tool reaches it identically**, which the docs state rather than leave to inference: "MCP
+server tools appear as regular tools in tool events (`PreToolUse`, `PostToolUse`,
+`PostToolUseFailure`, `PermissionRequest`, `PermissionDenied`)". So probing an MCP call needs no
+different instrument — `tool_name` carries `mcp__<server>__<tool>` like any other, and the payload
+adds an `mcp_server` object on top.
+
+What it does *not* carry is the title the dialog shows. A prompt reading "honeycomb — Get Dataset
+Tool" is served by a payload holding only `mcp__honeycomb__get_dataset`, so anything rendering that
+prompt from hook input is working from the name and will not match what the user saw. Whether the
+title rides in `permission_suggestions` — the one documented input field not read for this — is
+open, and `hooks/notify-permission-context.sh` now logs that field on every request so a single live
+MCP prompt settles it.
+
 ## Shaping a probe that attributes cleanly
 
 One command, with no pipe, redirect, or command substitution. Claude Code evaluates each segment of a
