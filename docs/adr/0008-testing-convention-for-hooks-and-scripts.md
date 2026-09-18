@@ -1,7 +1,7 @@
 # ADR 0008: Testing Convention for Hooks and Scripts
 
 **Date:** 2026-08-17
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
@@ -29,9 +29,9 @@ framed at the time as the real blocker, bats versus driving bash from pytest —
 answered itself in practice before anyone chose. Nobody weighed plain bash
 against a framework and picked bash. Plain bash kept being what got written.
 
-Three suites exist across two repos, and the relationship between them is worth
-stating precisely, because it is the whole evidentiary basis for the harness
-decision below. Two are in the sibling dotfiles repo: `demo/test/run-checks.sh`
+Three suites existed across two repos when this was drafted, and the relationship
+between them is worth stating precisely, because it is the whole evidentiary
+basis for the harness decision below. Two are in the sibling dotfiles repo: `demo/test/run-checks.sh`
 (28 cases, introduced in "add a demo topic to repair and extend demo-magic") and
 `shell/test/run-checks.sh` (9 cases, at "count local branch commits against the
 main branch", still unmerged). Those two share a *verbatim* helper signature
@@ -405,8 +405,8 @@ comes up would leave the gate unimplementable:
 | `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
 | `hooks/rtk-rewrite.sh` | 3 | vendored, pinned by checksum |
 | Skill validators and generators | 1 | dense deterministic logic; `init_skill.py` is 2, being human-run |
-| `scripts/sync-skill.sh` | 2 | copies files over others, human-run |
-| `scripts/compare-skills.sh` | 2 | reports a diff a human acts on |
+| `scripts/sync-skill.sh` | 2 | copies files over others, human-run — suite deferred, see below |
+| `scripts/compare-skills.sh` | 2 | reports a diff a human acts on — suite deferred, see below |
 | `scripts/check-prerequisites.sh` | 2 | its exit code is a contract, and its branches need synthesised conditions |
 | `scripts/session-meta-report.py` | 2 | derives figures that land in durable artifacts |
 | `scripts/rules-floor.sh` | 2 | same, and it writes a baseline |
@@ -422,6 +422,30 @@ comes up would leave the gate unimplementable:
 
 A unit added later is tiered by the axis above, and the table gains a row in the
 same change.
+
+**Two rows carry a deliberate exception: `sync-skill.sh` and `compare-skills.sh`
+are tiered and knowingly untested.** They are a matched pair over the same two
+skill directories, and more than that may be true of them — `sync-skill.sh`'s
+header states its file set "matches compare-skills.sh's notion of 'the skill'",
+they share the `MINE` / `THEIRS` variables and the `git ls-files` rule that
+derives it, and `sync-skill.sh --dry-run` already does most of what
+`compare-skills.sh <skill> --verbose` does. They may want to be one script with
+two modes, or one suite rather than two, and the criterion for the second
+question is the helper-set reading below rather than the file count.
+
+None of that is settled, and the question above it is not either: how skills get
+packaged for the team repo is under active reconsideration, and if they ship as a
+plugin then "sync between two checkouts" changes meaning or stops being the
+operation. A suite written now would pin the current shape, and — worse than the
+wasted effort — a green summary would make that shape read as settled while it is
+the thing in question.
+
+So these two wait on that decision rather than on anybody's attention, which is
+why the ratchet's "existing untested code is not retroactively a defect" clause is
+not what covers them. They are named here so the gap reads as a decision rather
+than an oversight, and so the next person to reach for the suites finds the
+ordering first: settle packaging, then the tool's shape, then write whatever
+suites the result wants — one, two, or none.
 
 The ratchet: **a Tier 1 or Tier 2 unit gains test cases in the same change that
 introduces or modifies it.** "Introduces" is deliberate — a new Tier 1 unit owes
