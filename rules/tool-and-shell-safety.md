@@ -18,7 +18,7 @@ The reflex appears after working across multiple directories in one session (e.g
 
 Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
 a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
-it is built out of are the ones the gate cannot resolve. Six instances, all real:
+it is built out of are the ones the gate cannot resolve. Seven instances, all real:
 
 - **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
@@ -51,6 +51,30 @@ it is built out of are the ones the gate cannot resolve. Six instances, all real
   output looks right, and no gate can help — the leading command resolves fine, since only its
   subcommand is invented, so a does-this-binary-exist check never fires. The stray segment is visible
   only to someone reading the command string rather than its result, and that reader is the user.
+- **A command substitution that cannot produce output.** The same shape one level in, where the
+  *outer* command is the legitimate part. A
+  `rtk grep -n 'runs,|failures' "$(rtk ls -t "$LOGDIR" | rtk head -1 > /dev/null; echo)"` greps a
+  log for a test count, which is an ordinary thing to want — so nothing about the line reads as
+  scaffolding until you look inside the `$( )`, where the body pipes its result into `/dev/null`
+  and then `echo`s nothing. The argument being computed was guaranteed to be the empty string
+  before the command ran. So ask what a `$( )` can actually return before sending it, and ask it
+  of the body as a whole rather than of its last word. A substitution is empty when *every*
+  output-producing command in it has had stdout taken away, which is what `> /dev/null` did here.
+  The trailing `echo` contributes nothing either way, and reading it as the cause is the specific
+  mistake: a bare `echo` prints blank, so it looks like it empties whatever it ends. It does not,
+  because it is not the only thing in there — `$(printf hello; echo)` returns `hello`. Read a bare
+  `echo` at the end as a tell that somebody was reaching for something, never as a guarantee.
+  `2>/dev/null` is a different thing again and usually right, since it discards the error channel
+  and leaves the value alone.
+
+  The prompt is no help, because a substitution is a `command_substitution` node the gate cannot
+  resolve (`settings.md`), so it asks about every substitution alike and says nothing about this
+  one being empty. Two faults also travelled together there, and the second is the general check:
+  the command carried a trailing `; rtk ls "$LOGDIR"` that nothing upstream depended on, which
+  means it was two commands rather than one. A later segment that does not use an earlier one is
+  the tell. Underneath both, the result being hunted for had already been reported by the command
+  run just before — `searching.md`'s *Don't search for what you already have*, in its
+  shell-rediscovery spelling.
 - **A variable assignment to avoid retyping a long string.** A `REF=origin/main; git show
   $REF:lib/parser.rb` reads as the tidy way to run three commands against one ref, and it is the same
   trade as the loop in *Batch repeated commands* below — nothing is saved, because a programmatically
