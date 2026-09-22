@@ -107,15 +107,19 @@ case "$TOOL" in
     #
     # Split on the DOUBLE underscore. A plugin-sourced server carries single underscores inside its
     # own segment — `mcp__plugin_my-plugin_db__query` is the docs' own example — so splitting on `_`
-    # would cut the server name in half.
+    # would put the boundary in the wrong place and hand the tool half a piece of the server name.
     REST=${TOOL#mcp__}
+    # Every claude.ai-hosted connector is named `claude_ai_<Name>`, so the prefix separates one from
+    # none of the others and only takes up room.
+    REST=${REST#claude_ai_}
     case "$REST" in
       *__*)
-        # Underscores become spaces in the tool half only. The server half is an identifier and
-        # stays verbatim, which is the whole reason for splitting on `__` rather than `_`.
+        # Both halves get underscores as spaces. Finding the boundary is what the `__` split is for;
+        # it says nothing about how either side then reads, and leaving the server half verbatim
+        # rendered the two sides in two different styles in one line.
         MCP_SERVER=${REST%%__*}
         MCP_TOOL=${REST#*__}
-        DESCRIPTOR="calls: $MCP_SERVER ${MCP_TOOL//_/ }"
+        DESCRIPTOR="calls: ${MCP_SERVER//_/ } ${MCP_TOOL//_/ }"
         ;;
       *)
         DESCRIPTOR="calls: ${REST//_/ }"

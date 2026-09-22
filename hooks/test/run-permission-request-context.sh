@@ -126,11 +126,22 @@ records "an MCP tool is split into server and tool" \
     "calls: honeycomb get dataset"
 
 # The split is on the double underscore, because a plugin-sourced server carries single underscores
-# inside its own segment — this name is the docs' own example. Splitting on `_` would render it
-# "plugin my-plugin db query", cutting the server identifier into three words.
-records "a plugin-sourced server keeps its own underscores" \
+# inside its own segment — this name is the docs' own example. Splitting on `_` would hand the tool
+# half `my-plugin_db__query`. The server's own underscores then become spaces like any other, so the
+# name stops being liftable as an identifier; a notification body is not where that is done.
+records "a plugin-sourced server is split at the double underscore, then spaced" \
     s13 mcp__plugin_my-plugin_db__query '{}' \
-    "calls: plugin_my-plugin_db query"
+    "calls: plugin my-plugin db query"
+
+# Every claude.ai-hosted connector carries this prefix, so it distinguishes none of them.
+records "a claude.ai connector loses its prefix" \
+    s15 mcp__claude_ai_Figma__get_design_context '{}' \
+    "calls: Figma get design context"
+
+# The prefix comes off before the split, so a multi-word connector name is spaced like any other.
+records "a multi-word connector name is spaced" \
+    s16 mcp__claude_ai_Google_Calendar__list_events '{}' \
+    "calls: Google Calendar list events"
 
 # A name with no second `__` is not the documented shape; render what there is rather than
 # splitting the server against itself.
