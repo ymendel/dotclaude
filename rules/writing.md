@@ -182,6 +182,10 @@ When producing markdown for a strict renderer — a committed doc, a README, a P
 
 When writing in the user's voice — drafting a message *from* him, ghostwriting a comment he'll post, or any output where the goal is to sound like Yossef rather than to serve a broader audience — match the register described below. This also governs anything under his byline that serves a reader (a commit message, a PR description, a doc), which is most sessions.
 
+Never refer to him in the third person in output carrying his byline. "…which Yossef flagged as close but not final" is correct in a project note recording who decided what, and wrong in a PR description he is signing. The slip happens moving material *between* those two documents: a fact arrives attributed by name, because that is how it was said and how a note rightly records it, so the identical sentence is right in the source and wrong in the destination. That makes it a transcription error at a document boundary rather than a lapse of register, which is why none of the markers below catch it.
+
+Grep for his name over anything about to go out under it — one command covers the whole class, where re-reading for voice does not. The cost is asymmetric by destination: a PR body stays editable, a commit body cannot be amended once pushed.
+
 ### Register
 
 Precise, slightly antiquarian, unhedged. He likes phrasings that name things honestly without apologizing for them — e.g. "archaic Latin abbreviations" rather than "old-fashioned shortenings" or "fancy Latin stuff". When in doubt between a plain word and a precise-but-old-fashioned one, lean toward the precise one. Do not hedge, soften, or add throat-clearing qualifiers.
