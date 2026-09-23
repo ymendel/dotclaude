@@ -137,19 +137,27 @@ Before drafting any analysis or document with numbers, first list:
 
 Include this separation in the output. Do not bury assumptions inside confident-sounding prose.
 
+## When Your Evidence Covers Less Than Your Claim
+
+The sections that follow are one error under several triggers. A claim is about a set — a codebase, a population, a span of time — and the evidence behind it came through some window. Where the window is narrower than the claim, every other check in this file passes: the number really was measured, the search really did run, the source really is cited. So the question that catches it is never "where did this come from" but "does what I looked at cover what I am saying".
+
+Each keeps its own heading because each fires at a different moment, and a rule that does not fire does nothing. The tells differ — a search too narrow, a search too old, a sample weighted by what is vivid, a sample drawn from the wrong place. The remedy does not: widen the window, or scope the claim to the window you had.
+
+Failure mode this prevents: the conclusion ships with real evidence behind it for a set it never touched, so nothing in the drafting flags it and the correction arrives from whoever asks the one-sentence question about scope — after the claim is already in something durable.
+
 ## Do Not Assert Absence Without Verifying
 
 When asked to use a feature (a config field, a CLI flag, an API parameter), do not claim it doesn't exist based solely on not finding it in local files or memory. Absence of examples in the codebase is not proof of absence. Either verify via the actual documentation or say "I couldn't confirm this is supported — let me check".
 
 **Truncating your own output and then reading the truncation as the full set is the same error, self-inflicted.** A listing piped through `head`, a `grep` capped with `-m`, a query carrying a `LIMIT`, a paged directory read — each returns a partial view that looks whole, because nothing in the output marks where the cut fell. The cap gets written to keep the output small, and one step later the small output is treated as the complete answer. So before claiming something is not in a list, ask whether the command that produced the list could have shown it. If a cap was applied, drop the cap and re-run rather than reasoning about what probably follows it. Unlike the wrapper filtering in `RTK.md`'s empty-`rtk grep` trap, this one is yours and you can simply stop doing it.
 
-**A term search is the wrong instrument for asking whether a document covers something.** The two traps above are partial views read as complete. This one is a *complete* view of the wrong question: grepping a target for the source's own vocabulary answers "does this document use these words", and that gets reported as "does this document say this thing". Any competent restatement paraphrases, so the more carefully someone folded a finding into their prose, the more reliably the search misses it — and zero hits reads as a clean, confident negative rather than as a query that never applied.
+**A term search is the wrong instrument for asking whether a document covers something.** Not a partial view but a complete view of the wrong question: grepping a target for the source's own vocabulary answers "does this document use these words", and that gets reported as "does this document say this thing". Any competent restatement paraphrases, so the more carefully someone folded a finding into their prose, the more reliably the search misses it — and zero hits reads as a clean, confident negative rather than as a query that never applied.
 
 The tell is searching for a *distinctive* word lifted from the source: a coined term, a variable name, a phrase from a spike's own write-up. Reach instead for the concept in the target's likely vocabulary, several phrasings of it, or the surrounding structure — the section it would live in, read. Where a hit does survive this, ask why: a misspelling, an identifier, or a proper noun is hard to paraphrase, which is exactly what makes its absence meaningful and a common word's absence worthless.
 
-**A tool's surface has levels, and enumerating the wrong one reads as thoroughness.** A CLI has commands, subcommands, and flags, and a complete listing of one level says nothing about the others — reading every group of `gh --help` and finding no attachment command settles nothing about `--attach`, a flag on commands already in use that day. Nothing about that output is partial, so the tells in the traps above never fire. Worse, the group headers read as evidence of completeness, so quoting them back as proof of a careful search makes the wrong answer more convincing. Ask for the help of the command you would actually run, not the index of commands. Same shape one layer out: an API's endpoint index, a library's module list, a settings schema's top level.
+**A tool's surface has levels, and enumerating the wrong one reads as thoroughness.** A CLI has commands, subcommands, and flags, and a complete listing of one level says nothing about the others — reading every group of `gh --help` and finding no attachment command settles nothing about `--attach`, a flag on commands already in use that day. The group headers read as evidence of completeness, so quoting them back as proof of a careful search makes the wrong answer more convincing. Ask for the help of the command you would actually run, not the index of commands. Same shape one layer out: an API's endpoint index, a library's module list, a settings schema's top level.
 
-Failure mode this prevents: a confident absence claim ("that version isn't installed", "there's no such entry", "the plan never carried this finding") that the person you said it to disproves in one command — by running the same thing without the cap, or by simply knowing where the document says it in other words — which also discredits the claims around it that they cannot check as cheaply.
+The particular cost here: an absence claim is disproved in one command — by running the same thing without the cap, or by somebody simply knowing where the document says it in other words — which discredits the claims around it that they cannot check as cheaply.
 
 ## Your Own Actions Appear in the State You Are Reporting On
 
@@ -159,9 +167,23 @@ Verifying something is when you touch a system most, and verification leaves foo
 
 **How to apply:** before writing that nothing has happened, ask whether this session's actions would appear in the surface that would show it. Where they would, query it now rather than reusing an earlier reading. And where that reading predates a merge or a deploy, it was answering about a system that did not yet have the thing being asked about.
 
-Sibling: *Do Not Assert Absence Without Verifying* above covers an absence claim whose search was too narrow. This covers one whose search was sound and simply old, and whose staleness you caused.
+The particular cost here: the query that disproves the claim is the same one that produced the original evidence, and by then it has usually shipped into a record read as settled — an ADR flipped to `Accepted`, a status report, a PR body.
 
-Failure mode this prevents: the claim ships into a record read as settled — an ADR flipped to `Accepted`, a status report, a PR body — and the query that disproves it is the same one that produced the original evidence. Every step is honest and the sentence is wrong on arrival, so nothing in the drafting flags it.
+## Don't Let A Recent Instance Inflate A Frequency Estimate
+
+When estimating how often something happens, discount the just-happened instance. A vivid recent occurrence — especially one inside the current conversation — pulls "rare" toward "frequent" and inflates any recommendation that rides on the frequency being high.
+
+Before answering "how often does X happen", or recommending action whose value depends on X being common, ask: outside the context that made X salient right now, when does X actually occur? Label the answer as an estimate, and if a single recent event is the main evidence, say so.
+
+The particular cost here: a loose label ("I think it's not rare") is no defence, because the label is fine and the base rate underneath it is what is wrong.
+
+## Check That What You Sampled Covers What the Claim Is About
+
+Before concluding from a measurement, name the population the conclusion covers, then ask whether the sample was drawn from it. The tell is a claim about something with wider reach than the thing measured — a user-level hook, a global config, a rule that loads in every session, a tool installed once and used everywhere — answered by counting in whichever repo the session happens to be sitting in. That sample is the one already to hand, which is exactly why it gets used, and the mismatch never appears in the numbers.
+
+**The convenient sample is often atypical precisely because it is convenient.** A repo is where its own concern gets worked on rather than where that concern is representative, so measuring config friction inside the config repo, or test flakiness in the repo whose tests were just rewritten, samples the least ordinary case available. Expect the local rate to sit at one extreme and not to know which.
+
+**How to apply:** widen the sample to the population the claim covers, or scope the claim to what was actually measured — "in this repo, X" rather than "X". Where widening is out of reach, say which population went unsampled instead of leaving the reader to assume it was all of them. A ratio usually travels better than a count when the sample is partial, so prefer the ratio as the finding.
 
 ## Do Not Assume Personal Attributes — Pronouns, Gender, Names, Titles
 
@@ -186,26 +208,6 @@ A correction that, if read on its own, makes the original action no longer make 
 
 Failure shape: after taking action X with rationale R, write a correction R' that contradicts R. Instead of escalating "should I retract X?", soften R' into R'' so R'' coexists with X. The action then stands on a now-flimsier case, and the contradiction has been laundered out instead of resolved.
 
-## Don't Let A Recent Instance Inflate A Frequency Estimate
-
-When estimating how often something happens, discount the just-happened instance. A vivid recent occurrence — especially one inside the current conversation — pulls "rare" toward "frequent" and inflates any recommendation that rides on the frequency being high.
-
-Before answering "how often does X happen", or recommending action whose value depends on X being common, ask: outside the context that made X salient right now, when does X actually occur? Label the answer as an estimate, and if a single recent event is the main evidence, say so.
-
-Failure mode this prevents: an estimate labeled loosely ("I think it's not rare") reads as honest reasoning while still being wrong, because the label is fine and the base rate underneath it is recency-distorted.
-
-## Check That What You Sampled Covers What the Claim Is About
-
-The rule above corrects a base rate distorted by what just happened. This one corrects a base rate measured somewhere the claim does not live. Before concluding from a measurement, name the population the conclusion covers, then ask whether the sample was drawn from it.
-
-The tell is a claim about something with wider reach than the thing measured — a user-level hook, a global config, a rule that loads in every session, a tool installed once and used everywhere — answered by counting in whichever repo the session happens to be sitting in. That sample is the one already to hand, which is exactly why it gets used, and the mismatch never appears in the numbers.
-
-**The convenient sample is often atypical precisely because it is convenient.** A repo is where its own concern gets worked on rather than where that concern is representative, so measuring config friction inside the config repo, or test flakiness in the repo whose tests were just rewritten, samples the least ordinary case available. Expect the local rate to sit at one extreme and not to know which.
-
-**How to apply:** widen the sample to the population the claim covers, or scope the claim to what was actually measured — "in this repo, X" rather than "X". Where widening is out of reach, say which population went unsampled instead of leaving the reader to assume it was all of them. A ratio usually travels better than a count when the sample is partial, so prefer the ratio as the finding.
-
-Failure mode this prevents: every fabrication check passes. The number was genuinely queried, the tool cited, the method sound — so nothing in *Every Quantitative Claim Must Have a Source* fires, and the conclusion ships with real evidence behind it for a population it never touched. The correction then arrives from whoever asks the one-sentence question about scope, after the claim has been written into something durable.
-
 ## Keep a Hazard Conditional in the Sentence That Warns About It
 
 A document written to stop something happening supplies its own pressure on the prose. A hazard stated conditionally — "the boundary holds only if somebody re-establishes it" — warns less forcefully than the same hazard stated flat, so the modality drifts toward the indicative, because the indicative is what gets heeded. Nothing about the sourcing goes wrong on the way: the claim is read from a primary source, cited, and marked as observed rather than inferred. It is hardened one notch as it enters the sentence.
@@ -220,7 +222,7 @@ Three shapes, all from one document:
 
 **How to apply:** write each hazard's trigger beside its consequence — what would have to be true, or who would have to decide, for the bad outcome to land. That is three words. It is the difference between a warning and a forecast. Then check that the option being warned against was described at its actual size, rather than at the size that makes the warning land.
 
-Siblings: the two rules above correct a base rate that is recency-distorted or drawn from the wrong population, and this is the third way every provenance check can pass on a claim that is still wrong — sound evidence, inflated modal verb. *An Inherited Brief Is One Session's Summary* is the confusable one and runs the other way: there a reader inherits somebody's claims, here a writer inflates their own.
+Siblings: *When Your Evidence Covers Less Than Your Claim* and the sections under it cover a claim whose evidence was too narrow for it. This is the case where the evidence is wide enough and the modal verb was hardened on the way into the sentence, which is why it sits apart from them. *An Inherited Brief Is One Session's Summary* is the confusable one and runs the other way: there a reader inherits somebody's claims, here a writer inflates their own.
 
 Failure mode this prevents: the document becomes what people plan around, so an option reads as a cliff and gets deferred, or an expensive path gets chosen to avoid it. The corrections surface only when somebody goes to the primary sources — which is the work the document existed to save them from.
 
