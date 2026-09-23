@@ -4,6 +4,20 @@
 #
 #   ./hooks/test/run-checks.sh
 #
+# FOUR SUBJECTS, named here because the file's own name names none of them and the
+# ratchet's TIERED table maps all four to it: shell-machinery-guard.sh,
+# reflexive-cd-guard.sh, uv-run-guard.sh and python-rewrite.sh. The last two went
+# uncovered for as long as that table said otherwise — a suite named for a category
+# absorbs a mapping without looking any different, where one named for a single
+# hook carries its own coverage in its filename. Add the subject to this list when
+# a fifth is mapped, and keep the list honest: it is the only place the mapping can
+# be checked against what is actually exercised.
+#
+# python-rewrite.sh is the odd one. It answers on stdout with a rewritten command
+# rather than through an exit code, and it branches on what PATH can see, so its
+# cases use their own helpers and their own bin-directory fixtures rather than
+# `check` and `says`.
+#
 # Every payload lives in this file rather than in a Bash command, because
 # shell-machinery-guard.sh and reflexive-cd-guard.sh both match their own
 # trigger text: assembling these cases inline would block the test run itself.
@@ -35,11 +49,44 @@ export CLAUDE_PROJECT_DIR="$PROJ"
 ADDED="$(mktemp -d)"
 OUTSIDE="$(mktemp -d)"
 mkdir -p "$ADDED/nested"
+
+# python-rewrite.sh branches on what PATH can see, so each branch needs a PATH
+# that admits only one answer. That means a PATH with nothing else on it, which
+# in turn means linking in the few tools the hook needs before it reaches any
+# branch: its shebang resolves bash through PATH, and it runs cat and jq.
+PYBIN_REWRITE="$(mktemp -d)"   # python3 only    -> rewrites
+PYBIN_HASPY="$(mktemp -d)"     # python present  -> no-op
+PYBIN_NEITHER="$(mktemp -d)"   # neither present -> no-op
+
 cleanup() {
     [ -n "$ADDED" ] && rm -rf "$ADDED"
     [ -n "$OUTSIDE" ] && rm -rf "$OUTSIDE"
+    [ -n "$PYBIN_REWRITE" ] && rm -rf "$PYBIN_REWRITE"
+    [ -n "$PYBIN_HASPY" ] && rm -rf "$PYBIN_HASPY"
+    [ -n "$PYBIN_NEITHER" ] && rm -rf "$PYBIN_NEITHER"
 }
 trap cleanup EXIT
+
+stock_bin() {
+    ln -s "$(command -v bash)" "$1/bash"
+    ln -s "$(command -v cat)" "$1/cat"
+    ln -s "$(command -v jq)" "$1/jq"
+}
+stock_bin "$PYBIN_REWRITE"
+stock_bin "$PYBIN_HASPY"
+stock_bin "$PYBIN_NEITHER"
+
+# The hook only asks `command -v`, never executing either interpreter, so these
+# link to the real ones rather than to stubs — a stub would pass the same check
+# while asserting less.
+if command -v python3 &>/dev/null; then
+    HAVE_PYTHON3=true
+    ln -s "$(command -v python3)" "$PYBIN_REWRITE/python3"
+    ln -s "$(command -v python3)" "$PYBIN_HASPY/python3"
+    ln -s "$(command -v python3)" "$PYBIN_HASPY/python"
+else
+    HAVE_PYTHON3=false
+fi
 
 # `~/.claude` is a symlink to this repo in the documented install, which is what
 # makes the physical-path check testable — a path that reaches a guarded root by
@@ -102,6 +149,39 @@ smg() { check shell-machinery-guard.sh "$@"; }
 smg_says() { says shell-machinery-guard.sh "$@"; }
 rcd() { check_at reflexive-cd-guard.sh "$@"; }
 rcd_says() { says reflexive-cd-guard.sh "$@"; }
+uvg() { check uv-run-guard.sh "$@"; }
+uvg_says() { says uv-run-guard.sh "$@"; }
+
+# pyrw_emits <label> <bindir> <command> <expected-stdout-substring>
+# python-rewrite.sh signals through stdout rather than an exit code, so neither
+# `check` nor `says` fits — both discard it. PATH is replaced outright rather
+# than prepended, since the branch under test is an *absence*.
+pyrw_emits() {
+    local label="$1" bindir="$2" cmd="$3" want="$4"
+    local out
+    out=$(jq -n --arg c "$cmd" '{tool_input:{command:$c}}' \
+        | PATH="$bindir" "$GUARD_DIR/python-rewrite.sh" 2>/dev/null)
+    if [[ "$out" == *"$want"* ]]; then
+        report true "$label"
+    else
+        report false "$label" "stdout lacked '$want'"
+    fi
+}
+
+# pyrw_silent <label> <bindir> <command> — the hook declined to act.
+# Checked on stdout rather than exit status because every branch here exits 0,
+# so the exit code cannot tell a rewrite from a pass-through.
+pyrw_silent() {
+    local label="$1" bindir="$2" cmd="$3"
+    local out
+    out=$(jq -n --arg c "$cmd" '{tool_input:{command:$c}}' \
+        | PATH="$bindir" "$GUARD_DIR/python-rewrite.sh" 2>/dev/null)
+    if [ -z "$out" ]; then
+        report true "$label"
+    else
+        report false "$label" "expected no output, got '$out'"
+    fi
+}
 
 echo "== shell-machinery-guard: blocks a definition (exit 2)"
 smg "leading posix definition"        2 'for_each() { :; }; git status'
@@ -311,5 +391,47 @@ rcd_says "stranded: cd . says no-op"       "no-op"                    "$OUTSIDE"
 rcd_says "stranded: says cwd is not root"  "NOT the project root"     "$OUTSIDE" "cd ."
 rcd_says "stranded: names the way back"    "$PROJ"                    "$OUTSIDE" "cd ."
 rcd_says "at root: git-root message"       "git root"                 "$PROJ" 'cd $(git rev-parse --show-toplevel)'
+
+echo
+echo "== uv-run-guard: an option before the script path is blocked (exit 2)"
+uvg "--with before the path"       2 'uv run --with requests skills/skill-architecture/scripts/validate.py'
+uvg "--index-url before the path"  2 'uv run --index-url http://example.invalid skills/skill-architecture/scripts/validate.py'
+uvg "--python before the path"     2 'uv run --python 3.13 skills/skill-architecture/scripts/validate.py'
+uvg "the rtk-rewritten spelling"   2 'rtk uv run --with requests skills/skill-architecture/scripts/validate.py'
+uvg "second in a chain"            2 'rtk ls && uv run --with requests skills/skill-architecture/scripts/validate.py'
+
+echo
+echo "== uv-run-guard: the safe shape, and anything it does not cover (exit 0)"
+uvg "bare, script path first"      0 'uv run skills/skill-architecture/scripts/validate.py'
+# An argument that merely starts like an option, sitting after the path where it
+# is the script's own. Pins the guard to position rather than to the option text.
+uvg "option-shaped script arg"     0 'uv run skills/skill-architecture/scripts/validate.py --with-teeth'
+uvg "option before an unguarded path" 0 'uv run --with requests tools/report.py'
+uvg "guarded path without uv run"  0 'python3 skills/skill-architecture/scripts/validate.py'
+uvg "unrelated command"            0 'git status'
+uvg "empty command"                0 ''
+
+echo
+echo "== uv-run-guard: the message names what it blocked"
+uvg_says "names the guard"         "uv-run-guard: blocked" '' 'uv run --with requests skills/skill-architecture/scripts/validate.py'
+uvg_says "names the option class"  "--with-requirements"   '' 'uv run --with requests skills/skill-architecture/scripts/validate.py'
+
+echo
+echo "== python-rewrite: acts only when python is absent and python3 is not"
+if [ "$HAVE_PYTHON3" = true ]; then
+    pyrw_emits  "rewrites a python command"        "$PYBIN_REWRITE" 'python script.py'    '"command":"python3 script.py"'
+    pyrw_emits  "rewrites bare python"             "$PYBIN_REWRITE" 'python'              '"command":"python3"'
+    pyrw_emits  "carries the allow decision"       "$PYBIN_REWRITE" 'python script.py'    '"permissionDecision":"allow"'
+    pyrw_silent "no-op where python exists"        "$PYBIN_HASPY"   'python script.py'
+    pyrw_silent "no-op where python3 is missing"   "$PYBIN_NEITHER" 'python script.py'
+    pyrw_silent "leaves python3 alone"             "$PYBIN_REWRITE" 'python3 script.py'
+    # It rewrites a *leading* python only, so a chain is untouched even though the
+    # interpreter it would fix is right there in the string.
+    pyrw_silent "leaves a chained python alone"    "$PYBIN_REWRITE" 'rtk ls && python script.py'
+    pyrw_silent "unrelated command"                "$PYBIN_REWRITE" 'git status'
+    pyrw_silent "empty command"                    "$PYBIN_REWRITE" ''
+else
+    report_skip "python-rewrite cases" "python3 is absent, so no branch can be told from another"
+fi
 
 summary
