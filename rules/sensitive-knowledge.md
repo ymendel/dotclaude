@@ -70,6 +70,46 @@ rule holds. ADRs are the sharpest case — they commit by design, so the sensiti
 *before* it lands, not cleaned up after. `project-notes` bites whenever its declared destination is a
 tracked file, which is the common case.
 
+## Access to an account is not ownership of what is in it
+
+The sections above split by *kind* of knowledge and treat ownership as the stakes of a leak rather
+than its trigger. This is the same conflation one layer out: there the question is which knowledge
+lands in a repo, here which systems the work touches at all.
+
+A shared surface — a cloud provider account, a hosting org, a CI dashboard, a monitoring
+workspace — routinely holds admin over several tenants, only some of which belong to the person
+asking. Admin rights look like the boundary and are not one. A listing command usually makes this
+worse by flattening the distinction: it returns everything reachable rather than everything owned,
+so the fleet appears to be one fleet. The tenant-scoped form of the same command is what draws the
+line, and it is the one to reach for when a task says "ours."
+
+Two things follow, and the second is the one that slips past.
+
+**Scope the work to what is owned.** A cleanup, audit, or cost review of "our infrastructure"
+covers the owned tenant and stops. Extending it to a neighbouring tenant is not thoroughness — it
+is acting on somebody else's system because the credentials happened to reach it. Where the access
+was granted for a specific engagement, it was granted for that engagement.
+
+**Keep the other tenant's detail out of your own artifacts.** Findings about a third party's
+resources, plans, and spend do not belong in a note written for your own operations, even a
+gitignored one, because nothing there will ever act on them. The pull is strong precisely because
+the data is already on screen and enumerating it feels like diligence — a survey of the whole
+account reads as the more complete audit. It is a different document for a different party, and
+usually one that is theirs to commission rather than yours to volunteer. An observation genuinely
+worth passing on goes to that party directly, on their timing, framed as something they may already
+know.
+
+**How to apply:** before a task that sweeps an account, establish which tenants are owned and name
+the scope explicitly in whatever gets written. Prefer the owner-scoped listing over the
+everything-reachable one, so the out-of-scope material is never in hand to be tidied out later. When
+an out-of-scope finding surfaces anyway, say it in conversation and let the user route it — do not
+file it, and do not offer to extend the sweep.
+
+Failure mode this prevents: a scoped request quietly becomes an audit of a client's estate, and the
+result is offered back as extra value — which puts the user in the position of explaining that the
+access is a client's trust rather than a mandate, and leaves a record of that client's costs sitting
+in the user's own notes for no purpose.
+
 ## Failure mode this prevents
 
 People and relationship knowledge — a candid note on how a client actually operates, who to route

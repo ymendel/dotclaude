@@ -54,6 +54,27 @@ Use imperative voice throughout ("do X", "never Y"). Avoid both first-person ("I
 
 When writing a new rule, include the failure mode it prevents — not just what to do, but what goes wrong without it. Rules that only describe the happy path leave room for the exact failure they're meant to prevent.
 
+## Offer a new mechanism before automating it
+
+When introducing a recurring behavior — a review checkpoint, a proactive suggestion, a hook, any
+trigger that could fire on its own — start by offering it, and let the user take or decline it each
+time. Automate later, once it has fired often enough that its shape is understood and the asking has
+become drudgery.
+
+The tension is between agency and drudgery, and it does not resolve the same way at both ends of a
+mechanism's life. Early on the offer *is* the point: it shows what the trigger recognized and what
+would happen next, which is how the user learns whether the recognition is any good. Later, after
+the answer has been yes many times, that same offer is friction carrying no information.
+
+"Should this be automatic?" is therefore a question to raise once a mechanism has proven itself, not
+while proposing it. And when a rule introduces a trigger, say which mode it is in, so nobody
+re-derives the answer every time it fires.
+
+Failure mode this prevents: a mechanism ships automatic because automatic is obviously better once
+it works, and the user never sees the trigger fire in order to judge it. What is lost is not control
+but understanding — a step that fires automatically on a recognition nobody inspected is
+indistinguishable from one that fires on a bad recognition.
+
 ## Where dated observations go
 
 Dated observations, confirmation records ("Confirmed <date>: …"), and "here's the incident that motivated this" asides belong in the commit body that introduces or changes a rule — git history — not in the always-loaded rule prose. Keep the actionable directive and the failure-mode-it-prevents in the rule. Move the dated incident to the commit. This is ADR 0007's destination 3 (see [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md) for the full four-destination routing policy). The one nuance: where an incident carried reusable insight, keep a compressed, un-dated version of that insight in prose and move only the dated narrative to the commit.
