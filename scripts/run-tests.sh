@@ -38,6 +38,13 @@
 #
 # A missing interpreter is REFUSED rather than skipped. A skipped suite still leaves a green
 # summary, which is a false pass. Bash suites need only bash and jq.
+#
+# RUNTIME is roughly 105 seconds as of 2026-09-23, close enough to a 120-second default timeout to
+# matter. A caller that backgrounds the command when its timeout expires gets no output and no exit
+# status, which is indistinguishable from a wedged run — so pass an explicit timeout rather than
+# relying on a default. The cost is concentrated rather than spread: run-test-runner.sh at ~29s and
+# run-checks.sh at ~23s are nearly half the total between them, every other bash suite is under 8
+# seconds, and the two Python packages together finish in under a second.
 
 set -o pipefail
 
