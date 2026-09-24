@@ -98,6 +98,18 @@ Workarounds when a legitimate command is caught:
 
 Failure mode this prevents: treating an unexpected denial as a broken deny rule or a tooling bug, and retrying variants, when the real cause is the command's *text* tripping a substring deny.
 
+## An MCP Allow Entry Names the Server's Provenance, Not the Tool
+
+An MCP permission entry matches the literal tool name, and that name carries where the server came from rather than what the tool does. A claude.ai connector serves Figma as `mcp__claude_ai_Figma__<tool>` — the same `claude_ai_<Name>` shape every hosted connector uses. The official plugin serves the same tools as `mcp__plugin_figma_figma__<tool>`, the plugin's name and the server's name both being `figma`, hence the doubling. Same vendor, same tools, same behavior, different string.
+
+So replacing a connector with a plugin, or the reverse, voids every entry written against the old name at once. Nothing reports a dead rule. The tools start prompting again, which reads as the permission system misbehaving rather than as a rename, and the old entries sit in the file still looking like working grants.
+
+Read this as the MCP form of the dead-rule failures elsewhere in this file — the leading-`*` allow entry that never fires, and the `MultiEdit` matcher naming a tool that no longer exists. All three are entries that look correct and match nothing.
+
+Whether an MCP rule accepts a glob at all — `mcp__plugin_figma_figma__get_*` — is **unverified**. Exact tool names have been enumerated rather than the question settled, so do not assume a pattern will cover a server's whole surface.
+
+Failure mode this prevents: the prompts get diagnosed as a permission bug or a missing entry, so the fix attempted is a broader rule — when the entry already there is correct for a server that is no longer the one serving the tool.
+
 ## Paths With Spaces
 
 When constructing shell commands that reference paths containing spaces (e.g. `~/Library/Application Support/`), use `$HOME` with proper quoting instead of backslash-escaping. Claude Code's permission system triggers a separate confirmation dialog for any command containing backslash-escaped whitespace, regardless of allow-list rules.
@@ -148,6 +160,23 @@ Anchoring has a mechanical cost worth knowing before you reach for it. A pattern
 This composes with the scope section above rather than substituting for it: a broad pattern in the right file is still broad, and a narrow one in the user-level file still fires in every repo that happens to type the same string.
 
 Failure mode this prevents: breadth gets decided by how destructive the command *sounds*. A linter that edits files reads as risky and gets anchored into uselessness, while a script named like ordinary project tooling reads as routine and gets granted whole — even though the second one is the one that writes outside the repo. The prompts then accumulate on the command that never needed them, and the standing grant sits on the one that did.
+
+## What Earns a Standing Grant — Reversible and Watched
+
+The section above decides how broad a pattern should be once a grant is warranted. This decides whether to reach for one at all, and the line is not reads against writes.
+
+Read-only is freely grantable, bounded by scope rather than by caution. `searching.md`'s home-directory prohibition is the live limit there, and it is about where a read reaches, not about reading as such.
+
+For anything that writes or executes, ask what the effect costs to undo and whether anyone would see it. New files under `.claude/scratch/`, or `.claude/` generally, are cheap to undo and sit where the user is already looking — grant them. Removing untracked files and anything reaching the network are neither: an untracked file has no history to restore from, and a network action cannot be recalled at all. Those keep their prompts.
+
+That refines the area-of-effect test above rather than replacing it. *Reversible and watched* is what "recoverable where it lands" amounts to in practice, and the two halves are independent — a change that is easy to undo but that nobody sees still gets missed.
+
+Two limits on the framing, both load-bearing:
+
+- **Safe is not unbounded.** Writing to scratch freely still fills a disk eventually, and a read inside the understood scope still returns something it should not once the scope has been drawn wrong. The gradient ranks actions. It does not license them without end.
+- **A prompt is not only a risk control.** It is also how the user stays aware of what is happening in work they own and answer for, which is a reason to keep one that has nothing to do with what the command might break. `rule-maintenance.md`'s *Prompt frequency is not an argument for breadth* is the refusal this states positively: that one says volume is no case for a grant, this says engagement is a case against one.
+
+Failure mode this prevents: the gradient reads as a safety ranking alone, so anything judged low-risk becomes a candidate for a standing grant and the allow list grows toward whatever cannot break something. What that loses is not safety but the user's view of their own work, and a risk assessment has no place to record it.
 
 ## Skill-Script Permissions — Frontmatter `allowed-tools` vs. settings.json
 
