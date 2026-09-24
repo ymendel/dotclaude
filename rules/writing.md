@@ -193,6 +193,29 @@ output looks wrong to whoever assembled it — the whole cost lands on the reade
 tell which image is which, and the author is the one person who cannot see the problem because they
 already know.
 
+## Use American spellings
+
+American spellings in durable output — `behavior`, `color`, `recognize`, `center`, `labeled`,
+`judgment`. This is a marker-level preference, so the preamble's scope governs it: anything under
+the user's byline, and not conversational replies.
+
+`licence` is worth naming apart from the rest. British splits it by part of speech — noun `licence`,
+verb `license` — where American uses `license` for both, so the British noun reads to an American
+reader as a misspelling rather than as a locale choice. That is a worse failure than `behaviour` or
+`colour` produce, which read as merely foreign. `defence`/`defense` is a plain variant carrying no
+such split.
+
+Sweeping for these is a different job from writing them. A stem match hits words that are already
+American — `organis` catches `organism`, `generalis` catches `generalist`, `enrol` catches
+`enrollment`, `realis` catches `realistic`. A quoted passage keeps its source's spelling, so an
+external quote is not yours to correct. And `analyses` is the noun plural in both, so changing it
+fixes no spelling and can break an anchor link into a heading that uses it.
+
+Failure mode this prevents: each instance is invisible in place, because nothing about `behaviour`
+in a sentence looks like a decision. The drift is noticed only when some word happens to look wrong
+in isolation, by which point it is spread across files — and whatever has landed in an accepted ADR
+or a pushed commit message cannot be swept at all.
+
 ## Markdown authoring mechanics
 
 When producing markdown for a strict renderer — a committed doc, a README, a PR body, an IDE preview — a small set of fragile constructs (fenced code inside a list item, an inline fence marker in prose, tables holding block content, &c.) render differently across implementations or break outright, and markdown never errors to warn you. The full list, the why, and the formatting discipline are in `rules/references/writing/markdown-authoring.md`. Load it when generating markdown bound for a durable deliverable.
