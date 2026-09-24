@@ -60,7 +60,7 @@ Best for trends. Labels are typically dates or sequential periods.
 
 ### Pie — proportions
 
-Best for parts-of-a-whole. Percentages should sum to ~100; raw numbers are normalised automatically.
+Best for parts-of-a-whole. Percentages should sum to ~100; raw numbers are normalized automatically.
 
 ```
 @heading Sprint status
@@ -119,6 +119,6 @@ Global `@style` and `@direction` directives apply across all embedded diagrams. 
 
 - Start with a high-level overview, then progressively reveal detail
 - Each slide: one heading, 1–2 sentences of prose, one diagram
-- Use different diagram types to show different perspectives — class for structure, sequence for behaviour, journey for UX, c4 for systems
+- Use different diagram types to show different perspectives — class for structure, sequence for behavior, journey for UX, c4 for systems
 - Keep individual diagrams focused: 3–7 elements, not comprehensive maps
 - Use `@heading` on diagrams to label what aspect they show

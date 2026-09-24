@@ -51,7 +51,7 @@ A declared destination is not the only place the finding may already live. Searc
 
 The destination check passing is what makes this easy to skip: grepping two or three local files and finding nothing reads as "not filed anywhere yet," which is a claim about those files restated as a claim about the project. The tracker is the surface those files cannot see, and it is where a finding of any consequence is likeliest to have been raised already.
 
-- **An open issue already covers it** — say so and point at the issue. Do not file a second copy in the same repo: the issue is the live artifact, visible to everyone, and a note in a gitignored file competes with it while ageing independently.
+- **An open issue already covers it** — say so and point at the issue. Do not file a second copy in the same repo: the issue is the live artifact, visible to everyone, and a note in a gitignored file competes with it while aging independently.
 - **An issue covers part of it** — write the note for the remainder alone and reference the issue number, so a reader lands on the live artifact rather than on the copy.
 
 ### Step 3: Determine destination type

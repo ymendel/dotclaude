@@ -70,6 +70,6 @@ Sequence diagrams show temporal interactions between participants.
 ## Tips
 
 - Message labels go between the participant and the arrow: `[A]label->[B]`
-- Omit the label entirely for unlabelled messages: `[A]->[B]`
+- Omit the label entirely for unlabeled messages: `[A]->[B]`
 - Self-messages work for internal processing: `[Auth]validate->[Auth]`
 - `@direction` has no effect — sequence diagrams always flow top-to-bottom

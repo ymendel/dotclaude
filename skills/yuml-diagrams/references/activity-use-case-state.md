@@ -13,7 +13,7 @@ Model workflows, algorithms, and business processes.
 <Decision>                — decision diamond
 |Fork|                    — fork/join bar (parallel flows)
 (A)->(B)                  — flow
-(A)label->(B)             — labelled flow
+(A)label->(B)             — labeled flow
 (A)[guard]->(B)           — guarded flow
 (note: text)              — note
 ```

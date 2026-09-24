@@ -14,7 +14,7 @@
 # Pass the current session's id to leave it out. A session that has been probing permissions writes
 # to `.claude/` far more than a working one, and including it inflates the rate it is measuring.
 #
-# WHAT THIS COUNTS, and the judgement in it:
+# WHAT THIS COUNTS, and the judgment in it:
 #
 # - Only the **write** verbs below, plus shell redirects into a `.claude/` path. Only a write hits
 #   the protected-path gate, so counting reads would fill the total with `rtk read` and `rtk grep`

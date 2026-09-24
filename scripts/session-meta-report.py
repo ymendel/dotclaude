@@ -4,7 +4,7 @@
 `/insights` writes one JSON file per session plus a rendered HTML report. The HTML
 carries whole-range totals; a synthesis needs the trend, which means bucketing the
 per-session files by week and by project. This script does only that. It applies no
-thresholds and makes no judgements, so every figure it prints is a count or a straight
+thresholds and makes no judgments, so every figure it prints is a count or a straight
 ratio over counts — the reading is the synthesis author's job.
 
 Two traps this script exists to make visible, both of which mislead in the report:
@@ -21,7 +21,7 @@ Two traps this script exists to make visible, both of which mislead in the repor
   dominated by a few held-open sessions. The duration-skew section prints what share the
   top few hold, which is the number that decides whether the total means anything.
 
-The model-analysed fields (goal achievement, satisfaction, friction type) are NOT in these
+The model-analyzed fields (goal achievement, satisfaction, friction type) are NOT in these
 files — they live only in the report's LLM pass. When that pass fails it does so silently:
 the run reports a session count as normal and every model-derived section renders "No data",
 which reads like a finding rather than a failure. Re-run before concluding anything from it.

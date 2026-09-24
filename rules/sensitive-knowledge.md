@@ -86,7 +86,7 @@ line, and it is the one to reach for when a task says "ours."
 Two things follow, and the second is the one that slips past.
 
 **Scope the work to what is owned.** A cleanup, audit, or cost review of "our infrastructure"
-covers the owned tenant and stops. Extending it to a neighbouring tenant is not thoroughness — it
+covers the owned tenant and stops. Extending it to a neighboring tenant is not thoroughness — it
 is acting on somebody else's system because the credentials happened to reach it. Where the access
 was granted for a specific engagement, it was granted for that engagement.
 

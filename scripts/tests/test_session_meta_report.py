@@ -6,7 +6,7 @@ carries a hyphen and cannot be imported.
 Covers `load`, `tool_calls` and `iso_week` — the three functions that read or
 derive rather than print. The reporting functions are left alone: they emit
 formatted text to stdout and asserting on their layout would pin column widths
-rather than behaviour.
+rather than behavior.
 """
 
 import datetime
@@ -68,7 +68,7 @@ class IsoWeekTest(unittest.TestCase):
 
     Asserted against `date.isocalendar()` rather than against hand-computed week
     numbers: the logic under test is the formatting, and hard-coding a calendar
-    fact would pin my arithmetic rather than the script's behaviour.
+    fact would pin my arithmetic rather than the script's behavior.
     """
 
     def test_formats_as_isoyear_and_week(self):

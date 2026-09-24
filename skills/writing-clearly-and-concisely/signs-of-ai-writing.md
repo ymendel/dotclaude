@@ -842,7 +842,7 @@ Editors should be able to explain why they made one or more edits or mistakes. F
 
 ## Ineffective Indicators
 
-False accusations of AI use can [drive away new editors](https://en.wikipedia.org/wiki/Wikipedia:BITE "Wikipedia:BITE") and foster an atmosphere of suspicion. Before claiming AI was used, consider if [Dunning–Kruger effect](https://en.wikipedia.org/wiki/Dunning%E2%80%93Kruger_effect "Dunning–Kruger effect") and [confirmation bias](https://en.wikipedia.org/wiki/Confirmation_bias "Confirmation bias") is clouding your judgement. Here are several somewhat commonly used indicators that are ineffective in LLM detection—and may even indicate the opposite.
+False accusations of AI use can [drive away new editors](https://en.wikipedia.org/wiki/Wikipedia:BITE "Wikipedia:BITE") and foster an atmosphere of suspicion. Before claiming AI was used, consider if [Dunning–Kruger effect](https://en.wikipedia.org/wiki/Dunning%E2%80%93Kruger_effect "Dunning–Kruger effect") and [confirmation bias](https://en.wikipedia.org/wiki/Confirmation_bias "Confirmation bias") is clouding your judgment. Here are several somewhat commonly used indicators that are ineffective in LLM detection—and may even indicate the opposite.
 
 - **Perfect grammar**: While modern LLMs are known for their high grammatical proficiency, many editors are also skilled writers or come from professional writing backgrounds. (See also [§ Discrepancies in writing style and variety of English](#discrepancies-in-writing-style-and-variety-of-english).)
 

@@ -21,7 +21,7 @@ The act of placing a number into a structured document gives it the aura of havi
 
 Before each number ships in prose, ask "where is this from, *right now*?" If the answer is "earlier this session", "the handoff", or "I think I saw it during the same task", re-query — SQL, file read, tool call — rather than reuse.
 
-**Where re-querying isn't possible, attribute the number or omit it.** A few figures can be read once and never refreshed from here — a `/context` usage percentage is the standing case, since only the user can run it and its output begins ageing the moment it prints. The honest forms are attribution ("41% as of the reading earlier this session") or silence. Restating one bare presents a snapshot as the current state, and the error runs one way: the figure reads *lower* than the truth, because context only grows between compactions.
+**Where re-querying isn't possible, attribute the number or omit it.** A few figures can be read once and never refreshed from here — a `/context` usage percentage is the standing case, since only the user can run it and its output begins aging the moment it prints. The honest forms are attribution ("41% as of the reading earlier this session") or silence. Restating one bare presents a snapshot as the current state, and the error runs one way: the figure reads *lower* than the truth, because context only grows between compactions.
 
 ## Never state an elapsed time — there is no clock to read
 
@@ -175,7 +175,7 @@ When estimating how often something happens, discount the just-happened instance
 
 Before answering "how often does X happen", or recommending action whose value depends on X being common, ask: outside the context that made X salient right now, when does X actually occur? Label the answer as an estimate, and if a single recent event is the main evidence, say so.
 
-The particular cost here: a loose label ("I think it's not rare") is no defence, because the label is fine and the base rate underneath it is what is wrong.
+The particular cost here: a loose label ("I think it's not rare") is no defense, because the label is fine and the base rate underneath it is what is wrong.
 
 ## Check That What You Sampled Covers What the Claim Is About
 

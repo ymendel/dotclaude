@@ -70,7 +70,7 @@ Project milestones with major and minor events.
 
 ## Roadmap Diagrams
 
-Feature cards organised across planning horizons.
+Feature cards organized across planning horizons.
 
 ### Syntax
 
@@ -78,7 +78,7 @@ Feature cards organised across planning horizons.
 (Horizon Name)             — column/horizon header
 [Card Title|Description]   — feature card with description
 [Card Title]               — card without description
-[Card{bg:color}]           — coloured card
+[Card{bg:color}]           — colored card
 ```
 
 ### Example: Product roadmap

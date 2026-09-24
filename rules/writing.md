@@ -133,7 +133,7 @@ Failure mode this prevents: speculative restructuring for an imagined agent read
 
 ## Don't borrow these rules' register
 
-The always-loaded rule set is the largest body of prose in any session and the most recently read, and it has a house style: state the directive, give the failure mode it prevents, name the sibling rule it sits beside. That style is right *here*. Always-loaded text competes for attention against everything else loaded, so it has to say what goes wrong without it and how it relates to its neighbours, or it cannot be weighed against them at all. None of that holds for a code comment, a commit body, or a PR description, whose reader arrived looking for something specific and wants the fact rather than the case for the fact.
+The always-loaded rule set is the largest body of prose in any session and the most recently read, and it has a house style: state the directive, give the failure mode it prevents, name the sibling rule it sits beside. That style is right *here*. Always-loaded text competes for attention against everything else loaded, so it has to say what goes wrong without it and how it relates to its neighbors, or it cannot be weighed against them at all. None of that holds for a code comment, a commit body, or a PR description, whose reader arrived looking for something specific and wants the fact rather than the case for the fact.
 
 What lets the register travel is that *capture the why, not the how* sets no limit. A how ends where the code says it. A why does not — every reason can be given a reason, and every rejected alternative can be given the argument that rejected it — so guidance that reads as a filter turns out to be a license, and this register is what fills the space it opens.
 
@@ -178,7 +178,7 @@ Failure mode this prevents: the durable artifact accretes evidence of diligence 
 
 When a document places one image directly after another — a before/after pair, a set of screenshots,
 anything a reader is meant to compare — put a short label line above each one. `Before:` and
-`After:` on their own lines is enough. Leave them unlabelled only when they genuinely are one thing,
+`After:` on their own lines is enough. Leave them unlabeled only when they genuinely are one thing,
 like frames of a single sequence.
 
 Whatever separation the renderer supplies is a gap and nothing more. A break between two images says

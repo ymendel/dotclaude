@@ -211,7 +211,7 @@ that it happens.
   file depending on which direction a skill moves; nothing enforces that the notice or
   the grant stays attached.
 - **Neutral:** Skills and agents are attributed asymmetrically — skills get a
-  travelling per-item notice, agents get repo-level credit only — because only skills
+  traveling per-item notice, agents get repo-level credit only — because only skills
   ship on their own. The asymmetry is deliberate and has a named revisit trigger
   (agents beginning to ship individually), so it is a documented choice rather than an
   inconsistency to trip over later.

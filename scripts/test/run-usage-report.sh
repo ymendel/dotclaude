@@ -3,7 +3,7 @@
 #
 #   ./scripts/test/run-usage-report.sh
 #
-# ADR 0008 puts it in Tier 2 as a script that "reads and summarises, no writes" — which is now only
+# ADR 0008 puts it in Tier 2 as a script that "reads and summarizes, no writes" — which is now only
 # mostly true: the snapshot path appends to a history TSV, and that file is the durable artifact the
 # trend is read from. A wrong row there is permanent and invisible, because nobody re-derives a
 # history file.

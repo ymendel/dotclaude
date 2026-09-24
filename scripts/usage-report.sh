@@ -98,8 +98,8 @@ file_mtime() { stat -f '%m' "$1" 2>/dev/null || stat -c '%Y' "$1" 2>/dev/null; }
 # --- Window (fixed lookback) -----------------------------------------------
 # Count only transcripts modified within the last WINDOW_DAYS, so every run
 # measures the same span. This fixes a bug in an earlier version: it counted
-# every surviving transcript and labelled the span by min/max file date, so a
-# run made after some transcripts had rotated out could show a *longer* labelled
+# every surviving transcript and labeled the span by min/max file date, so a
+# run made after some transcripts had rotated out could show a *longer* labeled
 # window with *fewer* counts than a prior run. A fixed lookback can't recover
 # rotated data, but it keeps the window — and the label — constant across runs.
 now_ts="$(date '+%s')"

@@ -42,7 +42,7 @@ This goes double when the edit is made from inside another project rather than f
 
 `rules/references/rule-maintenance/cross-session-handover.md` carries the protocol — establishing reach, when the message goes out, and what the receiver owes before staging. Load it when an edit needs handing over.
 
-Failure mode this prevents: the division of labour reads as obvious from each side and is agreed by neither, so the edit either sits uncommitted while both sessions wait or lands from outside the tree. Nothing errors, and each session's own conduct looks correct in isolation.
+Failure mode this prevents: the division of labor reads as obvious from each side and is agreed by neither, so the edit either sits uncommitted while both sessions wait or lands from outside the tree. Nothing errors, and each session's own conduct looks correct in isolation.
 
 Sibling: `self-improvement.md` governs *when* to capture a lesson — immediately, while the trigger is fresh. This governs *how polished* that capture has to be — rough is fine.
 

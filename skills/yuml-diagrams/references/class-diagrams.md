@@ -31,7 +31,7 @@ When translating from Mermaid (`Animal <|-- Duck`) or PlantUML, both become `[An
 ## Labels and Cardinality
 
 ```
-[A]label->[B]         — labelled association
+[A]label->[B]         — labeled association
 [A]orders>*[B]        — label with inline cardinality shorthand
 [A]1-0..*>[B]         — explicit cardinality on both ends
 ```
@@ -75,4 +75,4 @@ When translating from Mermaid (`Animal <|-- Duck`) or PlantUML, both become `[An
 
 - Semicolons separate attributes and methods within a section; pipes (`|`) separate sections
 - Stereotypes go before the class name: `[<<Interface>>;Name]`
-- Notes take optional background colour: `[note: text{bg:wheat}]`
+- Notes take optional background color: `[note: text{bg:wheat}]`

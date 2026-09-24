@@ -10,7 +10,7 @@ A single `c4` diagram type covers Context, Container, Component, and System Land
 [Name]                    — untyped element
 ```
 
-### Recognised Element Types (case-insensitive)
+### Recognized Element Types (case-insensitive)
 
 | Category | Accepted aliases |
 |----------|-----------------|

@@ -173,7 +173,7 @@ The section above sends a temporary change back out with Edit rather than `git c
 
 The standing case is a comment. Reverting a modified line by matching the line alone leaves the comment above it untouched, and restoring by writing comment-plus-line back adds a copy that was never removed. Two red/green cycles later the file carries the comment three times over one line of code. Both Edits reported success, correctly — each matched exactly what it was told to match.
 
-**Nothing catches it.** A test suite is silent by construction about text carrying no behaviour, so the run stays green through every cycle — and green is the signal being watched, because observing the red/green transition is the entire point of the exercise. The suite is not a weak detector here, it is an incapable one — a full run, however many times it is repeated, says nothing whatever about the file's state.
+**Nothing catches it.** A test suite is silent by construction about text carrying no behavior, so the run stays green through every cycle — and green is the signal being watched, because observing the red/green transition is the entire point of the exercise. The suite is not a weak detector here, it is an incapable one — a full run, however many times it is repeated, says nothing whatever about the file's state.
 
 The exposure scales with rigour: reverting code to observe an honest red is what test-first asks for when the code got written first, so the more faithfully the discipline runs, the more cycles execute and the more copies stack up.
 

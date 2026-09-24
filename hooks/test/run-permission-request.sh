@@ -14,7 +14,7 @@
 # outright. The routing is read from the log, pointed at a scratch file by CLAUDE_CLAUDEDIR_LOG so a
 # run never appends to the real one.
 #
-# What this cannot check: that Claude Code honours the decision. That it does — that an `allow` here
+# What this cannot check: that Claude Code honors the decision. That it does — that an `allow` here
 # clears the protected-path gate no allow rule reaches — was established by hand against Claude Code
 # 2.1.236, and the only detector is the "Allowed by PermissionRequest hook" label a human sees. See
 # rules/settings.md.

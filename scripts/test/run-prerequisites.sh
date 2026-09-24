@@ -62,7 +62,7 @@ run() {
 }
 
 # line_for <dep> — the status word, name and tier the report gave that dependency, with the
-# report's alignment padding normalised away. `read` does the trimming and the field splitting,
+# report's alignment padding normalized away. `read` does the trimming and the field splitting,
 # which keeps the expected values in each case readable as "what it says" rather than "what it
 # says plus however many spaces the column happens to need".
 line_for() {
@@ -93,9 +93,9 @@ expect_eq "$STATUS" 0 'with every dependency present, exit 0'
 did_not_see 'MISSING' 'with every dependency present, nothing is reported missing'
 did_not_see 'required* prerequisite is missing' 'no required-missing explanation when nothing is missing'
 did_not_see 'do not affect the exit code' 'no friction explanation when nothing is missing'
-expect_eq "$(line_for jq)" 'ok jq required' 'a present required dependency is labelled required'
-expect_eq "$(line_for rtk)" 'ok rtk load-bearing' 'a present dependency is labelled load-bearing'
-expect_eq "$(line_for trafilatura)" 'ok trafilatura optional' 'a present dependency is labelled optional'
+expect_eq "$(line_for jq)" 'ok jq required' 'a present required dependency is labeled required'
+expect_eq "$(line_for rtk)" 'ok rtk load-bearing' 'a present dependency is labeled load-bearing'
+expect_eq "$(line_for trafilatura)" 'ok trafilatura optional' 'a present dependency is labeled optional'
 
 # --- The exit-code contract, which the printed output does not reveal -------
 #

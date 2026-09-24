@@ -65,7 +65,7 @@ message was drafted correctly and the commit succeeds, so nothing marks what was
 asked to approve a step whose substance they cannot see, which is not an approval. So write
 any script under `.claude/scratch/` where they can open it, and say in the message what it
 computes before running it. The same holds for a config, a fixture, or a filter list a
-command reads: if the command's behaviour is decided by a file's contents rather than by
+command reads: if the command's behavior is decided by a file's contents rather than by
 its own arguments, the file has to be reachable.
 
 Failure mode this prevents: the reflex is to keep working files out of the project, which
@@ -96,7 +96,7 @@ gets reached for, and why nothing in that paragraph fires on it. Two things stil
   interpreter has no bounded area of effect at all. So prefer the file form for what the
   next bullet gives, and never on the grounds that the path makes it grantable.
 - **Its logic is gone the moment it scrolls past.** An inline program is not re-runnable
-  without retyping, has nowhere to put the judgement it encodes, and cannot be corrected —
+  without retyping, has nowhere to put the judgment it encodes, and cannot be corrected —
   the retype is where the second version quietly differs from the first.
 
 That second cost is worst when the program **produces a number that lands in a durable
@@ -109,7 +109,7 @@ anyone noticing which was wrong.
 
 **How to apply.** Reach for `-e` only for something whose output is read once and decides
 nothing that gets written down — a quick shape check, a one-off conversion. The moment a
-program is worth running twice, encodes a judgement, or feeds a figure into prose, it is a
+program is worth running twice, encodes a judgment, or feeds a figure into prose, it is a
 file under `.claude/scratch/` with its threshold stated in a header comment. Reference the
 file by path where the figure lands, so the next reader can re-run it rather than trust it.
 

@@ -55,7 +55,7 @@ writable rather than an extrapolation from one file:
   settings, no environment. Its cases need no fixtures whatsoever.
 - `reflexive-cd-guard.sh` resolves physical paths against the real filesystem,
   reads `permissions.additionalDirectories` from three separate settings files,
-  and honours an environment variable the tool payload does not carry. Its cases
+  and honors an environment variable the tool payload does not carry. Its cases
   need temporary directories created and removed, which is the first thing in
   this repo to want setup and teardown rather than pure invoke-and-check.
 - `check-prerequisites.sh` acquired a deliberate exit-code contract on
@@ -122,7 +122,7 @@ because the committed suite is scoped to `PreToolUse` Bash guards. That is the
 ratchet's case arriving before the ratchet exists.
 
 Three constraints apply regardless of which bar is chosen. `hooks/rtk-rewrite.sh`
-is vendored from RTK and pinned by a checksum, so its behaviour is not this
+is vendored from RTK and pinned by a checksum, so its behavior is not this
 repo's to guarantee and a test against it would break on every upstream update.
 The existing Python suite carries both an `__init__.py` and a `conftest.py`
 doing the same `sys.path` setup, so it runs under stdlib `unittest` as well as
@@ -283,7 +283,7 @@ five scripts. None of those holds now.
 ### Single entry point (sub-decision)
 
 **A. Defer it, as the sibling repo did.** Leave each suite invoked on its own
-terms until there are enough of them to generalise from.
+terms until there are enough of them to generalize from.
 
 - *Pros:* Consistent with the reasoning that deferred it elsewhere, where two
   suites was judged a thin basis for a convention.
@@ -310,9 +310,9 @@ suite, reporting a combined result and a non-zero exit if any suite fails.
 
 ### Ratchet enforcement (sub-decision)
 
-The bar above is a constraint on behaviour, and this repo already has a policy
+The bar above is a constraint on behavior, and this repo already has a policy
 for where those live. [ADR 0004](0004-rule-vs-hook-enforcement-split.md) asks one
-question — could a script recognise a violation without judgment? — and a change
+question — could a script recognize a violation without judgment? — and a change
 that stages `hooks/uv-run-guard.sh` without staging any test path answers yes.
 The staged file list settles it, with no judgment required. So leaving the ratchet
 in prose would be this repo declining its own test.
@@ -384,7 +384,7 @@ silently the unit fails:
   check but not no check.
 - **Tier 3, exempt.** Thin wrappers with too little logic to carry a test, and
   vendored code. Vendored code is exempt by construction: it is overwritten on
-  upstream update, so its behaviour is not ours to guarantee and a test against
+  upstream update, so its behavior is not ours to guarantee and a test against
   it would break on someone else's schedule.
 
 Every unit in the tree today is placed, because the gate below needs the
@@ -411,7 +411,7 @@ comes up would leave the gate unimplementable:
 | `scripts/session-meta-report.py` | 2 | derives figures that land in durable artifacts |
 | `scripts/rules-floor.sh` | 2 | same, and it writes a baseline |
 | `scripts/rules-sections.py` | 2 | parses rule files for a report |
-| `scripts/usage-report.sh` | 2 | reads and summarises, no writes |
+| `scripts/usage-report.sh` | 2 | reads and summarizes, no writes |
 | `scripts/context-usage.sh` | 2 | picks among per-session caches and reports staleness — more branching than its 82 lines suggest |
 | `scripts/measure-claude-dir-writes.sh` | 2 | derives figures that land in durable artifacts, and its verb matching and session exclusion both decide the result |
 | `scripts/run-tests.sh` | 1 | its failure mode is a false green: a suite it silently fails to discover reads exactly like a suite that passed |
@@ -609,7 +609,7 @@ convention.
 - **Positive:** Gating the ratchet rather than writing it down means the
   convention does not depend on being remembered mid-change, which is the whole
   finding ADR 0004 records. It also means this ADR's own bar is applied to itself:
-  a behavioural constraint that a script can check is not left in prose.
+  a behavioral constraint that a script can check is not left in prose.
 
 - **Neutral:** The harness decision ratifies what already happened rather than
   choosing it. Two independent arrivals is the strongest evidence available here,

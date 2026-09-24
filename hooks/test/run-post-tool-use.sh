@@ -13,7 +13,7 @@
 # status, which is 0 on every path including the ones that deliberately do nothing.
 #
 # One case documents a gap rather than a guarantee: `file` reports some binary content as plain
-# `data`, which the skip pattern does not match. That is asserted as current behaviour so a future
+# `data`, which the skip pattern does not match. That is asserted as current behavior so a future
 # fix fails here loudly instead of silently improving. See the section for the detail.
 #
 # No framework, no `set -e` (a failing case must report, not abort), non-zero exit at the end.
@@ -157,7 +157,7 @@ expect_eq "$STATUS" 0 'the ordinary append path also exits 0'
 
 write_raw opaque.bin '\000\001\002\003binary'
 run_on "$TARGET"
-expect_eq "$(bytes_of "$TARGET")" 10 'unrecognised binary content is skipped, not appended to'
+expect_eq "$(bytes_of "$TARGET")" 10 'unrecognized binary content is skipped, not appended to'
 
 # The SQLite magic is enough for the case: 16 bytes of header, NUL included, which is what makes it
 # binary. A real database is not needed and would make this suite depend on sqlite3 being installed.

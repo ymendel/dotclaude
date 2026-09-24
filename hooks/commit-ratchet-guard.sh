@@ -60,7 +60,7 @@ esac
 #
 # Tier 1 and Tier 2 units, each paired with the suite it owes. A suite named here need not exist
 # yet: the ratchet fires on the unit being *modified*, and demanding a suite that has to be written
-# is the intended behaviour rather than a gap. Tier 3 units are exempt and simply absent.
+# is the intended behavior rather than a gap. Tier 3 units are exempt and simply absent.
 
 TIERED=(
   "hooks/reflexive-cd-guard.sh|hooks/test/run-checks.sh"

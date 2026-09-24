@@ -54,7 +54,7 @@ SOUND="Submarine"   # blank for silent notifications
 # a machine that lacks it still notifies. Two reasons, in order.
 #
 # It carries its own bundle, so it gets its own System Settings > Notifications entry — its own
-# alert style, icon, and Focus behaviour. osascript is unbundled and attributed to
+# alert style, icon, and Focus behavior. osascript is unbundled and attributed to
 # com.apple.ScriptEditor2, so the only way to make these notifications persist rather than
 # auto-dismiss is to set *Script Editor*'s Alert Style to Persistent, which catches every unbundled
 # `display notification` on the machine. A separate entry is a setting you can aim.

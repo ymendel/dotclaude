@@ -15,7 +15,7 @@
 #
 # WHY NOT NOTIFY FROM HERE. This event fires the moment Claude Code asks. The six-second
 # no-typing gate that makes the notifications worth having lives on the Notification event, and
-# answering inside that window means no notification fires at all — which is the correct behaviour
+# answering inside that window means no notification fires at all — which is the correct behavior
 # and would be lost by notifying here.
 #
 # Registered with no matcher, so every tool reaches it. A matcher is a regex tested anywhere in the

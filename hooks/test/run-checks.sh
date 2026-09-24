@@ -225,7 +225,7 @@ echo "== shell-machinery-guard: documented over-blocks (exit 2)"
 # The three shapes the hook's header enumerates as knowingly over-blocked: a
 # separator ahead of a quoted definition, and a heredoc body line that begins
 # one (a newline counts as whitespace). The gate would have stayed quiet for
-# each, so these are false positives accepted deliberately rather than behaviour
+# each, so these are false positives accepted deliberately rather than behavior
 # worth preserving — if the matching ever becomes quote-aware, all three flip to
 # exit 0 and these expectations are what should change.
 smg "separator inside bash -c"        2 "bash -c 'echo hi; f() { :; }; f'"

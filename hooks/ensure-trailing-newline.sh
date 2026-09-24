@@ -14,7 +14,7 @@ if [ -z "$FILE_PATH" ] || [ ! -f "$FILE_PATH" ]; then
 fi
 
 # Skip binary files. `grep -I` treats a binary file as non-matching, so this asks whether there is
-# any text here rather than trying to recognise every description `file` can emit — which is a list
+# any text here rather than trying to recognize every description `file` can emit — which is a list
 # that cannot be completed. The previous pattern matched six words and missed SQLite ("SQLite 3.x
 # database"), where appending a byte is the corrupting kind. Matching on `data` instead would have
 # caught that and broken JSON, which `file` calls "JSON data".

@@ -18,7 +18,7 @@ stacks of punchcards, "READ ME!" scrawled on them, describing their use.
 
 A reader<sup>[1](#footnote-1)</sup> suggested that the title README may be a playful nudge toward Lewis
 Carroll's *Alice's Adventures in Wonderland*, which features a potion and a cake
-labelled *"DRINK ME"* and *"EAT ME"*, respectively.
+labeled *"DRINK ME"* and *"EAT ME"*, respectively.
 
 The pattern of README appearing in all-caps is a consistent facet throughout
 history. In addition to the visual strikingness of using all-caps, UNIX systems

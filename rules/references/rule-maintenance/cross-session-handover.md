@@ -74,7 +74,7 @@ Two things the receiver owes:
   clearer commit body rather than to give up the commit. Where the peer's content is not ready to
   land, ask it to hold rather than waiting silently.
 
-Failure mode this prevents: the division of labour reads as obvious from each side and is agreed by
+Failure mode this prevents: the division of labor reads as obvious from each side and is agreed by
 neither, so an edit either sits uncommitted while both sessions wait, or lands from outside the tree
 — the exact thing the messaging rule exists to avoid. Nothing errors, and each session's own conduct
 looks correct in isolation.

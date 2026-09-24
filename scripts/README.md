@@ -159,7 +159,7 @@ python3 scripts/session-meta-report.py [session-meta-dir]
 Buckets sessions by ISO week and by project and prints counts and straight
 ratios — tool calls, error rate, error categories, interruptions per session,
 project mix, capability adoption, duration skew. It applies no thresholds and
-makes no judgements; reading the output is the synthesis author's job.
+makes no judgments; reading the output is the synthesis author's job.
 
 Companion to `usage-report.sh`, and easy to confuse with it. That one counts
 **skill and agent invocations** and appends to a history file that outlives
@@ -181,7 +181,7 @@ Roughly monthly. `usage-data/README.md` maps the files; this is the method.
    Set `RETENTION_EDGE` in the script to match — the trend sections drop
    everything before it.
 3. **Check what the run actually produced.** The field-presence section lists the
-   keys present across all session files. The model-analysed fields — goal
+   keys present across all session files. The model-analyzed fields — goal
    achievement, satisfaction, friction type — are *not* in `session-meta`; they
    exist only in the report's HTML and only when its LLM pass yields something.
    Confirm with `grep -c 'class="empty"' usage-data/report-<date>.html`. **A count
@@ -409,7 +409,7 @@ ledger against `PATH`, prints `ok` or `MISSING` per entry, and prints the tier
 alongside — required, load-bearing, or optional. It does not auto-install.
 
 Only the required tier gates the exit code. That cut is what gives the middle
-tier a behaviour of its own: load-bearing means reported but not gated, which is
+tier a behavior of its own: load-bearing means reported but not gated, which is
 a checkable difference from the tier above rather than a matter of degree.
 
 The three tier arrays (`REQUIRED`, `LOAD_BEARING`, `OPTIONAL`) are hard-coded to

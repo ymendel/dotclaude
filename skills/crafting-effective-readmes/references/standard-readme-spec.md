@@ -203,7 +203,7 @@ progressively greater amount of knowledge."
 **Status**: Optional.
 
 **Requirements:**
-- Must be called `Thanks`, `Credits` or `Acknowledgements`.
+- Must be called `Thanks`, `Credits` or `Acknowledgments`.
 
 **Suggestions:**
 - State anyone or anything that significantly helped with the development of your project.

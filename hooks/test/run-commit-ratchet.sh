@@ -105,7 +105,7 @@ permits 'a tiered hook staged with its suite is permitted'
 # Two hooks share the PermissionRequest shape and one suite name is a prefix of the other, so a
 # prefix match anywhere in the obligation check would let either clear the other. It is an exact
 # comparison for a file entry and a prefix only for a directory one — asserted here because the
-# names make the wrong behaviour look plausible, and because nothing about a wrongly-cleared
+# names make the wrong behavior look plausible, and because nothing about a wrongly-cleared
 # obligation is visible at the moment it is cleared.
 fresh
 stage hooks/claude-dir-write-allow.sh hooks/test/run-permission-request-context.sh
@@ -172,7 +172,7 @@ permits 'an empty index is permitted'
 
 # The timing limitation, asserted rather than only described. PreToolUse fires before the command
 # runs, so a compound `git add X && git commit` arrives with X not yet staged and the gate cannot
-# see it. This case pins that as known behaviour: it is why development-workflow.md requires staging
+# see it. This case pins that as known behavior: it is why development-workflow.md requires staging
 # in a separate tool call, and if it ever starts failing the gate has become able to see further
 # than it could, which is worth noticing rather than silently benefiting from.
 fresh

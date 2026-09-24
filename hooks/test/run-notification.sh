@@ -95,7 +95,7 @@ logged_lines() { grep -c '' "$LOG"; }
 # channel, and writing to it is never incidental.
 printed() { [ -s "$STDOUT" ]; }
 
-# A permission prompt notifies, labelled by the working directory's basename.
+# A permission prompt notifies, labeled by the working directory's basename.
 run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
 if notified && grep -q 'shipping-tracker' "$CALLS" && grep -q 'needs a response' "$CALLS"; then
     report true "permission_prompt notifies, titled by project"
@@ -128,7 +128,7 @@ printed \
     && report false "idle_prompt writes nothing to stdout" "stdout: $(cat "$STDOUT")" \
     || report true "idle_prompt writes nothing to stdout"
 
-# An unrecognised type is surfaced rather than dropped, and names itself so it is not mistaken for
+# An unrecognized type is surfaced rather than dropped, and names itself so it is not mistaken for
 # a permission prompt. The elicitation, agent and quota families have never fired here.
 run "$(payload elicitation_url_dialog /Users/alice/dev/billing-api)"
 if notified && grep -q 'billing-api' "$CALLS" && grep -q 'elicitation_url_dialog' "$CALLS"; then
