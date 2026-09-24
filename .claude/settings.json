@@ -3,6 +3,7 @@
     "allow": [
       "Bash(./hooks/test/run-*.sh)",
       "Bash(./scripts/check-prerequisites.sh:*)",
+      "Bash(./scripts/compare-settings-json.py:*)",
       "Bash(./scripts/compare-skills.sh:*)",
       "Bash(./scripts/context-usage.sh:*)",
       "Bash(./scripts/rules-floor.sh:*)",

@@ -411,6 +411,7 @@ comes up would leave the gate unimplementable:
 | `scripts/session-meta-report.py` | 2 | derives figures that land in durable artifacts |
 | `scripts/rules-floor.sh` | 2 | same, and it writes a baseline |
 | `scripts/rules-sections.py` | 2 | parses rule files for a report |
+| `scripts/compare-settings-json.py` | 2 | human-run, but its list-as-set flattening decides whether a change reads as cosmetic |
 | `scripts/usage-report.sh` | 2 | reads and summarizes, no writes |
 | `scripts/context-usage.sh` | 2 | picks among per-session caches and reports staleness — more branching than its 82 lines suggest |
 | `scripts/measure-claude-dir-writes.sh` | 2 | derives figures that land in durable artifacts, and its verb matching and session exclusion both decide the result |

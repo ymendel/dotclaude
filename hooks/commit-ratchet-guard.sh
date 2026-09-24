@@ -76,6 +76,7 @@ TIERED=(
   "scripts/run-tests.sh|scripts/test/run-test-runner.sh"
   "scripts/measure-claude-dir-writes.sh|scripts/test/run-measure-writes.sh"
   "scripts/check-prerequisites.sh|scripts/test/run-prerequisites.sh"
+  "scripts/compare-settings-json.py|scripts/tests/"
   "scripts/compare-skills.sh|scripts/test/run-compare-skills.sh"
   "scripts/context-usage.sh|scripts/test/run-context-usage.sh"
   "scripts/rules-floor.sh|scripts/test/run-rules-floor.sh"

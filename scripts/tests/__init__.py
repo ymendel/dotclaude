@@ -31,6 +31,7 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parent.parent
 
 ALIASES = {
+    "compare_settings_json": "compare-settings-json.py",
     "rules_sections": "rules-sections.py",
     "session_meta_report": "session-meta-report.py",
 }

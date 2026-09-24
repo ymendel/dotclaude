@@ -8,8 +8,9 @@ and how sessions actually ran (`session-meta-report.py`),
 watching the always-loaded rule set for growth (`rules-floor.sh`, with
 `rules-sections.py` for per-section detail), and
 verifying the declared prerequisites are present
-(`check-prerequisites.sh`). Also includes runtime workarounds for Claude Code
-bugs (`enospc-workaround.sh`).
+(`check-prerequisites.sh`). Also includes a reader for settings.json that tells a
+real change from an external tool's reformatting (`compare-settings-json.py`), and
+runtime workarounds for Claude Code bugs (`enospc-workaround.sh`).
 
 ## `compare-skills.sh`
 
@@ -446,6 +447,35 @@ recorded and takes the most recent reading. Two sessions in one directory cannot
 told apart, and that case is reported rather than resolved silently. So is a reading
 older than five minutes, which under-reports rather than over-reports because context
 only grows within a session.
+
+### Exit status
+
+- `0` always. Reports only — it never edits and never fails.
+
+## `compare-settings-json.py`
+
+Compare `HEAD:settings.json` against the working copy as parsed data, to decide
+whether a diff is presentational or whether a setting actually moved.
+
+```
+./scripts/compare-settings-json.py
+```
+
+Claude Usage.app rewrites `settings.json` on Apply, reordering keys and stripping
+the blank lines that group the permission arrays. A change of two or three real
+settings then presents as a diff of tens of lines, and no reading by eye separates
+the two. This reports every leaf-path difference, so empty output under all three
+headings means the whole diff is presentational and the file can be restored from
+HEAD with any intentional edit re-applied by hand.
+
+Lists of scalars are compared as sets, because order in the permission arrays is
+presentational — see the *Organizing the allow list* section of
+[`rules/settings.md`](../rules/settings.md), which keeps them grouped for reading
+and records that any reformatter strips the grouping. A list holding objects is
+compared by index instead, since position carries meaning there.
+
+One limit worth knowing: a leaf is a scalar or a list of scalars, so an object
+emptied of every key produces no leaf and is invisible to the comparison.
 
 ### Exit status
 

@@ -139,6 +139,14 @@ stage scripts/session-meta-report.py scripts/tests/test_session_meta.py
 run
 permits 'a python unit is cleared by any file under its tests directory'
 
+# Pins the settings comparer's own row. The case above proves the python-unit mechanism works; this
+# proves the row exists, because a typo in it would exempt the script silently rather than erroring.
+fresh
+stage scripts/compare-settings-json.py
+run
+blocks 'the settings comparer is gated'
+says 'scripts/tests/' 'the block names its tests directory'
+
 # --- Tier 3 and everything the gate must leave alone ------------------------
 
 fresh
