@@ -259,6 +259,22 @@ ADR was drafted arrived misnamed, by two different authors. So this globs every
 `globstar` is on for the same reason — without it `**` stops at the first
 directory level, which hid `skills/session-handoff/tests` on the first run.
 
+Gitignored paths are passed over, and named where they are. A vendored tree ships
+its own tests, and running them reports a third party's failures as this repo's.
+
+The predicate is *ignored* rather than *untracked*. This repo's `.gitignore` is an
+allowlist — a catch-all `*` with whole subtrees re-included — so a suite written
+moments ago and not yet staged is untracked, not ignored, and still runs. Keying
+on tracked would stop running every new suite the moment before it is added.
+
+That allowlist is also why nothing is dropped in silence: a path is ignored by the
+*absence* of an entry rather than by one, so a new top-level directory is ignored
+because nobody allowlisted it, not because anybody judged it foreign. Whatever was
+passed over is listed in the run summary and under `--list`.
+
+Outside a git repo nothing is ignored and every candidate stands, which is the
+case the suite's own fixtures run in.
+
 ### Exit status is a suite's own
 
 No suite is piped. Output goes straight through and `$?` is read immediately,

@@ -19,6 +19,9 @@
 # deliberately, since both observed drift cases were `<topic>-checks.sh` names and those are still
 # refused; an accidental suite does not arrive underscore-prefixed.
 #
+# A SECOND EXEMPTION: a gitignored path is passed over, so a vendored tree's own tests are neither
+# run nor reported. The block below says why the predicate is `ignored` rather than `untracked`.
+#
 # EXIT STATUS is a suite's own, never a filter's. No suite is piped: output goes straight through,
 # and `$?` is read immediately. `tool-and-shell-safety.md`'s pipe rule is the whole reason — a
 # filtered suite whose status comes from the filter is exactly the trap this repo warns about, and a
@@ -60,6 +63,40 @@ cd "$REPO" || exit 1
 LIST_ONLY=false
 [ "${1:-}" = "--list" ] && LIST_ONLY=true
 
+# --- Ignored paths are not this repo's suites --------------------------------
+#
+# Discovery globs the filesystem, so a vendored tree that ships its own tests gets picked up and its
+# failures reported as ours. A plugin marketplace cloned under plugins/ is the live case: it carries
+# a tests/ directory that is not even importable, and the runner reported a failing suite this repo
+# does not own and cannot fix.
+#
+# THE PREDICATE IS `ignored`, NOT `untracked`, and the difference is the whole point. This repo's
+# .gitignore re-includes whole subtrees — `!/scripts/**/*`, `!/hooks/**/*`, `!/test/**/*` — so a
+# suite written moments ago and not yet staged is untracked, not ignored, and still runs. Keying on
+# tracked would stop running every new suite the moment before it is added, which is the quiet
+# discovery miss the name guard below exists to stop, reintroduced by the fix for a different one.
+#
+# WHAT IS PASSED OVER IS REPORTED, because in an allowlist .gitignore a path is ignored by the
+# ABSENCE of a decision rather than by one. The catch-all `*` at the top means a new top-level
+# directory — `lib/test/run-thing.sh` — is ignored because nobody has allowlisted it yet, not
+# because anybody judged it foreign. Dropping that in silence is the failure this unit is Tier 1 to
+# prevent. So the paths are named in the summary and under `--list`: vendored tests still do not
+# run, and nothing vanishes without saying so.
+#
+# Outside a git repo nothing is ignored and every candidate stands. That is the case this script's
+# own suite runs in: its fixtures are bare directory trees, so they exercise the fallback throughout.
+# A path git refuses to answer for — one beyond a symlink, say — also stands, which is the safe
+# direction: running something twice is visible, skipping it is not.
+IN_GIT_REPO=false
+git rev-parse --is-inside-work-tree &>/dev/null && IN_GIT_REPO=true
+
+ignored_paths=()
+
+# not_ours <path> — true when .gitignore excludes it, so discovery should pass over it.
+not_ours() {
+    [ "$IN_GIT_REPO" = true ] && git check-ignore --quiet "$1"
+}
+
 # --- Discover, and refuse a name that would have been skipped ----------------
 
 suites=()
@@ -70,6 +107,11 @@ for candidate in */test/*.sh **/test/*.sh; do
     case " ${suites[*]} ${misnamed[*]} " in
         *" $candidate "*) continue ;;
     esac
+    # Before the name check, so an ignored tree carrying an oddly-named file cannot refuse the run.
+    if not_ours "$candidate"; then
+        ignored_paths+=("$candidate")
+        continue
+    fi
     # A leading underscore is the "not a suite" marker — shared helpers meant to be sourced, not
     # run. Exempted rather than refused, and kept narrow on purpose: both real drift cases were
     # `<topic>-checks.sh` names, which still land in `misnamed` below. Nobody names a suite
@@ -99,6 +141,10 @@ for candidate in */tests **/tests; do
     case " ${unittest_dirs[*]} " in
         *" $candidate "*) continue ;;
     esac
+    if not_ours "$candidate"; then
+        ignored_paths+=("$candidate")
+        continue
+    fi
     unittest_dirs+=("$candidate")
 done
 
@@ -108,6 +154,9 @@ if [ "$LIST_ONLY" = true ]; then
     printf 'unittest packages:\n'
     if [ "${#unittest_dirs[@]}" -eq 0 ]; then printf '  (none)\n'; fi
     for dir in "${unittest_dirs[@]}"; do printf '  %s\n' "$dir"; done
+    printf 'passed over as gitignored:\n'
+    if [ "${#ignored_paths[@]}" -eq 0 ]; then printf '  (none)\n'; fi
+    for path in "${ignored_paths[@]}"; do printf '  %s\n' "$path"; done
     exit 0
 fi
 
@@ -149,6 +198,12 @@ done
 # --- Report ------------------------------------------------------------------
 
 printf '\n'
+if [ "${#ignored_paths[@]}" -gt 0 ]; then
+    echo "run-tests: passed over as gitignored, not run:"
+    for path in "${ignored_paths[@]}"; do printf '  %s\n' "$path"; done
+    printf '\n'
+fi
+
 if [ "$ran" -eq 0 ]; then
     echo "run-tests: no suites found. That is a discovery failure, not a pass." >&2
     exit 1

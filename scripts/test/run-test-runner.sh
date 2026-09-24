@@ -206,4 +206,60 @@ suite hooks/test/run-alpha.sh 0
 run --list
 saw '(none)' '--list says so explicitly when no unittest package exists'
 
+# --- Gitignored trees are not ours ------------------------------------------
+#
+# A vendored tree ships its own tests, and discovering them means running third-party code and
+# reporting its failures as this repo's. Every case above runs in a fixture that is not a git repo
+# at all, which is what pins the fallback: outside a repo nothing is ignored and everything stands.
+# These four need a repo, so they make one.
+#
+# The second case is the load-bearing one. `untracked` is the predicate a fix for this reaches for
+# first, and it would silently stop running every suite written and not yet staged — trading the
+# vendored-tests problem for the discovery miss that is this unit's whole reason to be Tier 1.
+
+fresh
+git -C "$FIX" init --quiet
+suite hooks/test/run-alpha.sh 0
+suite vendor/marketplace/test/run-theirs.sh 1 'THEIRS RAN'
+printf 'vendor/\n' > "$FIX/.gitignore"
+run
+exited 0 'a failing suite under a gitignored path does not fail the run'
+did_not_see 'THEIRS RAN' 'a gitignored suite is not executed'
+saw 'passed over as gitignored' 'the run says something was passed over'
+saw 'vendor/marketplace/test/run-theirs.sh' 'the passed-over suite is named, not dropped silently'
+
+fresh
+git -C "$FIX" init --quiet
+printf 'vendor/\n' > "$FIX/.gitignore"
+suite hooks/test/run-alpha.sh 0
+run
+saw 'hooks/test/run-alpha.sh' 'an untracked suite still runs — ignored is the test, not tracked'
+did_not_see 'passed over as gitignored' 'nothing is reported when nothing was passed over'
+
+fresh
+git -C "$FIX" init --quiet
+suite hooks/test/run-alpha.sh 0
+mkdir -p "$FIX/vendor/marketplace/tests"
+printf 'vendor/\n' > "$FIX/.gitignore"
+run
+saw '1 suites, all passed' 'a gitignored unittest package is not run'
+saw 'vendor/marketplace/tests' 'the passed-over package is named too'
+
+fresh
+git -C "$FIX" init --quiet
+suite hooks/test/run-alpha.sh 0
+plain_file vendor/marketplace/test/helpers.sh
+printf 'vendor/\n' > "$FIX/.gitignore"
+run
+exited 0 'a misnamed file under a gitignored path does not refuse the run'
+
+fresh
+git -C "$FIX" init --quiet
+suite hooks/test/run-alpha.sh 0
+suite vendor/marketplace/test/run-theirs.sh 0
+printf 'vendor/\n' > "$FIX/.gitignore"
+run --list
+saw 'passed over as gitignored:' '--list has a section for passed-over paths'
+saw 'vendor/marketplace/test/run-theirs.sh' '--list names a passed-over path'
+
 summary || exit 1
