@@ -36,9 +36,13 @@ to rely on, stays inert text. A tracker URL with no autolinking rules at all ren
 its slug being longer than a GitHub URL's. Use a named link there — `[shipping-tracker#59](url)`,
 `[ORD-242](url)` — which is exactly the form this section warns against one surface over.
 
-Commit SHAs are unsettled by that page rather than covered by it: the `## Commit SHAs` section
-describes the same shortening and carries no exclusion note, so whether a full commit URL shortens in
-a committed file is unchecked. The commit row above is left as it stands rather than tidied to match.
+Commit SHAs get no exclusion note on that page, and the silence is better read as incomplete
+documentation than as a different behavior. The line is categorical and runs between conversations
+and files rather than between one reference form and another: a repo file gets no reference
+conversion at all, shorthand or full-URL. For a commit URL to shorten there while an issue URL does
+not, the two would have to be special-cased apart, and nothing suggests they are. That is a reasoned
+expectation rather than a checked one, and it is deliberately left unchecked — the commit row above
+prefers the subject line either way, so the answer changes no guidance.
 
 The scope is the whole guidance. Both forms are right where they apply and wrong where they don't,
 and the failure is not ignoring the rule but extending a correctly-scoped one past its scope.
