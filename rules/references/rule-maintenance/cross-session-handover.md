@@ -68,6 +68,12 @@ Two things the receiver owes:
 - **Read what the prose asserts before staging it**, per `honesty.md`'s *Check the Claims in Prose
   You Are About to Commit*. A style pass is not a review, and committing puts your name on claims
   you neither made nor checked.
+- **Re-read immediately before staging, not only before reviewing.** The author is a live session
+  and may still be revising, so the version reviewed and the version staged can differ. That is not
+  `development-workflow.md`'s concurrent-edit hazard, where somebody else's unrelated change slips
+  into your commit — here it is the right file, and the review of it has gone stale. Asking a
+  question is what usually surfaces this, because the answer arrives with the revision attached, so
+  treat any pause between reviewing and staging as a reason to look again.
 - **Commit the whole file where it also carries a concurrent session's edit**, and name the other
   change in the body rather than handing the commit away. `git add --patch` is interactive and
   unavailable here, so there is no way to stage one hunk, and that constraint is a reason to write a
