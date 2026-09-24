@@ -129,9 +129,23 @@ records "an MCP tool is split into server and tool" \
 # inside its own segment — this name is the docs' own example. Splitting on `_` would hand the tool
 # half `my-plugin_db__query`. The server's own underscores then become spaces like any other, so the
 # name stops being liftable as an identifier; a notification body is not where that is done.
+# `plugin_` itself comes off for the same reason `claude_ai_` does, being provenance rather than
+# identity. What remains is `<plugin> <server>`, both kept here because they differ.
 records "a plugin-sourced server is split at the double underscore, then spaced" \
     s13 mcp__plugin_my-plugin_db__query '{}' \
-    "calls: plugin my-plugin db query"
+    "calls: my-plugin db query"
+
+# A plugin serving a server of its own name doubles it. Collapsed, or every Figma call reads
+# "figma figma get metadata".
+records "a plugin serving its own name is not doubled" \
+    s17 mcp__plugin_figma_figma__get_metadata '{}' \
+    "calls: figma get metadata"
+
+# Only an exact repeat collapses. A shared prefix is two different names and both stay, or the
+# descriptor would start dropping words that carry meaning.
+records "a server half that merely shares a prefix keeps both names" \
+    s18 mcp__plugin_fig_figma__get_metadata '{}' \
+    "calls: fig figma get metadata"
 
 # Every claude.ai-hosted connector carries this prefix, so it distinguishes none of them.
 records "a claude.ai connector loses its prefix" \

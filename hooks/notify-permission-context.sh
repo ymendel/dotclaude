@@ -110,8 +110,11 @@ case "$TOOL" in
     # would put the boundary in the wrong place and hand the tool half a piece of the server name.
     REST=${TOOL#mcp__}
     # Every claude.ai-hosted connector is named `claude_ai_<Name>`, so the prefix separates one from
-    # none of the others and only takes up room.
+    # none of the others and only takes up room. A plugin-sourced server carries `plugin_` for the
+    # same reason and gets the same treatment — the two are the provenance, not the identity, and
+    # the same vendor's tools arrive under both depending on how the server was installed.
     REST=${REST#claude_ai_}
+    REST=${REST#plugin_}
     case "$REST" in
       *__*)
         # Both halves get underscores as spaces. Finding the boundary is what the `__` split is for;
@@ -119,6 +122,19 @@ case "$TOOL" in
         # rendered the two sides in two different styles in one line.
         MCP_SERVER=${REST%%__*}
         MCP_TOOL=${REST#*__}
+        # What is left of a plugin server is `<plugin>_<server>`, and a plugin serving a server of
+        # its own name leaves that doubled — `plugin_figma_figma` renders "figma figma" otherwise.
+        # Collapse only an exact repeat, which no real pair produces: `my-plugin_db` keeps both.
+        #
+        # This assumes the plugin's own name holds no underscore. Where one does,
+        # `plugin_<name>_<server>` is genuinely ambiguous and nothing here can split it — the
+        # descriptor degrades to an extra word rather than to a wrong one, which is why this is a
+        # note and not a guard.
+        case "$MCP_SERVER" in
+          *_*)
+            [ "${MCP_SERVER%%_*}" = "${MCP_SERVER#*_}" ] && MCP_SERVER=${MCP_SERVER%%_*}
+            ;;
+        esac
         DESCRIPTOR="calls: ${MCP_SERVER//_/ } ${MCP_TOOL//_/ }"
         ;;
       *)
