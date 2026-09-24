@@ -18,134 +18,47 @@ The reflex appears after working across multiple directories in one session (e.g
 
 Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
 a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
-it is built out of are the ones the gate cannot resolve. Seven instances, all real:
+it is built out of are the ones the gate cannot resolve. The tells, all of them real:
 
 - **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
-  forbidden form. The guard defeats itself: the gate reports `function_definition` (see *Batch
-  repeated commands* below), that node cannot be allowlisted, so a read-only `grep` or `curl` stops
-  for approval. Shadowing a command is also how one gets broken for real. An always-loaded
-  prohibition is a reason to write a different command, never a mandate to build a mechanism that
-  blocks it — and the `cd` rule already has `hooks/reflexive-cd-guard.sh`.
+  forbidden form, and leave enforcement to the hook that already exists. The gate reports
+  `function_definition`, which cannot be allowlisted, so a read-only `grep` stops for approval.
 - **A function definition for no reason at all.** The case above at least has an argument behind it.
-  This one has none: a stray `for_each() { :; };` or `cd() { :; };` in front of an ordinary `grep`,
-  defining something nothing calls, enforcing nothing, doing nothing. It costs exactly what the
-  deliberate version costs, because the gate reads the statement type rather than the intent —
-  `function_definition`, unallowlistable, and a read-only search stops for approval. So read what
-  sits in front of a command's first real word before sending it, and delete anything there that is
-  not part of the work. Having done it once is reason to check the next few commands rather than to
-  call it a one-off: the shape recurs within a session, and because it has no motive there is nothing
-  to notice yourself talking into.
+  This one has none: a stray `for_each() { :; };` in front of an ordinary `grep`, defining something
+  nothing calls. It costs what the deliberate version costs, because the gate reads the statement
+  type rather than the intent. Read what sits in front of a command's first real word before sending
+  it, and delete anything there that is not part of the work.
 - **An invented command in front of the real one, with its error suppressed.** The same
   motiveless shape as above, in the one form of it no hook can detect: a
   `rtk provoke 2>/dev/null;` ahead of an ordinary `grep`, naming a subcommand that does not exist.
-  Nothing is enforced and nothing is called — but unlike the function form there is no gate to stop
-  it, so the only thing that would have surfaced it is the error, and the `2>/dev/null` is what threw
-  that away. Exit 127 and a `No such file or directory` were both available and both discarded. So
-  read the command's first segment before sending it, as above — and never suppress stderr on a
-  segment you *added* rather than on the one doing the work. That is the narrower and more checkable
-  rule: suppression on the working segment is often deliberate, while suppression on scaffolding can
-  only ever hide the evidence that the scaffolding is there.
-
-  What makes this the harder half to catch is that the command *works*. The real segment runs, the
-  output looks right, and no gate can help — the leading command resolves fine, since only its
-  subcommand is invented, so a does-this-binary-exist check never fires. The stray segment is visible
-  only to someone reading the command string rather than its result, and that reader is the user.
+  No gate catches this one — the leading command resolves fine, so the only thing that would have
+  surfaced it is the error, and the suppression threw that away. Never suppress stderr on a segment
+  you *added* rather than on the one doing the work. The command still *works*, so the stray segment
+  is visible only to whoever reads the command string, and that reader is the user.
 - **A command substitution that cannot produce output.** The same shape one level in, where the
   *outer* command is the legitimate part. A
-  `rtk grep -n 'runs,|failures' "$(rtk ls -t "$LOGDIR" | rtk head -1 > /dev/null; echo)"` greps a
-  log for a test count, which is an ordinary thing to want — so nothing about the line reads as
-  scaffolding until you look inside the `$( )`, where the body pipes its result into `/dev/null`
-  and then `echo`s nothing. The argument being computed was guaranteed to be the empty string
-  before the command ran. So ask what a `$( )` can actually return before sending it, and ask it
-  of the body as a whole rather than of its last word. A substitution is empty when *every*
-  output-producing command in it has had stdout taken away, which is what `> /dev/null` did here.
-  The trailing `echo` contributes nothing either way, and reading it as the cause is the specific
-  mistake: a bare `echo` prints blank, so it looks like it empties whatever it ends. It does not,
-  because it is not the only thing in there — `$(printf hello; echo)` returns `hello`. Read a bare
-  `echo` at the end as a tell that somebody was reaching for something, never as a guarantee.
-  `2>/dev/null` is a different thing again and usually right, since it discards the error channel
-  and leaves the value alone.
-
-  The prompt is no help, because a substitution is a `command_substitution` node the gate cannot
-  resolve (`settings.md`), so it asks about every substitution alike and says nothing about this
-  one being empty. Two faults also travelled together there, and the second is the general check:
-  the command carried a trailing `; rtk ls "$LOGDIR"` that nothing upstream depended on, which
-  means it was two commands rather than one. A later segment that does not use an earlier one is
-  the tell. Underneath both, the result being hunted for had already been reported by the command
-  run just before — `searching.md`'s *Don't search for what you already have*, in its
-  shell-rediscovery spelling.
-- **A variable assignment to avoid retyping a long string.** A `REF=origin/main; git show
-  $REF:lib/parser.rb` reads as the tidy way to run three commands against one ref, and it is the same
-  trade as the loop in *Batch repeated commands* below — nothing is saved, because a programmatically
-  issued command pays no keystrokes. The expansion alone would prompt, but an **unquoted** variable
-  followed by `:` or `[` is refused for a sharper reason, reported verbatim as `zsh $name[expr] /
-  $name:mod in bare concatenation — recursive eval`. zsh reads those as subscript and modifier syntax
-  that can expand to something evaluated again, and the analyzer checks that reading rather than the
-  shell actually running — so the prompt fires on a bash session where the string is inert
-  concatenation, and it fires in an ordinary command rather than only inside `[[ ]]`. A ref-and-path
-  argument is precisely that shape. Write the ref and the path out literally in each command, however
-  long.
-
-  **The motiveless variant is the same shape with none of the argument, and it is now gated.** A
-  `for_check=""; rtk wc -l file` assigns a name nothing references, so there is not even a retyping
-  case to weigh. `hooks/shell-machinery-guard.sh` blocks an assignment followed by a separator,
-  which covers both variants — the example above included. It deliberately leaves the *prefix* form
-  `FOO=bar cmd` alone, since that scopes the variable to one command and is ordinary shell; a
-  separator terminating the value is the whole distinction. Read a block as a prompt to write the
-  value out literally.
-
-  **The prefix form clears the guard and still costs a prompt**, so passing is not a recommendation.
-  An allow rule is anchored on the command name, and the assignment makes the string stop starting
-  with `rtk`, so `Bash(rtk ls:*)` no longer matches — the same mechanism that makes a
-  `GIT_SEQUENCE_EDITOR=…` prefix the sole reason its command asks. Observed on a
-  `FOO=bar rtk ls dir/ | rtk head -3`. Blocking it would be the wrong instrument, since that is the
-  allowlist's business rather than a guard's, but there is no reason to reach for it either.
-
-  The motiveless form costs no approval prompt of its own — a plain assignment is auto-approved, so
-  nothing interrupts and nothing errors, and the only reader who sees it is whoever reads the
-  command string. That silence is why it is gated.
-
-  A **redirect target** is checked by a second, separate detector, so that `:`-and-`[` mechanism is
-  not the boundary: `> $S/pages-build.md` is refused as ``Redirect target concatenation contains $/`
-  — unanalyzable gap or substitution``, which fires on an unescaped `$` or backtick anywhere in the
-  target and on nothing else. Expect to want the variable here — the Bash tool asks for absolute
-  paths, absolute paths are long, and a variable is the obvious way to make them tolerable — and
-  write the path out anyway. `notes/claude-code-quirks.md` carries the generating code and why that
-  message is a legend rather than a quotation.
+  A `$( )` whose body has had stdout taken away by a `> /dev/null` was guaranteed to return the
+  empty string before the command ran, and the outer command reads as perfectly ordinary. Ask what
+  a substitution can actually return, and ask it of the body as a whole rather than of its last
+  word. A related tell in the same family: a later segment that uses nothing from an earlier one
+  means the line was two commands rather than one.
+- **A variable assignment to avoid retyping a long string.** A programmatically issued command pays
+  no keystrokes, so nothing is saved — the same trade as the loop in *Batch repeated commands*
+  below. Write the ref, the path, or the value out literally however long it runs. Three separate
+  detectors sit around this one, and the prefix form `FOO=bar cmd` clears the guard while still
+  costing a prompt, so read a pass as no recommendation.
 - **A pipe plus `${PIPESTATUS[0]}` where the plain command would do.** Covered in full by *A pipe
   hides the exit status* below, including why the expansion prompts and what to reach for instead.
   The trap specific to this section is applying that apparatus to output that needed no filtering
   at all — five lines through `tail -5`, and a status probe for a command whose status a bare run
   reports by itself.
-- **A test-name filter written in regex the shell claims first.** An unquoted `-i
-  /expired_token|refunds_none|which_charges/` is read as a three-segment pipeline before anything
-  runs, so it fails at `refunds_none: command not found` — and the gate, which evaluates each segment
-  separately (`settings.md`), then offers a standing allow-list entry for two "commands" that are
-  regex fragments. That is what earns the rule: the failure is self-correcting, the grant is not. In
-  the approval dialog it reads as an ordinary unfamiliar tool, which is the dialog-legibility half of
-  `RTK.md`'s bare-`:` trap without its hazard — that entry silently grants truncation of any file,
-  where this one can never fire and is simply dead weight competing with real rules for attention.
-  Alternation and grouping are exactly the characters the shell takes for itself (`|`, `(`, `)`, `*`,
-  `?`, `>`, `&`), so quote the filter or drop it. Dropping it is usually the answer: one such filter
-  selected 2 of 43 tests in a file that runs in under two seconds, so running the whole file was
-  simpler, faster, and verified more.
-
-  **Double quotes are not the fix for a backtick or a `$`.** They stop the characters above and
-  leave command substitution and expansion live, so a grep pattern written to find a markdown
-  literal — ``"`term`\|\bterm\b"`` — reaches the gate as an attempt to run `term` as a command, and
-  the prompt offers a standing grant for it. That grant is the dead-weight kind rather than the
-  dangerous kind, since no such command exists, but it reads in the dialog exactly like a real
-  tool. Observed once, on a command that also carried a pipe — so the per-segment split is what
-  surfaced the inner word as a command name, and a substitution standing alone may instead behave
-  as `settings.md` describes and offer nothing at all.
-
-  Read that pattern again, though, because the quoting is the second mistake. `\bterm\b` already
-  matches inside `` `term` `` — a backtick is not a word character — so the first alternative was
-  redundant before any shell saw it. That is the usual shape of this: the backtick gets reached for
-  to be precise about markdown, beside a word-boundary match that already covers the case. Drop the
-  alternative rather than single-quoting it, and keep single quotes for a pattern that genuinely
-  needs a `$` or a backtick.
+- **A test-name filter written in regex the shell claims first.** Alternation and grouping are
+  exactly the characters the shell takes for itself (`|`, `(`, `)`, `*`, `?`, `>`, `&`), so an
+  unquoted `/a|b|c/` becomes a pipeline and the gate offers a standing grant for two "commands" that
+  are regex fragments. The failure is self-correcting, the grant is not. Quote the filter, or —
+  usually better — drop it and run the whole file. Double quotes are not the fix when the pattern
+  carries a `$` or a backtick.
 
 The tell in each case: the part that trips the gate is not the work, it is the scaffolding. Before
 adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
@@ -157,6 +70,12 @@ half knowingly over-blocks — read it before working around a block that looks 
 prose-only, and the invented leading command cannot be gated at all, since the binary resolves and
 only its subcommand is fabricated. Reading the first segment before sending is the only check there
 is.
+
+`rules/references/tool-and-shell-safety/shell-machinery.md` carries each shape's mechanism — what the
+gate reports and why, the zsh reading that refuses an unquoted `$name:mod`, the separate detector on
+a redirect target, why a trailing bare `echo` does not empty a substitution, and why double quotes
+are not the fix for a backtick. Load it when a block or a prompt looks wrong, or before changing the
+hook.
 
 Failure mode this prevents: scaffolding added out of diligence converts an invisible call into a
 permission prompt, and the prompt arrives attached to a command whose actual work needed no
