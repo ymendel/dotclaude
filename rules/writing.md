@@ -205,6 +205,12 @@ reader as a misspelling rather than as a locale choice. That is a worse failure 
 `colour` produce, which read as merely foreign. `defence`/`defense` is a plain variant carrying no
 such split.
 
+Existing drift is not a standard to join. A tree whose prose is British throughout — commit bodies,
+PR descriptions, code comments — reads as house style from inside, and `code-style.md`'s
+consistency bullet is the instinct that will argue for matching it. The artifact in hand takes the
+rule regardless of its neighbors. Bringing the rest into line is separate work to raise, never to
+fold into the change at hand.
+
 Sweeping for these is a different job from writing them. A stem match hits words that are already
 American — `organis` catches `organism`, `generalis` catches `generalist`, `enrol` catches
 `enrollment`, `realis` catches `realistic`. A quoted passage keeps its source's spelling, so an
