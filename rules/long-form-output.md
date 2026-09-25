@@ -37,13 +37,13 @@ Once the user picks a direction, default to keeping both files. The discarded fi
 
 A skill's prescribed output format — JSON findings, a structured report, anything multi-section — is a contract for *shape*, not for *placement*. The file-it threshold above still applies. Default to filing: write a markdown narrative to a file with the prescribed-format payload inside (a fenced block, or appended at the end), and post the usual pointer in chat.
 
-## Don't put decision-critical detail only in an AskUserQuestion preview — previews clip at a height you can't see
+## Omit the AskUserQuestion preview by default — it clips at a height you can't see
 
-When passing `preview` content on an AskUserQuestion option, never rely on the preview to carry information the user needs in order to choose. The picker renders previews in a pane sized to the user's terminal — a height you can't observe — and clips overflow to a "N lines hidden" marker with no scroll. On a short terminal even a two-or-three-line preview can collapse to a single visible line, so no preview length reliably fits.
+Default to passing no `preview` at all, and never use one to carry information the user needs in order to choose. What each option means, the tradeoffs, and the recommendation go in the labels, the descriptions, and the chat message accompanying the question, where nothing is clipped.
 
-**Why:** the available height of the preview pane can't be detected, so there's no judging what length will fit — even a two-or-three-line preview can collapse to a single visible line. The user can enlarge the pane, but that's not something to count on or measure.
+**Why:** the picker renders previews in a pane sized to the user's terminal — a height you can't observe — and clips overflow to a "N lines hidden" marker with no scroll. Even a two-or-three-line preview can collapse to a single visible line, so no length reliably fits, and the user enlarging the pane is not something to count on or measure. A clipped preview is also worse than an absent one rather than merely useless: it takes vertical space from the labels and descriptions that were carrying the decision, so the list reads as cramped in exchange for a snippet cut off mid-line.
 
-**How to apply:** treat previews as an optional visual aid whose absence would not block the decision — a mockup or snippet the user compares *if* it renders. Keep everything load-bearing (what each option means, tradeoffs, the recommendation) in the chat message accompanying the question, where nothing is clipped. When in doubt, skip the preview and rely on labels + descriptions + prose framing in chat.
+**The tool's own documentation is not a defense here.** It pitches previews for concrete artifacts a user compares side by side, and lists code snippets among them — which is precisely the case that produced "this preview isn't helpful". Whether a mockup or a diagram variant fares better is untested. So read a request to compare rendered artifacts as a reason to ask whether a preview would help, never as a standing exception.
 
 ## Don't point at tool output as a shared visible surface
 
