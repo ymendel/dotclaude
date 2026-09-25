@@ -217,6 +217,13 @@ American — `organis` catches `organism`, `generalis` catches `generalist`, `en
 external quote is not yours to correct. And `analyses` is the noun plural in both, so changing it
 fixes no spelling and can break an anchor link into a heading that uses it.
 
+A hand-built word list bounds an absence claim to the list rather than to the corpus, and that
+false-negative direction is worse than the stem-match overreach above: an overreach produces a
+wrong edit somebody catches, where a missed word produces a clean report nobody rechecks —
+`catalogue` survives a sweep built around `colour` and `behaviour`. So report what was searched,
+"these are the hits for this list", rather than "everything else is clean". That is `honesty.md`'s
+*Do Not Assert Absence Without Verifying* in the term-search form that file already describes.
+
 Failure mode this prevents: each instance is invisible in place, because nothing about `behaviour`
 in a sentence looks like a decision. The drift is noticed only when some word happens to look wrong
 in isolation, by which point it is spread across files — and whatever has landed in an accepted ADR
