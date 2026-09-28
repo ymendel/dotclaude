@@ -75,6 +75,22 @@ case "$SESSION" in
   */* | . | ..) exit 0 ;;
 esac
 
+# tail_path <path> — the last two segments, so `config/routes.rb` rather than a bare `routes.rb`.
+# A basename alone is ambiguous across the directories a repo repeats (`index.ts`, `README.md`,
+# `test.rb`), and the parent is usually the word that disambiguates. Degrades to the basename when
+# there is no parent to name, rather than emitting a leading slash.
+tail_path() {
+  local path=$1 base parent
+  base=${path##*/}
+  parent=${path%/*}
+  # No slash anywhere: `${path%/*}` returns the path untouched, so there is nothing to prepend.
+  [ "$parent" = "$path" ] && { printf '%s' "$base"; return; }
+  parent=${parent##*/}
+  # A root-level path leaves this empty, and `/routes.rb` is no improvement on `routes.rb`.
+  [ -z "$parent" ] && { printf '%s' "$base"; return; }
+  printf '%s/%s' "$parent" "$base"
+}
+
 # The descriptor is read by a human off a desktop notification, so it names the thing rather than
 # the field it came from. Tools not listed here fall through to their own name, which is already
 # more than the generic label says.
@@ -96,8 +112,32 @@ case "$TOOL" in
   Edit | Write | NotebookEdit)
     # NotebookEdit carries notebook_path where the other two carry file_path.
     DETAIL=$(jq -r '.tool_input.file_path // .tool_input.notebook_path // empty' <<<"$INPUT")
-    DESCRIPTOR="writes: ${DETAIL##*/}"
-    [ -z "$DETAIL" ] && DESCRIPTOR="writes a file"
+    if [ -n "$DETAIL" ]; then
+      DESCRIPTOR="writes: $(tail_path "$DETAIL")"
+    else
+      DESCRIPTOR="writes a file"
+    fi
+    ;;
+  Read)
+    DETAIL=$(jq -r '.tool_input.file_path // empty' <<<"$INPUT")
+    if [ -n "$DETAIL" ]; then
+      DESCRIPTOR="reads: $(tail_path "$DETAIL")"
+    else
+      DESCRIPTOR="reads a file"
+    fi
+    ;;
+  WebFetch)
+    DETAIL=$(jq -r '.tool_input.url // empty' <<<"$INPUT")
+    # The scheme is eight characters that distinguish nothing — every URL here is http or https, and
+    # the cap below truncates from the right, so those eight come off the path, which is the half
+    # that says what is being fetched.
+    DETAIL=${DETAIL#https://}
+    DETAIL=${DETAIL#http://}
+    DESCRIPTOR="fetches: ${DETAIL:-a URL}"
+    ;;
+  WebSearch)
+    DETAIL=$(jq -r '.tool_input.query // empty' <<<"$INPUT")
+    DESCRIPTOR="searches: ${DETAIL:-the web}"
     ;;
   mcp__*)
     # `mcp__<server>__<tool>`, per the hooks docs, which gloss these the way this renders them —

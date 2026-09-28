@@ -99,25 +99,59 @@ records "Bash names the command" \
     s3 Bash '{"command":"bin/rails db:migrate"}' \
     "runs: bin/rails db:migrate"
 
-records "Write names the basename, not the whole path" \
+records "Write names the last two path segments, not the whole path" \
     s4 Write '{"file_path":"/Users/alice/dev/shipping-tracker/config/routes.rb"}' \
-    "writes: routes.rb"
+    "writes: config/routes.rb"
+
+records "Write without a path says so rather than recording an empty descriptor" \
+    s25 Write '{}' \
+    "writes a file"
 
 # NotebookEdit carries notebook_path where Edit and Write carry file_path, so a hook reading only
 # file_path records a pathless write without saying so.
 records "NotebookEdit reads notebook_path" \
     s5 NotebookEdit '{"notebook_path":"/Users/alice/dev/analysis/orders.ipynb"}' \
-    "writes: orders.ipynb"
+    "writes: analysis/orders.ipynb"
 
 records "ExitPlanMode is named without reading its input" \
     s6 ExitPlanMode '{}' \
     "wants to leave plan mode"
 
+# Read names two segments where Write names one. A basename alone repeats across a repo's
+# directories, and the parent is usually the word that tells two `index.ts` apart.
+records "Read names the last two path segments" \
+    s19 Read '{"file_path":"/Users/alice/dev/shipping-tracker/app/models/shipment.rb"}' \
+    "reads: models/shipment.rb"
+
+records "Read degrades to the basename when there is no parent segment" \
+    s20 Read '{"file_path":"Gemfile"}' \
+    "reads: Gemfile"
+
+# A root-level path has a parent that is the empty string, which would render a leading slash.
+records "Read at the filesystem root does not emit a leading slash" \
+    s21 Read '{"file_path":"/Gemfile"}' \
+    "reads: Gemfile"
+
+records "Read without a path says so rather than recording an empty descriptor" \
+    s22 Read '{}' \
+    "reads a file"
+
+# The scheme distinguishes no URL from another and costs eight of the eighty characters, which the
+# cap takes off the path — the half that says what is being fetched.
+records "WebFetch names the URL without its scheme" \
+    s23 WebFetch '{"url":"https://example.com/docs/hooks","prompt":"what does it say?"}' \
+    "fetches: example.com/docs/hooks"
+
+records "WebSearch names the query" \
+    s24 WebSearch '{"query":"claude code permission request hook"}' \
+    "searches: claude code permission request hook"
+
 # An unlisted tool still beats the generic label, so it falls through to its own name rather than
-# being dropped.
+# being dropped. ListAgents carries no path, URL, or query, so it is a tool no future arm would have
+# anything to name — which is what makes it a stable stand-in here.
 records "an unlisted tool falls through to its own name" \
-    s7 WebFetch '{"url":"https://example.com"}' \
-    "WebFetch"
+    s7 ListAgents '{}' \
+    "ListAgents"
 
 # MCP tools arrive as `mcp__<server>__<tool>`, which is readable but not written for a human. The
 # docs gloss them the way this renders them: "Memory server's create entities tool".
