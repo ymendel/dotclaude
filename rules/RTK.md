@@ -108,6 +108,18 @@ for that anyway. Do not retry `rtk git diff` variants expecting different output
 go through the same filter. `git show` cannot substitute: it only shows committed changes,
 not working tree differences.
 
+**Never take a count from `rtk git log` — it caps at 50 lines.** `rtk git log --oneline <range>`
+returns the first 50 commits and marks nothing as omitted, so piping it into a counter measures the
+cap. Measured across ranges of 49, 50, 51 and 120 commits: the first two come back whole, the last
+two both return 50. Reach for `rtk git rev-list --count <range>` when the number is the question,
+and `rtk proxy git log` when the lines are.
+
+This is the inverse of the empty-result traps below. Those produce a suspicious nothing. A capped
+count produces a confident figure, and 50 is a plausible number of commits. Re-running the same
+filtered command reproduces it exactly, so agreement between two runs reads as corroboration rather
+than as the same cap twice. Failure mode this prevents: the number lands in a handoff, a PR body or
+a note as a measurement, where nothing marks it as partial and the next reader builds on it.
+
 **An empty or thin `rtk find` / `rtk grep` result is a wrapper artifact before it is an answer.**
 Four separate mechanisms in these two commands turn a real match into a clean-looking miss — token
 suppression, `.gitignore` filtering, a glob-vs-directory mismatch, and short flags consumed before
