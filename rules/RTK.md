@@ -162,7 +162,16 @@ tied to a step and appear under `UNKNOWN STEP`.
 
 ## Golden Rule
 
-**Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
+**Always prefix Bash commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it
+passes through unchanged, so the prefix never breaks a command.
+
+**That safety is the command's and not the permission gate's**, which is the whole of what the
+exception below turns on. The gate matches the literal string, and the allow list holds no
+`Bash(rtk:*)` — its `Bash(rtk <sub>:*)` entries enumerate rtk's own subcommands — so an `rtk` in
+front of a passthrough tool matches nothing and prompts, however granted the bare form is. rtk reads
+it the same way: `rtk rewrite` returns exit 3 on the prefixed form, which the hook's protocol treats
+as *prompt the user*, against exit 1 and a clean pass for the bare one. Read "safe" as "will run",
+never as "costs nothing".
 
 **Important**: Even in command chains with `&&`, use `rtk`:
 ```bash
