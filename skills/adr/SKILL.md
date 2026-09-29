@@ -162,16 +162,28 @@ disqualifies one is being a restatement of an option already listed, or a
 variation whose only difference belongs in that option's cons: "Option B but
 without the cache" is Option B with a drawback named, not a fourth option.
 
-A second *axis* is not a reason to lengthen the list — it is a reason to start
-a second one. When an ADR settles two questions that do not constrain each
-other — how a library is distributed, and how far its first version goes —
-give each its own `### Options considered: <axis>` heading and letter each
-list from A. The heading carries the axis, so no intro sentence goes beneath
-it. A single-axis ADR keeps the plain `### Options` heading — the longer form
-appears only where two lists have to be told apart. Failure mode this prevents:
-two orthogonal decisions get crammed into one lettered run, so the list reads
-as five answers to one question and the reader has to work out which options
-were ever alternatives to each other.
+A second *question* is not a reason to lengthen the list — it is a reason to
+start a second one. Give each question its own `### Options considered: <axis>`
+heading and letter each list from A. A single-axis ADR keeps the plain
+`### Options` heading — the longer form appears only where two lists have to be
+told apart.
+
+The two questions need not be independent. One shape is *orthogonal* — how a
+library is distributed, and how far its first version goes, neither
+constraining the other. The other is *dependent*, where the second question
+has options at all only because the first went a particular way: how a service
+authenticates its callers, and then what a request bearing an expired token
+gets back, which is a question only once the first list picks tokens. Both
+shapes get their own list.
+
+What the dependent shape adds is a premise, and it goes in the Decision prose
+above the lists. The heading carries the axis, so no intro sentence goes
+beneath it — which is exactly where the instinct puts "these presuppose Option
+A above".
+
+Failure mode this prevents: two questions get crammed into one lettered run, so
+the list reads as five answers to one question and the reader has to work out
+which options were ever alternatives to each other.
 
 The sharpest near-duplicate tell: two options that produce the **same
 technical end state** and differ only in **motivation** — one framed as a
