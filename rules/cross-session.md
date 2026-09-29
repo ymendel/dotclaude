@@ -46,6 +46,27 @@ one of them, and the user is asked to re-decide something they decided — which
 been listened to. Worse, a confident "still open" gets acted on as a status, so work is planned
 around a decision point that closed some time ago.
 
+## A handover message is prose somebody else will commit
+
+`references/rule-maintenance/cross-session-handover.md` tells the receiver to check a handed-over
+edit's claims before staging. It says nothing to the sender, who is the one party that had the
+evidence in front of them. Close it from this side: every claim in a handover has to survive that
+check, because the words land in a commit under a byline that is not yours.
+
+Make the case. That is what the message is for, and a receiver cannot route an edit they have only
+been told the shape of. What must not ride along is force the evidence does not carry. An argument
+for an edit pulls toward the flat quantifier — *will* rather than *can*, *at least as often as*, a
+mechanism called blind to a case it merely handles poorly. None of those is the argument, and
+striking them costs the argument nothing.
+
+It evades the writing rules because a message reads as conversation while it is underway.
+`writing.md`'s chat exemption covers replies to the user and not this — a handover becomes byline
+output the moment the receiver commits it verbatim.
+
+Failure mode this prevents: the receiver's claims check is the only control on the channel, so a
+careful receiver spends the turn stripping quantifiers and a hurried one commits them into a public
+repo. Both outcomes were avoidable by the only party who knew what the evidence was.
+
 ## Don't relay a peer message as though the user already read it
 
 A cross-session message lands whole in your context and thinly in the user's — recent builds
