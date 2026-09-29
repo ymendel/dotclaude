@@ -72,6 +72,14 @@ Many repos keep an index beside the records — a `docs/adr/README.md` carrying 
 
 Where no index exists, don't create one unprompted for a short, gapless sequence — it would only restate the filenames in a table. Offer one at the first gap — the moment the sequence stops explaining itself — or once the list has grown past roughly a screenful.
 
+## When two repos' ADR sets meet
+
+A consolidation — one codebase absorbing another — brings together two sequences that both start at `0001`. The number collision is the visible problem and the smaller one. Check the two sets for records answering the *same axes* differently, because renumbering does nothing about those. One codebase's ADR 0002 might say "API-only Rails application" where the other's says "the browser talks only to Rails, and Rails is the sole API client" — one question, two answers, and the consolidation has to pick. Treating the merge as a numbering exercise ships a tidy sequence containing contradictory decisions.
+
+**Don't move records between repos.** A record describes the system it was written for, and dropping its file into another repo makes it describe a system it never saw. Leave the originals where they are, historically accurate for their own codebase, and write *new* records in the destination's sequence for the decisions that survive absorption. Cite the original by repo-qualified reference — `shipping-tracker ADR 0005` — not by the relative path *Writing quality* below prescribes for same-repo links, which dangles the moment it crosses a repo boundary. Some incoming records get re-recorded that way, some are voided outright by the absorption, and neither case needs a file to move.
+
+**Never renumber to resolve a collision.** The Numbering section's rule holds here with more force, because the inbound citations live in *another* repo's history — pushed commit messages that can't be amended, closed pull requests, tickets citing by number. Give the surviving decisions new numbers in the destination sequence and let the originals keep theirs.
+
 ## Filename format
 
 `NNNN-kebab-case-title.md` — derived from the title, under ~60 characters. Strip articles (`a`, `the`), drop punctuation, lowercase. Example: `0008-tour-data-sync.md`.
