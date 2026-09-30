@@ -41,35 +41,38 @@
 # OSC 0 and OSC 2 were each tried and measured; `notes/claude-code-notification-hooks.md` records
 # what happened so it is not re-attempted.
 #
-# Delivery is `osascript`, which needs nothing installed.
+# Delivery is `terminal-notifier` when it is installed, falling back to `osascript`, which needs
+# nothing installed.
 
 # Overridable so a test run can be pointed at a scratch file rather than appending to the real log.
 LOG="${CLAUDE_NOTIFY_LOG:-$HOME/.claude/.notification-probe.jsonl}"
 SOUND="Submarine"   # blank for silent notifications
 
-# A hook must not print. osascript's own chatter would land in the session, so it is discarded —
+# A hook must not print. The notifier's own chatter would land in the session, so it is discarded —
 # the log is the record of what fired.
 #
-# TODO: prefer terminal-notifier when it is present, keeping this osascript path as the fallback so
-# a machine that lacks it still notifies. Two reasons, in order.
-#
-# It carries its own bundle, so it gets its own System Settings > Notifications entry — its own
-# alert style, icon, and Focus behavior. osascript is unbundled and attributed to
-# com.apple.ScriptEditor2, so the only way to make these notifications persist rather than
-# auto-dismiss is to set *Script Editor*'s Alert Style to Persistent, which catches every unbundled
-# `display notification` on the machine. A separate entry is a setting you can aim.
-#
-# Its Notification grouping also keys on the app, so every session stacks under one Script Editor
-# group — the wrong key, since the thing worth separating is the project.
-#
-# And `-group` replaces an earlier notification carrying the same group id, so grouping by project
-# means a session's second prompt supersedes its first instead of stacking.
+# terminal-notifier is preferred for two reasons. It carries its own bundle, so it gets its own
+# System Settings > Notifications entry — alert style, icon, Focus behavior. osascript is attributed
+# to com.apple.ScriptEditor2, so making its notifications persist means setting *Script Editor*'s
+# Alert Style, which catches every unbundled `display notification` on the machine. And `-group`
+# replaces an earlier notification with the same id, keyed here on the session rather than the
+# project: a session's second prompt supersedes its first, while two sessions in one directory stay
+# apart (`notes/claude-code-notification-hooks.md`).
 #
 # Its click actions are not a reason: they can focus an editor but not a terminal tab inside it.
-# Install is `brew install terminal-notifier`, and the Brewfile line belongs in dotfiles rather than
-# here, being machine setup rather than Claude config.
+# The Brewfile line belongs in dotfiles, being machine setup rather than Claude config.
 notify() {
   local title=$1 body=$2
+
+  if command -v terminal-notifier &>/dev/null; then
+    local args=(-title "$title" -message "$body")
+    [ -n "$SOUND" ] && args+=(-sound "$SOUND")
+    [ -n "$SESSION" ] && args+=(-group "$SESSION")
+    # Exits 3 when notifications are not authorized for it, so an unapproved install falls through
+    # to osascript rather than going silent.
+    terminal-notifier "${args[@]}" >/dev/null 2>&1 && return
+  fi
+
   if [ -n "$SOUND" ]; then
     osascript \
       -e 'on run argv' \

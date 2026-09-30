@@ -9,10 +9,12 @@
 # about that harness's shape fits.
 #
 # Both side effects are asserted. The log is read back from a scratch file, pointed there by
-# CLAUDE_NOTIFY_LOG so a run never appends to the real one. The notification is captured by an
-# `osascript` stub placed ahead of the real binary on PATH, which records its arguments instead of
-# displaying anything — without it the delivery half is unobservable, since a notification appearing
-# leaves no trace a script can read.
+# CLAUDE_NOTIFY_LOG so a run never appends to the real one. The notification is captured by
+# `osascript` and `terminal-notifier` stubs placed ahead of the real binaries on PATH, which record
+# their arguments instead of displaying anything — without them the delivery half is unobservable,
+# since a notification appearing leaves no trace a script can read. The terminal-notifier stub
+# exits 3 unless told otherwise, as the real one does when unauthorized, so most cases exercise the
+# osascript fallback.
 #
 # What this cannot check: that macOS actually renders what osascript was asked to render, or the
 # alert style it renders with. Those are System Settings' business and a human's eyes.
@@ -52,6 +54,13 @@ printf '%s\n' "$*" >> "$OSASCRIPT_CALLS"
 STUB
 chmod +x "$STUB_DIR/osascript"
 
+cat > "$STUB_DIR/terminal-notifier" <<'STUB'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$NOTIFIER_CALLS"
+exit "${NOTIFIER_EXIT:-3}"
+STUB
+chmod +x "$STUB_DIR/terminal-notifier"
+
 . "$(cd "$TEST_DIR/../.." && pwd)/test/_harness.sh"
 
 # run <payload> — feeds the hook, leaving the log in $LOG, the osascript calls in $CALLS, and the
@@ -59,13 +68,15 @@ chmod +x "$STUB_DIR/osascript"
 run() {
     LOG="$WORK_DIR/log.jsonl"
     CALLS="$WORK_DIR/calls.txt"
+    NOTIFIER="$WORK_DIR/notifier.txt"
     STDOUT="$WORK_DIR/stdout.json"
     : > "$LOG"
     : > "$CALLS"
+    : > "$NOTIFIER"
     : > "$STDOUT"
     printf '%s' "$1" \
-        | PATH="$STUB_DIR:$PATH" OSASCRIPT_CALLS="$CALLS" CLAUDE_NOTIFY_LOG="$LOG" \
-          CLAUDE_PERMISSION_CONTEXT_DIR="$CONTEXT_DIR" bash "$HOOK" \
+        | PATH="$STUB_DIR:$PATH" OSASCRIPT_CALLS="$CALLS" NOTIFIER_CALLS="$NOTIFIER" \
+          CLAUDE_NOTIFY_LOG="$LOG" CLAUDE_PERMISSION_CONTEXT_DIR="$CONTEXT_DIR" bash "$HOOK" \
         > "$STDOUT"
 }
 
@@ -219,5 +230,24 @@ notified \
     && report true "idle_prompt leaves the record alone" \
     || report false "idle_prompt leaves the record alone" "record was consumed"
 rm -rf "$CONTEXT_DIR"
+
+# --- Delivery ------------------------------------------------------------------
+
+# An authorized terminal-notifier delivers alone, grouped on the session so a second prompt from
+# one session replaces its first while two sessions in one directory stay apart.
+NOTIFIER_EXIT=0 run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
+grep -q -- '-group check' "$NOTIFIER" && grep -q 'shipping-tracker' "$NOTIFIER" \
+    && report true "terminal-notifier delivers, grouped by session" \
+    || report false "terminal-notifier delivers, grouped by session" "captured: $(cat "$NOTIFIER")"
+notified \
+    && report false "a delivered notification skips osascript" "captured: $(cat "$CALLS")" \
+    || report true "a delivered notification skips osascript"
+
+# Unauthorized, it exits 3 — the state of a fresh install — and delivery falls through.
+run "$(payload permission_prompt /Users/alice/dev/shipping-tracker)"
+[ -s "$NOTIFIER" ] && notified \
+    && report true "a failed terminal-notifier falls back to osascript" \
+    || report false "a failed terminal-notifier falls back to osascript" \
+        "notifier: $(cat "$NOTIFIER") osascript: $(cat "$CALLS")"
 
 summary || exit 1
