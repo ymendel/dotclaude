@@ -23,6 +23,10 @@
 !/skills
 !/skills/**/*
 
+# but NOT skills/synced — Claude Code's local copy of claude.ai account skills,
+# regenerated per machine and per account.
+/skills/synced/
+
 # and rules
 !/rules
 !/rules/**/*
