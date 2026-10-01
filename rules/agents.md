@@ -122,7 +122,7 @@ Failure mode this prevents: the wrapper exists, is correct, and never runs, beca
 
 ## `Explore` And `Plan` Are The Only Agents Without These Rules
 
-Exactly two sub-agents run without the rules loaded here, and both are built-ins: `Explore` and `Plan` skip the entire CLAUDE.md hierarchy — `~/.claude/CLAUDE.md`, the `rules/` directory including its private symlinked files, `CLAUDE.local.md`, managed policy. Every other agent loads all of it, custom definitions in `agents/` and the built-in `general-purpose` alike. No frontmatter field moves an agent across that line.
+Exactly two sub-agents run without the rules loaded here, and both are built-ins: `Explore` and `Plan` skip the entire CLAUDE.md hierarchy — `~/.claude/CLAUDE.md`, the `rules/` directory including its private symlinked files, `CLAUDE.local.md`, managed policy. Every other agent loads all of it, custom definitions in `agents/` and the built-in `general-purpose` alike. The one frontmatter field that moves a custom agent across that line is `omitClaudeMd` (2.1.271), which drops the user, project and local CLAUDE.md files, and none of the agents in `agents/` sets it.
 
 So a specialized agent's expertise arrives **on top of** this baseline rather than in competition with it. `postgres-pro` has the code style. `code-reviewer` has the revert hazard and the staging rules. Do not restate a rule in a prompt to one of them, and do not treat their output as advice from somewhere the conventions don't reach.
 
