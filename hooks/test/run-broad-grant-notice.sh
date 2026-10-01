@@ -196,4 +196,17 @@ expect_eq "$STATUS" 0 'the hook exits 0 with nothing to check'
 seed_then_add "Bash(git *)"
 expect_eq "$STATUS" 0 'the hook exits 0 when it emits a notice'
 
+# The broad rule lives in hooks/lib/permission-rules.jq. A copy of the hook with no lib/ beside it
+# must stay silent and exit 0, not emit a notice built from a failed jq call.
+mkdir -p "$WORK_DIR/bare-hook"
+cp "$SUBJECT" "$WORK_DIR/bare-hook/broad-grant-notice.sh"
+fresh
+allow "$LOCAL_FILE" "Bash(git grep:*)"
+jq -n '{tool_name: "Bash"}' | HOME="$FAKE_HOME" CLAUDE_PROJECT_DIR="$PROJECT" "$WORK_DIR/bare-hook/broad-grant-notice.sh" >/dev/null 2>&1
+allow "$LOCAL_FILE" "Bash(git grep:*)" "Bash(git *)"
+OUT=$(jq -n '{tool_name: "Bash"}' | HOME="$FAKE_HOME" CLAUDE_PROJECT_DIR="$PROJECT" "$WORK_DIR/bare-hook/broad-grant-notice.sh" 2>/dev/null)
+STATUS=$?
+expect_eq "$OUT" "" 'with the shared rules file missing, the hook stays silent'
+expect_eq "$STATUS" 0 'with the shared rules file missing, the hook exits 0'
+
 summary || exit 1

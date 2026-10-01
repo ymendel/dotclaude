@@ -19,12 +19,9 @@
 # never edits a settings file and never blocks — the notice is an offer, and whether to narrow the
 # grant is the user's call (rule-maintenance.md, "Permissions Allow List").
 #
-# "Broad" is a heuristic, deliberately loose because a false notice costs one sentence of chat:
-#   - the tool-wide `Bash` entry
-#   - one command word plus a trailing wildcard: `git *`, `python3:*`, `bin/rails*`
-#   - an interpreter with any wildcard: `python3 -c ' *`, `ruby -e *`
-#   - a command runner followed directly by a wildcard: `rtk proxy *`, `bundle exec *`, `npx *`
-# A leading `rtk ` is looked through, so `rtk bundle *` reads as `bundle *`.
+# "Broad" is defined in hooks/lib/permission-rules.jq, shared with scripts/local-allow.sh. It is a
+# heuristic, deliberately loose because a false notice costs one sentence of chat. If that file is
+# missing the hook stays silent rather than guessing.
 #
 # Watches Bash calls only: the dialog writes broad rules for Bash, and checking on every call keeps
 # the snapshot current enough that an Edit to a settings file is also caught on the next command.
@@ -47,26 +44,8 @@ SNAPSHOTS="$HOME/.claude/.grant-snapshots"
 FILES=("$HOME/.claude/settings.json")
 [ -n "$PROJECT_DIR" ] && FILES+=("$PROJECT_DIR/.claude/settings.local.json")
 
-read -r -d '' BROAD <<'JQ' || true
-def norm: if endswith(":*") then .[:-2] + " *" else . end;
-def interpreters: ["python", "python3", "ruby", "node", "bash", "sh", "zsh", "perl", "php", "deno", "bun"];
-def runners: ["rtk proxy", "rtk test", "rtk err", "bundle exec", "bin/rails runner", "rails runner",
-              "npx", "uv run", "xargs", "env", "direnv exec", "devenv shell", "nix run", "eval", "exec",
-              "sudo", "timeout", "nohup"];
-def broad:
-  if . == "Bash" then true
-  elif test("^Bash\\(.*\\)$") | not then false
-  else
-    (capture("^Bash\\((?<c>.*)\\)$").c | norm) as $whole
-    | (if ($whole | startswith("rtk ")) and (any(runners[]; . as $r | $whole | startswith($r + " ")) | not)
-       then $whole[4:] else $whole end) as $c
-    | ($c | split(" ")[0] | split("/") | last) as $head
-    | ($c | test("^[^ ]+ \\*$") or test("^[^ *]+\\*$"))
-      or (any(interpreters[]; . == $head) and ($c | contains("*")))
-      or any(runners[]; . as $r | $whole == $r + " *" or $c == $r + " *")
-  end;
-.[] | select(broad)
-JQ
+LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib"
+[ -f "$LIB_DIR/permission-rules.jq" ] || exit 0
 
 mkdir -p "$SNAPSHOTS" 2>/dev/null || exit 0
 
@@ -90,7 +69,7 @@ for file in "${FILES[@]}"; do
   printf '%s\n' "$current" > "$snapshot"
 
   [ -n "$added" ] || continue
-  broad=$(printf '%s\n' "$added" | jq -R . | jq -s -r "$BROAD")
+  broad=$(printf '%s\n' "$added" | jq -R . | jq -s -r -L "$LIB_DIR" 'include "permission-rules"; .[] | select(broad)')
   [ -n "$broad" ] || continue
 
   while IFS= read -r entry; do
