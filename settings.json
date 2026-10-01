@@ -245,7 +245,7 @@
   "workflowSizeGuideline": "small",
   "workflowKeywordTriggerEnabled": false,
   "autoUpdatesChannel": "stable",
-  "minimumVersion": "2.1.236",
+  "minimumVersion": "2.1.285",
   "claudeMdExcludes": [
     "**/rules/README.md",
     "**/rules/references/**"
