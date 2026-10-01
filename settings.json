@@ -128,6 +128,7 @@
       "Bash(*gh gist delete*)"
     ],
     "defaultMode": "acceptEdits",
+    "disableAutoMode": "disable",
     "additionalDirectories": [
       "~/.claude"
     ]
