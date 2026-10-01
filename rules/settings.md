@@ -255,15 +255,17 @@ Hook `command` strings are executed by bash, so `$HOME` works fine there.
 
 **Verify hook output semantics from the official docs (https://code.claude.com/docs/en/hooks) before designing a hook that depends on the model seeing the output.** Don't generalize from one hook type to another.
 
-## PreToolUse Hooks Block an Allowlisted Command Only via Exit Code 2
+## A PreToolUse Hook Can Tighten an Allow Rule but Never Loosen a Deny or Ask Rule
 
-A `PreToolUse` hook can force a command to be blocked even when a `permissions.allow` rule would auto-approve it — but **only by exiting with code 2** (a "blocking hook"). A JSON `hookSpecificOutput.permissionDecision: "deny"` does **not** override a matching allow rule: per the [docs](https://code.claude.com/docs/en/permissions), hook decisions don't bypass permission rules, so a matching `allow` wins against a hook's JSON `deny`. Exit code 2 is the exception — it stops the tool call *before* permission rules are evaluated, so it beats `allow`.
+PreToolUse hooks run on every tool call, allowlisted ones included, and their verdict overrides a matching `permissions.allow` rule in the restrictive direction. Exit code 2 blocks the call. A JSON `hookSpecificOutput.permissionDecision` of `"deny"` blocks it too, and `"ask"` forces a prompt. Verified 2026-10-01 against 2.1.285: an allowlisted `rtk git rev-parse HEAD` was refused by a hook's JSON `deny` and prompted on its `ask` (`notes/claude-code-quirks.md`, "Post-upgrade probes").
 
-PreToolUse hooks do run on every tool call, allowlisted ones included — an allow match doesn't skip the hook. So the hook always gets its say. The only question is which blocking mechanism it uses, and only exit 2 is authoritative over an allow rule.
+The other direction does not hold. Per the [docs](https://code.claude.com/docs/en/permissions), "Hook decisions don't bypass permission rules": a deny rule still blocks and an ask rule still prompts when the hook returned `"allow"` or `"ask"`. That sentence is about rules binding a permissive hook. It does not say an allow rule beats a hook's `deny`, and the same section says hook output "can deny the tool call".
 
-The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message. The safe bare-`uv run <script>` shape falls through to the allow rule. Returning JSON `deny` there would silently fail — the allow rule would still auto-approve.
+Pick the mechanism by what the user should see. Exit 2 puts the hook's stderr in front of Claude and stops the call before rules are evaluated — the shape every guard in `hooks/` uses, since their messages are written to steer the next attempt. JSON `deny` carries a `permissionDecisionReason`, and `ask` hands the call to the user rather than refusing it.
 
-Failure mode this prevents: writing a guard hook that returns `permissionDecision: "deny"`, watching it correctly block a command that *isn't* allowlisted, and assuming it also blocks the allowlisted one — when the allow rule quietly wins and the dangerous command runs with no prompt. Exit 2 is the mechanism that beats an allow rule. The JSON `deny` field does not. (The docs are explicit on exit-2 precedence but read as ambiguous on JSON-`deny`-vs-`allow`, which is itself the reason to reach for exit 2.)
+The live case: `hooks/uv-run-guard.sh` guards the deliberately-broad `Bash(uv run *skills/skill-architecture/scripts/*.py*)` allow entry. The glob's leading `*` can't exclude a `uv run` option *before* the script path (`--with`, `--index-url`, `--python`, …) that would fetch and execute arbitrary code. The hook detects that dangerous shape and `exit 2`s with a stderr message. The safe bare-`uv run <script>` shape falls through to the allow rule.
+
+Failure mode this prevents: assuming a hook can widen what the rules permit — returning `allow` to skip a prompt that an ask rule demands, or to run something a deny rule blocks. It can't, and nothing reports the failure: the prompt or the block simply happens anyway. The opposite mistake, believing an allow rule beats a hook's JSON `deny`, costs only a needless preference for exit 2.
 
 ## A Hook Matcher Is a Regex Tested Anywhere in the Tool Name
 
