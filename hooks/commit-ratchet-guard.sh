@@ -73,6 +73,7 @@ TIERED=(
   "hooks/claude-dir-write-allow.sh|hooks/test/run-permission-request.sh"
   "hooks/notify-permission-context.sh|hooks/test/run-permission-request-context.sh"
   "hooks/broad-grant-notice.sh|hooks/test/run-broad-grant-notice.sh"
+  "hooks/lib/permission-rules.jq|scripts/test/run-local-allow.sh"
   "hooks/commit-ratchet-guard.sh|hooks/test/run-commit-ratchet.sh"
   "scripts/run-tests.sh|scripts/test/run-test-runner.sh"
   "scripts/measure-claude-dir-writes.sh|scripts/test/run-measure-writes.sh"
@@ -85,6 +86,7 @@ TIERED=(
   "scripts/session-meta-report.py|scripts/tests/"
   "scripts/sync-skill.sh|scripts/test/run-sync-skill.sh"
   "scripts/usage-report.sh|scripts/test/run-usage-report.sh"
+  "scripts/local-allow.sh|scripts/test/run-local-allow.sh"
   "test/_harness.sh|test/run-harness.sh"
 )
 

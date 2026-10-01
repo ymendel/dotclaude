@@ -126,6 +126,19 @@ run
 blocks 'the broad-grant notice hook staged without its suite is blocked'
 says 'hooks/test/run-broad-grant-notice.sh' 'the block names the broad-grant suite'
 
+# The shared permission rules are a .jq file, which the untiered check (.sh and .py only) would never
+# see. Its explicit row is the only thing that gates it.
+fresh
+stage hooks/lib/permission-rules.jq
+run
+blocks 'the shared permission rules staged without a suite are blocked'
+says 'scripts/test/run-local-allow.sh' 'the block names the suite that exercises the shared rules'
+
+fresh
+stage scripts/local-allow.sh
+run
+blocks 'the local-allow script staged without its suite is blocked'
+
 # Several units share one suite, so staging that suite clears all of them at once.
 fresh
 stage hooks/reflexive-cd-guard.sh hooks/shell-machinery-guard.sh hooks/test/run-checks.sh

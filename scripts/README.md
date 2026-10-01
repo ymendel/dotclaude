@@ -9,8 +9,10 @@ watching the always-loaded rule set for growth (`rules-floor.sh`, with
 `rules-sections.py` for per-section detail), and
 verifying the declared prerequisites are present
 (`check-prerequisites.sh`). Also includes a reader for settings.json that tells a
-real change from an external tool's reformatting (`compare-settings-json.py`), and
-runtime workarounds for Claude Code bugs (`enospc-workaround.sh`).
+real change from an external tool's reformatting (`compare-settings-json.py`), a
+review of the allow entries that pile up in every project's `settings.local.json`
+(`local-allow.sh`), and runtime workarounds for Claude Code bugs
+(`enospc-workaround.sh`).
 
 ## `compare-skills.sh`
 
@@ -467,6 +469,48 @@ only grows within a session.
 ### Exit status
 
 - `0` always. Reports only — it never edits and never fails.
+
+## `local-allow.sh`
+
+Review the allow entries in every project's `.claude/settings.local.json` under
+`~/dev`, where "Yes, and don't ask again" puts them.
+
+```
+./scripts/local-allow.sh candidates
+./scripts/local-allow.sh prune [--apply]
+```
+
+The two modes make one loop. `candidates` lists entries found in two or more
+projects that user settings don't already cover, each labeled narrow or broad. You
+decide which earn a user-level grant and add them to `settings.json`. `prune` then
+removes the local copies the promotion now covers, along with entries that can never
+fire and one-off exact commands.
+
+The label informs the decision and doesn't make it. Recurring across projects shows
+an entry keeps coming up, not that it should be granted everywhere — `python3:*`
+recurs as readily as `gem list *`. [`rules/settings.md`](../rules/settings.md)'s
+*What Earns a Standing Grant* is the test.
+
+`prune` is a dry run until `--apply`, which backs each changed file up under
+`~/.claude/.local-allow-backups/<timestamp>/` first. These files are gitignored, so
+that backup is the only way back. Only `permissions.allow` is touched.
+
+The coverage and broadness rules live in `hooks/lib/permission-rules.jq`, shared with
+`hooks/broad-grant-notice.sh`, so the hook and this script agree on what "broad" means.
+
+### Configuration
+
+```
+SEARCH_ROOT=...    # default $HOME/dev
+USER_SETTINGS=...  # default $HOME/.claude/settings.json
+BACKUP_DIR=...     # default $HOME/.claude/.local-allow-backups
+MIN_PROJECTS=...   # default 2
+```
+
+### Exit status
+
+- `0` Report produced, or prune applied.
+- `2` A configured path is missing or arguments are invalid.
 
 ## `compare-settings-json.py`
 

@@ -403,6 +403,7 @@ comes up would leave the gate unimplementable:
 | `hooks/notify-permission-context.sh` | 1 | fires automatically, and anything it printed would be read as a permission decision |
 | `hooks/ensure-trailing-newline.sh` | 1 | mutates files without being invoked |
 | `hooks/broad-grant-notice.sh` | 1 | fires on every Bash call, and a hook that misses a broad grant looks like one with nothing to report |
+| `hooks/lib/permission-rules.jq` | 1 | the coverage and broadness rules `broad-grant-notice.sh` and `local-allow.sh` both rely on; gated through `scripts/test/run-local-allow.sh` |
 | `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
 | `hooks/rtk-rewrite.sh` | 3 | vendored, pinned by checksum |
 | Skill validators and generators | 1 | dense deterministic logic; `init_skill.py` is 2, being human-run |
@@ -414,6 +415,7 @@ comes up would leave the gate unimplementable:
 | `scripts/rules-sections.py` | 2 | parses rule files for a report |
 | `scripts/compare-settings-json.py` | 2 | human-run, but its list-as-set flattening decides whether a change reads as cosmetic |
 | `scripts/usage-report.sh` | 2 | reads and summarizes, no writes |
+| `scripts/local-allow.sh` | 2 | human-run, but `prune --apply` rewrites gitignored files in other repos where only its own backup can restore them |
 | `scripts/context-usage.sh` | 2 | picks among per-session caches and reports staleness — more branching than its 82 lines suggest |
 | `scripts/measure-claude-dir-writes.sh` | 2 | derives figures that land in durable artifacts, and its verb matching and session exclusion both decide the result |
 | `scripts/run-tests.sh` | 1 | its failure mode is a false green: a suite it silently fails to discover reads exactly like a suite that passed |
