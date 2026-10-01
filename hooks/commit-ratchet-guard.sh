@@ -49,8 +49,8 @@ fi
 COMMAND=$(jq -r '.tool_input.command // empty' <<<"$INPUT" 2>/dev/null)
 [ -z "$COMMAND" ] && exit 0
 
-# The `if` conditions in settings.json should mean only commits arrive, but the hook outlives its
-# registration and a missed `if` would otherwise gate every Bash call.
+# Registered without an `if`, so every Bash call arrives here and this is the filter. Hooks run in
+# parallel and rtk-rewrite.sh sees every call regardless, so an `if` would save no wall-clock time.
 case "$COMMAND" in
   *"git commit"*) ;;
   *) exit 0 ;;
