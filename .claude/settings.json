@@ -6,6 +6,8 @@
       "Bash(./scripts/compare-settings-json.py:*)",
       "Bash(./scripts/compare-skills.sh:*)",
       "Bash(./scripts/context-usage.sh:*)",
+      "Bash(./scripts/local-allow.sh candidates)",
+      "Bash(./scripts/local-allow.sh prune)",
       "Bash(./scripts/rules-floor.sh:*)",
       "Bash(./scripts/rules-sections.py:*)",
       "Bash(./scripts/run-tests.sh:*)",
