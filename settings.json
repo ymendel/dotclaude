@@ -29,6 +29,7 @@
       "Bash(git switch:*)",
       "Bash(git symbolic-ref:*)",
       "Bash(grep:*)",
+      "Bash(heroku --version)",
       "Bash(heroku apps:info:*)",
       "Bash(heroku config:get *)",
       "Bash(heroku help*)",
