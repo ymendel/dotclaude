@@ -119,6 +119,13 @@ run
 blocks 'the shorter sibling suite does not clear the longer one'
 says 'hooks/test/run-permission-request-context.sh' 'the block names the context suite'
 
+# The newest tiered hook, which arrived with its own row.
+fresh
+stage hooks/broad-grant-notice.sh
+run
+blocks 'the broad-grant notice hook staged without its suite is blocked'
+says 'hooks/test/run-broad-grant-notice.sh' 'the block names the broad-grant suite'
+
 # Several units share one suite, so staging that suite clears all of them at once.
 fresh
 stage hooks/reflexive-cd-guard.sh hooks/shell-machinery-guard.sh hooks/test/run-checks.sh

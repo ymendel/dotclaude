@@ -402,6 +402,7 @@ comes up would leave the gate unimplementable:
 | `hooks/claude-dir-write-allow.sh` | 1 | decides a permission without being invoked, and an abstention is indistinguishable from not running |
 | `hooks/notify-permission-context.sh` | 1 | fires automatically, and anything it printed would be read as a permission decision |
 | `hooks/ensure-trailing-newline.sh` | 1 | mutates files without being invoked |
+| `hooks/broad-grant-notice.sh` | 1 | fires on every Bash call, and a hook that misses a broad grant looks like one with nothing to report |
 | `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
 | `hooks/rtk-rewrite.sh` | 3 | vendored, pinned by checksum |
 | Skill validators and generators | 1 | dense deterministic logic; `init_skill.py` is 2, being human-run |
