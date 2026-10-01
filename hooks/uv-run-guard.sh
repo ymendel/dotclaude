@@ -22,8 +22,7 @@
 # This hook enforces the safe shape: when a `uv run` command targets one of the
 # auto-allowed scripts, the first token after `uv run` must be the script path,
 # not an option. Any option before the path is a hard block via exit code 2,
-# which takes precedence over the allow rule (a JSON permissionDecision of
-# "deny" would NOT — it loses to a matching allow rule; only exit 2 blocks).
+# which takes precedence over the allow rule (see rules/settings.md).
 # uv's own options must precede the script, so anything after the path is the
 # script's own args and stays safe.
 #

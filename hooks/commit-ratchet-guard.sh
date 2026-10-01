@@ -8,9 +8,9 @@
 # `git commit` in every project on the machine, blocking unrelated repos against this repo's tier
 # table.
 #
-# EXIT 2 IS THE MECHANISM, not a JSON decision. `Bash(rtk git:*)` is allow-listed, and a matching
-# allow rule beats a hook's JSON `deny` — only exit 2 stops the call before permission rules are
-# evaluated. See rules/settings.md.
+# EXIT 2 IS THE MECHANISM. `Bash(rtk git:*)` is allow-listed, and exit 2 stops the call before
+# permission rules are evaluated while putting the stderr message in front of Claude. A JSON `deny`
+# would also beat the allow rule. See rules/settings.md.
 #
 # SCOPE, and what it deliberately cannot do. It sees only commits made through the tool, so a commit
 # from the user's own terminal is unaffected — which is the escape hatch by construction rather than
