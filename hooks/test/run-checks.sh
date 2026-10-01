@@ -4,9 +4,10 @@
 #
 #   ./hooks/test/run-checks.sh
 #
-# FOUR SUBJECTS, named here because the file's own name names none of them and the
-# ratchet's TIERED table maps all four to it: shell-machinery-guard.sh,
-# reflexive-cd-guard.sh, uv-run-guard.sh and python-rewrite.sh. The last two went
+# FIVE SUBJECTS, named here because the file's own name names none of them and the
+# ratchet's TIERED table maps all five to it: shell-machinery-guard.sh,
+# reflexive-cd-guard.sh, uv-run-guard.sh, python-rewrite.sh and
+# commit-message-wrap-guard.sh. uv-run-guard.sh and python-rewrite.sh went
 # uncovered for as long as that table said otherwise — a suite named for a category
 # absorbs a mapping without looking any different, where one named for a single
 # hook carries its own coverage in its filename. Add the subject to this list when
@@ -151,6 +152,8 @@ rcd() { check_at reflexive-cd-guard.sh "$@"; }
 rcd_says() { says reflexive-cd-guard.sh "$@"; }
 uvg() { check uv-run-guard.sh "$@"; }
 uvg_says() { says uv-run-guard.sh "$@"; }
+cmw() { check commit-message-wrap-guard.sh "$@"; }
+cmw_says() { says commit-message-wrap-guard.sh "$@"; }
 
 # pyrw_emits <label> <bindir> <command> <expected-stdout-substring>
 # python-rewrite.sh signals through stdout rather than an exit code, so neither
@@ -432,6 +435,46 @@ if [ "$HAVE_PYTHON3" = true ]; then
     pyrw_silent "empty command"                    "$PYBIN_REWRITE" ''
 else
     report_skip "python-rewrite cases" "python3 is absent, so no branch can be told from another"
+fi
+
+# The wrap guard parses with Python's shlex and passes everything through without python3, so
+# without it every case would pass unearned.
+echo
+echo "== commit-message-wrap-guard: a long body line is blocked (exit 2)"
+if [ "$HAVE_PYTHON3" = true ]; then
+    AT72=$(printf '%*s' 72 '' | tr ' ' 'x')
+    AT73=$(printf '%*s' 73 '' | tr ' ' 'x')
+    cmw "second -m over the limit"        2 "git commit -m 'subject' -m '$AT73'"
+    cmw "rtk-prefixed commit"             2 "rtk git commit -m 'subject' -m '$AT73'"
+    cmw "long line inside the first -m"   2 "git commit -m 'subject
+
+$AT73'"
+    cmw "--message= form"                 2 "git commit -m 'subject' --message='$AT73'"
+    cmw "--message with a separate value" 2 "git commit -m 'subject' --message '$AT73'"
+    cmw "combined -am flags"              2 "git commit -am 'subject' -m '$AT73'"
+    cmw "commit after && in a chain"      2 "git add notes.md && git commit -m 'subject' -m '$AT73'"
+    cmw "a later long line in a body"     2 "git commit -m 'subject' -m 'short line
+$AT73'"
+
+    echo
+    echo "== commit-message-wrap-guard: what it leaves alone (exit 0)"
+    cmw "a long subject on its own"       0 "git commit -m '$AT73$AT73'"
+    cmw "a body line exactly at the limit" 0 "git commit -m 'subject' -m '$AT72'"
+    cmw "a body broken at the limit"      0 "git commit -m 'subject' -m '$AT72
+$AT72'"
+    cmw "commit from a file"              0 'git commit -F .claude/scratch/commit-message.txt'
+    cmw "amend with no message"           0 'git commit --amend --no-edit'
+    cmw "the text only mentioned"         0 "echo \"git commit -m 'subject' -m '$AT73'\""
+    cmw "an unparseable quote"            0 "git commit -m 'subject -m $AT73"
+    cmw "a different git command"         0 "git log --grep '$AT73' -m"
+
+    echo
+    echo "== commit-message-wrap-guard: the message says what to do"
+    cmw_says "names the guard"            "commit-message-wrap-guard: blocked" '' "git commit -m 's' -m '$AT73'"
+    cmw_says "gives the measured length"  "runs 73 characters"                 '' "git commit -m 's' -m '$AT73'"
+    cmw_says "points at the file form"    "git commit -F"                      '' "git commit -m 's' -m '$AT73'"
+else
+    report_skip "commit-message-wrap-guard cases" "python3 is absent, and the guard passes everything through without it"
 fi
 
 summary

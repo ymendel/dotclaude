@@ -397,6 +397,7 @@ comes up would leave the gate unimplementable:
 | `hooks/shell-machinery-guard.sh` | 1 | same, 161 lines |
 | `hooks/uv-run-guard.sh` | 1 | same, 57 lines, and it guards a deliberately-broad allow entry |
 | `hooks/python-rewrite.sh` | 1 | rewrites a command before it runs |
+| `hooks/commit-message-wrap-guard.sh` | 1 | fires on every Bash call and blocks commits; a parse it gets wrong either stops a good commit or waves through the slip it exists for |
 | `hooks/context-usage-notice.sh` | 1 | fires automatically, reports nothing when it works |
 | `hooks/notify-session-attention.sh` | 1 | fires automatically, and routes some event types silently by design |
 | `hooks/claude-dir-write-allow.sh` | 1 | decides a permission without being invoked, and an abstention is indistinguishable from not running |

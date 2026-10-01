@@ -139,6 +139,12 @@ stage scripts/local-allow.sh
 run
 blocks 'the local-allow script staged without its suite is blocked'
 
+fresh
+stage hooks/commit-message-wrap-guard.sh
+run
+blocks 'the commit-message wrap guard staged without its suite is blocked'
+says 'hooks/test/run-checks.sh' 'the block names the shared guard suite'
+
 # Several units share one suite, so staging that suite clears all of them at once.
 fresh
 stage hooks/reflexive-cd-guard.sh hooks/shell-machinery-guard.sh hooks/test/run-checks.sh

@@ -175,6 +175,10 @@
           },
           {
             "type": "command",
+            "command": "$HOME/.claude/hooks/commit-message-wrap-guard.sh"
+          },
+          {
+            "type": "command",
             "command": "$HOME/.claude/hooks/rtk-rewrite.sh"
           },
           {
