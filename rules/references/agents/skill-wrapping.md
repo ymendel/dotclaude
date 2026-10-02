@@ -26,7 +26,7 @@ Picking the wrong one produces an agent that returns nothing.
   skill hands the agent knowledge and no instruction, and it returns without meaningful output.
 
 A forked skill can also name `agent: Explore`, which is the one way to run this shape without the
-~70K hierarchy load, since Explore skips it.
+hierarchy load, since Explore skips it.
 
 ## Nothing enforces the ordering
 
@@ -42,7 +42,7 @@ rather than in config, and that list is the only thing that makes the wrapper re
 ## When not to build one
 
 Reach for a wrapper only where the skill's package is large enough that isolation is the point.
-Where a skill is small, invoking it in-session beats a 70K spawn, and the wrapper is dead weight
+Where a skill is small, invoking it in-session beats paying a spawn's fixed cost, and the wrapper is dead weight
 worth deleting rather than routing to.
 
 Failure mode this prevents: the wrapper agent exists, is correct, and never runs — because the skill

@@ -20,7 +20,7 @@ Three spellings, and they do not cost the same:
 
 - **Glob on a known path.** A wasted call that reads as uncertainty about a path you are not uncertain about. *Scope searches to the known location* above covers it.
 - **Shell rediscovery** — an `ls | head -1`, a `find`, a command substitution producing a path an earlier tool result already supplied. `command_substitution` is one of the node types the permission gate cannot resolve (`settings.md`), so this one interrupts for approval, and what the user is asked to approve is a command whose entire purpose is recovering something that was never lost.
-- **A sub-agent** sent after a location the spawning context holds. `agents.md` prices a spawn at around 70K tokens before the agent does any work, which makes this the most expensive of the three by a wide margin.
+- **A sub-agent** sent after a location the spawning context holds. `agents.md` prices a spawn at roughly the size of the always-loaded rule set before the agent does any work, which makes this the most expensive of the three by a wide margin.
 
 Watch for the second and third mid-recovery, when something else has already gone wrong and the information needed to get back on track looks missing. Re-read before re-deriving — it scrolled past rather than never existing.
 

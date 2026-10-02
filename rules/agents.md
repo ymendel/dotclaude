@@ -6,16 +6,17 @@ Every spawned agent draws on the session and weekly token budgets. Those are sep
 context window and are the binding constraint: keeping the main context clean does not replenish
 them.
 
-**The fixed cost of a spawn is around 70K tokens before the agent does any work**, and the rule set
-is the dominant term in it rather than the agent's own prompt or its tool definitions. A
-`general-purpose` agent that made zero tool calls and answered three questions about its own
-context came to 72,497 tokens, nearly all of it input — this file and its two dozen siblings, plus
-`CLAUDE.md`. Every agent that loads the hierarchy pays that, which is all of them but `Explore` and
-`Plan`.
+**The fixed cost of a spawn is roughly the size of the always-loaded rule set — what `/context`
+reports as *Memory files* — plus tool definitions, before the agent does any work.** About 100K as
+of 2026-10-02. The rule set is the dominant term, not the agent's own prompt or its tools, so
+growing or pruning the rules moves the cost of every spawn. The main session's *Memory files*
+figure is a proxy, not a measurement of an agent's load — agents carry different tool sets — so
+read it at order-of-magnitude precision. Every agent that loads the hierarchy pays this, which is
+all of them but `Explore` and `Plan`.
 
 A spawn earns that back because the noisy output never enters the main context and so is never
 re-sent on later turns. That makes the comparison a product rather than a threshold: **tokens of
-noise avoided, times turns remaining, against ~70K.** A broad search early in a long session clears
+noise avoided, times turns remaining, against that fixed cost.** A broad search early in a long session clears
 it comfortably. The same search on the last turn before stopping does not, and neither does a small
 read at any point — "the output is large" is not sufficient on its own, because a single large read
 is one turn's worth of savings against the whole fixed cost.
