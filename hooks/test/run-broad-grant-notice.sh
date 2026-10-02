@@ -118,6 +118,9 @@ flags "Bash(rtk bundle *)" 'a leading rtk is looked through'
 seed_then_add "Bash(rtk proxy:*)"
 flags "Bash(rtk proxy:*)" 'rtk proxy, which runs anything, is flagged'
 
+seed_then_add "Bash(rtk run *)"
+flags "Bash(rtk run *)" 'rtk run, which runs a shell command, is flagged'
+
 seed_then_add "Bash(bundle exec *)"
 flags "Bash(bundle exec *)" 'a command runner followed by a wildcard is flagged'
 
@@ -128,6 +131,9 @@ flags "Bash" 'the tool-wide Bash entry is flagged'
 
 seed_then_add "Bash(heroku releases:*)"
 silent 'a subcommand grant is not flagged'
+
+seed_then_add "Bash(rtk recall:*)"
+silent "an rtk subcommand with no command of its own name is not looked through"
 
 seed_then_add "Bash(bundle exec rake test)"
 silent 'a runner with a fixed command is not flagged'

@@ -128,6 +128,16 @@ lacks 'gh pr' 'an entry user settings already cover is not a candidate'
 says 'rtk proxy' 'an uncovered broad entry is a candidate'
 
 fresh
+project alpha "Bash(rtk smart *)"
+project beta  "Bash(rtk smart *)"
+run candidates
+if grep -q '2  narrow  Bash(rtk smart \*)' <<<"$OUT"; then
+    report true "an rtk subcommand with no command of its own name is labeled narrow"
+else
+    report false "an rtk subcommand with no command of its own name is labeled narrow" "output: $OUT"
+fi
+
+fresh
 project alpha "Bash(bash .claude/scratch/probe.sh)" "Bash(done)"
 project beta  "Bash(bash .claude/scratch/probe.sh)" "Bash(done)"
 run candidates

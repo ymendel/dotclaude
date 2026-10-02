@@ -11,7 +11,13 @@ def bash_inner: capture("^Bash\\((?<c>.*)\\)$").c;
 def webfetch_domain: capture("^WebFetch\\(domain:(?<d>.*)\\)$").d;
 
 def interpreters: ["python", "python3", "ruby", "node", "bash", "sh", "zsh", "perl", "php", "deno", "bun"];
-def runners: ["rtk proxy", "rtk test", "rtk err", "bundle exec", "bin/rails runner", "rails runner",
+# rtk's own subcommands, which wrap no command of the same name, so a leading `rtk ` is not looked
+# through for them. `rtk env` shows variables, unlike the `env` runner below.
+def rtk_natives: ["read", "smart", "json", "deps", "env", "log", "gain", "cc-economics", "config",
+                  "discover", "session", "telemetry", "learn", "recall", "pipe", "trust", "untrust",
+                  "verify", "hook-audit", "rewrite", "hook", "init", "help"];
+def runners: ["rtk proxy", "rtk run", "rtk summary", "rtk test", "rtk err", "bundle exec",
+              "bin/rails runner", "rails runner",
               "npx", "uv run", "xargs", "env", "direnv exec", "devenv shell", "nix run", "eval", "exec",
               "sudo", "timeout", "nohup"];
 
@@ -20,13 +26,16 @@ def runners: ["rtk proxy", "rtk test", "rtk err", "bundle exec", "bin/rails runn
 #   - one command word plus a trailing wildcard: `git *`, `python3:*`, `bin/rails*`
 #   - an interpreter with any wildcard: `python3 -c ' *`
 #   - a runner followed directly by a wildcard: `rtk proxy *`, `bundle exec *`
-# A leading `rtk ` is looked through, so `rtk bundle *` reads as `bundle *`.
+# A leading `rtk ` is looked through, so `rtk bundle *` reads as `bundle *`, except before a runner
+# or one of rtk's own subcommands: `rtk recall *` is a subcommand grant.
 def broad:
   if . == "Bash" then true
   elif test("^Bash\\(.*\\)$") | not then false
   else
     (bash_inner | norm) as $whole
-    | (if ($whole | startswith("rtk ")) and (any(runners[]; . as $r | $whole | startswith($r + " ")) | not)
+    | (if ($whole | startswith("rtk "))
+          and (any(runners[]; . as $r | $whole | startswith($r + " ")) | not)
+          and (($whole[4:] | split(" ")[0]) as $sub | any(rtk_natives[]; . == $sub) | not)
        then $whole[4:] else $whole end) as $c
     | ($c | split(" ")[0] | split("/") | last) as $head
     | ($c | test("^[^ ]+ \\*$") or test("^[^ *]+\\*$"))
