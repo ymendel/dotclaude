@@ -24,6 +24,22 @@ Failure mode this prevents: the message is never sent, the session it was meant 
 without it, and the user finds out only if they go looking. Meanwhile something lands in a rule file
 on the strength of an instruction that was never about rules.
 
+## Ask the session that owns a repo before reading it from outside
+
+When a question turns on the state of a repo another live session is working in — whether its work
+has landed, what a config file there now says — check `ListAgents` and ask that session before
+fetching the files yourself through `gh api`, a raw URL, or a path into its tree. It can read its own
+`main`, knows what is merged versus merely local, and can say what it did not check. A fetch from
+outside sees only what was pushed, and none of the context around it.
+
+The reach for the fetch is strong because it looks like the self-sufficient move, and the tool to do
+it is already at hand. Reserve it for when no session owns the repo, or the owner has said it cannot
+answer.
+
+Failure mode this prevents: the answer comes back stripped of what the owning session would have
+said with it — that a branch was squashed, that a claim was left unchecked — and the user has to
+interrupt to redirect the question to the session that was sitting there idle.
+
 ## Write a settled call into the artifact, not only into the message that reports it
 
 A decision taken in one session is invisible everywhere else until something durable carries it. A
