@@ -46,7 +46,7 @@ fresh() {
 }
 
 # skill <name> / agent <name> — declare inventory.
-skill() { mkdir -p "$FIX/skills/$1"; }
+skill() { mkdir -p "$FIX/skills/$1"; printf 'skill stub\n' > "$FIX/skills/$1/SKILL.md"; }
 agent() { printf 'agent stub\n' > "$FIX/agents/$1.md"; }
 
 # transcript <name> <line>... — a .jsonl in the store, in window by default.
@@ -172,6 +172,17 @@ transcript session-a '{"subagent_type":"debugger"}'
 run --no-snapshot
 did_not_see 'README' 'agents/README.md is not treated as an agent'
 saw 'AGENTS (1)' 'the agent inventory counts only real agents'
+
+# A directory under skills/ with no SKILL.md is not a skill. The harness syncs claude.ai org skills
+# into a gitignored skills/synced/<uuid>/ tree, and counting it put a permanent zero row named
+# `synced` in the report and the history.
+fresh
+skill adr
+mkdir -p "$FIX/skills/synced/some-uuid/docs"
+transcript session-a '{"skill":"adr"}'
+run --no-snapshot
+did_not_see 'synced' 'a skills/ directory without SKILL.md is not treated as a skill'
+saw 'SKILLS (1)' 'the skill inventory counts only directories with a SKILL.md'
 
 # --- The snapshot, which is the durable artifact ----------------------------
 

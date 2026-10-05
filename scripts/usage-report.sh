@@ -17,7 +17,7 @@ usage() {
 Usage: usage-report.sh [options]
 
 Scan Claude Code transcripts from the last WINDOW_DAYS and report invocation
-counts for every skill (skills/<name>/) and agent (agents/<name>.md) in this
+counts for every skill (skills/<name>/SKILL.md) and agent (agents/<name>.md) in this
 repo, highlighting the ones that went unused in that window. Appends a dated
 snapshot to the history file so the trend can be tracked despite transcript
 rotation — read the TSV for the trend rather than comparing raw counts between
@@ -115,7 +115,9 @@ window_start="$(date -r "$cutoff_ts" '+%Y-%m-%d' 2>/dev/null || true)"
 window_end="$(date '+%Y-%m-%d')"
 
 # --- Inventory -------------------------------------------------------------
-mapfile -t skills < <(find "$SKILLS_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)
+# A skill is a directory holding a SKILL.md. Anything else under skills/ — notably the harness's
+# gitignored skills/synced/ tree of claude.ai org skills — is not part of this repo's inventory.
+mapfile -t skills < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -name SKILL.md -exec dirname {} \; | xargs -n 1 basename | sort)
 mapfile -t agents < <(find "$AGENTS_DIR" -maxdepth 1 -mindepth 1 -name '*.md' ! -name 'README.md' -exec basename {} .md \; | sort)
 
 # --- Gather invocation counts from in-window transcripts -------------------
