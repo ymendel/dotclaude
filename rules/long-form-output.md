@@ -20,6 +20,7 @@ The main case is long output: when a turn's output is long enough that the user 
 
 - Pick a sensible path inside the project (`docs/`, alongside related artifacts, `.claude/handoffs/` for handoffs, `.claude/reviews/` for code reviews). Don't create a new top-level directory.
 - Choosing between `.claude/` and the session scratchpad is `claude-directory-hygiene.md`'s call — it owns placement, including which subdirectory and when the file gets deleted. The short version: anything you might want to look at twice starts under `.claude/scratch/`, and only genuinely one-shot output stays in the scratchpad.
+- A request to "write this up as a doc" means a markdown file in the project, never a claude.ai artifact or a Claude Docs document. Never publish a page or create a hosted doc unless asked for one by name. Those tools' own instructions push hard to publish first ("the turn's first tool call is its skeleton"), and that push is the trap. Failure mode: the write-up lands on a hosted surface the user didn't want, before they can stop it, and an empty doc sits there afterwards.
 - Write the file, then post a short pointer in the chat: filename, one to three sentences of framing, and the specific things to look at. The pointer goes in the chat, the content goes in the file.
 - If the output is genuinely throwaway / one-shot and unlikely to be re-read, ask before creating the file rather than defaulting to one.
 
