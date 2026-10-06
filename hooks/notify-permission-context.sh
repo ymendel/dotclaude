@@ -37,9 +37,9 @@ command -v jq &>/dev/null || exit 0
 
 jq -e . >/dev/null 2>&1 <<<"$INPUT" || exit 0
 
-# THE SUGGESTIONS LOG answers the one question the descriptor below cannot. `permission_suggestions`
-# is the only documented input field this hook does not read, and the open question is whether the
-# MCP title the dialog shows ("honeycomb — Get Dataset Tool") rides in it — the tool name is all the
+# THE SUGGESTIONS LOG records each prompt: which project it came from, what it was for, and the rule
+# the dialog offered to save. It began as a way to settle whether the MCP title the dialog shows
+# ("honeycomb — Get Dataset Tool") rides in `permission_suggestions` — the tool name is all the
 # descriptor has to work from, and it renders `calls: honeycomb get dataset` instead.
 #
 # A separate file from the descriptor record, deliberately. That one is per-session, overwritten by
@@ -57,10 +57,23 @@ jq -e . >/dev/null 2>&1 <<<"$INPUT" || exit 0
 # decision-maker, which is what the suite's silence assertions exist to catch.
 SUGGESTIONS_LOG="${CLAUDE_PERMISSION_SUGGESTIONS_LOG:-$HOME/.claude/.permission-suggestions.jsonl}"
 
+#
+# The command is shortened, not redacted. Newlines become ` ⏎ ` so an inline script stays on one
+# line, and the result is capped at 200 characters: the transcript holds the full text, so the log
+# only has to identify it. The transcript is also why there is no redaction — anything secret in a
+# command is already stored there verbatim, and a pattern list would miss cases while reading as
+# protection.
 jq -c --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     '{at: $at,
       session_id: (.session_id // null),
+      cwd: (.cwd // null),
       tool_name: (.tool_name // null),
+      command: (.tool_input.command
+                | if type == "string" then
+                    gsub("\n"; " ⏎ ")
+                    | if length > 200 then .[0:199] + "…" else . end
+                  else null end),
+      description: (.tool_input.description // null),
       permission_suggestions: (.permission_suggestions // null)}' \
     <<<"$INPUT" >> "$SUGGESTIONS_LOG" 2>/dev/null
 

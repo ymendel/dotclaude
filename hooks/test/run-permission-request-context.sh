@@ -245,9 +245,9 @@ abstains "a session id containing a slash records nothing" \
 
 # --- The suggestions log -------------------------------------------------------
 
-# This log exists to settle whether the MCP title the dialog shows rides in
-# `permission_suggestions`. It is separate from the descriptor record above: that one is
-# per-session and consumed, this one is append-only and nothing deletes it.
+# This log records what each prompt was for and what the dialog offered to save. It is separate
+# from the descriptor record above: that one is per-session and consumed, this one is append-only
+# and nothing deletes it.
 
 run "$(jq -nc '{hook_event_name:"PermissionRequest", session_id:"s15", tool_name:"Bash",
                 tool_input:{command:"ls"},
@@ -285,6 +285,34 @@ run "$(jq -nc '{hook_event_name:"PermissionRequest", session_id:"s18",
                                          rules:[{toolName:"mcp__honeycomb__get_dataset"}]}]}')"
 expect_eq "$(jq -r '.tool_name' < "$SUGGESTIONS_LOG")" "mcp__honeycomb__get_dataset" \
     "an MCP request logs its full tool name"
+
+# Which project prompted, and what for. The cwd names the project without a transcript lookup.
+run "$(jq -nc '{hook_event_name:"PermissionRequest", session_id:"s19", cwd:"/work/shipping-tracker",
+                tool_name:"Bash",
+                tool_input:{command:"git merge-tree --write-tree main feature",
+                            description:"Preview the merge"}}')"
+expect_eq "$(jq -r '.cwd' < "$SUGGESTIONS_LOG")" "/work/shipping-tracker" \
+    "the logged line carries the cwd"
+expect_eq "$(jq -r '.command' < "$SUGGESTIONS_LOG")" "git merge-tree --write-tree main feature" \
+    "a Bash request logs its command"
+expect_eq "$(jq -r '.description' < "$SUGGESTIONS_LOG")" "Preview the merge" \
+    "a Bash request logs its description"
+
+# An inline script spans lines. Kept on one so the record stays one JSON line a reader can scan.
+run "$(payload s20 Bash '{"command":"ruby -e \"\n  puts 1\n  puts 2\""}')"
+expect_eq "$(jq -r '.command' < "$SUGGESTIONS_LOG")" 'ruby -e " ⏎   puts 1 ⏎   puts 2"' \
+    "a multi-line command is logged on one line"
+
+# Capped, because the transcript holds the full text and the log only has to identify it.
+run "$(payload s21 Bash "$(jq -nc '{command: ("echo " + ("x" * 300))}')")"
+expect_eq "$(jq -r '.command | length' < "$SUGGESTIONS_LOG")" "200" \
+    "a long command is capped at 200 characters"
+expect_eq "$(jq -r '.command | .[-1:]' < "$SUGGESTIONS_LOG")" "…" \
+    "a capped command ends in an ellipsis"
+
+run "$(payload s22 Edit '{"file_path":"/work/shipping-tracker/app.rb"}')"
+expect_eq "$(jq -c '.command' < "$SUGGESTIONS_LOG")" "null" \
+    "a non-Bash request logs a null command"
 
 # Unparseable input must not append a line either — the log is fed from a jq filter over the payload,
 # so a parse failure there would otherwise write a malformed record the reader cannot skip past.
