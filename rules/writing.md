@@ -174,6 +174,14 @@ This is not license to drop provenance where provenance is the claim. `honesty.m
 
 Failure mode this prevents: the durable artifact accretes evidence of diligence in place of statements of fact, a register shift the author then has to edit out by hand.
 
+## Don't carry another project's identifiers into a commit or PR body
+
+A change is often prompted by work somewhere else — an alias fixed after it misbehaved in a client repo, a template default changed after it bit a derived app. Give the motivation as the general situation that makes the change worth having, and leave the other project unnamed: no repo name, no PR or issue numbers, no account of how the problem played out there. "I don't always control how the repos I work in are configured" is a reason this repo's reader can weigh. "Client PR #412 conflicted with #409" is a story only its author can follow.
+
+This holds in every repo, not only public ones. A shared or company repo's history is read by people with no business knowing about the other engagement. Where an incident genuinely belongs in the body — a rule commit here, per `rule-maintenance.md`'s *Where dated observations go* — it comes after the general reason and de-identified, never in place of it.
+
+Failure mode this prevents: the incident is the most vivid version of the reason, so it is what gets written. A client's or an unrelated project's identifiers land in a history read by another audience, where once pushed they can be removed only by rewriting published commits — and the reader who never saw the incident is left without the reason it stood in for.
+
 ## Label consecutive images rather than running them together
 
 When a document places one image directly after another — a before/after pair, a set of screenshots,
