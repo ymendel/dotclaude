@@ -145,6 +145,18 @@ run
 blocks 'the commit-message wrap guard staged without its suite is blocked'
 says 'hooks/test/run-checks.sh' 'the block names the shared guard suite'
 
+# A tiered hook written in Python, which the row has to gate the same as a shell one.
+fresh
+stage hooks/git-read-allow.py
+run
+blocks 'the git read allow hook staged without its suite is blocked'
+says 'hooks/test/run-git-read-allow.sh' 'the block names the git read allow suite'
+
+fresh
+stage hooks/git-read-allow.py hooks/test/run-git-read-allow.sh
+run
+permits 'the git read allow hook staged with its suite is permitted'
+
 # Several units share one suite, so staging that suite clears all of them at once.
 fresh
 stage hooks/reflexive-cd-guard.sh hooks/shell-machinery-guard.sh hooks/test/run-checks.sh

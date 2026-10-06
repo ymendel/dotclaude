@@ -154,6 +154,8 @@
       "Bash(*git switch -f*)",
       "Bash(*git switch --force*)",
       "Bash(*git switch --discard-changes*)",
+      "Bash(*git grep*-O*)",
+      "Bash(*git grep*--op*)",
       "Bash(*git add -A*)",
       "Bash(*git add --all*)",
       "Bash(*git add .)",
@@ -232,6 +234,15 @@
           {
             "type": "command",
             "command": "$HOME/.claude/hooks/claude-dir-write-allow.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/git-read-allow.py"
           }
         ]
       },

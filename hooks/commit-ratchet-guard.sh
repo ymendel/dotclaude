@@ -73,6 +73,7 @@ TIERED=(
   "hooks/notify-session-attention.sh|hooks/test/run-notification.sh"
   "hooks/claude-dir-write-allow.sh|hooks/test/run-permission-request.sh"
   "hooks/notify-permission-context.sh|hooks/test/run-permission-request-context.sh"
+  "hooks/git-read-allow.py|hooks/test/run-git-read-allow.sh"
   "hooks/broad-grant-notice.sh|hooks/test/run-broad-grant-notice.sh"
   "hooks/lib/permission-rules.jq|scripts/test/run-local-allow.sh"
   "hooks/commit-ratchet-guard.sh|hooks/test/run-commit-ratchet.sh"
