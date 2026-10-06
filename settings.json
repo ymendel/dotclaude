@@ -176,7 +176,8 @@
       "Bash(*gh pr close*--delete-branch*)",
       "Bash(*gh pr close* -d*)",
       "Bash(*gh gist delete*)",
-      "Artifact"
+      "Artifact",
+      "mcp__claude_ai_Claude_Docs"
     ],
     "defaultMode": "acceptEdits",
     "disableAutoMode": "disable",
