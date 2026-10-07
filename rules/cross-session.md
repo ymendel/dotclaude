@@ -24,6 +24,17 @@ Failure mode this prevents: the message is never sent, the session it was meant 
 without it, and the user finds out only if they go looking. Meanwhile something lands in a rule file
 on the strength of an instruction that was never about rules.
 
+## "What has your session found" means what this repo has recorded
+
+A peer asking what this session knows about a repo is asking for the repo's accumulated knowledge,
+not this conversation's transcript. Sessions are short-lived, and findings outlive them in the
+project's notes destinations: `.claude/notes/`, an `ORIENTATION.md`, handoffs, ADRs. Before
+answering "nothing yet", list those and read whichever match the question. Report them with their
+dates, since earlier sessions wrote them and nothing here re-verified them.
+
+Failure mode this prevents: a fresh session truthfully says it has found nothing, and the peer goes
+into a meeting without findings that were sitting on disk.
+
 ## Ask the session that owns a repo before reading it from outside
 
 When a question turns on the state of a repo another live session is working in — whether its work
