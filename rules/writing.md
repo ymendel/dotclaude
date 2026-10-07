@@ -157,7 +157,7 @@ Assign the fact to the reader who hits it, and leave the other artifacts a point
 
 - A constraint that will trip whoever next edits a line goes in the comment beside it. That reader is not reading the history.
 - Why this approach rather than the one it displaced goes in the commit body, or in an ADR when the decision outlives the commit.
-- What to look at and in what order, and what was deliberately left out, goes in the PR description. A reviewer reads it once and then reads the diff.
+- What was deliberately left out goes in the PR description, as does a reading mode the diff can't announce — "ignore whitespace", "one commit at a time" — per `development-workflow.md`'s *Pull Requests*. A reviewer reads it once and then reads the diff.
 - Reasoning that several sites depend on goes in an ADR or a note, with a pointer from each site.
 
 The test for a second copy is whether a reader plausibly reaches the second artifact without passing the first. A comment's reader may never open the log, so a comment restating a commit body can be right. A reviewer reads the PR description and the commits both, which makes that the copy that most reliably fails — reasoning already carried by the commit bodies does not want restating above them.
