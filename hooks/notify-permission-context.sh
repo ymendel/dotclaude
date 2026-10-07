@@ -50,8 +50,15 @@ jq -e . >/dev/null 2>&1 <<<"$INPUT" || exit 0
 # tool never prompted" and "it prompted and carried nothing" — and distinguishing those two is the
 # entire reason for the log.
 #
-# Growth is unbounded by decision rather than by oversight: these are log lines, and rotation is
-# available if the size ever matters. Same call as `.notification-probe.jsonl`.
+# It outgrew that question and is kept on purpose. It is the record of the literal string the gate
+# matched, which rule-maintenance.md says an allowlist entry must be built from, and of where each
+# prompt came from. Reading it settled which git subcommands were still prompting, why a script
+# with a standing grant prompted anyway, and two offered grants to decline (`Bash(:)` among them).
+# Don't remove it as finished instrumentation.
+#
+# Growth is unbounded by decision rather than by oversight: these are log lines. When the size
+# matters, rotate or truncate the oldest entries rather than deleting the file. Same call as
+# `.notification-probe.jsonl`.
 #
 # Appended to a file, never printed. Emitting anything on stdout would make this observer a
 # decision-maker, which is what the suite's silence assertions exist to catch.
