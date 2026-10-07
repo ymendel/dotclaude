@@ -297,6 +297,25 @@ smg "separator inside a grep pattern" 2 "rtk grep 'x; y=1;' src/"
 smg "subshell assignment"             2 '(FOO=1; rtk ls)'
 
 echo
+echo "== shell-machinery-guard: a loop whose body is only : (exit 2)"
+smg "observed shape"                  2 'for n in 509 516 517; do :; done; gh issue list --state open'
+smg "no semicolon before done"        2 'for n in a b; do : done'
+smg "while form"                      2 'while false; do :; done; rtk ls'
+smg "until form"                      2 'until true; do :; done'
+smg "after a separator"               2 'rtk ls; for f in x; do :; done'
+smg "newline-separated"               2 'for n in a b
+do :
+done'
+
+echo
+echo "== shell-machinery-guard: loops that do something pass (exit 0)"
+smg "loop with a real body"           0 'for f in a b; do echo $f; done'
+smg ": as a while condition"          0 'while :; do sleep 1; done'
+smg "colon later in the body"         0 'for f in a b; do echo $f; :; done'
+smg "the words in a grep pattern"     0 "rtk grep 'do :; done' hooks/"
+smg "for inside a commit message"     0 'git commit -m "for the record, do not stop"'
+
+echo
 echo "== shell-machinery-guard: the message points at what matched"
 # The matcher scans the whole string, so a message asserting the command "opens
 # with" an assignment sends the reader to the wrong end of a long command line.

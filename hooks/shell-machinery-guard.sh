@@ -2,10 +2,11 @@
 # shell-machinery-guard.sh — PreToolUse (Bash) guard.
 #
 # Named for the rule it enforces: tool-and-shell-safety.md's "Don't add shell
-# machinery the task didn't ask for". It blocks two of the shapes that section
-# enumerates — a function definition, and a motiveless assignment before a
-# separator — and the two have different justifications, set out in their own
-# blocks below. Read them separately; the second does not inherit the first's.
+# machinery the task didn't ask for". It blocks three of the shapes that section
+# enumerates — a function definition, a motiveless assignment before a
+# separator, and a loop whose body is only `:` — and they have different
+# justifications, set out in their own blocks below. Read them separately; the
+# second does not inherit the first's.
 #
 # FIRST SHAPE: a shell function definition. Not because defining a function is
 # wrong in general, but because every observed instance has been scaffolding
@@ -66,8 +67,9 @@
 # statement while staying inert. A function definition, an assignment followed
 # by a separator, and a command that does nothing are three of them, and all
 # three were observed in a single day. That the family is bounded rather than
-# open-ended is what makes gating worth doing instead of a treadmill — but the
-# third slot cannot be gated, for the reason the rule gives.
+# open-ended is what makes gating worth doing instead of a treadmill. The third
+# slot is gated only in its structural form, the no-op loop below. An invented
+# command name cannot be, for the reason the rule gives.
 #
 # ITS JUSTIFICATION IS NOT THE FUNCTION FORM'S, AND IS WEAKER. Everything
 # above turns on the permission gate reporting `function_definition`, so a
@@ -128,6 +130,27 @@
 # (`rtk grep 'x; y=1;' src/`), and a subshell assignment (`(FOO=1; cmd)`) —
 # which trips the gate's `subshell` node regardless. The escape is the one the
 # file rules already require: write the script to a file and run the file.
+#
+# ---------------------------------------------------------------------------
+# THIRD SHAPE: a loop whose whole body is `:`.
+# `for n in 509 516 517; do :; done; gh issue list …` — iterating over values
+# and doing nothing with any of them, ahead of a command that is already
+# allowlisted. It is the "command that does nothing" slot above, in the one form
+# a parser can see: the no-op is structural rather than a fabricated command
+# name, so it can be matched without judgment.
+#
+# Its justification is the function form's, not the assignment's: the gate
+# reports `for_statement` (or `while_statement`, `until_statement`), which no
+# allow rule can grant, so the work behind it stops for approval. Worse, the
+# prompt offers to save `Bash(:)`, which grants nothing but redirects — a
+# standing licence to truncate files (RTK.md). One observation, 2026-10-07.
+#
+# Matched narrowly: the loop keyword after a start-of-string or separator, and a
+# `do` whose body is `:` alone before `done`. A loop with a real body is not
+# this guard's business — it prompts on its own merits, and the batching rule
+# covers it. `while :; do sleep 1; done` passes, since there `:` is the
+# condition. Same quote-unaware trade-off as above: the shape inside a quoted
+# `bash -c` string is over-blocked.
 
 if ! command -v jq &>/dev/null; then
   # Consistent with the other Bash hooks: without jq we cannot parse the input,
@@ -167,6 +190,15 @@ keyword_form="(^|[[:space:]\;\&\|\(])function[[:space:]]+${name}([[:space:]]*\(\
 # separator inside the quotes, which is the prefix form and legitimate.
 assign_value="(\"[^\"]*\"|'[^']*'|[^[:space:]\;\&\|\"']*)"
 assign_form="(^|\([[:space:]]*|[\;\&\|][[:space:]]+)${name}=${assign_value}[[:space:]]*[\;\&\|]"
+
+# A loop whose body is only `:`: the keyword, anything up to a `do` that follows
+# `;` or whitespace (a newline included), then `:` and `done`.
+noop_loop_form="(^|[[:space:]\;\&\|\(])(for|while|until)[[:space:]].*[\;[:space:]]do[[:space:]]+:[[:space:]]*\;?[[:space:]]*done([[:space:]\;\&\|\)]|$)"
+
+if [[ "$CMD" =~ $noop_loop_form ]]; then
+  echo "shell-machinery-guard: blocked at \`${BASH_REMATCH[0]}\`. That is a loop whose only body is \`:\` — it iterates and does nothing. The permission gate reports \`for_statement\` (or \`while_statement\`/\`until_statement\`), a parser node no allow rule can grant, so the command stops for approval even when the work beside it is already allowlisted. Delete the loop and run the command that does the work. Never accept the \`Bash(:)\` grant the prompt offers: \`:\` does nothing alone, so that entry grants only redirects. See tool-and-shell-safety.md, \"Don't add shell machinery the task didn't ask for\"." >&2
+  exit 2
+fi
 
 if [[ "$CMD" =~ $assign_form ]]; then
   # Quote the matched fragment. The matcher scans the whole string rather than

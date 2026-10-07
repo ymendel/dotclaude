@@ -64,9 +64,11 @@ The tell in each case: the part that trips the gate is not the work, it is the s
 adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
 of a short command, or a plain invocation that respects the rule rather than policing it.
 
-**Two of these shapes are gated:** `hooks/shell-machinery-guard.sh` blocks a function definition and
-an assignment-plus-separator with exit 2 and a pointer back here. Its header enumerates what each
-half knowingly over-blocks — read it before working around a block that looks wrong. The rest stay
+**Three of these shapes are gated:** `hooks/shell-machinery-guard.sh` blocks a function definition,
+an assignment-plus-separator, and a loop whose whole body is `:` (`for n in …; do :; done`, which
+trips `for_statement` and then offers the `Bash(:)` grant `RTK.md` says to decline), each with exit 2
+and a pointer back here. Its header enumerates what each knowingly over-blocks — read it before
+working around a block that looks wrong. The rest stay
 prose-only, and the invented leading command cannot be gated at all, since the binary resolves and
 only its subcommand is fabricated. Reading the first segment before sending is the only check there
 is.
