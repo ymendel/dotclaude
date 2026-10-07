@@ -4,10 +4,10 @@
 #
 #   ./hooks/test/run-checks.sh
 #
-# FIVE SUBJECTS, named here because the file's own name names none of them and the
-# ratchet's TIERED table maps all five to it: shell-machinery-guard.sh,
-# reflexive-cd-guard.sh, uv-run-guard.sh, python-rewrite.sh and
-# commit-message-wrap-guard.sh. uv-run-guard.sh and python-rewrite.sh went
+# SIX SUBJECTS, named here because the file's own name names none of them and the
+# ratchet's TIERED table maps all six to it: shell-machinery-guard.sh,
+# reflexive-cd-guard.sh, uv-run-guard.sh, python-rewrite.sh,
+# commit-message-wrap-guard.sh and invoke-form-guard.sh. uv-run-guard.sh and python-rewrite.sh went
 # uncovered for as long as that table said otherwise — a suite named for a category
 # absorbs a mapping without looking any different, where one named for a single
 # hook carries its own coverage in its filename. Add the subject to this list when
@@ -323,6 +323,86 @@ echo "== shell-machinery-guard: the message points at what matched"
 # explanation locates the match or invents a position for it.
 smg_says "names the matched fragment"  'TMP=/tmp;' "$PROJ" 'rtk ls; TMP=/tmp; ls $TMP'
 smg_says "no claim about opening"      'blocked at' "$PROJ" 'for_check=""; rtk wc -l file'
+
+# invoke-form-guard.sh reads allow lists from the user settings and the project,
+# so it gets a project of its own: a temp tree with granted and ungranted
+# scripts, and a user settings file standing in for ~/.claude/settings.json.
+IFG="$(mktemp -d)"
+mkdir -p "$IFG/.claude" "$IFG/scripts" "$IFG/hooks/test" "$IFG/bin"
+cat >"$IFG/.claude/settings.json" <<'JSON'
+{"permissions":{"allow":[
+  "Bash(./scripts/report.sh:*)",
+  "Bash(./hooks/test/run-*.sh)",
+  "Bash(./scripts/sync.sh *--dry-run)",
+  "Bash(*leading-star*)"
+]}}
+JSON
+cat >"$IFG/user-settings.json" <<'JSON'
+{"permissions":{"allow":["Bash(bin/tool:*)"]}}
+JSON
+for script in scripts/report.sh scripts/sync.sh scripts/ungranted.sh hooks/test/run-checks.sh bin/tool; do
+    printf '#!/usr/bin/env bash\n' >"$IFG/$script"
+    chmod +x "$IFG/$script"
+done
+printf '#!/usr/bin/env bash\n' >"$IFG/scripts/plain.sh"   # not executable
+
+# ifg <label> <expected-exit> <command-string>
+ifg() {
+    local label="$1" want="$2" cmd="$3" got
+    jq -n --arg c "$cmd" --arg w "$IFG" '{tool_input:{command:$c}, cwd:$w}' \
+        | CLAUDE_PROJECT_DIR="$IFG" INVOKE_FORM_USER_SETTINGS="$IFG/user-settings.json" \
+          "$GUARD_DIR/invoke-form-guard.sh" >/dev/null 2>&1
+    got=$?
+    if [ "$got" = "$want" ]; then
+        report true "$label"
+    else
+        report false "$label" "want exit=$want, got exit=$got"
+    fi
+}
+
+ifg_says() {
+    local label="$1" want="$2" cmd="$3" out
+    out=$(jq -n --arg c "$cmd" --arg w "$IFG" '{tool_input:{command:$c}, cwd:$w}' \
+        | CLAUDE_PROJECT_DIR="$IFG" INVOKE_FORM_USER_SETTINGS="$IFG/user-settings.json" \
+          "$GUARD_DIR/invoke-form-guard.sh" 2>&1 >/dev/null)
+    if [[ "$out" == *"$want"* ]]; then
+        report true "$label"
+    else
+        report false "$label" "message lacked '$want'"
+    fi
+}
+
+echo
+echo "== invoke-form-guard: an ungranted spelling of a granted script (exit 2)"
+ifg "bare relative, the observed shape"   2 "hooks/test/run-checks.sh > $IFG/out.txt"
+ifg "bash prefix"                         2 'bash scripts/report.sh --verbose'
+ifg "bash prefix with ./"                 2 'bash ./scripts/report.sh'
+ifg "absolute path"                       2 "$IFG/scripts/report.sh"
+ifg "python3 prefix"                      2 'python3 scripts/report.sh'
+ifg "anchored flag kept last"             2 'bash scripts/sync.sh --to-theirs x --dry-run'
+ifg "user-level grant, ./ spelling"       2 './bin/tool --check'
+ifg "with a pipe after"                   2 'hooks/test/run-checks.sh | rtk wc -l'
+
+echo
+echo "== invoke-form-guard: nothing to redirect to (exit 0)"
+ifg "the granted form"                    0 './scripts/report.sh --verbose'
+ifg "granted form with a redirect"        0 "./hooks/test/run-checks.sh > $IFG/out.txt"
+ifg "user-level grant as written"         0 'bin/tool --check'
+ifg "script with no grant"                0 'bash scripts/ungranted.sh'
+ifg "interpreter on a non-executable"     0 'bash scripts/plain.sh'
+ifg "anchored flag absent"                0 'bash scripts/sync.sh --to-theirs x'
+ifg "leading-star pattern is skipped"     0 'bash scripts/ungranted.sh leading-star'
+ifg "file outside the tree"               0 '/usr/bin/env true'
+ifg "missing file"                        0 'bash scripts/nope.sh'
+ifg "not a path at all"                   0 'git status'
+ifg "rtk wrapper"                         0 'rtk test hooks/test/run-checks.sh'
+ifg "interpreter running a flag"          0 'bash -c "echo hi"'
+
+echo
+echo "== invoke-form-guard: the message names the granted form"
+ifg_says "names ./ form"  'allowlisted as `./scripts/report.sh --verbose`' 'bash scripts/report.sh --verbose'
+
+rm -rf "$IFG"
 
 echo
 echo "== reflexive-cd-guard: redundant and misdirecting targets (exit 2)"

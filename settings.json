@@ -217,6 +217,10 @@
           },
           {
             "type": "command",
+            "command": "$HOME/.claude/hooks/invoke-form-guard.sh"
+          },
+          {
+            "type": "command",
             "command": "$HOME/.claude/hooks/commit-message-wrap-guard.sh"
           },
           {

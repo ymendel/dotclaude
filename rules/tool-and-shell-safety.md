@@ -102,7 +102,9 @@ Failure mode this prevents: a read-only batch that should have been invisible in
 
 ## Invoke a project script by the relative path its allow rule names
 
-Run `bin/rubocop`, `scripts/report.sh`, `bash scripts/floor.sh` — not the absolute path to the same file. Allow rules match the literal command string, so a grant written as `Bash(bash scripts/floor.sh)` does not cover `bash /Users/…/project/scripts/floor.sh`: same script, same effect, different string, and the gate asks. The absolute form is the natural reach right after working in another directory or reading a path out of a tool result, which is when it slips in. The shell's cwd is the project root and stays there, so the relative form always resolves.
+Spell the call the way its grant does — `./scripts/report.sh` where the entry is `Bash(./scripts/report.sh:*)`, `bin/rubocop` where it is `Bash(bin/rubocop:*)` — not the absolute path, not a bare path missing the `./`, and not behind a `bash` or `python3` prefix. Allow rules match the literal command string, so each of those is the same script, with the same effect, under a different string, and the gate asks. The absolute form is the natural reach right after working in another directory or reading a path out of a tool result, which is when it slips in. The shell's cwd is the project root and stays there, so the relative form always resolves.
+
+**Gated:** `hooks/invoke-form-guard.sh` blocks any of those spellings when a grant covers the canonical one, and names the granted form. Where no grant exists it stays silent, since the prompt is then legitimate.
 
 `agents.md` carries the same constraint for sub-agent prompts, which is where it bites hardest.
 
