@@ -321,6 +321,7 @@
     "commit": "",
     "pr": ""
   },
+  "autoCompactEnabled": false,
   "effortLevel": "high",
   "showThinkingSummaries": true,
   "workflowSizeGuideline": "small",
