@@ -45,6 +45,7 @@
       "Bash(heroku ps:*)",
       "Bash(heroku releases:*)",
       "Bash(jq:*)",
+      "Bash(log show:*)",
       "Bash(rtk --help)",
       "Bash(rtk curl:*)",
       "Bash(rtk cut:*)",
