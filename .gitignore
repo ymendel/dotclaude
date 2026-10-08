@@ -27,6 +27,9 @@
 # regenerated per machine and per account.
 /skills/synced/
 
+# nor skills/.trash — where that sync moves skills dropped from the account.
+/skills/.trash
+
 # and rules
 !/rules
 !/rules/**/*
