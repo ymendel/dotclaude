@@ -256,6 +256,10 @@
           {
             "type": "command",
             "command": "$HOME/.claude/hooks/git-read-allow.py"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/help-version-allow.py"
           }
         ]
       },

@@ -163,6 +163,17 @@ stage hooks/git-read-allow.py hooks/test/run-git-read-allow.sh
 run
 permits 'the git read allow hook staged with its suite is permitted'
 
+fresh
+stage hooks/help-version-allow.py
+run
+blocks 'the help and version hook staged without its suite is blocked'
+says 'hooks/test/run-help-version-allow.sh' 'the block names the help and version suite'
+
+fresh
+stage hooks/help-version-allow.py hooks/test/run-help-version-allow.sh
+run
+permits 'the help and version hook staged with its suite is permitted'
+
 # Several units share one suite, so staging that suite clears all of them at once.
 fresh
 stage hooks/reflexive-cd-guard.sh hooks/shell-machinery-guard.sh hooks/test/run-checks.sh
