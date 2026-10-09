@@ -172,6 +172,8 @@ A measurement's *result* belongs in a commit message, an ADR, or a PR body. How 
 
 This is not license to drop provenance where provenance is the claim. `honesty.md` still governs: a number a reader must be able to check keeps its citation, and an estimate is still labeled as one. The distinction is between *what a reader needs in order to judge the claim* and *what shows the author did the work*. The second is self-justification, and it reads as such.
 
+The incident that prompted a change is the same kind of thing. Give the general reason the change is worth having, and add the story of what happened only when it tells the reader something that reason doesn't — a non-obvious trigger, or a cost that sizes the problem. Most of the time the reason already covers it, and the story is just the author's memory of the day.
+
 Failure mode this prevents: the durable artifact accretes evidence of diligence in place of statements of fact, a register shift the author then has to edit out by hand.
 
 ## Don't carry another project's identifiers into a commit or PR body
