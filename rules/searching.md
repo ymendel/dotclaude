@@ -26,6 +26,14 @@ Watch for the second and third mid-recovery, when something else has already gon
 
 Failure mode this prevents: the rediscovery is indistinguishable from an ordinary search. It is a correct command, competently written, answering a question that had an answer, so nothing about it looks wrong from inside the session. What the user meets is an approval prompt or a spawn they cannot evaluate without reconstructing what was already known — and in the sub-agent case the cost is paid before any work begins.
 
+## Look it up before asking the user
+
+The section above covers re-deriving something already in context. This covers asking the user for something not yet in context but within reach. Before putting a factual question to the user — who a record belongs to, what a config value is, which version is deployed — check whether a tool already in use this session can answer it. A database being queried has the `users` table. A repo being read has the git log. A CLI already authenticated can describe its own resources.
+
+The tell is a question about data rather than about intent or preference. "Who is user 53?" has an answer sitting in the system. "Should this token be revoked?" does not, and that one belongs to the user. Asking is right for decisions, for context nothing records, and for a lookup the access in hand can't reach or shouldn't — say which, so the question doesn't read as unchecked.
+
+Failure mode this prevents: the question reads as appropriate caution — not guessing, checking with the person who knows — so nothing flags it. The user then does a lookup the session was already equipped for, and has to say so, which costs a round trip and reads as not having tried.
+
 ## Search tracked content with `git grep`, not a recursive filesystem grep
 
 When the question is whether something appears in a repository — a symbol, a reference, a string a decision rides on — reach for `git grep -n <pattern> -- <pathspec>`. It searches what the repo tracks. A recursive grep searches whatever happens to sit under that path on disk: gitignored build output, vendored dependencies, caches, and any app data a tool has parked there.
