@@ -11,6 +11,7 @@ paths:
 
 ## Ruby
 
+- Rubies come from `ruby-install` into `~/.rubies` and are switched by chruby, with `chruby_auto` reading each project's `.ruby-version` at shell start (the dotfiles repo's `ruby/chruby.bash`). The Bash tool's shell already has both loaded, so don't source `chruby.sh` by hand. There is no rbenv, asdf or mise on the machine, so never reach for their commands or shims. Install a new Ruby with the dotfiles' `ruby-add <version>`, which runs ruby-install and then installs ruby-lsp for it, and run a command under a specific Ruby with `chruby-exec <version> -- <command>`.
 - Prefer instance-oriented design over class methods.
 - No metaprogramming — it's a last resort. Repetition, even many times over, is better than meta magic. Write the code out explicitly.
 - Method name prefixes suggest extracting a sub-object.
