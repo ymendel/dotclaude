@@ -54,3 +54,11 @@ This skill routes the entry-map output to "an orientation doc", which is now bac
 `orientation-doc` skill (its shape: gap-as-risk first, then what-this-is, misleading terms, redefined
 concepts, fragile areas, where the rest lives, what's not in the repo). When that skill isn't
 installed, the grill falls back to a plain "read this first" markdown doc.
+
+## Next runs worth doing
+
+- **A partial-context holder.** Both live runs so far interviewed someone who held most of the
+  system. A project where the holder knows only part of it would probe how the grill handles answers
+  that run out.
+- **Feed the field-research playbook.** The second run produced fresh material for that thread, which
+  is the more valuable next step than packaging this skill.
