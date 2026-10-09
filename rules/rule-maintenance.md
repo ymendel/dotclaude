@@ -95,12 +95,12 @@ When adding a new rule file, update `rules/README.md` with a description before 
 
 ## Feedback Routing
 
-General feedback and lessons belong in `~/.claude` rule files — **not in project memory**. Project memory is for project-specific context (ongoing work, decisions, references). Behavioral corrections and general lessons are durable guidance that belongs in rules.
+General feedback and lessons belong in `~/.claude` rule files — **not in project memory**. Project-specific context (ongoing work, decisions, references) goes in the project's own `.claude/notes/`, with auto-memory reserved for what must load every session — see `project-notes.md`'s *Facts about the project go in the project*. Behavioral corrections and general lessons are durable guidance that belongs in rules.
 
 When feedback is given:
 1. If it corrects a rule or skill: fix the source file directly (see Making Corrections above).
 2. If it's a general behavioral lesson with no existing rule: add it to `rules/feedback.md`.
-3. Only use project-level memory if the feedback is genuinely specific to that project and would not apply elsewhere.
+3. Only use the project's own notes if the feedback is genuinely specific to that project and would not apply elsewhere.
 
 Observations about how global tools behave (e.g., RTK filtering output unexpectedly) count as corrections to the relevant rule file — go there directly, not project memory.
 

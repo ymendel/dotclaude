@@ -32,7 +32,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`self-improvement.md`** — Triggers for when to self-improve: user corrections, workarounds, failed commands, violated rules, and inconsistencies. Points to `rule-maintenance.md` for how to act on them.
 
-**`project-notes.md`** — Recognition triggers for long-running project notes that don't belong in code, commit messages, memory, or session handoffs: cleanup-debt, drafted upstream feedback, lessons for a derived-template. Covers the *when* to file. The `project-notes` skill covers structure and the *how*. Destinations are project-specific config.
+**`project-notes.md`** — Recognition triggers for long-running project notes that don't belong in code, commit messages, memory, or session handoffs: cleanup-debt, drafted upstream feedback, lessons for a derived-template. Covers the *when* to file. The `project-notes` skill covers structure and the *how*. Destinations are project-specific config. Also routes general facts about a project to its `.claude/notes/` rather than Claude Code's auto-memory directory.
 
 **`cross-project-notes.md`** — Sibling to `project-notes.md` for findings that generalize beyond any single project and don't have an upstream / template / external destination yet. Names `~/.claude/notes/` as the durable home for those, with one file per topic (`template-lessons.md`, `postgres-quirks.md`, …). Directory is intentionally outside version control.
 

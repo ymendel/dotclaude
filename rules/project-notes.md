@@ -52,6 +52,14 @@ Both rules watch the same broad terrain — moments mid-work where something is 
 
 The same moment often fires both. A workaround the model fell back to during a task might be *both* a rule that should be tightened *and* an upstream limitation that should be documented for the codebase. File in both places — the audiences are different.
 
+## Facts about the project go in the project, not in auto-memory
+
+Things worth knowing about a project — its history, why its names are what they are, who decides what, how its pieces relate — go in the repo's own `.claude/notes/`, gitignored. Where the project has no `.claude/CLAUDE.md` yet, add a short one pointing at the notes so a later session finds them. This covers the general facts that fit none of the destinations above, not only this rule's triggers.
+
+Claude Code's auto-memory directory (`~/.claude/projects/<encoded-path>/memory/`) is for the narrow remainder that genuinely has to load into every session in that project. The harness's own memory instructions push everything there, and "write project memories" anywhere in these rules means the project's `.claude/` first.
+
+Failure mode this prevents: the knowledge lands in a store keyed to one user, one machine, and one checkout path. A second checkout, a worktree, another machine, or a renamed directory starts without it, and nothing in the repo signals that it was ever written down.
+
 ## Project configuration
 
 This rule is general, the destinations are project-specific. A project that uses this rule declares its notes destinations somewhere always-loaded — typically `CLAUDE.md` or a rule file imported from it. See the `project-notes` skill for the destination types it understands (cleanup-debt, upstream-feedback, derived-template lessons) and the per-destination structures.
