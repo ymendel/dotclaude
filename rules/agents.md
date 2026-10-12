@@ -93,7 +93,7 @@ Failure mode this prevents: jumping straight to drafting on a substantial ADR pr
 
 When a tool call would dump high-volume output into the main context — large generated files, broad searches across many files, verbose test runs, long PR comment threads, full migration histories — and only a few facts are needed from it, that is the shape delegation is for: one `Explore` or `general-purpose` agent with a tight prompt asking for just those facts, burning its own context on the noise. This shape carries the standing authorization at the top of this file, so send it without asking first.
 
-What it does need is a *tight* prompt. A vague one pays the fixed cost and returns the noise anyway, which is the only way this shape loses — so name the facts wanted and the form to return them in.
+What it does need is a *tight* prompt. A vague one pays the fixed cost and returns the noise anyway, which is the only way this shape loses — so name the facts wanted and the form to return them in, and what to report when one can't be found. Without that last part, a gap comes back filled with something plausible rather than flagged.
 
 Trigger examples:
 - "When was the `users.email_verified_at` column added?" — delegate. The main context doesn't need 30 migrations loaded.
