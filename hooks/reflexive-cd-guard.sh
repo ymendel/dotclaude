@@ -66,10 +66,10 @@ CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT")
 
 # Shadowing `cd` — a function definition or an alias — is not a cd at all. It is
 # an attempt to enforce the rule this hook guards on oneself, and it backfires
-# twice: the permission gate reports `function_definition`, a parser node no
-# allow rule can grant, so a read-only command stops for approval; and shadowing
-# a builtin is how one gets broken for real. See tool-and-shell-safety.md's
-# "Don't add shell machinery the task didn't ask for".
+# twice: the permission gate refuses a function named after a program it knows,
+# and no allow rule can grant that, so a read-only command stops for approval;
+# and shadowing a builtin is how one gets broken for real. See
+# tool-and-shell-safety.md's "Don't add shell machinery the task didn't ask for".
 #
 # Checked BEFORE the leading-`cd` match below, which requires whitespace after
 # `cd` and so never sees `cd()`. Matched anywhere in the command, not just at the
@@ -82,7 +82,7 @@ CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT")
 if [[ "$CMD" =~ (^|[[:space:]\;\&\|\(])cd[[:space:]]*\(\)[[:space:]]*\{ ]] \
   || [[ "$CMD" =~ (^|[[:space:]\;\&\|\(])function[[:space:]]+cd([[:space:]]*\(\))?[[:space:]]*\{ ]] \
   || [[ "$CMD" =~ (^|[[:space:]\;\&\|\(])alias[[:space:]]+cd= ]]; then
-  echo "reflexive-cd-guard: blocked. This shadows \`cd\` with a function or alias, which is not a directory change but an attempt to enforce the no-reflexive-cd rule on yourself. It backfires: the permission gate reports \`function_definition\`, which no allow rule can grant, so the command stops for approval even when its actual work is read-only — and shadowing a builtin is how one gets broken for real. Comply by writing the command without the forbidden form. Enforcement is this hook's job, not the command's." >&2
+  echo "reflexive-cd-guard: blocked. This shadows \`cd\` with a function or alias, which is not a directory change but an attempt to enforce the no-reflexive-cd rule on yourself. It backfires: the permission gate refuses a function named after a program it knows, which no allow rule can grant, so the command stops for approval even when its actual work is read-only — and shadowing a builtin is how one gets broken for real. Comply by writing the command without the forbidden form. Enforcement is this hook's job, not the command's." >&2
   exit 2
 fi
 

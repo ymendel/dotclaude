@@ -20,8 +20,8 @@ caught as well.
 Separately from the reflex, a command that **shadows `cd`** — `cd() { … }`, `function cd { … }`, or
 `alias cd=…` — anywhere in it, not only at the start. This is not a directory change but
 self-enforcement of the rule the guard already enforces, and it costs an approval prompt on a
-command whose real work is often read-only, because the gate reports `function_definition` and no
-allow rule can grant a parser node. The brace (or the `=`) is required to match, so a mere mention
+command whose real work is often read-only, because the gate refuses a function named after a
+program it knows and no allow rule can grant that. The brace (or the `=`) is required to match, so a mere mention
 passes — `rtk grep "cd()"` is fine, a command carrying the full definition text is not. That is the
 deny-substring trade-off from `settings.md`: it over-blocks, and the workaround is to pass the text
 via a file.

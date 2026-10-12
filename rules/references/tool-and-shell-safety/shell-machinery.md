@@ -7,11 +7,11 @@ write a command. Read it before changing `hooks/shell-machinery-guard.sh`.
 
 ## A function definition, deliberate or motiveless
 
-The gate reports `function_definition` (one of the parser-node names it names as its reason, alongside
-`for_statement` and `simple_expansion`). That node cannot be allowlisted, so a read-only `grep` or
-`curl` stops for approval. The check reads the statement type rather than the intent, which is why the
-motiveless form — a stray `for_each() { :; };` defining something nothing calls — costs exactly what a
-deliberate guard costs.
+The gate analyzes a function's body and refuses only a function named like a program it knows, `cd`
+among them, so a self-enforcing shadow stops a read-only `grep` for approval. The motiveless form — a
+stray `for_each() { :; };` defining something nothing calls — likely costs no prompt at all, which
+makes the guard the only thing that surfaces it. Both are read from the binary rather than observed,
+since the guard blocks the shape before the gate sees it (`notes/claude-code-quirks.md`).
 
 Shadowing a command is also how one gets broken for real. An always-loaded prohibition is a reason to
 write a different command, never a mandate to build a mechanism that blocks it, and the `cd` rule
@@ -50,8 +50,8 @@ ends. It does not, because it is not the only thing in there — `$(printf hello
 guarantee. `2>/dev/null` is a different thing again and usually right, since it discards the error
 channel and leaves the value alone.
 
-The prompt is no help. A substitution is a `command_substitution` node the gate cannot resolve
-(`settings.md`), so it asks about every substitution alike and says nothing about this one being empty.
+The prompt is no help. The gate cannot resolve a substitution (`settings.md`), so it asks about every
+substitution alike — "the output of another command" — and says nothing about this one being empty.
 
 Two faults travelled together in the observed case, and the second is the general check: the command
 carried a trailing `; rtk ls "$LOGDIR"` that nothing upstream depended on, which means it was two

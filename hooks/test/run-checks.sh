@@ -146,10 +146,27 @@ says() {
     fi
 }
 
+# lacks <guard> <label> <unwanted> <cwd> <command>
+# The inverse of `says`, for a claim a message must stop making — a reason that
+# was true of an older Claude Code and would now mislead whoever reads the block.
+lacks() {
+    local guard="$1" label="$2" unwanted="$3" cwd="$4" cmd="$5"
+    local out
+    out=$(jq -n --arg c "$cmd" --arg w "$cwd" '{tool_input:{command:$c}, cwd:$w}' \
+        | "$GUARD_DIR/$guard" 2>&1 >/dev/null)
+    if [[ "$out" == *"$unwanted"* ]]; then
+        report false "$label" "message still says '$unwanted'"
+    else
+        report true "$label"
+    fi
+}
+
 smg() { check shell-machinery-guard.sh "$@"; }
 smg_says() { says shell-machinery-guard.sh "$@"; }
+smg_lacks() { lacks shell-machinery-guard.sh "$@"; }
 rcd() { check_at reflexive-cd-guard.sh "$@"; }
 rcd_says() { says reflexive-cd-guard.sh "$@"; }
+rcd_lacks() { lacks reflexive-cd-guard.sh "$@"; }
 uvg() { check uv-run-guard.sh "$@"; }
 uvg_says() { says uv-run-guard.sh "$@"; }
 cmw() { check commit-message-wrap-guard.sh "$@"; }
@@ -324,6 +341,12 @@ echo "== shell-machinery-guard: the message points at what matched"
 smg_says "names the matched fragment"  'TMP=/tmp;' "$PROJ" 'rtk ls; TMP=/tmp; ls $TMP'
 smg_says "no claim about opening"      'blocked at' "$PROJ" 'for_check=""; rtk wc -l file'
 
+# From 2.1.287 the gate no longer refuses a loop or most function definitions
+# on statement type, so a message citing the parser node would misstate why the
+# block exists.
+smg_lacks "loop: no node-type claim"     'for_statement'       "$PROJ" 'for n in 1 2; do :; done; rtk ls'
+smg_lacks "function: no node-type claim" 'function_definition' "$PROJ" 'noop() { :; }; rtk ls'
+
 # invoke-form-guard.sh reads allow lists from the user settings and the project,
 # so it gets a project of its own: a temp tree with granted and ungranted
 # scripts, and a user settings file standing in for ~/.claude/settings.json.
@@ -493,6 +516,7 @@ rcd_says "stranded: cd . says no-op"       "no-op"                    "$OUTSIDE"
 rcd_says "stranded: says cwd is not root"  "NOT the project root"     "$OUTSIDE" "cd ."
 rcd_says "stranded: names the way back"    "$PROJ"                    "$OUTSIDE" "cd ."
 rcd_says "at root: git-root message"       "git root"                 "$PROJ" 'cd $(git rev-parse --show-toplevel)'
+rcd_lacks "shadow: no node-type claim"     "function_definition"      "$PROJ" 'cd() { return 1; }; grep -rn foo .'
 
 echo
 echo "== uv-run-guard: an option before the script path is blocked (exit 2)"

@@ -22,13 +22,13 @@ it is built out of are the ones the gate cannot resolve. The tells, all of them 
 
 - **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
   1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
-  forbidden form, and leave enforcement to the hook that already exists. The gate reports
-  `function_definition`, which cannot be allowlisted, so a read-only `grep` stops for approval.
+  forbidden form, and leave enforcement to the hook that already exists. A function named after a
+  real program is one the gate refuses, so a read-only `grep` stops for approval.
 - **A function definition for no reason at all.** The case above at least has an argument behind it.
   This one has none: a stray `for_each() { :; };` in front of an ordinary `grep`, defining something
-  nothing calls. It costs what the deliberate version costs, because the gate reads the statement
-  type rather than the intent. Read what sits in front of a command's first real word before sending
-  it, and delete anything there that is not part of the work.
+  nothing calls. It likely passes the gate silently, which leaves the user, reading the command
+  string, as the only one who sees it. Read what sits in front of a command's first real word before
+  sending it, and delete anything there that is not part of the work.
 - **An invented command in front of the real one, with its error suppressed.** The same
   motiveless shape as above, in the one form of it no hook can detect: a
   `rtk provoke 2>/dev/null;` ahead of an ordinary `grep`, naming a subcommand that does not exist.
@@ -65,8 +65,7 @@ adding a construct, ask what breaks if it is simply left out. Usually nothing �
 of a short command, or a plain invocation that respects the rule rather than policing it.
 
 **Three of these shapes are gated:** `hooks/shell-machinery-guard.sh` blocks a function definition,
-an assignment-plus-separator, and a loop whose whole body is `:` (`for n in …; do :; done`, which
-trips `for_statement` and then offers the `Bash(:)` grant `RTK.md` says to decline), each with exit 2
+an assignment-plus-separator, and a loop whose whole body is `:` (`for n in …; do :; done`), each with exit 2
 and a pointer back here. Its header enumerates what each knowingly over-blocks — read it before
 working around a block that looks wrong. The rest stay
 prose-only, and the invented leading command cannot be gated at all, since the binary resolves and
@@ -92,11 +91,8 @@ In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content li
 
 ## Batch repeated commands by repeating them literally, not with a loop variable
 
-When running the same command over several files, write the calls out — `rtk read a.json && rtk read b.json` — or issue them as separate tool calls in one message. Do not wrap them in a `for f in …; do … "$f"; done`. The gate flags the loop by its construct, reporting `Contains for_statement`, and that check reads the statement type rather than anything inside the body — so a batch that would otherwise pass silently prompts instead, and rewriting the loop to carry no `$f` buys nothing. The loop is also the more fragile form: one unquoted expansion or a filename holding a space and the whole batch breaks.
-
-`for_statement` joins `simple_expansion` (`settings.md`) and `function_definition` (`agents.md`) as parser-node names the gate reports as its reason. None of the three can be allowlisted, so in each case the fix is to write a different command rather than to add an entry.
-
-The pull toward the loop is real — it looks like the tidier way to avoid repeating yourself, and it saves round-trips against an interactive prompt where a human is typing. Neither applies to a programmatically issued command, which pays nothing for the repetition and pays an approval for the construct. Same fix as the `cat "$(ls …)"` slip in `RTK.md`: resolve the paths first, then name them literally.
+When running the same command over several files, write the calls out — `rtk read a.json && rtk read b.json` — or issue them as separate tool calls in one message. Do not wrap them in a `for f in …; do … "$f"; done`. The `$f` is a variable the gate cannot resolve ahead of time, so a batch that would otherwise pass silently prompts instead — "Part of this command (a variable) cannot be checked in advance" — and no allow entry can cover it (`settings.md`). The loop is also the more fragile form: one unquoted expansion or a filename holding a space and the whole batch breaks.
+The pull toward the loop is real — it looks like the tidier way to avoid repeating yourself, and it saves round-trips against an interactive prompt where a human is typing. Neither applies to a programmatically issued command, which pays nothing for the repetition and pays an approval for the loop variable. Same fix as the `cat "$(ls …)"` slip in `RTK.md`: resolve the paths first, then name them literally.
 
 Failure mode this prevents: a read-only batch that should have been invisible interrupts the user for approval, and does it at exactly the moment the work is meant to be running unattended.
 

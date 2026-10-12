@@ -17,11 +17,12 @@
 #   - A stray `for_each() { :; };` or `noop() { :; };` in front of an ordinary
 #     read-only command, defining something nothing calls and enforcing nothing.
 #
-# Either way the permission gate reports `function_definition` — a parser node
-# no allow rule can grant — so a read-only `grep` or `git config` stops for
-# approval, and the prompt reads as a gap in the allow list rather than as a
-# self-inflicted one. See tool-and-shell-safety.md, "Don't add shell machinery
-# the task didn't ask for".
+# The permission gate refuses a function named like a program it knows, so a
+# shadow of `cd` stops a read-only command for approval. A motiveless definition
+# under any other name likely passes the gate silently, which leaves this hook as
+# the only thing that surfaces it. See tool-and-shell-safety.md, "Don't add shell
+# machinery the task didn't ask for", and notes/claude-code-quirks.md for how the
+# gate's handling of definitions has changed across versions.
 #
 # The rule naming this failure is complete and was bypassed four times across
 # two sessions, so this is the next rung per ADR 0004's rule-vs-hook split.
@@ -71,17 +72,11 @@
 # slot is gated only in its structural form, the no-op loop below. An invented
 # command name cannot be, for the reason the rule gives.
 #
-# ITS JUSTIFICATION IS NOT THE FUNCTION FORM'S, AND IS WEAKER. Everything
-# above turns on the permission gate reporting `function_definition`, so a
-# read-only command stops for approval. That does not transfer. A plain
-# assignment is not among the parser nodes the gate refuses (see settings.md),
-# and the changelog records assignments as auto-approved except for one
-# arithmetic-to-integer-variable case fixed in 2.1.252 — ahead of the version
-# installed here. So this shape costs no prompt at all. What it costs is what
-# the rule says: the reflex recurs within a session, and because it has no
-# motive there is nothing to notice yourself talking into. That is a real cost
-# and a thinner case than the function form's, on one observation rather than
-# four. Deliberate, not an oversight.
+# ITS JUSTIFICATION IS NOT A PROMPT. A plain assignment is auto-approved, so
+# this shape costs no prompt at all. What it costs is what the rule says: the
+# reflex recurs within a session, and because it has no motive there is nothing
+# to notice yourself talking into. That is a real cost, on one observation.
+# Deliberate, not an oversight.
 #
 # What it matches, and why the preceding set is narrower than above:
 # start-of-string or one of `;&|(` — NOT bare whitespace, which the function
@@ -139,11 +134,10 @@
 # a parser can see: the no-op is structural rather than a fabricated command
 # name, so it can be matched without judgment.
 #
-# Its justification is the function form's, not the assignment's: the gate
-# reports `for_statement` (or `while_statement`, `until_statement`), which no
-# allow rule can grant, so the work behind it stops for approval. Worse, the
-# prompt offers to save `Bash(:)`, which grants nothing but redirects — a
-# standing licence to truncate files (RTK.md). One observation, 2026-10-07.
+# The gate no longer prompts on a variable-free loop, so its justification is
+# the assignment form's: scaffolding with no motive, which nothing else surfaces.
+# If a prompt for it ever offers `Bash(:)`, decline — that entry grants nothing
+# but redirects, a standing licence to truncate files (RTK.md).
 #
 # Matched narrowly: the loop keyword after a start-of-string or separator, and a
 # `do` whose body is `:` alone before `done`. A loop with a real body is not
@@ -196,7 +190,7 @@ assign_form="(^|\([[:space:]]*|[\;\&\|][[:space:]]+)${name}=${assign_value}[[:sp
 noop_loop_form="(^|[[:space:]\;\&\|\(])(for|while|until)[[:space:]].*[\;[:space:]]do[[:space:]]+:[[:space:]]*\;?[[:space:]]*done([[:space:]\;\&\|\)]|$)"
 
 if [[ "$CMD" =~ $noop_loop_form ]]; then
-  echo "shell-machinery-guard: blocked at \`${BASH_REMATCH[0]}\`. That is a loop whose only body is \`:\` — it iterates and does nothing. The permission gate reports \`for_statement\` (or \`while_statement\`/\`until_statement\`), a parser node no allow rule can grant, so the command stops for approval even when the work beside it is already allowlisted. Delete the loop and run the command that does the work. Never accept the \`Bash(:)\` grant the prompt offers: \`:\` does nothing alone, so that entry grants only redirects. See tool-and-shell-safety.md, \"Don't add shell machinery the task didn't ask for\"." >&2
+  echo "shell-machinery-guard: blocked at \`${BASH_REMATCH[0]}\`. That is a loop whose only body is \`:\` — it iterates and does nothing, and is scaffolding the task did not ask for. Delete the loop and run the command that does the work. If a prompt ever offers a \`Bash(:)\` grant, decline it: \`:\` does nothing alone, so that entry grants only redirects. See tool-and-shell-safety.md, \"Don't add shell machinery the task didn't ask for\"." >&2
   exit 2
 fi
 
@@ -210,7 +204,7 @@ if [[ "$CMD" =~ $assign_form ]]; then
 fi
 
 if [[ "$CMD" =~ $posix_form ]] || [[ "$CMD" =~ $keyword_form ]]; then
-  echo "shell-machinery-guard: blocked. This command defines a shell function. The permission gate reads the statement type, not the intent, and reports \`function_definition\` — a parser node no allow rule can grant — so the command stops for approval even when its actual work is read-only. Every observed instance has been scaffolding the task did not ask for: a stray \`for_each() { :; };\` in front of an ordinary command, or a shadow of a builtin meant to enforce a rule on yourself. Write the command without it; nothing usually breaks. If a function is genuinely needed, write the script to a file with the Write tool and run the file, which keeps the definition out of the command string. See tool-and-shell-safety.md, \"Don't add shell machinery the task didn't ask for\"." >&2
+  echo "shell-machinery-guard: blocked. This command defines a shell function. Every observed instance has been scaffolding the task did not ask for: a stray \`for_each() { :; };\` in front of an ordinary command, or a shadow of a builtin meant to enforce a rule on yourself. Write the command without it; nothing usually breaks. If a function is genuinely needed, write the script to a file with the Write tool and run the file, which keeps the definition out of the command string. See tool-and-shell-safety.md, \"Don't add shell machinery the task didn't ask for\"." >&2
   exit 2
 fi
 
