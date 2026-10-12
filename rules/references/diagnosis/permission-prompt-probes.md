@@ -6,16 +6,24 @@
 
 | Outcome | Trace |
 |---|---|
-| Rejected | an explicit error in the tool result |
-| Approved with "don't ask again" | a new entry in the repo's `.claude/settings.local.json` |
-| Approved with a plain "Yes" | nothing |
-| Auto-allowed | nothing |
+| Rejected | a log entry, and an error in the tool result |
+| Approved with "don't ask again" | a log entry, and a new rule in the repo's `.claude/settings.local.json` |
+| Approved with a plain "Yes" | a log entry only |
+| Auto-allowed | no log entry |
 
-The blind spot is one pair — plain-Yes and auto-allow — and they are the two that matter when the
-question is whether a config change suppressed a prompt. A saved rule is therefore a **one-way
-detector**: its presence proves a prompt happened, and its shape shows what string the gate matched;
-its absence proves nothing. The session transcript holds no per-call record either, only the
-session's own `permissionMode`.
+The log is `~/.claude/.permission-suggestions.jsonl`, written by `hooks/notify-permission-context.sh`
+on `PermissionRequest`. Without it, plain-Yes and auto-allow both leave nothing — and they are the
+pair that matters when the question is whether a config change suppressed a prompt. A saved rule alone
+is only a one-way detector: its presence proves a prompt happened, its absence proves nothing.
+
+An absent log entry is a negative only while the hook is alive. It exits silently without `jq`, and
+it suppresses its own write errors, so confirm it with a recent entry from the same session before
+reading a missing one as "auto-allowed".
+
+The `PermissionRequest` payload carries no `tool_use_id`, so matching a log entry to a call goes by
+session, tool and command text. A manual "No" fires neither `PostToolUse` nor `PermissionDenied`
+(which runs only in auto mode), so no hook records it — the tool-result error is the only trace, and
+it is visible from inside the session that ran the probe.
 
 ## The user's report carries the same skew
 
@@ -45,8 +53,8 @@ ask, it carries `tool_name` and `tool_input`, and a hook that returns no `decisi
 flow unchanged — so it observes without deciding. One exclusion: it does not fire for a sandboxed
 command's network request, which reaches `permission_prompt` only.
 
-This does not reopen the plain-Yes blind spot above. `PermissionRequest` separates *prompted* from
-*never going to prompt*; it still says nothing about which answer the user gave.
+`PermissionRequest` separates *prompted* from *never going to prompt*. It says nothing about which
+answer the user gave, which is why the table above pairs it with the tool result and the saved rule.
 
 **An MCP tool reaches it identically**, which the docs state rather than leave to inference: "MCP
 server tools appear as regular tools in tool events (`PreToolUse`, `PostToolUse`,
@@ -58,8 +66,9 @@ What it does *not* carry is the title the dialog shows. A prompt reading "honeyc
 Tool" is served by a payload holding only `mcp__honeycomb__get_dataset`, so anything rendering that
 prompt from hook input is working from the name and will not match what the user saw. Whether the
 title rides in `permission_suggestions` — the one documented input field not read for this — is
-open, and `hooks/notify-permission-context.sh` now logs that field on every request so a single live
-MCP prompt settles it.
+open, and the log records that field on every request so a single live MCP prompt settles it. The
+field is not always the rule the dialog offers either: one prompt logged its exact command while the
+dialog offered `git *`.
 
 ## Shaping a probe that attributes cleanly
 

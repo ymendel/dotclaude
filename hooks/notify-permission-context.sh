@@ -37,8 +37,9 @@ command -v jq &>/dev/null || exit 0
 
 jq -e . >/dev/null 2>&1 <<<"$INPUT" || exit 0
 
-# THE SUGGESTIONS LOG records each prompt: which project it came from, what it was for, and the rule
-# the dialog offered to save. It began as a way to settle whether the MCP title the dialog shows
+# THE SUGGESTIONS LOG records each prompt: which project it came from, what it was for, and the
+# `permission_suggestions` the payload carried — which is not always the rule the dialog offers.
+# It began as a way to settle whether the MCP title the dialog shows
 # ("honeycomb — Get Dataset Tool") rides in `permission_suggestions` — the tool name is all the
 # descriptor has to work from, and it renders `calls: honeycomb get dataset` instead.
 #
