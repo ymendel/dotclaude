@@ -46,6 +46,7 @@
       "Bash(heroku config:get *)",
       "Bash(heroku help*)",
       "Bash(heroku logs:*)",
+      "Bash(heroku pg:info:*)",
       "Bash(heroku pipelines:info:*)",
       "Bash(heroku ps:*)",
       "Bash(heroku releases:*)",
