@@ -326,6 +326,7 @@
     "type": "command",
     "command": "$HOME/.claude/statusline-command.sh"
   },
+  "includeGitInstructions": false,
   "attribution": {
     "commit": "",
     "pr": ""
