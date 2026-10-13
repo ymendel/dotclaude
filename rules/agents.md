@@ -60,6 +60,25 @@ well as affordable — the request was made here rather than in the session.
 Failure mode this prevents: an extra agent looks free, because the resource it consumes is invisible
 from inside the session — so the user finds out at the weekly limit, having never been asked.
 
+## Review uncommitted work on top of a pause commit
+
+Reviewers keep Edit so they can verify by changing code or a test. A probe edit in a file that also
+holds uncommitted work can't be undone without taking the work with it, so before a `code-reviewer`
+or `architect-reviewer` looks at uncommitted work, commit it first:
+
+1. Commit the work as `WIP: <subject>`. Where the commit-ratchet gate blocks it (an untested hook
+   change in this repo), ask the user to make that commit from their terminal.
+2. Spawn the reviewer in the main tree. Tell it to leave any probe edits in place and list them.
+3. Read `git diff HEAD`, which is now exactly what the reviewer touched, and revert those files.
+4. `git reset --soft HEAD~1`. The work comes back staged, losing any staged/unstaged split it had.
+
+Don't reach for `isolation: "worktree"` here. The isolated worktree is cut from a commit that
+doesn't include ones made during the session, so it never contains the pause commit. A WIP commit
+never gets pushed, which the no-push rule already guarantees.
+
+Failure mode this prevents: probes get unwound by hand and one is missed, or a `git checkout` aimed
+at a probe discards the uncommitted work in the same file.
+
 ## Codebase Exploration
 
 Three agents handle codebase work. This table picks *which* one, within the standing authorization
