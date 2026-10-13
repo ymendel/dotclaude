@@ -38,6 +38,11 @@ Three shapes stay prose-only, because no hook can see them:
   for regex fragments. Quote the filter, or drop it and run the whole file. Double quotes are not
   the fix when the pattern carries a `$` or a backtick.
 
+Git revision syntax has the same problem. `@{upstream}..HEAD` prompts as a brace expansion,
+though bash leaves it alone, because the gate sees a `{` and a `..` in one word. To count unpushed
+commits, use `git status --short --branch`, which prints `[ahead N]` and the dirty files in one
+command with no revision syntax (`notes/claude-code-quirks.md`).
+
 A pipe plus `${PIPESTATUS[0]}` on output that needed no filtering is the same habit, and *A pipe
 hides the exit status* below covers it.
 
