@@ -4,79 +4,45 @@ Operating the shell and the file tools without silent mishaps — commands that 
 
 ## Don't reflexively `cd` into the working directory
 
-The Bash working directory is set to the project root at session start and persists across calls. Do not prefix commands with `cd /path/to/project` — it is unnecessary, and a `cd` combined with output redirection (`cd ... 2>/dev/null; <command>`) trips a security approval rule ("path resolution bypass"), forcing the user to manually approve every such command.
+The Bash working directory starts at the project root and persists across calls, so a `cd` to the root is redundant and a `cd` anywhere else strands every later cwd-relative command there. Run commands directly, and reach another directory with `git -C <path>`, an absolute path, or a reverting subshell `(cd <dir> && <cmd>)`. The reflex shows up after working across several directories in one session, out of a wish to be sure of the cwd. When a tool's output lands somewhere unexpected, check `pwd` before suspecting the tool.
 
-The reflex appears after working across multiple directories in one session (e.g. the project plus `~/.claude`), out of a wish to "be sure" of the cwd. Read/Edit on a file elsewhere does not change the shell's cwd, and tool calls don't drift it.
+**Gated:** `hooks/reflexive-cd-guard.sh` blocks the redundant and the persistent forms, and its message carries the why for each. `rules/references/tool-and-shell-safety/cd-guard.md` has what it blocks and what it lets through. Load it when the guard fires on a command that looks legitimate, or before changing the hook.
 
-**A subtler consequence — silent wrong output, no approval prompt:** a `cd` into a *subdirectory of the project* (not just an unrelated dir) persists across calls the same way, and cwd-dependent tools then act on the wrong location without erroring — e.g. a handoff script writing relative to `os.getcwd()` lands its output in a subtree that the `SessionStart` hook and `list_handoffs.py` never scan (they see only the root), so nothing errors and the mistake is visible only by reading the tool's output path. This is distinct from the redirect/approval consequence above: that one is loud (an approval prompt), this one is silent.
-
-**How to apply:** run commands directly — cwd is already the project root. If a command genuinely needs a different directory, pass it explicitly (`git -C <path>`, an absolute path) rather than `cd`-ing, and never combine `cd` with output redirection. This holds for project subdirectories too — a `cd` into `skills/` or `docs/` persists and will misdirect any cwd-relative tool (handoff scripts, generators, anything calling `getcwd`). When a tool's output lands somewhere unexpected, check `pwd` before assuming the tool is wrong.
-
-**Now gated:** `hooks/reflexive-cd-guard.sh` blocks both hazard shapes with exit 2 and a pointer back here, so this prose is the discoverable *why* while the gate steers toward `git -C`, an absolute path, or a reverting subshell. It deliberately lets several `cd` forms through, including the ones that can strand the cwd elsewhere — blocking the way back would have the guard trap the drift it exists to warn about. `rules/references/tool-and-shell-safety/cd-guard.md` has the full blocked-and-allowed breakdown; load it when the guard fires on a command that looks legitimate, or before changing the hook.
+Failure mode this prevents: the hook fires only after the attempt, so without the recognition here every reflexive `cd` costs a blocked call and a rewrite.
 
 ## Don't add shell machinery the task didn't ask for
 
-Write the command the work needs and nothing around it. The machinery bolted on out of diligence —
-a guard, a status probe, a filter — is where the approval prompts come from, because the constructs
-it is built out of are the ones the gate cannot resolve. The tells, all of them real:
+Write the command the work needs and nothing around it. Scaffolding added out of diligence — a
+guard, a status probe, a filter — is built from the constructs the gate cannot resolve, so it is
+where the approval prompts come from. Before adding a construct, ask what breaks if it is simply
+left out. Usually nothing.
 
-- **A function definition to enforce a rule on yourself.** Never open a command with `cd() { return
-  1; }` or any other shadow of a command a rule forbids. Comply by writing the command without the
-  forbidden form, and leave enforcement to the hook that already exists. A function named after a
-  real program is one the gate refuses, so a read-only `grep` stops for approval.
-- **A function definition for no reason at all.** The case above at least has an argument behind it.
-  This one has none: a stray `for_each() { :; };` in front of an ordinary `grep`, defining something
-  nothing calls. It likely passes the gate silently, which leaves the user, reading the command
-  string, as the only one who sees it. Read what sits in front of a command's first real word before
-  sending it, and delete anything there that is not part of the work.
-- **An invented command in front of the real one, with its error suppressed.** The same
-  motiveless shape as above, in the one form of it no hook can detect: a
-  `rtk provoke 2>/dev/null;` ahead of an ordinary `grep`, naming a subcommand that does not exist.
-  No gate catches this one — the leading command resolves fine, so the only thing that would have
-  surfaced it is the error, and the suppression threw that away. Never suppress stderr on a segment
-  you *added* rather than on the one doing the work. The command still *works*, so the stray segment
-  is visible only to whoever reads the command string, and that reader is the user.
-- **A command substitution that cannot produce output.** The same shape one level in, where the
-  *outer* command is the legitimate part. A
-  A `$( )` whose body has had stdout taken away by a `> /dev/null` was guaranteed to return the
-  empty string before the command ran, and the outer command reads as perfectly ordinary. Ask what
-  a substitution can actually return, and ask it of the body as a whole rather than of its last
-  word. A related tell in the same family: a later segment that uses nothing from an earlier one
-  means the line was two commands rather than one.
-- **A variable assignment to avoid retyping a long string.** A programmatically issued command pays
-  no keystrokes, so nothing is saved — the same trade as the loop in *Batch repeated commands*
-  below. Write the ref, the path, or the value out literally however long it runs. Three separate
-  detectors sit around this one, and the prefix form `FOO=bar cmd` clears the guard while still
-  costing a prompt, so read a pass as no recommendation.
-- **A pipe plus `${PIPESTATUS[0]}` where the plain command would do.** Covered in full by *A pipe
-  hides the exit status* below, including why the expansion prompts and what to reach for instead.
-  The trap specific to this section is applying that apparatus to output that needed no filtering
-  at all — five lines through `tail -5`, and a status probe for a command whose status a bare run
-  reports by itself.
-- **A test-name filter written in regex the shell claims first.** Alternation and grouping are
-  exactly the characters the shell takes for itself (`|`, `(`, `)`, `*`, `?`, `>`, `&`), so an
-  unquoted `/a|b|c/` becomes a pipeline and the gate offers a standing grant for two "commands" that
-  are regex fragments. The failure is self-correcting, the grant is not. Quote the filter, or —
-  usually better — drop it and run the whole file. Double quotes are not the fix when the pattern
-  carries a `$` or a backtick.
+**Gated:** `hooks/shell-machinery-guard.sh` blocks three shapes, and its message carries the why
+for each — a function definition (including a shadow of `cd` meant to police a rule), a variable
+assignment followed by a separator, and a loop whose whole body is `:`. Its header lists what it
+knowingly over-blocks, so read it before working around a block that looks wrong. The prefix form
+`FOO=bar cmd` clears the guard and still prompts, so a pass is no recommendation.
 
-The tell in each case: the part that trips the gate is not the work, it is the scaffolding. Before
-adding a construct, ask what breaks if it is simply left out. Usually nothing — an unfiltered run
-of a short command, or a plain invocation that respects the rule rather than policing it.
+Three shapes stay prose-only, because no hook can see them:
 
-**Three of these shapes are gated:** `hooks/shell-machinery-guard.sh` blocks a function definition,
-an assignment-plus-separator, and a loop whose whole body is `:` (`for n in …; do :; done`), each with exit 2
-and a pointer back here. Its header enumerates what each knowingly over-blocks — read it before
-working around a block that looks wrong. The rest stay
-prose-only, and the invented leading command cannot be gated at all, since the binary resolves and
-only its subcommand is fabricated. Reading the first segment before sending is the only check there
-is.
+- **An invented command in front of the real one, with its error suppressed** — a
+  `rtk provoke 2>/dev/null;` ahead of an ordinary `grep`. The binary resolves, so only the error
+  would have surfaced it, and the suppression threw that away. Never suppress stderr on a segment
+  you added. Read what sits in front of a command's first real word before sending it, and delete
+  anything there that is not part of the work.
+- **A command substitution that cannot produce output** — a `$( )` whose body sends stdout to
+  `/dev/null`. Ask what a substitution can return, of the body as a whole rather than its last word.
+  A later segment that uses nothing from an earlier one means the line was two commands.
+- **A test-name filter written in regex the shell claims first.** `|`, `(`, `)`, `*`, `?`, `>` and
+  `&` belong to the shell, so an unquoted `/a|b|c/` becomes a pipeline and the gate offers a grant
+  for regex fragments. Quote the filter, or drop it and run the whole file. Double quotes are not
+  the fix when the pattern carries a `$` or a backtick.
 
-`rules/references/tool-and-shell-safety/shell-machinery.md` carries each shape's mechanism — what the
-gate reports and why, the zsh reading that refuses an unquoted `$name:mod`, the separate detector on
-a redirect target, why a trailing bare `echo` does not empty a substitution, and why double quotes
-are not the fix for a backtick. Load it when a block or a prompt looks wrong, or before changing the
-hook.
+A pipe plus `${PIPESTATUS[0]}` on output that needed no filtering is the same habit, and *A pipe
+hides the exit status* below covers it.
+
+`rules/references/tool-and-shell-safety/shell-machinery.md` carries each shape's mechanism. Load it
+when a block or a prompt looks wrong, or before changing the hook.
 
 Failure mode this prevents: scaffolding added out of diligence converts an invisible call into a
 permission prompt, and the prompt arrives attached to a command whose actual work needed no
@@ -98,13 +64,11 @@ Failure mode this prevents: a read-only batch that should have been invisible in
 
 ## Invoke a project script by the relative path its allow rule names
 
-Spell the call the way its grant does — `./scripts/report.sh` where the entry is `Bash(./scripts/report.sh:*)`, `bin/rubocop` where it is `Bash(bin/rubocop:*)` — not the absolute path, not a bare path missing the `./`, and not behind a `bash` or `python3` prefix. Allow rules match the literal command string, so each of those is the same script, with the same effect, under a different string, and the gate asks. The absolute form is the natural reach right after working in another directory or reading a path out of a tool result, which is when it slips in. The shell's cwd is the project root and stays there, so the relative form always resolves.
+Spell the call the way its grant does — `./scripts/report.sh` where the entry is `Bash(./scripts/report.sh:*)`, `bin/rubocop` where it is `Bash(bin/rubocop:*)` — not the absolute path, a bare path missing the `./`, or a `bash` or `python3` prefix. The absolute form is the natural reach right after reading a path out of a tool result.
 
-**Gated:** `hooks/invoke-form-guard.sh` blocks any of those spellings when a grant covers the canonical one, and names the granted form. Where no grant exists it stays silent, since the prompt is then legitimate.
+**Gated:** `hooks/invoke-form-guard.sh` blocks those spellings when a grant covers the canonical one, names the granted form, and carries the why. Where no grant exists it stays silent, since the prompt is then legitimate. `agents.md` carries the same constraint for sub-agent prompts.
 
-`agents.md` carries the same constraint for sub-agent prompts, which is where it bites hardest.
-
-Failure mode this prevents: a routine, already-granted command interrupts the user for approval, and because the command is *correct* the prompt reads as a gap in the allow list rather than as a slip in how the command was written — so the fix attempted is a new allowlist entry that duplicates the one already there.
+Failure mode this prevents: the prompt on a correct command reads as a gap in the allow list, so the fix attempted is an entry duplicating one already there.
 
 ## Let the script's own header pick the runner
 
