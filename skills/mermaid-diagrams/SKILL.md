@@ -149,7 +149,7 @@ For in-depth guidance on specific diagram types, see:
 
 1. **Start Simple** - Begin with core entities/components, add details incrementally
 2. **Use Meaningful Names** - Clear labels make diagrams self-documenting
-3. **Comment Extensively** - Use `%%` comments to explain complex relationships
+3. **Comment Sparingly** - Use a `%%` comment only for a relationship its label doesn't explain
 4. **Keep Focused** - One diagram per concept; split large diagrams into multiple focused views
 5. **Version Control** - Store `.mmd` files alongside code for easy updates
 6. **Add Context** - Include titles and notes to explain diagram purpose
