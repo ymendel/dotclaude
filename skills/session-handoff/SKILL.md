@@ -165,9 +165,24 @@ Follow the checklist in [references/resume-checklist.md](references/resume-check
 4. Review modified files for conflicts
 5. Check environment state
 
-### Step 5: Begin Work
+### Step 5: Derive Where Things Stand, Then Begin Work
 
-Start with "Immediate Next Steps" item #1 from the handoff document.
+The handoff's "Immediate Next Steps" is the author's plan as of writing, not the state of the work.
+Before starting item #1, read the state the plan was about and reconcile each step against it:
+
+- **Commits since the handoff** — `git log --oneline <handoff-commit-or-date>..HEAD`, in every repo
+  the handoff names. A step whose commit already exists is done.
+- **The working tree** — `git status` and the staged set. Uncommitted work the handoff doesn't
+  mention belongs to somebody, and is the first thing to ask about.
+- **Anything external a step waits on** — a PR's state and head (`gh pr view <n> --json
+  state,headRefOid`), an issue, a deploy.
+
+Then say which steps are done, which are still open, and which the state contradicts, and start from
+the first open one. The user commits, pushes and switches context without narrating it, so the
+stored step may be finished or overtaken.
+
+Failure mode this prevents: the resuming session redoes finished work, or builds on a step the user
+has since abandoned, because the handoff's next-step line read as current.
 
 Reference these sections as you work:
 - "Critical Files" for important locations

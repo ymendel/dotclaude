@@ -25,7 +25,7 @@ Follow this checklist when resuming work from a handoff document to ensure zero-
 
 ## Resume Execution
 
-- [ ] Start with "Immediate Next Steps" item #1
+- [ ] Reconcile each "Immediate Next Steps" item against commits since the handoff, the working tree, and any PR it waits on (SKILL.md Step 5), then start with the first item still open
 - [ ] Reference "Files Modified" table for context on recent changes
 - [ ] Apply patterns documented in "Key Patterns Discovered"
 - [ ] Follow architectural insights from "Architecture Overview"
