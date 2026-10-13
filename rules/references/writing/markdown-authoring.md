@@ -17,3 +17,22 @@ The fragile constructs, most-common first:
 **Why:** for the renderer-variant constructs the failure is invisible at generation time — the terminal and chat surfaces render leniently (or not at all), markdown never errors, so nothing pushes back, and the defect only appears once the artifact is opened downstream in a strict renderer, by which point it has shipped. The deterministic inline-fence case is the opposite: it shows as a visible gray blob even in chat, so the tell is on-screen at generation time if you look for it.
 
 **A linter is a weak check, not the fix.** `markdownlint` and its kin catch this only obliquely — they flag *where* something is structurally off (a mis-paired fence trips MD040 plus the MD031/MD032 blank-line rules) but never name the cause, and out of the box they bury that signal under line-length noise unless the config is tuned. Reserve them, tuned, for committed deliverables where a specific renderer matters — not as a net over everything generated. The durable guard is knowing the fragile-construct list above and formatting for it up front.
+
+## Label consecutive images rather than running them together
+
+When a document places one image directly after another — a before/after pair, a set of screenshots,
+anything a reader is meant to compare — put a short label line above each one. `Before:` and
+`After:` on their own lines is enough. Leave them unlabeled only when they genuinely are one thing,
+like frames of a single sequence.
+
+Whatever separation the renderer supplies is a gap and nothing more. A break between two images says
+they are two images, never which is which. Nor is the direction they run in a property of the
+markdown — the same pair can stack on one surface and sit side by side on another.
+
+Sharpest for animated GIFs, which play whether or not they are being looked at, so two of them
+adjacent compete for attention and neither gets read.
+
+Failure mode this prevents: the images are the right images in the right order, so nothing about the
+output looks wrong to whoever assembled it — the whole cost lands on the reader, who has no way to
+tell which image is which, and the author is the one person who cannot see the problem because they
+already know.

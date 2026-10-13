@@ -184,25 +184,6 @@ This holds in every repo, not only public ones. A shared or company repo's histo
 
 Failure mode this prevents: the incident is the most vivid version of the reason, so it is what gets written. A client's or an unrelated project's identifiers land in a history read by another audience, where once pushed they can be removed only by rewriting published commits — and the reader who never saw the incident is left without the reason it stood in for.
 
-## Label consecutive images rather than running them together
-
-When a document places one image directly after another — a before/after pair, a set of screenshots,
-anything a reader is meant to compare — put a short label line above each one. `Before:` and
-`After:` on their own lines is enough. Leave them unlabeled only when they genuinely are one thing,
-like frames of a single sequence.
-
-Whatever separation the renderer supplies is a gap and nothing more. A break between two images says
-they are two images, never which is which. Nor is the direction they run in a property of the
-markdown — the same pair can stack on one surface and sit side by side on another.
-
-Sharpest for animated GIFs, which play whether or not they are being looked at, so two of them
-adjacent compete for attention and neither gets read.
-
-Failure mode this prevents: the images are the right images in the right order, so nothing about the
-output looks wrong to whoever assembled it — the whole cost lands on the reader, who has no way to
-tell which image is which, and the author is the one person who cannot see the problem because they
-already know.
-
 ## Use American spellings
 
 American spellings in durable output — `behavior`, `color`, `recognize`, `center`, `labeled`,
@@ -221,18 +202,9 @@ consistency bullet is the instinct that will argue for matching it. The artifact
 rule regardless of its neighbors. Bringing the rest into line is separate work to raise, never to
 fold into the change at hand.
 
-Sweeping for these is a different job from writing them. A stem match hits words that are already
-American — `organis` catches `organism`, `generalis` catches `generalist`, `enrol` catches
-`enrollment`, `realis` catches `realistic`. A quoted passage keeps its source's spelling, so an
-external quote is not yours to correct. And `analyses` is the noun plural in both, so changing it
-fixes no spelling and can break an anchor link into a heading that uses it.
-
-A hand-built word list bounds an absence claim to the list rather than to the corpus, and that
-false-negative direction is worse than the stem-match overreach above: an overreach produces a
-wrong edit somebody catches, where a missed word produces a clean report nobody rechecks —
-`catalogue` survives a sweep built around `colour` and `behaviour`. So report what was searched,
-"these are the hits for this list", rather than "everything else is clean". That is `honesty.md`'s
-*Do Not Assert Absence Without Verifying* in the term-search form that file already describes.
+Sweeping a tree for these is a different job from writing them, with its own false positives and an
+absence claim bounded by the word list. Load `rules/references/writing/spelling-sweeps.md` before
+running one.
 
 Failure mode this prevents: each instance is invisible in place, because nothing about `behaviour`
 in a sentence looks like a decision. The drift is noticed only when some word happens to look wrong
@@ -241,7 +213,7 @@ or a pushed commit message cannot be swept at all.
 
 ## Markdown authoring mechanics
 
-When producing markdown for a strict renderer — a committed doc, a README, a PR body, an IDE preview — a small set of fragile constructs (fenced code inside a list item, an inline fence marker in prose, tables holding block content, &c.) render differently across implementations or break outright, and markdown never errors to warn you. The full list, the why, and the formatting discipline are in `rules/references/writing/markdown-authoring.md`. Load it when generating markdown bound for a durable deliverable.
+When producing markdown for a strict renderer — a committed doc, a README, a PR body, an IDE preview — a small set of fragile constructs (fenced code inside a list item, an inline fence marker in prose, tables holding block content, &c.) render differently across implementations or break outright, and markdown never errors to warn you. The full list, the why, and the formatting discipline are in `rules/references/writing/markdown-authoring.md`, along with labeling images placed one after another. Load it when generating markdown bound for a durable deliverable, and before placing two images next to each other.
 
 ## Emulating the user's voice
 
