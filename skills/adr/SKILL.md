@@ -326,6 +326,12 @@ Once an ADR is `Accepted`, it is effectively immutable. The only edits permitted
 
    Update the status line in the same edit (see item 1 examples). Status itself stays `Accepted`; the extension after the em-dash signals "this ADR has been amended" so a reader who never scrolls past Decision still gets the pointer.
 
+4. **Clarifications inline**, when the edit makes the text say what it always meant and changes nothing a reader would conclude about the context, the options, or the decision. Replacing an ambiguous term with the precise one it stood for is the standard case: "the database" becomes "the reporting database" where only that one was ever meant. Edit in place, with no amendment section and no status change, and say in the commit message that the edit is a clarification.
+
+   The test has a second half. A clarification must not remove reasoning about the ambiguity itself. Where the ADR says "this term covers several things, and here we mean X", that acknowledgment is content. Changing X, or replacing the passage with wording that no longer admits the term was ambiguous, changes the context, and that is an amendment or a new ADR.
+
+   The distinction from item 3 is time. A clarification fixes text that was unclear when it was written. A fact that was true then and is false now — a file moved, a column renamed — is an amendment, however small.
+
 Anything beyond these belongs in a new ADR, not an edit to the existing one.
 
 ### Amend vs. supersede
