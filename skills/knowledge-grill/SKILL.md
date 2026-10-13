@@ -40,8 +40,9 @@ asking.
 
 The mechanic, one question at a time:
 
-- Interview the holder relentlessly about the system until you reach a shared understanding. Walk
-  down each branch of the design, resolving dependencies between decisions one by one.
+- Interview the holder relentlessly about the system until the evidence-seeded threads are exhausted
+  and the gap-as-risk question turns up nothing new, or the holder calls a stop. Walk down each
+  branch of the design, resolving dependencies between decisions one by one.
 - Ask one question at a time, waiting for the answer before the next. A wall of questions is
   bewildering.
 - For each question, offer your recommended answer rather than asking cold.

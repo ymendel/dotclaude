@@ -116,7 +116,7 @@ The script checks for:
 | ---- | ----------------------------------------------- |
 | 0    | No issues found                                 |
 | 1    | Errors detected                                 |
-| 2    | Warnings only (errors ignored with --warn-only) |
+| 2    | Warnings only (exit 0 instead with --warn-only) |
 
 ## Integration with Claude Code
 
@@ -125,7 +125,7 @@ When Claude Code creates or edits ASCII diagrams:
 1. Run the validator script on the file
 2. Review any errors in the output
 3. Apply suggested fixes
-4. Re-run until clean
+4. Re-run until it exits 0. Exit 2 means warnings only: fix them, or pass `--warn-only` if the warnings are acceptable
 
 ### Example Workflow
 

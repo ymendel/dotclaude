@@ -123,7 +123,7 @@ Run the **skill-judge** skill as the audit step — a skill isn't done until it 
 
 ### Iterate Based on Feedback
 
-After evaluating results, improve the skill and retest. Keep iterating until the user is satisfied or feedback is consistently positive. Key principles for each iteration:
+After evaluating results, improve the skill and retest. Keep iterating until the success criteria you wrote down pass on the test prompts, or the user calls it done. Key principles for each iteration:
 
 1. **Generalize from specific feedback.** Skills will be used across many different prompts. Avoid overfitting to test cases with fiddly, narrow fixes. If a pattern keeps failing, try a different approach or metaphor rather than adding more constraints.
 

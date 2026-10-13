@@ -15,7 +15,7 @@ When invoked:
 Debugging checklist:
 - Issue reproduced consistently
 - Root cause identified clearly
-- Fix validated thoroughly
+- Fix validated: the reproduction that showed the bug now passes, and the surrounding tests are green
 - Side effects checked completely
 - Performance impact assessed
 - Documentation updated properly
