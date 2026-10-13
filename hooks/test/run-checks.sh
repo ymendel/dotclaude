@@ -4,10 +4,11 @@
 #
 #   ./hooks/test/run-checks.sh
 #
-# SIX SUBJECTS, named here because the file's own name names none of them and the
-# ratchet's TIERED table maps all six to it: shell-machinery-guard.sh,
+# SEVEN SUBJECTS, named here because the file's own name names none of them and the
+# ratchet's TIERED table maps all seven to it: shell-machinery-guard.sh,
 # reflexive-cd-guard.sh, uv-run-guard.sh, python-rewrite.sh,
-# commit-message-wrap-guard.sh and invoke-form-guard.sh. uv-run-guard.sh and python-rewrite.sh went
+# commit-message-wrap-guard.sh, invoke-form-guard.sh and claude-dir-redirect-guard.sh.
+# uv-run-guard.sh and python-rewrite.sh went
 # uncovered for as long as that table said otherwise — a suite named for a category
 # absorbs a mapping without looking any different, where one named for a single
 # hook carries its own coverage in its filename. Add the subject to this list when
@@ -171,6 +172,8 @@ uvg() { check uv-run-guard.sh "$@"; }
 uvg_says() { says uv-run-guard.sh "$@"; }
 cmw() { check commit-message-wrap-guard.sh "$@"; }
 cmw_says() { says commit-message-wrap-guard.sh "$@"; }
+cdr() { check claude-dir-redirect-guard.sh "$@"; }
+cdr_says() { says claude-dir-redirect-guard.sh "$@"; }
 
 # pyrw_emits <label> <bindir> <command> <expected-stdout-substring>
 # python-rewrite.sh signals through stdout rather than an exit code, so neither
@@ -599,5 +602,41 @@ $AT72'"
 else
     report_skip "commit-message-wrap-guard cases" "python3 is absent, and the guard passes everything through without it"
 fi
+
+echo
+echo "== claude-dir-redirect-guard: a shell write into .claude/ (exit 2)"
+cdr "the observed shape"                 2 'bin/rails test test/models/order_test.rb > .claude/scratch/order-test.log 2>&1; rtk grep -n "Failure" .claude/scratch/order-test.log'
+cdr "append"                             2 'rtk git log --oneline >> .claude/scratch/history.txt'
+cdr "no space before the target"         2 'rtk ls >.claude/scratch/listing.txt'
+cdr "stderr only"                        2 'bin/ci 2> .claude/scratch/ci-errors.log'
+cdr "both streams"                       2 'bin/ci &> .claude/scratch/ci.log'
+cdr "clobber form"                       2 'rtk ls >| .claude/scratch/listing.txt'
+cdr "quoted target"                      2 'rtk ls > ".claude/scratch/listing.txt"'
+cdr "absolute target"                    2 "rtk ls > $PROJ/.claude/scratch/listing.txt"
+cdr "home-relative target"               2 'rtk ls > ~/.claude/notes/listing.txt'
+cdr "heredoc into a file"                2 "cat > .claude/scratch/payload.json <<'EOF'
+{}
+EOF"
+cdr "a later redirect in a chain"        2 'rtk ls > /dev/null && rtk ls > .claude/scratch/listing.txt'
+cdr "tee"                                2 'bin/ci | tee .claude/scratch/ci.log'
+cdr "tee with append flag"               2 'bin/ci | tee -a .claude/scratch/ci.log'
+
+echo
+echo "== claude-dir-redirect-guard: what it leaves alone (exit 0)"
+cdr "redirect elsewhere"                 0 'bin/ci > /tmp/ci.log 2>&1'
+cdr "stream merge only"                  0 'bin/ci 2>&1'
+cdr "reading from .claude/"              0 'jq . < .claude/scratch/payload.json'
+cdr ".claude/ as an argument"            0 'git commit -F .claude/scratch/commit-message.txt'
+cdr "copy out of .claude/ is a read"     0 'cat .claude/scratch/listing.txt > /tmp/listing.txt'
+cdr "a directory merely named .claude"   0 'rtk ls > notes.claude/listing.txt'
+cdr "tee elsewhere"                      0 'bin/ci | tee /tmp/ci.log'
+cdr "rtk test wrapper"                   0 'rtk test bin/rails test test/models/order_test.rb'
+
+echo
+echo "== claude-dir-redirect-guard: the message says what to do"
+cdr_says "names the target"   'blocked a shell write to `.claude/scratch/ci.log`' '' 'bin/ci > .claude/scratch/ci.log'
+cdr_says "points at rtk test" 'rtk test <cmd>'                                    '' 'bin/ci > .claude/scratch/ci.log'
+cdr_says "points at tmp/"     'gitignored `tmp/`'                                 '' 'bin/ci > .claude/scratch/ci.log'
+cdr_says "says tmp/ is quiet" 'does not prompt either'                            '' 'bin/ci > .claude/scratch/ci.log'
 
 summary

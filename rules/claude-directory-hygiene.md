@@ -37,12 +37,21 @@ copy a long string just to see what they were handed.
 
 When it isn't clear who the file is for, start it under `.claude/scratch/` anyway. Rescuing
 a file *out* of the scratchpad is a chore that has to be remembered and mostly isn't, while
-deleting one the user can see costs nothing. So only genuinely one-shot output — a commit
-message, an issue body — stays in the scratchpad.
+deleting one the user can see costs an approval — `rm` under `.claude/` prompts like any write
+to a protected path, and one `rm` naming every dead file keeps that to one. So only genuinely
+one-shot output — a commit message, an issue body — stays in the scratchpad.
 
 Failure mode this prevents: a file that only became worth keeping *after* it was written
 evaporates with the session, or an artifact meant *for the user* lands where only the model
 navigates comfortably and they are left asking "where is it?" before they can use it.
+
+**Write into `.claude/` with the file tools, never a shell redirect.** `.claude/` is a
+protected path, so a Bash `>` or `tee` into it prompts every time, while Write is approved by
+`hooks/claude-dir-write-allow.sh`. Gated: `hooks/claude-dir-redirect-guard.sh` blocks the
+redirect and names the alternatives — `rtk test` for a run being filtered, the scratchpad for
+output only the model reads, a gitignored `tmp/` for command output the user may open. A redirect
+into `tmp/` was observed not to prompt under the user's default `acceptEdits` mode, since it is
+not a protected path (`notes/claude-code-quirks.md`).
 
 **"Who will open it" has a third answer — another session — and the scratchpad cannot serve
 it.** That path is keyed to a session id, so a peer cannot reach it: invisibly, rather than

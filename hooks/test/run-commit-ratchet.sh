@@ -151,6 +151,12 @@ run
 blocks 'the invoke-form guard staged without its suite is blocked'
 says 'hooks/test/run-checks.sh' 'the block names the shared guard suite for the invoke-form guard'
 
+fresh
+stage hooks/claude-dir-redirect-guard.sh
+run
+blocks 'the .claude redirect guard staged without its suite is blocked'
+says 'hooks/test/run-checks.sh' 'the block names the shared guard suite for the .claude redirect guard'
+
 # A tiered hook written in Python, which the row has to gate the same as a shell one.
 fresh
 stage hooks/git-read-allow.py

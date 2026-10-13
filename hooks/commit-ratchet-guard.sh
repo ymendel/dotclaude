@@ -69,6 +69,7 @@ TIERED=(
   "hooks/python-rewrite.sh|hooks/test/run-checks.sh"
   "hooks/commit-message-wrap-guard.sh|hooks/test/run-checks.sh"
   "hooks/invoke-form-guard.sh|hooks/test/run-checks.sh"
+  "hooks/claude-dir-redirect-guard.sh|hooks/test/run-checks.sh"
   "hooks/context-usage-notice.sh|hooks/test/run-stop.sh"
   "hooks/ensure-trailing-newline.sh|hooks/test/run-post-tool-use.sh"
   "hooks/notify-session-attention.sh|hooks/test/run-notification.sh"
