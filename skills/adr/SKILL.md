@@ -309,12 +309,13 @@ Once an ADR is `Accepted`, it is effectively immutable. The only edits permitted
    - `**Status:** Accepted — broadcast mechanism superseded by ADR 0021`
    - `**Status:** Accepted — amended 2026-05-21 (ADR 0029)`
    - `**Status:** Accepted — amended 2026-05-21 (ADR 0029), 2026-08-12 (ADR 0034)`
+   - `**Status:** Accepted — amended 2026-08-14 (agent directory pruned)` *(no ADR triggered it)*
    - `**Status:** Accepted — amended (see Amendment sections below)` *(when the inline list gets unwieldy)*
 
    Where the repo keeps an index, its row carries the same status, so it changes in the same commit. See *The index* above.
 
 2. **Reference additions in the body** when a later ADR only *partially* supersedes this one and a future reader needs to be pointed at the relevant new ADR. Do not rewrite the original reasoning to reflect the new state — that's what the new ADR is for.
-3. **Amendments appended as new sections** when a later ADR shifts the *facts surrounding* the decision (a column renamed, a join path changed, an index replaced) without changing the decision itself. Use the format:
+3. **Amendments appended as new sections** when the *facts surrounding* the decision shift (a column renamed, a join path changed, an index replaced) without changing the decision itself — whether a later ADR shifted them or a change made without one did. Use the format:
 
    ```
    ## Amendment — YYYY-MM-DD (ADR NNNN)
@@ -322,7 +323,7 @@ Once an ADR is `Accepted`, it is effectively immutable. The only edits permitted
    [What shifted. The original ADR said X; ADR NNNN changed Y; the relevant code/schema now reads Z. Point at the implementing issue or PR.]
    ```
 
-   The amendment is a top-level (`##`) section appended after all existing sections of the ADR — always at the end, regardless of what it touches. Multiple amendments stack chronologically at the bottom. The original sections are not edited. The parenthetical names the triggering ADR.
+   The amendment is a top-level (`##`) section appended after all existing sections of the ADR — always at the end, regardless of what it touches. Multiple amendments stack chronologically at the bottom. The original sections are not edited. The parenthetical names the triggering ADR. Where no ADR triggered it, put a short reason in its place, in the heading and the status line alike — `(agent directory pruned)` — so the status line still says why without a reader opening the section.
 
    Update the status line in the same edit (see item 1 examples). Status itself stays `Accepted`; the extension after the em-dash signals "this ADR has been amended" so a reader who never scrolls past Decision still gets the pointer.
 
