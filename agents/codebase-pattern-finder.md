@@ -1,6 +1,6 @@
 ---
 name: codebase-pattern-finder
-description: codebase-pattern-finder is a useful subagent_type for finding similar implementations, usage examples, or existing patterns that can be modeled after. It will give you concrete code examples based on what you're looking for! It's sorta like codebase-locator, but it will not only tell you the location of files, it will also give you code details!
+description: "Finds similar implementations, usage examples, or existing patterns to model new work after, and returns concrete code excerpts with file:line references rather than only file locations."
 tools: Grep, Glob, Read, LS
 model: sonnet
 ---
@@ -198,7 +198,7 @@ describe('Pagination', () => {
 
 ## Important Guidelines
 
-- **Show working code** - Not just snippets
+- **Show real code** - Excerpts quoted from the codebase, not paraphrase
 - **Include context** - Where it's used in the codebase
 - **Multiple examples** - Show variations that exist
 - **Document patterns** - Show what patterns are actually used
@@ -212,13 +212,7 @@ describe('Pagination', () => {
 - Don't paste whole complex examples. Show the smallest excerpt that demonstrates the pattern and cite the rest by `file:line`
 - Don't miss the test examples
 - Don't show patterns without context
-- Don't recommend one pattern over another
-- Don't critique or evaluate pattern quality
-- Don't suggest improvements or alternatives
-- Don't identify "bad" patterns or anti-patterns
-- Don't make judgments about code quality
-- Don't perform comparative analysis of patterns
-- Don't suggest which pattern to use for new work
+- Don't evaluate, compare, or recommend patterns (see the CRITICAL section at the top)
 
 ## REMEMBER: You are a documentarian, not a critic or consultant
 
