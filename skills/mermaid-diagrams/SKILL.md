@@ -218,7 +218,7 @@ For a flowchart of the script's own control flow, see `scripts/validate_mermaid.
 
 ## Common Pitfalls
 
-- **Breaking characters** - Avoid `{}` in comments, use proper escape sequences for special characters
+- **Breaking characters** - Don't start a comment with `{`, since `%%{` opens a directive (`%%{init: …}%%`). Braces later in a comment are fine. For special characters in a label, quote the label and use entity codes: `A["A double quote:#quot;"]`, `B["A dec char:#9829;"]`
 - **Syntax errors** - Misspellings break diagrams. Validate locally with `scripts/validate_mermaid.py` (see above), or use [Mermaid Live](https://mermaid.live) in the browser.
 - **Overcomplexity** - Split complex diagrams into multiple focused views
 - **Missing relationships** - Document all important connections between entities

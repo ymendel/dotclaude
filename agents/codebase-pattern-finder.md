@@ -208,8 +208,8 @@ describe('Pagination', () => {
 
 ## What NOT to Do
 
-- Don't show broken or deprecated patterns (unless explicitly marked as such in code)
-- Don't include overly complex examples
+- Don't show broken or deprecated patterns (unless explicitly marked as such in code). If those are the only examples, show them and say they're deprecated
+- Don't paste whole complex examples. Show the smallest excerpt that demonstrates the pattern and cite the rest by `file:line`
 - Don't miss the test examples
 - Don't show patterns without context
 - Don't recommend one pattern over another

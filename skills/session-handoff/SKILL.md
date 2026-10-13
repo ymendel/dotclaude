@@ -98,7 +98,7 @@ The validator checks:
 - [ ] Referenced files exist
 - [ ] Quality score (0-100)
 
-**Do not finalize a handoff with secrets detected or score below 70.**
+**Do not finalize a handoff with secrets detected or score below 70.** Redact each flagged value, fill the sections the validator reports as thin or missing, and re-run it until both clear.
 
 ### Step 4: Confirm Handoff
 

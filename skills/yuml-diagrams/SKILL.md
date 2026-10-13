@@ -117,7 +117,7 @@ Do not load reference files for diagram types not being used.
 - **NEVER leave an unclosed `]`, `)`, or `{`** — the parser fails silently and renders nothing; always check the last element of each line
 - **NEVER use a class arrow in a sequence diagram (or vice versa)** — each type has its own arrow set; cross-type arrows produce no output or a malformed render
 - **NEVER get the pipe count wrong** — `[Name|Type|Desc]` (C4) vs. `[Name|attrs|methods]` (class) both use three sections but mean different things; one extra pipe shifts the renderer's interpretation of every section
-- **NEVER quote names that don't need it** — the grammar is liberal about bare names; unnecessary quotes can break parsing
+- **NEVER quote names that don't need it** — the grammar is liberal about bare names; unnecessary quotes can break parsing. Write names bare. The one quoted form in the references is a journey speech bubble, `[:emotion: "Quote text"]`
 - **NEVER set `@direction` on sequence, journey, timeline, roadmap, or chart types** — those types have intrinsic layout; the directive is silently ignored and signals a misunderstanding of the type
 
 ## When the Diagram Renders Wrong

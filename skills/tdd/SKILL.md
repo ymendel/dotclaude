@@ -27,7 +27,7 @@ See [tests.md](references/tests.md) for examples and [mocking.md](references/moc
 
 - **Never mock what you control.** Only mock at system boundaries: external APIs, third-party services, time, randomness. Your own classes, internal collaborators, and the database are not mocking targets — test them for real.
 - **Never stub DB reads/writes.** Use a real test database. Stubbing hides real behavior and tests something you own.
-- **Never assert on call counts or call order** unless specifically testing protocol compliance or performance. These break on internal refactors without behavior changing.
+- **Never assert on call counts or call order** unless specifically testing protocol compliance or performance. These break on internal refactors without behavior changing. Assert on the observable outcome through the public interface instead.
 - **Never test private methods or internal state.** Test through the public interface only. If an internal needs its own test, it belongs on a different object.
 - **Never write implementation before a failing test.** No red = no confidence the test would have caught anything.
 - **Never batch multiple behaviors into one red step.** One behavior per cycle — batching collapses the discipline.
