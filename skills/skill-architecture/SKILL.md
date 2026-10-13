@@ -250,17 +250,6 @@ See [Structural Patterns](./references/structural-patterns.md) for detailed guid
 
 ---
 
-## User Conventions Integration
-
-This skill follows common user conventions:
-
-- **Absolute paths**: Always use full paths (terminal Cmd+click compatible)
-- **Unix-only**: macOS, Linux (no Windows support)
-- **Python**: `uv run script.py` with PEP 723 inline dependencies
-- **Planning**: OpenAPI 3.1.1 specs when appropriate
-
----
-
 ## Reference Documentation
 
 For detailed information, see:
