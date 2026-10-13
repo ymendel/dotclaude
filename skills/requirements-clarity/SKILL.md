@@ -142,8 +142,14 @@ Identify missing information across four dimensions:
 
 ### Step 3: Interactive Clarification
 
+**Core Questions** (the first round, before any gap category):
+1. **Why?** (YAGNI check) - What problem does this solve, and what happens if it isn't built? Name any requested piece that doesn't trace back to the answer and ask whether to drop it.
+2. **Simpler?** (KISS check) - Is there a smaller version that solves the same problem? Propose one when you can see it, for the user to accept or correct.
+
+Record the answers under Business Value and Feature Boundaries, and drop anything ruled out before scoring the gaps.
+
 **Question Strategy**:
-1. Start with highest-impact gaps
+1. After the core questions, start with highest-impact gaps
 2. Ask 2-3 questions per round
 3. Build context progressively
 4. Use user's language
