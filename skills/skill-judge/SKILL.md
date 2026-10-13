@@ -657,8 +657,12 @@ Fix: Move all triggering information to description field
 ```
 Symptom: README.md, CHANGELOG.md, INSTALLATION_GUIDE.md, CONTRIBUTING.md
 Root cause: Treating Skill like a software project
-Fix: Delete all auxiliary files. Only include what Agent needs for the task.
-     No documentation about the Skill itself.
+Fix: Delete documentation written for a human installing or contributing to
+     the Skill — README, CHANGELOG, install and contributing guides.
+     Keep files that carry an obligation: LICENSE and ATTRIBUTION.md (licensing),
+     COMPANIONS.md (rules the Skill needs, per skill-architecture), and TODO.md
+     (deferred work). None of them loads with the Skill, so they cost the
+     Agent nothing.
 ```
 
 ### Pattern 9: The Freedom Mismatch
