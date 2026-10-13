@@ -171,11 +171,11 @@ See [YAML Frontmatter Reference](./references/yaml-frontmatter.md) for the compl
 ```yaml
 ---
 name: my-skill
-description: Does X when user mentions Y. Use for Z workflows.
+description: "Does X when user mentions Y. Use for Z workflows."
 ---
 ```
 
-**Key rules**: `name` is lowercase-hyphen, `description` is single-line max 1024 chars with trigger keywords, no colons in description text.
+**Key rules**: `name` is lowercase-hyphen, `description` is single-line max 1024 chars with trigger keywords, and quoted as a YAML string (`description: "..."`) so a `: ` inside it doesn't break parsing.
 
 ### Progressive Disclosure (3 Levels)
 
