@@ -150,7 +150,7 @@ For in-depth guidance on specific diagram types, see:
 1. **Start Simple** - Begin with core entities/components, add details incrementally
 2. **Use Meaningful Names** - Clear labels make diagrams self-documenting
 3. **Comment Sparingly** - Use a `%%` comment only for a relationship its label doesn't explain
-4. **Keep Focused** - One diagram per concept; split large diagrams into multiple focused views
+4. **Keep Focused** - One diagram per concept; split a diagram past about 15 nodes into multiple focused views
 5. **Version Control** - Store `.mmd` files alongside code for easy updates
 6. **Add Context** - Include titles and notes to explain diagram purpose
 7. **Iterate** - Refine diagrams as understanding evolves
@@ -220,7 +220,7 @@ For a flowchart of the script's own control flow, see `scripts/validate_mermaid.
 
 - **Breaking characters** - Don't start a comment with `{`, since `%%{` opens a directive (`%%{init: …}%%`). Braces later in a comment are fine. For special characters in a label, quote the label and use entity codes: `A["A double quote:#quot;"]`, `B["A dec char:#9829;"]`
 - **Syntax errors** - Misspellings break diagrams. Validate locally with `scripts/validate_mermaid.py` (see above), or use [Mermaid Live](https://mermaid.live) in the browser.
-- **Overcomplexity** - Split complex diagrams into multiple focused views
+- **Overcomplexity** - Split a diagram past about 15 nodes into multiple focused views (see *Keep Focused* above)
 - **Missing relationships** - Document all important connections between entities
 
 ## When to Create Diagrams

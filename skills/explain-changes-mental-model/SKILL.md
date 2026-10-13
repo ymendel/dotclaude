@@ -173,7 +173,7 @@ If git command fails:
 If diff is empty:
 - Report "No changes found for the specified source"
 
-If changes are too large to analyze meaningfully:
+If the diff is over the 5000-line threshold from step 2:
 - Provide a high-level overview first
 - Offer to deep-dive into specific areas: "This is a large changeset. Want me to focus on a specific area? (e.g., 'the API changes' or 'the database migrations')"
 

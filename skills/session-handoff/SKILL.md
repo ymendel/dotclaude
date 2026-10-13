@@ -13,7 +13,7 @@ Creates comprehensive handoff documents that enable fresh AI agents to seamlessl
 
 Determine which mode applies:
 
-**Creating a handoff?** User wants to save current state, pause work, or context is getting full.
+**Creating a handoff?** User wants to save current state, pause work, or a context reading (`/context`, or a usage notice) shows the window filling.
 - Follow: CREATE Workflow below
 
 **Resuming from a handoff?** User wants to continue previous work, load context, or mentions an existing handoff.

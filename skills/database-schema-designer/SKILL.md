@@ -176,7 +176,7 @@ After designing a schema:
 - [ ] All relationships have foreign key constraints
 - [ ] ON DELETE strategy defined for each FK
 - [ ] Indexes exist on all foreign keys
-- [ ] Indexes exist on frequently queried columns
+- [ ] Indexes exist on the WHERE, JOIN and ORDER BY columns of the access patterns from Phase 1, confirmed with EXPLAIN
 - [ ] Appropriate data types (DECIMAL for money, etc.)
 - [ ] NOT NULL on required fields
 - [ ] UNIQUE constraints where needed
@@ -517,7 +517,7 @@ CREATE TABLE comments (
 | Factor | Embed | Reference |
 |--------|-------|-----------|
 | Access pattern | Read together | Read separately |
-| Relationship | 1:few | 1:many |
+| Relationship | 1:few, bounded | 1:many, unbounded or growing |
 | Document size | Small | Approaching 16MB |
 | Update frequency | Rarely | Frequently |
 

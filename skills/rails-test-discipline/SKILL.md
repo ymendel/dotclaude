@@ -66,7 +66,7 @@ The failure modes to guard against:
 
 Countermeasures:
 
-- **Small, reviewable slices.** Draft the next slice, not the whole feature. If a change can't be reviewed in one sitting without fatigue, it's too big.
+- **Small, reviewable slices.** Draft the next slice, not the whole feature. If a slice runs past about 200 changed lines, tests included, it's too big.
 - **Clear, boring test code.** Explicit setup, obvious assertions, named fixtures. Clever abstractions make subtle mistakes harder to spot — and AI-generated cleverness is the worst of both worlds.
 - **Check test intent matches test code.** Before presenting a test, re-read the test name against the assertion. If the name is broader than the assertion, narrow the name or widen the assertion.
 - **Compare implementation against the ADR.** If an ADR exists for this work, read it before implementing and again before presenting. Name the ADR sections the change implements. If you find drift, **stop and surface it** — do not paper over it.
@@ -105,7 +105,7 @@ Work in the smallest reviewable slice, one red/green/refactor cycle at a time. D
 3. **Refactor.** *Deliberately* decide whether a refactor is warranted — tighter naming, extracted method, removed duplication. If nothing obvious improves readability or removes a duplication, skip the refactor step and say so. Skipping is a valid choice; forgetting to consider it is not.
 4. **Repeat.** If the slice has more than one behavior to prove, loop back to red for the next one. Do not batch multiple behaviors into a single red step.
 
-Keep the diff small enough that a tired reviewer could still catch a subtle mistake. If you find yourself wanting to skip ahead because "the code obviously works," that's the moment the skill exists for — write the red test anyway.
+Keep the diff within the slice size above, small enough that a tired reviewer could still catch a subtle mistake. If you find yourself wanting to skip ahead because "the code obviously works," that's the moment the skill exists for — write the red test anyway.
 
 If you genuinely cannot run the tests in the current environment, state that clearly in the review notes under Assumptions (e.g., "I could not run the tests; the red/green transitions are asserted by inspection, not execution"). Do not claim a red or green you didn't observe.
 

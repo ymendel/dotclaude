@@ -26,7 +26,7 @@ Use this skill whenever you write prose for humans:
 
 ## Limited Context Strategy
 
-When context is tight:
+Load the one section file you need directly. When a context reading (`/context`, or a usage notice) shows the window past about 80% full, use a subagent instead:
 
 1. Write your draft using judgment
 2. Dispatch a subagent with your draft and the relevant section file

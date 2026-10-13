@@ -70,7 +70,7 @@ Many repos keep an index beside the records — a `docs/adr/README.md` carrying 
 
 **Write the reason for a gap into the index, not just into the conversation.** The Numbering section above says to note a reserved or abandoned number to the user so the jump reads as intentional. That note lives as long as the session does. The durable form is a short paragraph under the index table: which number is held, why, where its file lives if it lives anywhere, and — for an abandoned decision — that the number stays retired rather than reused, because closed PRs and tickets still cite it by that number. Then the next reader meets the gap and gets the answer without having to ask anyone who was there.
 
-Where no index exists, don't create one unprompted for a short, gapless sequence — it would only restate the filenames in a table. Offer one at the first gap — the moment the sequence stops explaining itself — or once the list has grown past roughly a screenful.
+Where no index exists, don't create one unprompted for a short, gapless sequence — it would only restate the filenames in a table. Offer one at the first gap — the moment the sequence stops explaining itself — or once the list has grown past about 10 records.
 
 ## When two repos' ADR sets meet
 
@@ -310,7 +310,7 @@ Once an ADR is `Accepted`, it is effectively immutable. The only edits permitted
    - `**Status:** Accepted — amended 2026-05-21 (ADR 0029)`
    - `**Status:** Accepted — amended 2026-05-21 (ADR 0029), 2026-08-12 (ADR 0034)`
    - `**Status:** Accepted — amended 2026-08-14 (agent directory pruned)` *(no ADR triggered it)*
-   - `**Status:** Accepted — amended (see Amendment sections below)` *(when the inline list gets unwieldy)*
+   - `**Status:** Accepted — amended (see Amendment sections below)` *(from the third amendment on)*
 
    Where the repo keeps an index, its row carries the same status, so it changes in the same commit. See *The index* above.
 
