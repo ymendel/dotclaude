@@ -227,6 +227,10 @@ When dependencies are broken, run diagnosis:
 
 ### Emergency Fixes
 
+Reach for these only after the targeted fixes above have failed, and only with the user's go-ahead.
+Deleting a lockfile releases every pin it held, so the reinstall can move any dependency, not just
+the broken one.
+
 ```bash
 # Node.js - Nuclear reset
 rm -rf node_modules package-lock.json
@@ -367,14 +371,15 @@ taze major --write --include approved-pkg1,approved-pkg2
 npm install  # or pnpm install / yarn
 ```
 
-### Auto-Approve List
+### Low-Risk Majors
 
-Some packages have frequent major bumps but are backward-compatible:
+Some packages bump majors often without breaking callers. They are still prompted individually per
+Step 5. Say in the prompt that the bump is likely low-risk, and why:
 
 | Package | Reason |
 |---------|--------|
 | `lucide-react` | Icon library, majors are additive |
-| `@types/*` | Type definitions, usually safe |
+| `@types/*` | Type definitions. For a runtime's types such as `@types/node`, the major should match the runtime version in use |
 
 </details>
 
