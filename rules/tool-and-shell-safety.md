@@ -119,7 +119,7 @@ Reproduced here: `ls <nonexistent> > merged.txt 2>&1` exited 1 and left 59 bytes
 
 **How to apply:** redirect stdout alone when capturing data to parse — a downloaded log, an API response, a generated fixture — and check the exit status. Reserve `2>&1` for capturing a transcript somebody is going to read, where interleaving the two channels is the point. Then run `wc -c` on the artifact before grepping it: a payload that should be hundreds of kilobytes arriving at a hundred bytes settles the question at once, and that evidence is usually in hand several commands before anyone looks at it.
 
-This does not retract the `2>&1` suggestion in `RTK.md`'s empty-`gh`-result guidance. That one is about making output *visible* in the terminal, where merging the channels surfaces a message that would otherwise be lost. Keep the two uses apart by purpose — `2>&1` to see something, stdout alone to store something.
+This does not retract the `2>&1` suggestion in `rules/references/rtk/traps.md`'s empty-`gh`-result guidance. That one is about making output *visible* in the terminal, where merging the channels surfaces a message that would otherwise be lost. Keep the two uses apart by purpose — `2>&1` to see something, stdout alone to store something.
 
 Failure mode this prevents: a failed fetch becomes a small file of error text rather than no file at all, and the greps that follow report findings about content the artifact never held. The command's exit status said so at the time, and the redirect is what made it easy not to look.
 

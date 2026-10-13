@@ -130,47 +130,15 @@ its mechanism and its escape (`rtk proxy …`, `rtk ls`, the built-in Glob tool,
 Failure mode this prevents: a filtered or gitignored miss is taken as ground truth, and the next
 step is built on "that file isn't here" or "nothing matches" when both are false.
 
-**`gh` shows the same shape, so treat an empty `gh` result the same way.** `rtk gh issue view
-<n> --comments` returned nothing at all with exit 0, and so did `rtk proxy gh issue view <n>
---comments` — `proxy` is no escape here. Two escapes have been tried, and only one of them has
-held up on every occasion:
+**`gh` shows the same shape, so read an empty `gh` result as the tooling until a data-mode call
+says otherwise.** `rtk proxy` is no escape. Reach first for `--json <fields>`, narrowing with
+`gh`'s own `--jq` rather than a pipe. The empty result reads as *an issue with no body or no
+comments*, a claim about the artifact that then gets summarized onward. `rules/references/rtk/traps.md`
+has the observations, and why appending `2>&1` is no guarantee.
 
-- **`--json <fields>` works, and wants no pipe.** The call
-  `rtk gh issue view <n> --json number,title,body,comments` returned the whole issue where the
-  plain and `2>&1` forms both returned nothing. To narrow the result, reach for `gh`'s own
-  `--jq <expression>` rather than piping into `jq`: a pipe adds a segment for the permission gate
-  to clear and reports the filter's exit status in place of `gh`'s. Reach for it first rather
-  than as a fallback.
-- **Appending `2>&1` worked once and has since failed.** It returned the full issue on the occasion
-  that first produced this note, and on a later one `rtk gh issue view <n> --comments 2>&1` returned
-  nothing at all. So it is worth a try and worth nothing as a guarantee: a still-empty result after
-  adding it says nothing about the issue. Keep it to output being *read here* — appending it to a
-  redirect that captures a payload writes the error text into the file instead, per
-  `tool-and-shell-safety.md`'s *Don't merge stderr into a file you intend to parse*.
-
-Read an empty result as the tooling until a data-mode call says otherwise. This matters more than a
-missing `grep` match, because the empty result reads as *an issue with no body or no comments* — a
-claim about the artifact rather than about the tooling — and an issue or PR is exactly the kind of
-thing whose contents get summarized onward to other people. It is also the check whose whole value
-rides on trusting a negative, which `project-notes.md` leans on when it asks for a tracker search
-before filing anything as new.
-
-**For an Actions job log, reach for `gh run view` rather than the raw API path.** Actions logs carry
-ANSI escape sequences from whatever ran inside them, and RTK declines to emit output containing
-them without `--allow-escape-sequences` — so `rtk gh api repos/{owner}/{repo}/actions/jobs/{id}/logs`
-stops with a refusal on stderr at exit 1, and `rtk proxy` is no escape. Reach for
-`--log-failed` first, which returns only the failed steps and is usually the whole question, and
-`--log` for the entire thing. `--job <id>` works on its own, so neither form needs a run id:
-
-```bash
-rtk gh run view --log-failed --job <job-id>
-rtk gh run view --log --job <job-id>
-```
-
-Two caveats `gh`'s own help volunteers, both platform-dependent rather than deterministic. Logs come
-as a zip by default, with a slower per-job API fallback when `gh` cannot associate jobs with their
-logs, and that fallback fails outright once more than 25 job logs are missing. Some lines cannot be
-tied to a step and appear under `UNKNOWN STEP`.
+**For an Actions job log, run `rtk gh run view --log-failed --job <job-id>`** (or `--log` for all of
+it), never the raw `gh api …/actions/jobs/{id}/logs` path, which RTK refuses over escape sequences.
+`rules/references/rtk/commands.md` has the caveats.
 
 ## Golden Rule
 
@@ -345,7 +313,8 @@ Two reference files carry the rest, both excluded from context and read on deman
 
 - `rules/references/rtk/commands.md` — when you need an RTK command or flag not covered above, or
   when rtk itself misbehaves: the install check, the `reachingforthejack/rtk` name collision, and
-  the `rtk gain` / `rtk discover` analytics along with how to read their output.
-- `rules/references/rtk/traps.md` — when `rtk find` or `rtk grep` returns an empty or surprising
-  result, per the section above.
+  the `rtk gain` / `rtk discover` analytics along with how to read their output, and reading an
+  Actions job log.
+- `rules/references/rtk/traps.md` — when `rtk find`, `rtk grep` or `rtk gh` returns an empty or
+  surprising result, per the section above.
 

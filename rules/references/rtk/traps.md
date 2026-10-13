@@ -3,7 +3,8 @@
 > Not loaded in context by default. See `rules/RTK.md` for behavioral guidance.
 
 Four mechanisms in `rtk find` and `rtk grep` turn a real match into a clean-looking miss. None of
-them errors, so the result reads as the answer.
+them errors, so the result reads as the answer. The last section covers `gh`, which shows the same
+shape.
 
 ## `rtk find` suppresses output to save tokens
 
@@ -57,3 +58,28 @@ through untouched. Move the short flag after the positional args. Or go around t
 short flags, so assume nothing about which of theirs leak. Failure mode this prevents: reading rtk's
 usage block as "I got the grep syntax wrong" and retyping variants when the flag was correct and
 never arrived — or taking the exit 0 for a successful search that found nothing.
+
+## `gh` returns empty output too
+
+`rtk gh issue view <n> --comments` returned nothing at all with exit 0, and so did `rtk proxy gh
+issue view <n> --comments` — `proxy` is no escape here. Two escapes have been tried, and only one of
+them has held up on every occasion:
+
+- **`--json <fields>` works, and wants no pipe.** The call
+  `rtk gh issue view <n> --json number,title,body,comments` returned the whole issue where the
+  plain and `2>&1` forms both returned nothing. To narrow the result, reach for `gh`'s own
+  `--jq <expression>` rather than piping into `jq`: a pipe adds a segment for the permission gate
+  to clear and reports the filter's exit status in place of `gh`'s. Reach for it first rather
+  than as a fallback.
+- **Appending `2>&1` worked once and has since failed.** It returned the full issue on the occasion
+  that first produced this note, and on a later one `rtk gh issue view <n> --comments 2>&1` returned
+  nothing at all. So it is worth a try and worth nothing as a guarantee: a still-empty result after
+  adding it says nothing about the issue. Keep it to output being *read here* — appending it to a
+  redirect that captures a payload writes the error text into the file instead, per
+  `tool-and-shell-safety.md`'s *Don't merge stderr into a file you intend to parse*.
+
+This matters more than a missing `grep` match, because the empty result reads as *an issue with no
+body or no comments* — a claim about the artifact rather than about the tooling — and an issue or PR
+is exactly the kind of thing whose contents get summarized onward to other people. It is also the
+check whose whole value rides on trusting a negative, which `project-notes.md` leans on when it asks
+for a tracker search before filing anything as new.

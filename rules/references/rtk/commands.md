@@ -138,3 +138,22 @@ installed instead.
 | Network | curl, wget | 65-70% |
 
 Overall average: **60-90% token reduction** on common development operations.
+
+## Actions job logs
+
+Reach for `gh run view` rather than the raw API path. Actions logs carry ANSI escape sequences from
+whatever ran inside them, and RTK declines to emit output containing them without
+`--allow-escape-sequences` — so `rtk gh api repos/{owner}/{repo}/actions/jobs/{id}/logs` stops with a
+refusal on stderr at exit 1, and `rtk proxy` is no escape. Reach for `--log-failed` first, which
+returns only the failed steps and is usually the whole question, and `--log` for the entire thing.
+`--job <id>` works on its own, so neither form needs a run id:
+
+```bash
+rtk gh run view --log-failed --job <job-id>
+rtk gh run view --log --job <job-id>
+```
+
+Two caveats `gh`'s own help volunteers, both platform-dependent rather than deterministic. Logs come
+as a zip by default, with a slower per-job API fallback when `gh` cannot associate jobs with their
+logs, and that fallback fails outright once more than 25 job logs are missing. Some lines cannot be
+tied to a step and appear under `UNKNOWN STEP`.

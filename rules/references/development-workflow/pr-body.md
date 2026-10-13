@@ -1,8 +1,9 @@
 # Writing a pull request body
 
-Companion to `development-workflow.md`'s *Pull Requests*, which carries the directives. This carries
-the reasoning behind the three that are consulted only while composing or editing a body. Load it
-when writing one, or when a body mentions an issue it must not close.
+Companion to `development-workflow.md`'s *Pull Requests*, which keeps the rules that apply whether
+or not a body is being written — drafts, no pushing, no merging. This carries the rules that apply
+only while composing or editing a body, and the reasoning behind them. Load it before
+`gh pr create` or `gh pr edit`, or when a body mentions an issue it must not close.
 
 Everything here presumes a PR is the right artifact at all. On a personally-owned repo it usually
 isn't — the no-PR sub-bullet under *Version Control* governs that first.
@@ -58,6 +59,39 @@ it can pass silently. Then name what settles it rather than reporting where it s
 as history a reader can follow, where "waits on the API reaching production" reads as a live block
 that is simply false. So the correction on merge is nothing.
 
-Failure mode all three prevent: the block clears or the issue closes itself, and a reviewer arriving
-afterwards either acts on a constraint that no longer exists or stops trusting the body and re-checks
-every claim in it — including the ones that were never about status.
+Failure mode the three sections above prevent: the block clears or the issue closes itself, and a
+reviewer arriving afterwards either acts on a constraint that no longer exists or stops trusting the
+body and re-checks every claim in it — including the ones that were never about status.
+
+## No CI status or test counts
+
+No "`bin/ci` is green", no "180 tests, 512 assertions, 0 failures". GitHub renders the checks on the
+PR itself, so the claim duplicates a live surface with a dead copy that is wrong from the next push
+onward, and nobody edits a PR body to retract "all green". Chat is the right home for the numbers.
+
+Where the pipeline result carries something the checks don't — that CI had never run on this branch
+before, that a step was skipped or a flake diagnosed, that the suite was green *before* a known-risky
+rebase — state that fact, which is durable, rather than the pass/fail, which is not.
+
+**This covers another repo's checks too, which is the easier miss.** "The upstream's `deploy` job
+reports success for both merge commits" is the same dead copy one repo over, and it slips past a rule
+that scans as being about *this* PR's pipeline. Where those checks are what gates this PR, the
+blocking-dependency section above governs instead.
+
+## No reviewing instructions, except a reading mode
+
+Don't tell a reviewer how to review. The exception is a reading mode the diff can't announce and that
+changes what a reviewer sees — "ignore whitespace" on a reindent, "one commit at a time" where a
+squashed view tangles a mechanical move with a real change. A reading order a reviewer would find
+anyway, or a list of what to look at, is the commits restated.
+
+Failure mode: the body spends its opening on instructions the reviewer neither needs nor follows, and
+the one mode that would genuinely have helped is lost among them.
+
+## The body names no merge strategy
+
+The merge is the user's action, so the body never says the branch "merges best as a rebase" or is
+written as though it will be squashed. The strategy preference in *Pull Requests* shapes how commits
+get structured and what to say when asked, not what the body asserts.
+
+Failure mode: the body asserts a strategy nobody chose.
