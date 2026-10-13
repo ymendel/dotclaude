@@ -117,7 +117,7 @@ If substantive issues — wrong framing, wrong scope, wrong decision, unverified
 
 ## Anti-patterns to avoid
 
-- **Rubber-stamping.** If the review notes are all "looks good", you didn't look hard enough. There is almost always a missing tradeoff or an unverified claim.
+- **Rubber-stamping.** A clean section is legitimate when it says what was checked — "nothing flagged here: the two premises in Context match the schema, and the rejected option's cost is stated". A bare "looks good" is the rubber stamp. If every section comes back clean, look again for a missing tradeoff or an unverified claim, since there is almost always one.
 - **Rewriting the ADR unprompted.** The user drafted it (possibly via the `adr` skill) for a reason. Critique and propose — don't overwrite.
 - **Fabricating codebase claims.** If you didn't actually read the file, don't say "the existing X does Y". Say "I didn't verify this — can you confirm?"
 - **Burying the lede.** If the ADR has a structural problem (wrong decision, wrong framing, wrong scope), say so in **Overall** first. Don't hide it under line-level nitpicks.

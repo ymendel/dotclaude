@@ -191,7 +191,7 @@ If there are no open questions, say "None" — don't fabricate some for shape.
 ## Anti-patterns to avoid in your own output
 
 - **Fluffy principles without teeth.** "Write good tests" is not guidance. "Prefer model tests for validations because they exercise the rule directly and run cheaply" is.
-- **Review notes that don't name risks.** If the Risks bullet is empty on a non-trivial change, you didn't look hard enough.
+- **Review notes that don't name risks.** On a non-trivial change, an empty Risks bullet has to say what was considered and ruled out — "no new queries, no migration, callers unchanged". A bare empty bullet is the miss.
 - **Collapsing the interaction pattern.** Skipping classification or self-review because the change "seems small" is exactly how subtle failures slip through.
 - **Drafting tests before the ADR comparison.** If an ADR exists, read it first. Writing tests against a half-remembered plan is how drift starts.
 
