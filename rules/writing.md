@@ -176,6 +176,14 @@ The incident that prompted a change is the same kind of thing. Give the general 
 
 Failure mode this prevents: the durable artifact accretes evidence of diligence in place of statements of fact, a register shift the author then has to edit out by hand.
 
+## Example values carry the role, not too little and not too much
+
+Two rules about the values in an example — in code, a test, a rule, a doc, a commit body. One bans values carrying too little meaning, the other values carrying too much.
+
+**Never use metasyntactic placeholder names** (`foo`, `bar`, `baz`, &c.). Use a domain-flavored name that names the role the placeholder plays — `payload` and `subject` for message-shaped data, `customer` and `order` for transactional data. This applies even in throwaway examples — tests are the most common slip site, where `let(:foo)` or `assert_equal(foo, bar)` feels low-stakes but ships the same disconnect. Failure mode: `foo` reads as generic-LLM-output and disconnects the example from the concept being illustrated.
+
+**Invent example values — never paste a real one from the session at hand.** A live client path, repo name, hostname, or ticket ID is the value nearest to hand while writing an example, which is exactly why it ends up in one. Substitute a domain-flavored equivalent: `-Users-alice-dev-shipping-tracker`, not the client directory just being debugged. Sharpest in anything committed to a public or client-visible repo, where `sensitive-knowledge.md` governs what else gets routed out. Neither review pass catches it: a de-identification pass reads the narrative, and a claims pass checks what the prose asserts — an example asserts nothing, so it sits in neither's scope. The section below covers the narrative half, an incident carried into a commit or PR body. Failure mode: the identifier is noticed only after the commit is pushed, and where the default branch rejects force pushes the correction costs the whole force-push-to-`main` dance — branch, re-point the default, force-push, restore, delete — rather than an amend.
+
 ## Don't carry another project's identifiers into a commit or PR body
 
 A change is often prompted by work somewhere else — an alias fixed after it misbehaved in a client repo, a template default changed after it bit a derived app. Give the motivation as the general situation that makes the change worth having, and leave the other project unnamed: no repo name, no PR or issue numbers, no account of how the problem played out there. "I don't always control how the repos I work in are configured" is a reason this repo's reader can weigh. "Client PR #412 conflicted with #409" is a story only its author can follow.
