@@ -26,3 +26,28 @@ Failure mode this prevents: the resize is invisible from inside the session. The
 back at whatever size it was going to be regardless, so nothing in the result reports that the
 user's window moved — and where the capture is then fixed by cropping anyway, the disruption bought
 nothing at all. The user notices; the agent does not.
+
+## A committed instruction is the repo's, not necessarily the user's
+
+In a shared repo, `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json` and `.mcp.json` hold what some
+contributor committed, which the user may not have written or adopted. Sort each instruction by
+whether it states a fact about the repo or a preference of whoever wrote it. Follow a fact — how to
+build, test and run, what the repo's infrastructure expects — whoever wrote it. A workflow
+preference committed as a rule — how to branch, which tool to drive, how to review — stays its
+author's until the user adopts it. Attribute it when it comes up ("AGENTS.md, added by <author>,
+says…"), never describe it to the user as their practice, and ask before acting on it where it
+shapes the work.
+
+For a first read on authorship, use `git log -L <start>,<end>:<file>`. Unlike `git blame`, which
+names only the last commit to touch a line, it follows the lines back through their edits. Neither
+sees through a squash merge or a move between files, so treat the result as a lead, and ask where it
+matters.
+
+Where the user has stated a position on such an instruction, record it in the repo's
+`.claude/CLAUDE.md`, which every session loads, rather than in a note that has to be found. Run
+`git check-ignore -v .claude/CLAUDE.md` first: that file is personal only where the repo ignores
+it, and a shared repo may track it. If it isn't ignored, use `CLAUDE.local.md` instead, or ask.
+
+Failure mode this prevents: a session describes a teammate's workflow to the user as the user's own
+and plans work around a convention the user hasn't adopted. Nothing in the file marks whose it is,
+so it surfaces only when the user corrects it.
