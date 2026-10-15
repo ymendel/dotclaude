@@ -336,13 +336,14 @@
     "commit": "",
     "pr": ""
   },
-  "autoCompactEnabled": false,
+  "autoCompactEnabled": true,
+  "idleCompaction": false,
   "effortLevel": "high",
   "showThinkingSummaries": true,
   "workflowSizeGuideline": "small",
   "workflowKeywordTriggerEnabled": false,
   "autoUpdatesChannel": "stable",
-  "minimumVersion": "2.1.287",
+  "minimumVersion": "2.1.292",
   "claudeMdExcludes": [
     "**/rules/README.md",
     "**/rules/references/**"
