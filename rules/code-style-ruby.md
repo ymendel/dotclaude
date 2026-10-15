@@ -36,6 +36,7 @@ paths:
 
 - Principle of least power: prefer HTML over CSS, CSS over JS, backend over frontend.
 - `app/` is for business domain. `lib/` is for generic, non-business-specific code that could theoretically be upstreamed or extracted to a gem.
+- Keep logic out of views. A view component exists in part so its template doesn't have to decide anything about data: building a hash of options, choosing between values, and assembling a URL from computed arguments go in a component method, and the template calls it. Where there's no component, the same goes to a helper or presenter. The tell is a `<% x = … %>` assignment or an `if`/`unless` that picks data rather than markup. Failure mode: the decision reads as markup, so it is easy to miss in review, can be tested only by rendering the template, and gets copied into the next template that needs it.
 
 ### Gemfile
 
