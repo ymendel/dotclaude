@@ -81,6 +81,10 @@ Most carried items are one command from settled: `gh pr view <n> --json state`, 
 
 Failure mode this prevents: a carried list survives several handoffs untouched, each copy making it look more established, until a session finally acts on it and finds the work already merged, the state different from the one claimed, and the script it was told to run broken by a change two sessions back. Nothing errors, and the wasted effort is invisible until someone checks.
 
+**Quote a constraint taken from a project file, and keep your own reasoning apart from it.** When the handoff says to do or avoid something because a file says so — `AGENTS.md`, a contributing guide, an ADR — quote the line rather than paraphrasing it, and put any reason of your own in a separate sentence. Where you know who set the instruction, say so: a collaborator's checked-in convention and a preference the user stated this session read identically in a handoff.
+
+Failure mode this prevents: paraphrase drifts in scope — "parallel branches go in worktrees" becomes "side branches go in worktrees" — and because the citation still points at the file, the resuming session obeys the wider version with no reason to reopen it.
+
 If the handoff references artifacts that live outside the repo — a draft message sent to a teammate, an ASCII wireframe in a chat window, a question put to a stakeholder — preserve copies under `.claude/handoffs/artifacts/` and link to them from "Related Resources". The `artifacts/` subdirectory keeps these companion files out of the way of the `SessionStart` hook and `list_handoffs.py`, both of which only look at top-level `.md` files in `.claude/handoffs/`. Ideally these were saved as they were produced during the session, not at handoff-write time — by then a chat-only draft may already have scrolled out of context. A handoff that mentions "three wireframes sent to a teammate" without preserving the wireframes themselves leaves the resuming session unable to reason about a later reply like "I like B".
 
 ### Step 3: Validate the Handoff

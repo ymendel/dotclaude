@@ -43,6 +43,12 @@ Failure mode this prevents: confident-sounding prose that frames a concept wrong
 
 Specific case: ADR Context. Claims about *what an external system actually does* are easy to phrase confidently from one or two examples. They feel like Context (background facts setting up the Decision) but are often Premises (load-bearing assumptions the Decision depends on). Label them accordingly: an inferred premise should read as a premise to be validated, not as an observation. Honest forms: "a sample of N showed [shape]; the matcher needs to tolerate this" (observation, with sample size disclosed); "we expect X; this has not been checked across the full set and is an assumption to validate when sync runs" (assumption, labeled); or a quote from the system's docs with a citation (authoritative). The trap is phrasing an unverified premise with the cadence of an observation, then taking the Decision as if the premise were checked.
 
+### Wording the next reader will act on goes through as a quote
+
+For a description, the quote is a check, and the reader gets your accurate restatement. Wording the reader will *act on* needs the quote itself to reach them: a directive from any source (a checked-in agent file, a stakeholder's request, an issue's acceptance criteria, the user's own correction), a definition or requirement where one word moves the boundary, a constraint passed into a sub-agent prompt. When relaying one — in a handoff, a recap to the user, a peer message, a PR body — quote the line with its source, and put your own reading in a separate sentence.
+
+Failure mode this prevents: paraphrase drifts in scope, usually wider — "parallel branches go in worktrees" becomes "side branches go in worktrees" — and the citation travels with the restatement, so the next reader follows a rule nobody wrote and has no reason to reopen the source.
+
 ## Check the Claims in Prose You Are About to Commit, Not Only Its Shape
 
 The rule above governs prose you are writing. This one governs prose you are *committing* — a working tree found on arrival, a file dropped in by a parallel session, a draft handed over to be tidied and landed. Reviewing it for shape is not reviewing it. Trailing newlines, index entries, house style, and spelling are the visible half and the cheap half, and a false claim passes every one of them untouched.
