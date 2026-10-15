@@ -110,18 +110,6 @@ Whether an MCP rule accepts a glob at all — `mcp__plugin_figma_figma__get_*` �
 
 Failure mode this prevents: the prompts get diagnosed as a permission bug or a missing entry, so the fix attempted is a broader rule — when the entry already there is correct for a server that is no longer the one serving the tool.
 
-## Paths With Spaces
-
-When constructing shell commands that reference paths containing spaces (e.g. `~/Library/Application Support/`), use `$HOME` with proper quoting instead of backslash-escaping. Claude Code's permission system triggers a separate confirmation dialog for any command containing backslash-escaped whitespace, regardless of allow-list rules.
-
-```bash
-# ❌ Triggers backslash-escaped whitespace warning
-rtk read "$(ls -t ~/Library/Application\ Support/rtk/tee/*.log | head -1)"
-
-# ✅ No warning — $HOME + quoted path
-rtk read "$(ls -t "$HOME/Library/Application Support/rtk/tee/"*.log | head -1)"
-```
-
 ## Project vs. Global Settings — Match Scope to Use
 
 When adding a permission, choose the file by **scope of use**, not by which settings file happens to be open:

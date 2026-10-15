@@ -60,6 +60,27 @@ In a `<<'EOF'` heredoc (single-quoted delimiter), the shell preserves content li
 
 **How to apply:** When writing inside `<<'EOF'`, write content as-is. The single-quoted delimiter is the explicit "treat this as a string literal" signal, so escaping inside it always overshoots. If you find yourself reaching for a backslash inside a heredoc, check the opening — if it's `'EOF'`, don't. (The same caution applies in reverse to `<<EOF` without quotes, where backticks and dollar signs *do* need escaping if you want them literal.)
 
+## Never put a backslash before whitespace in a Bash command
+
+The permission gate refuses it with "Contains backslash-escaped whitespace", offering no grant, so no allow-list entry can cover it. Quoting the backslash doesn't help: a grep pattern holding `\ ` inside double quotes was refused the same way. Tab completion and hand-built paths both produce the escaped form, so a path is where it usually comes from.
+
+For a read, use the Read tool, which takes an absolute path with spaces and never reaches the Bash gate. Where a shell command needs the path, quote it from the slash after the tilde onwards. A tilde inside the quotes is not expanded, so that form names a literal `~` directory. A `$HOME` path is unverified, and as an expansion is expected to prompt for that reason (`settings.md`'s *Shell Expansion Makes a Command Non-Allowlistable*).
+
+```bash
+# ❌ Refused: backslash-escaped whitespace
+rtk ls ~/Library/Application\ Support/Zed/extensions/
+
+# ❌ Runs, but looks for a directory literally named "~"
+rtk ls "~/Library/Application Support/Zed/extensions/"
+
+# ✅ Ran without a prompt
+rtk read ~/"Library/Application Support/Zed/extensions/installed/sql/extension.toml"
+```
+
+`notes/claude-code-quirks.md` has the observations behind this.
+
+Failure mode this prevents: the escaped form is what completion hands you and reads as correct shell, so the prompt arrives on a command that would otherwise run unprompted, and nothing the user can approve stops the next one.
+
 ## Batch repeated commands by repeating them literally, not with a loop variable
 
 When running the same command over several files, write the calls out — `rtk read a.json && rtk read b.json` — or issue them as separate tool calls in one message. Do not wrap them in a `for f in …; do … "$f"; done`. The `$f` is a variable the gate cannot resolve ahead of time, so a batch that would otherwise pass silently prompts instead — "Part of this command (a variable) cannot be checked in advance" — and no allow entry can cover it (`settings.md`). The loop is also the more fragile form: one unquoted expansion or a filename holding a space and the whole batch breaks.
