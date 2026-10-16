@@ -56,6 +56,8 @@ When claiming there's a finding to see — "the standout is X", "as the table ab
 
 Relaying a *peer session's* message has the same shape one surface over, and lives in `cross-session.md` with the rest of the multi-session material.
 
+**Text written between tool calls is the same trap one layer in.** The UI can collapse a turn's intermediate text into a one-line summary once later tool calls follow it, so a draft, a proposal, or anything the closing question asks about must go in the turn's *final* message — the one after the last tool call. "The draft above" in a closing line points at something that may have been folded away. Failure mode: the user is asked to approve a commit message, a config, or an option they were never shown.
+
 ## Failure mode this prevents
 
 Long structured replies posted inline force the user to scroll back and forth in the terminal to re-read or compare sections, when opening the same content in their editor would be both easier and more durable. Files survive the conversation. Inline content has to be quoted, screenshotted, or re-prompted to re-visit. The default tilts toward "inline" because it's the cheaper local action for the model. This rule corrects the tilt.
