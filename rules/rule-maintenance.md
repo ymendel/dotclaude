@@ -89,6 +89,8 @@ A rule may reference a skill or another rule freely. Rules load passively in the
 
 The reverse direction is fragile, and it is the skill author's concern, not the rule author's — a *skill* that references a rule may ship to an environment where that rule is absent, because rules never travel with a skill package. The `skill-architecture` skill covers how a skill degrades gracefully there (a `COMPANIONS.md` entry, a conditional sentence). Nothing symmetric is needed when writing a rule — cross-reference skills and rules as freely as the prose wants.
 
+**A rule doesn't depend on reasoning held in a note.** A rule may name a note, as the place to file something or as where fuller evidence lives for a claim the rule already states. What it can't do is send the reader there for the why: the mechanism, the measurements that justify it, the reproduction that shows whether it applies. That material goes in `rules/references/`, the consult-on-demand destination in [ADR 0007](../docs/adr/0007-progressive-disclosure-for-rules.md). `notes/` is the private repo's, surfaced here through a gitignored symlink (`cross-project-notes.md`), so a clone of this tree has the rule without the note. The test is whether the rule still makes its case with the note gone. Failure mode: the rule rests on reasoning that a reader of the public repo, or any environment without the private tree, cannot open.
+
 ## Rule File Index
 
 When adding a new rule file, update `rules/README.md` with a description before committing.
