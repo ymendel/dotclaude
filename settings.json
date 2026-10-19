@@ -28,6 +28,7 @@
       "Bash(gem search:*)",
       "Bash(gem which:*)",
       "Bash(gh:*)",
+      "Bash(git check-attr:*)",
       "Bash(git check-ignore:*)",
       "Bash(git grep:*)",
       "Bash(git init:*)",
