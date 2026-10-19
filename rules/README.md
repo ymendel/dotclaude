@@ -16,7 +16,7 @@ A single concern occasionally splits across both. The `project-notes` rule cover
 
 **`claude-directory-hygiene.md`** — Keeping a project's `.claude/` readable: which files belong at top level versus in a subdirectory, when a file belongs in `.claude/` at all rather than the session scratchpad, how transient artifacts (commit messages, PR bodies, issue drafts) are named, and the delete-when-the-content-lands-somewhere-permanent trigger that keeps them from accumulating. Owns file placement; `long-form-output.md` owns the file-versus-inline call.
 
-**`code-style.md`** — General code style: trailing newlines, simplicity, parser libraries over regex, naming, consistency. The Tailwind literal-identifier measurements and the theming and `@apply` reasoning are in `references/code-style/tailwind.md`.
+**`code-style.md`** — General code style: trailing newlines, simplicity, parser libraries over regex, naming, consistency. The Tailwind literal-identifier measurements and the theming and `@apply` reasoning are in `references/code-style/tailwind.md`, and which bash runs on macOS and how to probe for 3.2 in `references/code-style/bash.md`.
 
 **`cross-session.md`** — Working alongside other Claude sessions, which cannot read each other's transcripts: reading "tell <name>" as an instruction to message that session rather than to file something, writing a settled decision into an artifact the other side reads rather than only into the message reporting it, and relaying a peer's message as the user's first and only telling of it. Handing a *rule edit* to a session in the config tree has its own protocol in `references/rule-maintenance/cross-session-handover.md`.
 
