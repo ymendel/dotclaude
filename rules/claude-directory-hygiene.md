@@ -15,11 +15,13 @@ names: the declared notes destinations, the settings files, and the subdirectori
 Everything else goes in a subdirectory. A file that is neither named in that layout nor
 inside one of its directories is the thing this rule exists to prevent.
 
-Anything written to feed a single command and then discarded — a commit message, an issue
-body, a PR body posted once — does not belong here at all. It goes in the session
-scratchpad, for the reason the next section gives. What earns a place in `.claude/scratch/`
-is material the user may want to open: a draft to read back, a working file whose
-usefulness is not settled yet. Live PR bodies outgrow both, since they get re-read and
+Anything the session writes to feed a single command it runs itself, unreviewed, and then
+discards — a commit message, an issue body, a PR body posted once — does not belong here at
+all. It goes in the session scratchpad, for the reason the next section gives. What earns a
+place in `.claude/scratch/` is material the user may want to open: a draft to read back, a
+working file whose usefulness is not settled yet. A draft handed to the user for review
+before it goes out is one of these until they approve it, whatever kind of artifact it is.
+An issue body awaiting their read belongs here, not in the scratchpad. Live PR bodies outgrow both, since they get re-read and
 re-edited across a PR's life, so give them a `pr-bodies/` subdirectory.
 
 When a project's `.claude/` grows a directory its layout section doesn't mention, add the
@@ -32,14 +34,16 @@ reach a file. So the question is who will open it.
 
 Anything the user will open and act on directly — a rebase message sheet, a command list,
 anything they will paste or run from their own terminal — goes one step from the project
-root, in `.claude/` or a gitignored `tmp/`. A deep `/private/tmp/claude-…/` path makes them
-copy a long string just to see what they were handed.
+root, in `.claude/` or a gitignored `tmp/`. The scratchpad is a session-keyed path under
+`/private/tmp/claude-…/` that the user has no reason to know, so a file there is out of
+their reach rather than merely long to type.
 
 When it isn't clear who the file is for, start it under `.claude/scratch/` anyway. Rescuing
 a file *out* of the scratchpad is a chore that has to be remembered and mostly isn't, while
 deleting one the user can see costs an approval — `rm` under `.claude/` prompts like any write
 to a protected path, and one `rm` naming every dead file keeps that to one. So only genuinely
-one-shot output — a commit message, an issue body — stays in the scratchpad.
+one-shot output — a commit message or an issue body the session sends without review —
+stays in the scratchpad.
 
 Failure mode this prevents: a file that only became worth keeping *after* it was written
 evaporates with the session, or an artifact meant *for the user* lands where only the model
