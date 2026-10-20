@@ -51,3 +51,16 @@ it, and a shared repo may track it. If it isn't ignored, use `CLAUDE.local.md` i
 Failure mode this prevents: a session describes a teammate's workflow to the user as the user's own
 and plans work around a convention the user hasn't adopted. Nothing in the file marks whose it is,
 so it surfaces only when the user corrects it.
+
+## Size a version bump by its releases, not its numbers
+
+A version number is the maintainer's claim, and only as reliable as the maintainer. Even honest
+semver says little. A minor release can break behavior you depend on, public or not, and a major
+release can leave everything you use untouched. Nor does major come in degrees: pagy's 9.4.0 →
+43.0.0, a single release that redesigned the API, is a maintainer trying to say "more major". Before
+calling a bump big, small, or "a long way", open the release list between the two versions and
+describe what's in it.
+
+Failure mode this prevents: a bump gets sized from its numerals, so a one-step upgrade reads as a
+long climb, or a small-looking minor bump that breaks things reads as safe. The user has to correct
+the framing every time it comes up.
