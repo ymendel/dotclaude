@@ -21,7 +21,8 @@ argument-hint: <file-path> [--verbose]
 | Field                       | Required | Rules                                                                                                             |
 | --------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
 | `name`                      | No\*     | Lowercase, hyphens, numbers. Max 64 chars. Unique. Falls back to directory name if omitted.                       |
-| `description`               | Yes      | WHAT it does + WHEN to use. Max 1024 chars. Single line. Include trigger keywords!                                |
+| `description`               | Yes      | WHAT it does + WHEN to use. Max 1024 chars, aim for ~400. Single line. Include trigger keywords!                  |
+| `when_to_use`               | No       | Claude Code only. Extra trigger phrases or example requests, appended to `description` in the listing. Counts toward the 1,536-char listing cap. |
 | `allowed-tools`             | No       | **Grants** tools without per-use approval (comma-separated). Does NOT restrict -- unlisted tools still available. |
 | `disable-model-invocation`  | No       | `true` = only manual `/name` invocation, never auto-triggered by Claude. Default: `false`.                        |
 | `user-invocable`            | No       | `false` = background-only (no `/name` slash command). Claude auto-triggers based on description. Default: `true`. |
@@ -32,6 +33,8 @@ argument-hint: <file-path> [--verbose]
 | `name-aliases`              | No       | Comma-separated alternative names for `/name` invocation.                                                         |
 
 \* Agent Skills spec (`agentskills.io`) requires `name`. Claude Code falls back to directory name. Include it for portability.
+
+> **Note**: `when_to_use` is a Claude Code extension, not part of the Agent Skills spec. claude.ai uploads, the Skills API, and `package_skill.py` accept only `name`, `description`, `license`, `compatibility`, `metadata`, and `allowed-tools`, and fail with a hard error on any other field (code.claude.com/docs/en/skills.md, *Using skill frontmatter outside Claude Code*, checked 2026-10-23). For a skill that may ship outside Claude Code, keep the triggers in `description`.
 
 > **Note**: `allowed-tools` delimiter is **commas** in Claude Code (e.g., `Read, Grep, Bash`). The Agent Skills spec uses **spaces**. Use commas for Claude Code skills.
 

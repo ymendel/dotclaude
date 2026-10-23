@@ -56,8 +56,19 @@ description:
 A good description has three parts:
 
 1. **What it does** (one sentence)
-2. **When to use it** (enumerate trigger contexts, be inclusive)
+2. **When to use it** (name the trigger contexts by category, inclusively)
 3. **When NOT to use it** (prevent false triggers on adjacent skills)
+
+### Length
+
+Completeness and pushiness both argue for adding words, so the length needs its own limit. Aim for roughly 400 characters, and give a reason for anything past ~500.
+
+- **Every description sits in context in every session**, whether or not the skill fires.
+- **Claude Code truncates** the combined `description` and `when_to_use` text at 1,536 characters in the skill listing, and advises putting the key use case first (code.claude.com/docs/en/skills.md, checked 2026-10-23). The cap is configurable with `skillListingMaxDescChars`.
+- **The listing as a whole has a budget**, 1% of the context window by default. When it overflows, Claude Code drops whole descriptions, starting with the least-used skills (same page). A long description makes room for itself by taking it from other skills.
+- **The Agent Skills spec** allows up to 1,024 characters for `description` and budgets ~100 tokens for the name-plus-description metadata layer (agentskills.io/specification, checked 2026-10-23).
+
+To tighten a description, cut scenarios that are instances of a category already named, cut restatements of the WHAT inside the WHEN, and merge the negative triggers into one clause. Then check that each remaining trigger is still reachable from some phrase in the text. A rewrite that loses nothing a trigger needs is the right length.
 
 ### Natural Language Over Keywords
 

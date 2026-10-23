@@ -220,7 +220,9 @@ Does the Skill follow official format requirements? **Special focus on descripti
 | 0-5 | Missing frontmatter or invalid format |
 | 6-10 | Has frontmatter but description is vague or incomplete |
 | 11-13 | Valid frontmatter, description has WHAT but weak on WHEN |
-| 14-15 | Perfect: comprehensive description with WHAT, WHEN, and trigger keywords |
+| 14-15 | Perfect: WHAT, WHEN, and trigger keywords, at a length where nothing can be cut without losing a trigger (aim ~400 chars) |
+
+A description past ~500 characters can't score 14-15 unless the extra length is needed. Completeness and pushiness both reward adding words, so this is the check that pushes the other way. Every description sits in context in every session, and Claude Code truncates `description` + `when_to_use` at 1,536 characters in the listing and drops whole descriptions, least-used skills first, when the listing overflows its budget. When a description is long, show the tightened version in the suggestions rather than just flagging the length.
 
 **Frontmatter requirements**:
 - `name`: lowercase, alphanumeric + hyphens only, ≤64 characters
@@ -292,6 +294,8 @@ This is useless — Agent has no idea when to activate it.
 - [ ] Contains searchable keywords (file extensions, domain terms, action verbs)
 - [ ] Specific enough that Agent knows EXACTLY when to use it
 - [ ] Includes scenarios where this skill MUST be used (not just "can be used")
+- [ ] Concise: key use case first, ~400 chars, nothing cuttable without losing a trigger
+- [ ] Uses `when_to_use` only if the skill never ships outside Claude Code (it's not an Agent Skills spec field, and packaging or upload fails on it)
 
 ---
 
@@ -721,6 +725,7 @@ Fix: Compress to one conditional sentence. If the other skill isn't installed,
 │    [ ] description answers: WHEN should it be used?                     │
 │    [ ] description contains trigger KEYWORDS                            │
 │    [ ] description is specific enough for Agent to know when to use     │
+│    [ ] description is ~400 chars, key use case first                    │
 │                                                                         │
 │  STRUCTURE:                                                             │
 │    [ ] SKILL.md < 500 lines (ideal < 300)                               │
