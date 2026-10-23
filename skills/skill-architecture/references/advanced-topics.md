@@ -1,44 +1,25 @@
 **Skill**: [Skill Architecture](../SKILL.md)
 
-## Critical Formatting Bugs (MUST READ)
+## Wrapped Descriptions
 
-### 🚨 BUG #9817: Multiline Description Footgun
-
-**CRITICAL**: Skills with multiline descriptions are **silently ignored** - no error message!
-
-**What breaks** (silently ignored):
+Older Claude Code versions (reported against 2.0.22) silently dropped a skill whose `description` wrapped across lines, which is the shape Prettier with `proseWrap: true` produces (anthropics/claude-code#9817, closed as a duplicate of #4700). On 2.1.308 (checked 2026-10-23), both wrapped shapes load, with the lines joined into one description in the skill listing:
 
 ```yaml
----
-name: my-skill
-description: This description wraps to multiple lines
-  and will be silently ignored by Claude
----
+description:
+  Text starting on the next line,
+  continued here.
 ```
-
-**What works** (single line):
 
 ```yaml
----
-name: my-skill
-description: This description stays on one line and works correctly.
----
+description: Text starting on this line
+  and continued here.
 ```
 
-**How to prevent**:
-
-- ✅ Keep description under 180 characters (safe from Prettier wrapping)
-- ✅ Use third person ("Reads files...") not imperative ("Read files...")
-- ✅ Test with `/clear` and trigger keywords after creating skill
-- ✅ If skill doesn't activate, check description length/format first
-
-**Why it happens**: Prettier with `proseWrap: true` reformats long descriptions to wrap across lines. Claude Code's YAML parser silently fails on multiline descriptions. This is a known footgun tracked in Issue #9817.
+Keep descriptions single-line and quoted anyway, since that's the form every parser and packager agrees on. Length is governed by triggering and context cost, not wrapping; see [Writing Guide](./writing-guide.md#length).
 
 **Validation checklist**:
 
-- [ ] Description is single line (check with `head -5 SKILL.md`)
 - [ ] Description uses third person ("Does X", not "Do X")
-- [ ] Description under 200 chars (CLI max is 1024 but Prettier wraps ~80)
 - [ ] Test activation with `/clear` and trigger keywords
 
 ## Content Sections (Recommended)
