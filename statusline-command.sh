@@ -271,7 +271,16 @@ branch_text=""
 if [ "$show_branch" = "1" ]; then
   if git rev-parse --git-dir > /dev/null 2>&1; then
     branch=$(git branch --show-current 2>/dev/null)
-    [ -n "$branch" ] && branch_text="${GREEN}⎇ ${branch}${RESET}"
+    head_sha=$(git rev-parse --short HEAD 2>/dev/null)
+    if [ -n "$branch" ] && [ -n "$head_sha" ]; then
+      branch_text="${GREEN}⎇ ${branch}${RESET} ${GRAY}${head_sha}${RESET}"
+    elif [ -n "$branch" ]; then
+      # Unborn branch: no commits yet, so no SHA to show.
+      branch_text="${GREEN}⎇ ${branch}${RESET}"
+    elif [ -n "$head_sha" ]; then
+      # Detached HEAD: the SHA is the only locator there is.
+      branch_text="${GREEN}⎇ ${head_sha}${RESET}"
+    fi
   fi
 fi
 
