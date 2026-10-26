@@ -43,6 +43,16 @@ When unsure whether a phrase qualifies, prefer the literal alternative. The cate
 
 Failure mode this prevents: these phrases pass casual review because they are industry-common, then ship in user-facing prose where they read as careless or aggressive.
 
+## Use current inclusive terms, not the legacy ones
+
+Where the industry has replaced a term rooted in slavery, race, or exclusion, use the replacement: primary/replica (or leader/follower) rather than master/slave, allowlist/denylist rather than whitelist/blacklist, `main` rather than `master` for a new default branch. This applies to code names as well as prose — a new config key, method, or column takes the current term.
+
+An existing identifier is quoted as it is. A branch that really is named `master`, a library option called `whitelist`, a vendor API's `slave_host` — refer to each by its real name, since a renamed reference points at nothing. Renaming the thing itself is separate work to raise, never to fold into the change at hand.
+
+More pairs, including the less obvious ones, are in `rules/references/writing/catalogs.md`.
+
+Failure mode this prevents: the legacy term is still the more common one in older docs, Stack Overflow answers, and library source, so it is what comes to hand first and reads as merely standard. It then ships in a name or a document where it reads as careless, and a name in code is far more expensive to change later than a word in prose.
+
 ## Prefer plain labels over jargon shorthand
 
 When labeling phases, parts, or branches of a sequenced piece of work, use plain words and descriptive labels — not jargon shorthand, not bare numbers.

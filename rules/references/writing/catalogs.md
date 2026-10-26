@@ -1,4 +1,4 @@
-# Writing Catalogs — Metaphor Offenders and Term-of-Art Collisions
+# Writing Catalogs — Metaphor Offenders, Inclusive Terms, and Term-of-Art Collisions
 
 > Not loaded in context by default. See `rules/writing.md` for the directives, heuristics, and failure modes.
 
@@ -7,9 +7,23 @@
 Categories and examples for the "Avoid violent and military metaphors" rule:
 
 - **Overt violence**: "kill two birds with one stone", "take a stab at", "shoot down", "pull the trigger on", "bite the bullet".
-- **Military or war origins**: "boots on the ground", "rally the troops", "in the trenches", "battle-tested", "war room", "scorched earth", "marching orders", "war story", "blast radius".
+- **Military or war origins**: "boots on the ground", "rally the troops", "in the trenches", "battle-tested", "war room", "scorched earth", "marching orders", "war story", "blast radius", "landmine", "minefield".
 
 The "in anger" and "war story" specific-replacement directives stay in `writing.md` — they name particular high-frequency traps with prescribed alternatives, not just examples to check against.
+
+## Inclusive-term replacements
+
+Pairs for the "Use current inclusive terms, not the legacy ones" rule. Legacy term first, replacement after.
+
+- master/slave → primary/replica, leader/follower, controller/worker
+- master (branch, copy, list) → main, source, canonical
+- whitelist/blacklist → allowlist/denylist (also safelist/blocklist)
+- grandfathered → legacy, exempt
+- man-hours, manpower → person-hours, staffing
+- sanity check → quick check, smoke test
+- dummy value → placeholder, sample value
+- guys (addressing a group) → folks, everyone, all
+- tribal knowledge → institutional knowledge, unwritten knowledge
 
 ## Term-of-art collision examples
 
