@@ -117,7 +117,7 @@ For each test prompt, run the skill and examine the output:
 - **Did it follow the workflow?** Check whether instructions were followed or ignored.
 - **Was the output useful?** Compare against what you'd expect from a skilled human.
 
-When subagents are available, run with-skill and without-skill versions in parallel to measure the skill's actual value-add. When not available, run test cases yourself as a sanity check.
+When subagents are available, run with-skill and without-skill versions in parallel to measure the skill's actual value-add. When not available, run test cases yourself as a quick check.
 
 Run the **skill-judge** skill as the audit step — a skill isn't done until it has survived that pass, the same way an ADR draft isn't done until `adr-refine` has critiqued it. skill-judge scores the skill across eight dimensions (knowledge delta, anti-patterns, progressive disclosure, freedom calibration, and more) and surfaces specific gaps to fix back here. Build with skill-architecture, audit with skill-judge, fix back here — a build → judge → fix loop. Scope the audit's depth to the change: a full pass for new or materially rewritten content, a proportionately lighter read for a typo or a link fix. Skipping it entirely is the failure mode — a skill edited without an audit is exactly how the gaps skill-judge catches ship unnoticed.
 

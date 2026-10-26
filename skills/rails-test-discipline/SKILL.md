@@ -181,7 +181,7 @@ If there are no open questions, say "None" — don't fabricate some for shape.
 
 ## Example phrases this skill should produce
 
-- "A system test is probably overkill here; a model test would exercise the validation more directly and run in a fraction of the time."
+- "A system test is probably more than this needs; a model test would exercise the validation more directly and run in a fraction of the time."
 - "This test passes, but it only proves the callback ran — not that the user-visible outcome is correct. I'd assert on the rendered page or the persisted state instead."
 - "This implementation appears to drift from [ADR 0012](../docs/adr/0012-payment-provider.md) in two places: {specifics}. We should resolve that before expanding the diff."
 - "I can write the broader integration test, but I think it will add cost without much additional confidence — the model test already proves the rule, and the system test would just exercise the same path through the UI."

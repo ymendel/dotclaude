@@ -165,7 +165,7 @@ fi
 # --- The standing invariant -------------------------------------------------
 #
 # This hook approves or abstains. It must never deny: a denial here would block a write that no rule
-# objected to, and `deny` is the one behavior whose blast radius is not a prompt.
+# objected to, and `deny` is the one behavior whose worst case is not a prompt.
 denied=0
 for tool in Edit Write NotebookEdit Bash; do
     run "$(payload "$tool" file_path /Users/alice/dev/shipping-tracker/.claude/settings.json)"

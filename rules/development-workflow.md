@@ -139,7 +139,7 @@ Everything here presumes a PR is the right artifact. On a personally-owned repo 
 
 ## Commenting
 
-- Preserve existing comments when editing code. Comments are for humans, not the parser. Never silently drop them as collateral during edits.
+- Preserve existing comments when editing code. Comments are for humans, not the parser. Never silently drop them as a side effect of edits.
 - Add comments for some of the same reasons as including a body in the git commit — why (if not obvious), context that's not clear. Prefer a reference to an ADR to inlining the full reasoning.
 - Use comment keywords to highlight special comments
     - **NOTE**: explanations and miscellaneous annotations

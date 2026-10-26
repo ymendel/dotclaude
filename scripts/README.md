@@ -303,7 +303,7 @@ traffic is repetitive.
 `.claude/` is a protected path, so a write there prompts however the allow list
 is written — only `bypassPermissions` or a `PermissionRequest` hook reaches it
 (see `rules/settings.md`). This exists to decide whether such a hook is worth
-building for Bash, which means whitelisting command shapes, which pays off only
+building for Bash, which means allowlisting command shapes, which pays off only
 on repetitive traffic. So the distinct-strings line decides the question and the
 volume does not.
 

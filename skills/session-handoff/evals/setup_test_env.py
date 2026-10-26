@@ -52,7 +52,7 @@ def run_or_die(cmd: list[str], cwd: str = None) -> None:
 
 
 def _is_safe_rmtree_path(path: Path) -> bool:
-    """Sanity-check that path looks like a disposable test location.
+    """Check that path looks like a disposable test location.
 
     Accepts:
     - any path whose name contains "test"

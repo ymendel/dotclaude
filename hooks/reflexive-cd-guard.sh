@@ -52,7 +52,7 @@ if ! command -v jq &>/dev/null; then
   # so pass through. This one says so, because the others do not: they exit 0
   # in silence, and the only other voice on a missing jq is rtk-rewrite.sh's,
   # which reports that rewrites are off and says nothing about the guards. So
-  # the loud symptom understates the blast radius — every guard in this
+  # the loud symptom understates the reach — every guard in this
   # directory is off, not just the rewriting. Warned from here because this
   # hook is registered first (settings.json), so its message lands before the
   # rest of the chain runs.

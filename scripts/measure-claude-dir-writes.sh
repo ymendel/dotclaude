@@ -4,7 +4,7 @@
 #
 # `.claude/` is a protected path: a write there prompts however the allow list is written, and only
 # bypassPermissions or a PermissionRequest hook reaches it (rules/settings.md). A hook covering Bash
-# would have to whitelist command shapes, which pays off only on repetitive traffic — so the
+# would have to allowlist command shapes, which pays off only on repetitive traffic — so the
 # distinct-strings line at the bottom decides the question, not the volume.
 #
 # Usage:
@@ -118,7 +118,7 @@ fi
 printf '\nWrites per project:\n'
 sort "$BYPROJECT" | uniq -c | sort -rn
 
-# The crux. A whitelist is a bet on repetition, so report the whole distribution rather than a
+# The crux. An allowlist is a bet on repetition, so report the whole distribution rather than a
 # capped head — a cap here reads as the answer.
 printf '\nDistinct command strings:           %s (of %s writes)\n' \
   "$(sort -u "$WRITES" | grep -c '')" "$writing"

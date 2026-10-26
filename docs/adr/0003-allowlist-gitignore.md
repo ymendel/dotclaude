@@ -62,7 +62,7 @@ that surfaces when the `session-handoff` skill's tests run).
 - *Cons:* Adding a new top-level tracked path requires a `.gitignore` update
   in the same commit — easy to forget. `git status` shows fewer untracked
   files than actually exist on disk, which can mask work-in-progress when a
-  new file lands in a non-allowlisted directory. The pattern fights the
+  new file lands in a non-allowlisted directory. The pattern cuts against the
   default `git add .` mental model: stage-everything silently drops changes
   in non-allowlisted paths. The allowlist is also coarse — `!/agents/**/*`
   re-includes everything under that directory, including artifacts the
@@ -143,7 +143,7 @@ the existing ones haven't been migrated out yet.
   exist on disk. A file landing in a non-allowlisted directory is invisible
   to default git commands, which can mask work-in-progress.
 
-- **Negative:** The pattern fights the natural `git add .` workflow.
+- **Negative:** The pattern cuts against the natural `git add .` workflow.
   Anyone (or any tool) used to "stage everything" finds their changes
   silently dropped when the files are in non-allowlisted paths. There is
   no warning; the staging is just empty.
