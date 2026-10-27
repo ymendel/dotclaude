@@ -240,6 +240,12 @@ in the body of the bullet, not as a competing prefix.
 Use a separate bullet per consequence. If a bullet mixes polarities
 ("simpler to operate, but slower at p99"), split it into two.
 
+Group the bullets by valence in that order — all Positives, then all
+Neutrals, then all Negatives — so the Negatives sit together at the end
+rather than scattered or wedged in the middle. Like the prefixes, the
+order is fixed. A repo whose existing ADRs order them differently
+doesn't change it.
+
 A decision with no negative consequences is suspicious — keep looking.
 If one of the negatives turns out to be unacceptable, that's a signal
 to revisit the decision before writing the ADR.

@@ -46,6 +46,7 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 ### Unlabeled consequences
 - {file:line} `- Rollback is straightforward.` → `- **Positive:** Rollback is straightforward.`
 - {file:line} `- **Positive:** Simpler to operate, but slower at p99.` → split: `- **Positive:** Simpler to operate.` and `- **Negative:** p99 latency regresses by ~Xms.`
+- {file:line} Neutral bullet after the Negatives → move it above the first Negative (order: Positive, Neutral, Negative)
 
 ### Unmarked options
 - {file:line} option with no `(chosen)` marker on the winner, or no **`Rejected:`** line on a loser → which marker it needs, and (for a rejected option) the reason to put on the line, drawn from its own cons
@@ -82,7 +83,7 @@ Print review notes in this exact structure. Omit a section only if it has genuin
 
 **Missing tradeoffs.** A decision with no negative consequences is suspicious. So is a decision that names only one alternative. Push on: what did we *not* pick, and why? What does this make harder or impossible?
 
-**Unlabeled consequences.** Every bullet under `## Consequences` must begin with **`Positive:`**, **`Neutral:`**, or **`Negative:`** (bold prefix, colon, then the body). Flag any bullet that doesn't — report it with file:line and a suggested rewrite that picks the right label. If a bullet mixes polarities ("simpler to operate, but slower at p99"), the rewrite splits it into two bullets, one per valence. Topical-only labels like "Rollback", "Privacy", or "Cost" hide whether the consequence is good news or bad news; rewrite them into the valence-first form with the topic named in the body.
+**Unlabeled consequences.** Every bullet under `## Consequences` must begin with **`Positive:`**, **`Neutral:`**, or **`Negative:`** (bold prefix, colon, then the body). Flag any bullet that doesn't — report it with file:line and a suggested rewrite that picks the right label. If a bullet mixes polarities ("simpler to operate, but slower at p99"), the rewrite splits it into two bullets, one per valence. Topical-only labels like "Rollback", "Privacy", or "Cost" hide whether the consequence is good news or bad news; rewrite them into the valence-first form with the topic named in the body. Then check the order: all Positives, then all Neutrals, then all Negatives. Flag a section that interleaves them or puts Neutrals after Negatives, and give the reordered list as the rewrite. The order is fixed, not house style, so a neighboring ADR in a different order doesn't excuse it.
 
 **Unmarked options.** In an `### Options` subsection, the chosen option must carry `(chosen)` after its name and every other option must carry a **`Rejected:`** line naming why it lost. Flag any option missing its marker — report it with file:line and, for a rejected option, the reason the line should give (drawn from that option's own cons). An options list where nothing is marked chosen, or where the rejected options don't say why, forces the reader to re-derive the outcome the author already knew.
 
