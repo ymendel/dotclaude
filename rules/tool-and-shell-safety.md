@@ -200,3 +200,13 @@ Some commands simply do not exit. A CLI that forks a detached update-check or te
 **How to apply:** when a backgrounded command's output has been read and the answer taken from it, stop the task (`TaskStop`) rather than leaving it. Where the command really is still working, *Distinguish "in progress" from "failed"* in `diagnosis.md` governs first — this is for the case where the output is complete and only the process is left.
 
 Failure mode this prevents: an orphaned shell holds a process tree for hours, and the user is the one who finds it — auditing leftovers they never created, in a task list where the stale entries hide the genuinely running one.
+
+## Ask for the field, not the description, when the description may carry secrets
+
+A command that *describes* an app or environment — a release, a deploy, a service's details — may print its config along with the metadata asked for, and config on a deployed app means credentials. Before running one, ask whether its output could include config vars, connection strings, or keys, and reach for the form that returns only the field needed.
+
+The standing case is `heroku releases:info`, observed printing every config var of the release with no flag requesting them — master key, `SECRET_KEY_BASE`, database URLs with passwords, API keys. Its `--help` (11.12.1) mentions none of this and offers no flag to suppress it. For a release's commit, `heroku releases` shows the short SHA in each description, and `heroku config:get HEROKU_SLUG_COMMIT` gives the full one where the app sets that var.
+
+**Gated:** `Bash(*heroku releases:info*)` is in the deny list. The command used to prompt, and the prompt didn't help, because it shows a release lookup that reads as harmless and gets approved.
+
+Failure mode this prevents: a question about one field gets answered with a command that dumps an app's secrets into the transcript, where they persist in the session store and in anything the output is quoted into.

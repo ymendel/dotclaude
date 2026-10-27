@@ -188,6 +188,7 @@
       "Bash(*gh pr close*--delete-branch*)",
       "Bash(*gh pr close* -d*)",
       "Bash(*gh gist delete*)",
+      "Bash(*heroku releases:info*)",
       "Artifact",
       "mcp__claude_ai_Claude_Docs"
     ],
