@@ -116,6 +116,18 @@ end
 def find_and_touch_user(id)
 ```
 
+**Shared noun prefixes** — several methods or attributes on one object sharing a noun prefix point to a missing sub-object:
+```ruby
+# Bad: an address is hiding inside Order
+order.billing_street
+order.billing_city
+order.billing_zip
+
+# Good
+order.billing_address.street
+```
+The signal is a *noun* repeated across members, not a verb or convention prefix — `to_`, `find_by_`, `before_`/`after_` callbacks, `has_many` don't count. This is an extraction, not a rename, so report it under its own heading rather than as `current_name → suggested_name`.
+
 **Vague names** — always flag: `data`, `info`, `result`, `temp`, `val`, `x`, `obj`
 
 **Abbreviations** — flag unless well-established (`id`, `url`, `api`, `html`, `json`, `db`):
