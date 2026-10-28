@@ -9,7 +9,7 @@ PR description, ADR, issue, commit message, handoff, or shared skill content.
 |---|---|---|
 | a project file | a tracked path, checked with `git ls-files <path>` | anything under `.claude/`, which the user's `~/.gitignore` hides globally even in repos whose own `.gitignore` doesn't list it |
 | a commit | the subject line, or branch-plus-position ("the tip of `ym/graphify`") | a bare SHA, unless the commit is on `main` or otherwise merged — rebase, amend, and squash-on-merge all rewrite it |
-| an ADR | the number, "ADR 0005" — plus `[ADR 0005](docs/adr/0005-….md)` inside the repo, where a click-through is wanted and a relative path resolves | the bare file path, whose descriptive slug rots on rename; and on a GitHub surface the blob URL, which is longer than the number and answers nothing the number didn't |
+| an ADR | the number, "ADR 0005" — plus `[ADR 0005](docs/adr/0005-….md)` inside a committed markdown file, where a click-through is wanted — the one place a relative path resolves | the bare file path, whose descriptive slug rots on rename; and on a GitHub surface the blob URL, which is longer than the number and answers nothing the number didn't |
 | a GitHub issue or PR | in a conversation (issue, PR, comment), the full URL bare, which GitHub shortens to `owner/repo#NN`. In a committed file, a named link — `[shipping-tracker#59](url)` | in a committed file, a bare URL, which links but prints at full length, and a bare `#NN`, which is inert there; a hand-built cross-repo `owner/repo#NN`, inert text outside a conversation; and `[text](url)` in a conversation, which suppresses both the short form and the backlink on the target |
 
 Where the volatile locator is genuinely useful, pair it with the stable one: a SHA quoted alongside
@@ -49,8 +49,26 @@ and the failure is not ignoring the rule but extending a correctly-scoped one pa
 
 The corollary covers what GitHub does *not* autolink. An ADR, a doc, or a file has no short form to
 gain, and the only link available on a GitHub surface is a blob URL — longer than `ADR 0015`, and
-answering nothing the number didn't. So name those there rather than linking them. Inside the repo,
-where a relative path resolves and the reader can click through, the link is worth having.
+answering nothing the number didn't. So name those there rather than linking them. Inside a
+committed markdown file, where a relative path resolves and the reader can click through, the link
+is worth having.
+
+**A relative link in a conversation is not a shorter blob URL. It is a broken one.** GitHub's README
+docs scope relative links to "rendered files", where "a relative link is a link that is relative to
+the current file" and a leading `/` is relative to the repository root. They say nothing of PR
+bodies, issues, or comments. Rendered there, the href is left as written (checked 2026-10-28 against
+the markdown API's comment mode, a stand-in for the PR-body renderer), so the browser resolves it
+against the page URL: `docs/adr/0022-….md` in a PR body becomes `/owner/repo/pull/docs/adr/0022-….md`,
+and `/docs/…` becomes `github.com/docs/…`. Both 404. `git ls-files` passes for the file either way,
+because the test checks reachability, not how a surface resolves the link.
+
+The blob-URL forms each fail somewhere. One on the branch breaks when the branch is deleted after
+merge, and one on `main` 404s until the PR merges. One pinned to a commit shows the file as of that
+commit and needs re-pinning after later edits. Whether it survives a squash merge plus branch
+deletion is undocumented: GitHub's docs call `refs/pull/` read-only without saying how long it
+lasts, and the sensitive-data-removal page says rewritten commits stay reachable "through any pull
+requests that reference them" until Support removes them, which suggests survival without
+promising it. The number avoids all of this, and a reviewer finds the file in the Files tab.
 
 ## Naming an unreachable file is fine. Linking it is not.
 
