@@ -6,7 +6,9 @@
 
 Split by whether the change touches the *message* or only the *content*.
 
-**Rewording** — ask the user to run `git rebase -i` interactively. Scripted workarounds (GIT_EDITOR overrides, chained amends) are unreliable and cause cascading message corruption.
+**Rewording** — write the new message to a file, then `GIT_EDITOR="cp <file>" git commit --fixup=reword:<target-sha>` and fold it with `git -c sequence.editor=: rebase --interactive --autosquash <base>`. Git hands the editor the message file's path as its last argument, so `cp` overwrites it with yours. Read the result back with `git log --format=%B` before moving on. A wrong message folds in silently, with every step exiting 0.
+
+Set the editor with `GIT_EDITOR`, never `-c core.editor=…`. `GIT_EDITOR` outranks `core.editor`, and a `-c core.editor="cp <file>"` reword was observed to exit 0 while keeping the original message. Why it was ignored wasn't established. The same prefix skips an editor outright: `GIT_EDITOR=true git rebase --continue` resumes a rebase without stopping on each message. That exact string is allow-listed. The `cp` form prompts, since its command string carries a file path no entry can cover.
 
 **Folding content in** — do it yourself, no interactivity required. Stage the change, `git commit --fixup <target-sha>`, then `git rebase --autosquash <target-sha>^`. A `fixup!` commit keeps the target's message verbatim, so no editor is ever invoked, and `--autosquash` has worked outside `-i` since git 2.38. This is the case for "that hunk belongs in an earlier commit" — an allowlist entry the rule it implements arrived without, a file the commit should have carried.
 

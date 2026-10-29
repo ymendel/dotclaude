@@ -42,6 +42,7 @@
       "Bash(git rev-list:*)",
       "Bash(git switch:*)",
       "Bash(git symbolic-ref:*)",
+      "Bash(GIT_EDITOR=true git rebase --continue)",
       "Bash(grep:*)",
       "Bash(heroku --version)",
       "Bash(heroku apps:info:*)",
