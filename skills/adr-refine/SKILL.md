@@ -26,13 +26,13 @@ This skill is the refinement half of the ADR workflow. The `adr` skill writes th
 1. **Read the ADR file in full.** Don't skim. Note the title, status, date, and every section.
 2. **Read the surrounding codebase where the ADR makes claims.** If the ADR says "we currently use X" or "the existing Y pattern", verify it. Use Grep and Read. An ADR that misdescribes the current state is worse than no ADR.
 3. **Read 1-2 topically related ADRs** if any exist — neighboring by subject, not just by number. Use Grep to find ADRs that mention the same component, system, or decision area. Check for contradictions, supersession gaps, or unlinked prior decisions that should be referenced.
-4. **Produce structured review notes** (format below) and print them to the chat. Do not edit the file yet.
+4. **Produce structured review notes** (format below). Do not edit the file yet.
 5. **Wait for the user's responses** to the questions and proposed edits. Do not apply anything until they answer.
 6. **Apply accepted edits** once the user has responded. Skip or revise the ones they rejected or modified. Before running another pass, check *When to stop refining* below.
 
 ## Review notes format
 
-Print review notes in this exact structure. Omit a section only if it has genuinely nothing to flag — prefer saying "nothing flagged here" over silently dropping a heading, so the user knows you looked.
+Use this exact structure. Omit a section only if it has genuinely nothing to flag — prefer saying "nothing flagged here" over silently dropping a heading, so the user knows you looked.
 
 ```markdown
 ## Review notes for ADR NNNN: {title}
