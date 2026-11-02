@@ -79,7 +79,7 @@ For **each changeset**, you must provide the following:
 
 ## 5. The Output Template
 
-You must generate a single markdown file. Your final output must strictly adhere to the following template. Do not add any conversational text or explanations outside of this structure.
+You must generate a single markdown document. Your final output must strictly adhere to the following template. Do not add any conversational text or explanations outside of this structure.
 
 Once the output is generated, show it to the user and ask for explicit confirmation before touching GitHub. Only after the user approves: create the PR with the output as the body (or update it if one is already open), and update its title.
 

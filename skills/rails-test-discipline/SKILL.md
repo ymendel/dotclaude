@@ -128,7 +128,7 @@ Ask yourself, honestly:
 
 ```markdown
 ## Proposed change
-{One-paragraph summary of what the slice does and why. The actual diff lives in the tool calls above — don't repeat it here.}
+{One-paragraph summary of what the slice does and why. The diff itself is in the working tree — don't repeat it here.}
 
 ## Test strategy
 {Which test type, and why this level is the right one for this change. One or two sentences.}
