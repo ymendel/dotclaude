@@ -8,6 +8,9 @@ only while composing or editing a body, and the reasoning behind them. Load it b
 Everything here presumes a PR is the right artifact at all. On a personally-owned repo it usually
 isn't — the no-PR sub-bullet under *Version Control* governs that first.
 
+Write each paragraph of the body on one line. GitHub renders single newlines as line breaks, per
+`rules/references/writing/markdown-authoring.md`.
+
 ## Why closing keywords belong on the PR and not on a commit
 
 The user closes issues through the PR that merges the work, so the linkage belongs on that one

@@ -233,6 +233,8 @@ or a pushed commit message cannot be swept at all.
 
 When producing markdown for a strict renderer — a committed doc, a README, a PR body, an IDE preview — a small set of fragile constructs (fenced code inside a list item, an inline fence marker in prose, tables holding block content, &c.) render differently across implementations or break outright, and markdown never errors to warn you. The full list, the why, and the formatting discipline are in `rules/references/writing/markdown-authoring.md`, along with labeling images placed one after another. Load it when generating markdown bound for a durable deliverable, and before placing two images next to each other.
 
+Never hard-wrap prose bound for a GitHub issue, pull request, comment, or review — GitHub renders every single newline there as a line break, so text wrapped the way a committed file wraps it shows up broken mid-sentence. Write each paragraph and each list item as one line. Failure mode: the wrap is invisible in the raw body and in every terminal view, so it ships, and the user hand-fixes the rendered page.
+
 ## Emulating the user's voice
 
 When writing in the user's voice — drafting a message *from* him, ghostwriting a comment he'll post, or any output where the goal is to sound like Yossef rather than to serve a broader audience — match the register described below. This also governs anything under his byline that serves a reader (a commit message, a PR description, a doc), which is most sessions.
