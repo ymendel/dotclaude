@@ -107,6 +107,12 @@ When in doubt, ask: in this paragraph, which sense will the reader reach for *fi
 
 Failure mode this prevents: a word chosen for its loose or metaphorical sense (or for the wrong sub-field's term of art, or a methodology phrase that reads plainly but imports a model) gets parsed as the dominant local sense, producing a confident-sounding sentence that means something other than what you wrote.
 
+## An endpoint responds with a status, it doesn't answer one
+
+In API documentation, don't use "answers" as the verb for what a request gets back — "deleting answers `204`", "a missing record answers `404`". Write "responds with", "gets", or "returns". The user reads "answers" as awkward. It is easy to pick up from codebases and ADRs that use it throughout.
+
+Failure mode this prevents: the borrowed verb repeats in every status row and prose line of an API page, so one correction turns into a sweep across already-committed pages.
+
 ## Sweep prose when you rename a code example
 
 When you rename or restructure a code example in a document, sweep the surrounding prose for stale references. Names in the code — variables, method arguments, class names — appear in adjacent prose too: workaround sections, verification notes, follow-up paragraphs that picked up the old name. A rename in the code without a sweep leaves a reader confused about where the new name suddenly appeared from.
