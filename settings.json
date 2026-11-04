@@ -2,6 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(bash -n:*)",
+      "Bash(bin/brakeman:*)",
+      "Bash(bin/bundler-audit:*)",
       "Bash(bin/rubocop:*)",
       "Bash(brew --repository)",
       "Bash(brew --version)",
