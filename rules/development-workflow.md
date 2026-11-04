@@ -79,7 +79,9 @@ Failure mode this prevents: the reader follows the reference, finds nothing, and
 
 ## User's Independent Habits
 
-The user pushes branches, creates commits, creates new branches, and switches contexts independently — without narrating it. When interpreting a request, always check current state first (`git status`, `git branch`, `git diff HEAD`) rather than assuming the working context matches what was last discussed.
+The user pushes branches, creates commits, creates new branches, and switches contexts independently — without narrating it. Before interpreting a request, and before stating local state at all — in a status report, a recap, or an offer to act on it — check current state first (`git status --short --branch`, `git diff HEAD`) rather than assuming the working context matches what was last discussed.
+
+The unprompted report is the easier miss, because nothing was asked that would prompt a check. It comes right after the user says they did something themselves — pushed, merged, deployed — which is exactly when they have likely also switched branches. Failure mode: a branch name remembered from earlier in the session gets stated as current fact ("locally you're still on `<branch>`"), and any offer built on it, like switching to main and pulling, proposes work that is already done.
 
 Specific case: "review the current diff" or "review this" without a PR number means review the local uncommitted or unpushed changes (`git diff HEAD`), not a PR. Run `git diff HEAD` directly rather than invoking the `review` skill, which assumes a PR context.
 
