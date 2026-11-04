@@ -155,6 +155,15 @@ in `git log`, confirm the PR is merged. `.claude/` is gitignored in most setups,
 wrong deletion here is not recoverable from the repo — the recoverability is entirely in
 the external record you are relying on, and that claim is worth one command.
 
+**Never delete a handoff, and never suggest deleting one.** A handoff whose work has all
+landed is spent in the sense above but is still the user's record of the session, not a
+transient carrier, so the delete-on-landing trigger doesn't apply to `.claude/handoffs/`.
+Where a finished handoff would surface at the next session's start, say so and leave it.
+Move anything only the handoff records — an untested assumption, an unexamined warning —
+somewhere durable instead. Failure mode: the handoff reads as cleanup debt once its work has
+merged, so deleting it gets offered as tidying, when it is the one record of why the work
+went the way it did.
+
 ## Failure mode this prevents
 
 Every task leaves two or three files behind and none of them announce that they are spent,
