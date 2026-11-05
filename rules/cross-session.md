@@ -44,8 +44,19 @@ fetching the files yourself through `gh api`, a raw URL, or a path into its tree
 outside sees only what was pushed, and none of the context around it.
 
 The reach for the fetch is strong because it looks like the self-sufficient move, and the tool to do
-it is already at hand. Reserve it for when no session owns the repo, or the owner has said it cannot
-answer.
+it is already at hand. Reserve it for when the owner has said it cannot answer, or the user has
+declined to start one.
+
+**Where no session is running in that repo, offer to start one.** A session launched there loads the
+repo's own `CLAUDE.md` and notes, which is what makes it the better source, and it needs none of an
+earlier session's context to answer from the repo itself. For a single question, run
+`(cd <repo> && claude -p --permission-prompts none --no-session-persistence "<question>")` and the
+answer comes back as the command's output. Anything that run would need approved is denied
+instead, so ask for what that repo's grants already cover. Where follow-ups are likely,
+`claude --bg --name <name> "<question>"` starts one to message, and `claude stop <id>` ends it once
+the answer is in. This stays an offer every time: a launch costs a full session load and runs outside
+this project. The launch prompt offers only yes or no, because no allow rule can match a `cd`
+subshell, and that prompt is where the user accepts.
 
 Failure mode this prevents: the answer comes back stripped of what the owning session would have
 said with it — that a branch was squashed, that a claim was left unchecked — and the user has to

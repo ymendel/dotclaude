@@ -22,6 +22,7 @@
       "Bash(bundle version:*)",
       "Bash(chmod +x:*)",
       "Bash(claude --version)",
+      "Bash(claude stop:*)",
       "Bash(command -v:*)",
       "Bash(echo:*)",
       "Bash(find:*)",
