@@ -114,6 +114,12 @@ cap. Measured across ranges of 49, 50, 51 and 120 commits: the first two come ba
 two both return 50. Reach for `rtk git rev-list --count <range>` when the number is the question,
 and `rtk proxy git log` when the lines are.
 
+**Without an explicit count it also drops merge commits.** With no `--max-count`, `rtk git log`
+caps at 50 lines *and* omits merges, marking neither. Over 38 first-parent commits, `--first-parent`
+returned the 6 non-merges, and a plain `--oneline` over a 141-commit range returned 50 lines with no
+merges in them. An explicit `--max-count=N` switches both off (rtk 1.1.0; observed, not read from
+rtk's source). Use `rtk proxy git log` wherever merges or completeness matter.
+
 This is the inverse of the empty-result traps below. Those produce a suspicious nothing. A capped
 count produces a confident figure, and 50 is a plausible number of commits. Re-running the same
 filtered command reproduces it exactly, so agreement between two runs reads as corroboration rather
