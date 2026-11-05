@@ -3,6 +3,7 @@
     "allow": [
       "Bash(actionlint)",
       "Bash(actionlint -verbose)",
+      "Bash(bash --help)",
       "Bash(bash -n:*)",
       "Bash(bin/brakeman:*)",
       "Bash(bin/bundler-audit:*)",
