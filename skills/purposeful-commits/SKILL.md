@@ -22,11 +22,11 @@ If `commit-message-guide` is also active, this skill runs first to structure the
 
 ## The commit taxonomy
 
-Changes almost always fall into these categories. Each category should be its own commit:
+Changes almost always fall into these categories. Each is usually its own commit, with the exception item 3 describes:
 
 1. **Refactoring** — structural changes that prepare the codebase for new work without changing behavior. Extracts interfaces, moves files, renames, simplifies. These come *first*.
 2. **Feature / fix** — the actual new behavior or bug fix. Should be simpler because the refactoring already happened.
-3. **Supporting changes** — configuration, dependency, timeout, or policy changes driven by the feature. Isolate these with clear rationale in the commit message explaining *why*.
+3. **Supporting changes** — configuration, dependency, timeout, or policy changes driven by the feature. Isolate these with clear rationale in the commit message explaining *why*. Isolate one only when it carries a decision of its own, one a reviewer could disagree with or a maintainer could revert without touching the feature. A change that exists only so the feature works as written, such as an allow entry for the command a new rule prescribes, belongs in the feature's commit. Split off, it leaves two commits that each make half a change.
 
 Not every PR needs all three. Most PRs yield **1–3 commits**, occasionally up to 10 for larger changes.
 
@@ -39,7 +39,7 @@ When invoked:
 2. **Classify each change.** Group the changes by purpose:
    - Refactoring (structural prep, no behavior change)
    - Feature or fix (new behavior, bug fix)
-   - Supporting (config, deps, policy changes driven by the feature)
+   - Supporting (config, deps, policy changes driven by the feature), when it could be reviewed or reverted on its own. Otherwise it goes with the feature.
    - Tests (group with the commit they verify — tests for the refactor go with the refactor commit, tests for the feature go with the feature commit)
    - Cleanup (formatting, typos, dead code removal — only if unrelated to the main work)
 
