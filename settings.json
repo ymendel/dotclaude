@@ -1,6 +1,8 @@
 {
   "permissions": {
     "allow": [
+      "Bash(actionlint)",
+      "Bash(actionlint -verbose)",
       "Bash(bash -n:*)",
       "Bash(bin/brakeman:*)",
       "Bash(bin/bundler-audit:*)",
