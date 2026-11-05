@@ -98,3 +98,14 @@ written as though it will be squashed. The strategy preference in *Pull Requests
 get structured and what to say when asked, not what the body asserts.
 
 Failure mode: the body asserts a strategy nobody chose.
+
+## Images go up with `--attach`
+
+`gh pr edit` and `gh pr comment` upload images and video with `--attach <file>[#alt text]`. Write the
+`![alt](path)` references into the body file first, then pass each file with `--attach`. gh rewrites
+each reference to the uploaded asset's URL, resolving paths in a `--body-file` relative to that file's
+directory, then the working directory. An attached file the body doesn't reference is appended to the
+end. A partial upload failure still updates the PR but exits non-zero, so check the status. Layout of
+consecutive images is `rules/references/writing/markdown-authoring.md`'s concern.
+
+Failure mode: the user is sent to GitHub's web editor to drag in screenshots gh could have uploaded.
