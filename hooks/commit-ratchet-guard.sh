@@ -78,6 +78,7 @@ TIERED=(
   "hooks/git-read-allow.py|hooks/test/run-git-read-allow.sh"
   "hooks/help-version-allow.py|hooks/test/run-help-version-allow.sh"
   "hooks/broad-grant-notice.sh|hooks/test/run-broad-grant-notice.sh"
+  "hooks/reminders-notice.sh|hooks/test/run-session-start.sh"
   "hooks/lib/permission-rules.jq|scripts/test/run-local-allow.sh"
   "hooks/commit-ratchet-guard.sh|hooks/test/run-commit-ratchet.sh"
   "scripts/run-tests.sh|scripts/test/run-test-runner.sh"

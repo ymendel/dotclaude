@@ -119,12 +119,18 @@ run
 blocks 'the shorter sibling suite does not clear the longer one'
 says 'hooks/test/run-permission-request-context.sh' 'the block names the context suite'
 
-# The newest tiered hook, which arrived with its own row.
+# Tiered hooks that arrived after the table was written, each with its own row.
 fresh
 stage hooks/broad-grant-notice.sh
 run
 blocks 'the broad-grant notice hook staged without its suite is blocked'
 says 'hooks/test/run-broad-grant-notice.sh' 'the block names the broad-grant suite'
+
+fresh
+stage hooks/reminders-notice.sh
+run
+blocks 'the reminders notice hook staged without its suite is blocked'
+says 'hooks/test/run-session-start.sh' 'the block names the session-start suite'
 
 # The shared permission rules are a .jq file, which the untiered check (.sh and .py only) would never
 # see. Its explicit row is the only thing that gates it.

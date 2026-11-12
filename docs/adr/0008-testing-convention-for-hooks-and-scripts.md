@@ -405,6 +405,7 @@ comes up would leave the gate unimplementable:
 | `hooks/git-read-allow.py` | 1 | approves Bash commands without a prompt, so a parse it gets wrong runs something nobody saw |
 | `hooks/ensure-trailing-newline.sh` | 1 | mutates files without being invoked |
 | `hooks/broad-grant-notice.sh` | 1 | fires on every Bash call, and a hook that misses a broad grant looks like one with nothing to report |
+| `hooks/reminders-notice.sh` | 1 | fires at every session start, and a reminder it fails to read looks like nothing being due |
 | `hooks/lib/permission-rules.jq` | 1 | the coverage and broadness rules `broad-grant-notice.sh` and `local-allow.sh` both rely on; gated through `scripts/test/run-local-allow.sh` |
 | `hooks/notify-config-update.sh` | 3 | 4 lines, no branching worth asserting on |
 | `hooks/rtk-rewrite.sh` | 3 | vendored, pinned by checksum |

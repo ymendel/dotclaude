@@ -215,6 +215,15 @@
             "command": "$HOME/.claude/skills/session-handoff/hooks/recent-handoff-notice.sh"
           }
         ]
+      },
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/reminders-notice.sh"
+          }
+        ]
       }
     ],
     "PreToolUse": [
