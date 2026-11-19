@@ -214,6 +214,12 @@ run
 blocks 'the settings comparer is gated'
 says 'scripts/tests/' 'the block names its tests directory'
 
+fresh
+stage scripts/command-failure-report.py
+run
+blocks 'the command-failure report is gated'
+says 'scripts/tests/' 'the block names the command-failure report tests directory'
+
 # --- Tier 3 and everything the gate must leave alone ------------------------
 
 fresh

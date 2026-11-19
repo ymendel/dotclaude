@@ -17,6 +17,7 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parent.parent
 
 ALIASES = {
+    "command_failure_report": "command-failure-report.py",
     "rules_sections": "rules-sections.py",
     "session_meta_report": "session-meta-report.py",
 }

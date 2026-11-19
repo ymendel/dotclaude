@@ -208,7 +208,9 @@ Roughly monthly. `usage-data/README.md` maps the files; this is the method.
    Project mix moving — the script prints per-week mix beside per-project error
    rates — and configuration landing in the same period, via
    `git log --since=<date> -- hooks/ settings.json rules/`. A step change points
-   at something landing; a drift usually doesn't.
+   at something landing; a drift usually doesn't. Then run
+   `./scripts/command-failure-report.py` for what "Command Failed" is made of,
+   with its `WINDOW_START` set to the same edge.
 6. **Take skill and agent counts from `usage-data/usage-history.tsv`**, not from
    the report. That track was built to survive rotation, and its own section
    above explains why raw counts between runs aren't comparable while the trend
@@ -231,15 +233,35 @@ opened 2026-08-10.
 the top ten held 41%, against a 161-minute median and a 300-minute mean. Cite the
 median, or cite messages and commits.
 
-**A rising error rate may be a guard working.** Hook blocks and permission
-rejections land in the same `tool_errors` count as genuine failures, so read the
-per-category breakdown. `User Rejected` falling while `Command Failed` rises is a
-different story from both rising together.
+**"Command Failed" is mostly not failure.** It counts every non-zero exit, so a
+red test run and a grep that matched nothing land beside a genuine mistake. In the
+2026-11-19 window those two made up nearly half of it, and guard blocks about
+1 per 1,000 tool calls. Read `command-failure-report.py` before reading the rate.
 
 ### Exit status
 
 - `0` Report produced.
 - `1` No session JSON found under the target directory.
+
+## `command-failure-report.py`
+
+Split the Bash errors `/insights` counts as "Command Failed" by what produced
+them: a guard hook's block, a rejection, or a non-zero exit, tallied by command
+and exit code.
+
+```
+./scripts/command-failure-report.py [projects-dir]
+```
+
+`session-meta` records only a count per category, so this reads the transcripts
+themselves. They rotate on the same schedule as the cache, so it covers the same
+month, and it belongs to step 5 of the synthesis procedure above. Read-only. It
+prints counts and command heads, never transcript text.
+
+### Exit status
+
+- `0` Report produced.
+- `1` No transcripts touched since `WINDOW_START`.
 
 ## `run-tests.sh`
 
