@@ -168,9 +168,9 @@ Companion to `usage-report.sh`, and easy to confuse with it. That one counts
 **skill and agent invocations** and appends to a history file that outlives
 transcript rotation. This one describes **how sessions ran**, reading a cache
 `/insights` maintains incrementally — it adds a file the first time it sees a
-transcript and rewrites only the ones that changed. Whether an entry survives
-its own transcript rotating out is untested; the script's `RETENTION_EDGE`
-comment records the open question and the date it resolves.
+transcript and rewrites only the ones that changed. An entry goes when its
+transcript rotates, so the cache covers one rotation and no more: a month
+skipped between runs is lost.
 
 ### The synthesis procedure
 

@@ -43,13 +43,11 @@ DEFAULT_DIR = pathlib.Path.home() / ".claude" / "usage-data" / "session-meta"
 # the period they date from, and the trend sections drop them. Recompute when the window
 # moves.
 #
-# UNTESTED: whether a captured session survives its own transcript rotating out. The cache
-# updates incrementally, but nothing observed so far says whether a stale entry is kept or
-# pruned — and the answer decides whether coverage accumulates across runs or only ever
-# reaches back one rotation. The three 2026-05 sessions here were last written to between
-# 2026-08-10 and 2026-08-20, so they rotate around 2026-09-09 to 2026-09-19; if their files
-# are still present after that, the cache accumulates.
-RETENTION_EDGE = "2026-08-10"
+# The cache does not accumulate. The 2026-09-09 run held sessions back to 2026-08-10; by the
+# 2026-11-19 run the earliest left was 2026-10-20, so an entry goes when its transcript
+# rotates and coverage only ever reaches back one rotation. A run more than about a month
+# after the last one leaves a gap no later run can fill.
+RETENTION_EDGE = "2026-10-20"
 
 
 def load(directory):
