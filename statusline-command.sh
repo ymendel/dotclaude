@@ -26,6 +26,8 @@ if [ -f "$config_file" ]; then
   show_weekly_reset=$SHOW_WEEKLY_RESET_TIME
   show_weekly_label=$SHOW_WEEKLY_LABEL
   show_extra_usage=$SHOW_EXTRA_USAGE
+  show_fable=$SHOW_FABLE
+  show_cache=$SHOW_CACHE
   element_color_dir=$ELEMENT_COLOR_DIR
   element_color_branch=$ELEMENT_COLOR_BRANCH
   element_color_model=$ELEMENT_COLOR_MODEL
@@ -61,6 +63,8 @@ else
   show_weekly_reset=1
   show_weekly_label=1
   show_extra_usage=0
+  show_fable=0
+  show_cache=0
   element_color_dir="#0000EE"
   element_color_branch="#00BB00"
   element_color_model="#BBBB00"
@@ -89,33 +93,6 @@ hex_to_ansi() {
 
   printf '\033[38;2;%d;%d;%dm' "$r" "$g" "$b"
 }
-
-# Render a cache age as a compact duration: 47s, 13m, 2h, 2h5m.
-format_cache_age() {
-  local seconds=$1
-
-  if [ "$seconds" -lt 60 ]; then
-    printf '%ds' "$seconds"
-  elif [ "$seconds" -lt 3600 ]; then
-    printf '%dm' "$((seconds / 60))"
-  else
-    local hours=$((seconds / 3600))
-    local minutes=$(((seconds % 3600) / 60))
-
-    if [ "$minutes" -eq 0 ]; then
-      printf '%dh' "$hours"
-    else
-      printf '%dh%dm' "$hours" "$minutes"
-    fi
-  fi
-}
-
-# How old the Claude Usage app's cache may get before a reading is shown with
-# its age appended. The app's refresh cadence is irregular and has been
-# observed running to tens of minutes, so expect this to be exceeded during
-# normal operation — the age is displayed precisely so the number can be
-# judged rather than this threshold trusted.
-cache_stale_after=300
 
 # Set colors based on mode
 RESET=$'\033[0m'
@@ -363,28 +340,62 @@ fi
 
 usage_text=""
 if [ "$show_usage" = "1" ]; then
-  # Values come from the Claude Usage app, which rewrites this cache on each
-  # refresh. There is deliberately no fallback fetch: the endpoint sits behind a
-  # Cloudflare managed challenge no headless client can clear, so a stale cache
-  # means the app has stopped — not something this script can retry.
+  # Try reading from cache first (written by Claude Usage app on each refresh)
   cache_file="$HOME/.claude/.statusline-usage-cache"
-  utilization=""
-  resets_at=""
-  usage_stale=0
-  usage_cache_age=""
+  swift_result=""
   if [ -f "$cache_file" ]; then
     cache_ts=$(grep "^TIMESTAMP=" "$cache_file" 2>/dev/null | cut -d= -f2)
-    utilization=$(grep "^UTILIZATION=" "$cache_file" | cut -d= -f2)
-    resets_at=$(grep "^RESETS_AT=" "$cache_file" | cut -d= -f2)
+    now_ts=$(date +%s)
     if [ -n "$cache_ts" ]; then
-      usage_cache_age=$(( $(date +%s) - cache_ts ))
-      [ "$usage_cache_age" -ge "$cache_stale_after" ] && usage_stale=1
-    else
-      usage_stale=1
+      cache_age=$((now_ts - cache_ts))
+      if [ "$cache_age" -lt 300 ]; then
+        cache_util=$(grep "^UTILIZATION=" "$cache_file" | cut -d= -f2)
+        cache_reset=$(grep "^RESETS_AT=" "$cache_file" | cut -d= -f2)
+        if [ -n "$cache_util" ]; then
+          swift_result="${cache_util}|${cache_reset}"
+        fi
+      fi
     fi
   fi
 
-  if [ -n "$utilization" ]; then
+  # The app's cache is older than 5 minutes (it refreshes less often than that
+  # in ordinary use, #322). Claude Code reports the session's own rate limits on
+  # stdin, so use those before anything slower.
+  stale_note=""
+  if [ -z "$swift_result" ]; then
+    rl_block=$(echo "$input" | grep -o '"five_hour": *{[^}]*}' | head -1)
+    rl_pct=$(echo "$rl_block" | grep -o '"used_percentage": *[0-9.]*' | sed 's/.*: *//')
+    rl_reset=$(echo "$rl_block" | grep -o '"resets_at": *[0-9]*' | sed 's/.*: *//')
+    if [ -n "$rl_pct" ]; then
+      rl_iso=""
+      [ -n "$rl_reset" ] && rl_iso=$(date -u -r "$rl_reset" "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null)
+      swift_result="$(printf '%.0f' "$rl_pct")|${rl_iso}"
+    fi
+  fi
+
+  # Then the swift script
+  if [ -z "$swift_result" ]; then
+    swift_result=$(swift "$HOME/.claude/fetch-claude-usage.swift" 2>/dev/null)
+  fi
+
+  # Last resort: the old cached reading, marked with its age, for up to 6 hours.
+  # A dated number is more use than a blank segment.
+  if [ -z "$swift_result" ] && [ -f "$cache_file" ] && [ -n "$cache_ts" ] && [ "$cache_age" -lt 21600 ]; then
+    cache_util=$(grep "^UTILIZATION=" "$cache_file" | cut -d= -f2)
+    cache_reset=$(grep "^RESETS_AT=" "$cache_file" | cut -d= -f2)
+    if [ -n "$cache_util" ]; then
+      swift_result="${cache_util}|${cache_reset}"
+      if [ "$cache_age" -ge 3600 ]; then
+        stale_note=" (stale $((cache_age / 3600))h)"
+      else
+        stale_note=" (stale $((cache_age / 60))m)"
+      fi
+    fi
+  fi
+
+  if [ -n "$swift_result" ]; then
+    utilization=$(echo "$swift_result" | cut -d'|' -f1)
+    resets_at=$(echo "$swift_result" | cut -d'|' -f2)
 
     # Parse reset epoch once for shared use by pace marker and reset time display
       reset_epoch=""
@@ -509,25 +520,10 @@ if [ "$show_usage" = "1" ]; then
         fi
       fi
 
-      stale_marker=""
-      if [ "$usage_stale" = "1" ]; then
-        if [ -n "$usage_cache_age" ]; then
-          stale_age=" $(format_cache_age "$usage_cache_age")"
-        else
-          stale_age=""
-        fi
-
-        if [ "$color_mode" = "monochrome" ]; then
-          stale_marker=" (stale${stale_age})"
-        else
-          stale_marker=" ${GRAY}⋯${stale_age}${RESET}${usage_color}"
-        fi
-      fi
-
       if [ "$show_usage_label" = "1" ]; then
-        usage_text="${usage_color}Usage: ${utilization}%${progress_bar}${reset_time_display}${stale_marker}${RESET}"
+        usage_text="${usage_color}Usage: ${utilization}%${progress_bar}${reset_time_display}${stale_note}${RESET}"
       else
-        usage_text="${usage_color}${utilization}%${progress_bar}${reset_time_display}${stale_marker}${RESET}"
+        usage_text="${usage_color}${utilization}%${progress_bar}${reset_time_display}${stale_note}${RESET}"
       fi
     else
       if [ "$show_usage_label" = "1" ]; then
@@ -550,17 +546,26 @@ if [ "$show_weekly" = "1" ] && [ "$show_usage" = "1" ]; then
   cache_file="$HOME/.claude/.statusline-usage-cache"
   weekly_util=""
   weekly_reset=""
-  weekly_stale=0
-  weekly_cache_age=""
   if [ -f "$cache_file" ]; then
     cache_ts=$(grep "^TIMESTAMP=" "$cache_file" 2>/dev/null | cut -d= -f2)
-    weekly_util=$(grep "^WEEKLY_UTILIZATION=" "$cache_file" | cut -d= -f2)
-    weekly_reset=$(grep "^WEEKLY_RESETS_AT=" "$cache_file" | cut -d= -f2)
+    now_ts=$(date +%s)
     if [ -n "$cache_ts" ]; then
-      weekly_cache_age=$(( $(date +%s) - cache_ts ))
-      [ "$weekly_cache_age" -ge "$cache_stale_after" ] && weekly_stale=1
-    else
-      weekly_stale=1
+      cache_age=$((now_ts - cache_ts))
+      if [ "$cache_age" -lt 300 ]; then
+        weekly_util=$(grep "^WEEKLY_UTILIZATION=" "$cache_file" | cut -d= -f2)
+        weekly_reset=$(grep "^WEEKLY_RESETS_AT=" "$cache_file" | cut -d= -f2)
+      fi
+    fi
+  fi
+
+  # Cache too old: take the weekly window Claude Code reports on stdin (#322)
+  if [ -z "$weekly_util" ]; then
+    rl_block=$(echo "$input" | grep -o '"seven_day": *{[^}]*}' | head -1)
+    rl_pct=$(echo "$rl_block" | grep -o '"used_percentage": *[0-9.]*' | sed 's/.*: *//')
+    rl_reset=$(echo "$rl_block" | grep -o '"resets_at": *[0-9]*' | sed 's/.*: *//')
+    if [ -n "$rl_pct" ]; then
+      weekly_util=$(printf '%.0f' "$rl_pct")
+      [ -n "$rl_reset" ] && weekly_reset=$(date -u -r "$rl_reset" "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null)
     fi
   fi
 
@@ -677,25 +682,10 @@ if [ "$show_weekly" = "1" ] && [ "$show_usage" = "1" ]; then
       fi
     fi
 
-    weekly_stale_marker=""
-    if [ "$weekly_stale" = "1" ]; then
-      if [ -n "$weekly_cache_age" ]; then
-        weekly_stale_age=" $(format_cache_age "$weekly_cache_age")"
-      else
-        weekly_stale_age=""
-      fi
-
-      if [ "$color_mode" = "monochrome" ]; then
-        weekly_stale_marker=" (stale${weekly_stale_age})"
-      else
-        weekly_stale_marker=" ${GRAY}⋯${weekly_stale_age}${RESET}${weekly_color}"
-      fi
-    fi
-
     if [ "$show_weekly_label" = "1" ]; then
-      weekly_text="${weekly_color}Weekly: ${weekly_util}%${weekly_bar}${weekly_reset_display}${weekly_stale_marker}${RESET}"
+      weekly_text="${weekly_color}Weekly: ${weekly_util}%${weekly_bar}${weekly_reset_display}${RESET}"
     else
-      weekly_text="${weekly_color}${weekly_util}%${weekly_bar}${weekly_reset_display}${weekly_stale_marker}${RESET}"
+      weekly_text="${weekly_color}${weekly_util}%${weekly_bar}${weekly_reset_display}${RESET}"
     fi
   fi
 fi
@@ -750,6 +740,66 @@ if [ "$show_extra_usage" = "1" ] && [ "$show_usage" = "1" ]; then
   fi
 fi
 
+# Fable weekly limit, from the cache the app writes on each refresh (#323).
+# Hidden when the account has no Fable limit or the cache is stale.
+fable_text=""
+if [ "$show_fable" = "1" ] && [ "$show_usage" = "1" ]; then
+  cache_file="$HOME/.claude/.statusline-usage-cache"
+  if [ -f "$cache_file" ]; then
+    cache_ts=$(grep "^TIMESTAMP=" "$cache_file" 2>/dev/null | cut -d= -f2)
+    fable_util=$(grep "^FABLE_UTILIZATION=" "$cache_file" 2>/dev/null | cut -d= -f2)
+    if [ -n "$cache_ts" ] && [ -n "$fable_util" ] && [ $(( $(date +%s) - cache_ts )) -lt 300 ]; then
+      fable_level=$(( (fable_util + 9) / 10 ))
+      [ "$fable_level" -lt 1 ] && fable_level=1
+      [ "$fable_level" -gt 10 ] && fable_level=10
+      fable_level_var="LEVEL_${fable_level}"
+      fable_text="${!fable_level_var}Fable: ${fable_util}%${RESET}"
+    fi
+  fi
+fi
+
+# Prompt-cache health: Claude Code reports it under "prompt_cache" once the first
+# API response has landed (hit_ratio 0-1, warm flag, and the likely cause of the
+# last miss). Absent until then, so the element simply stays hidden.
+cache_text=""
+if [ "$show_cache" = "1" ]; then
+  hit_ratio=$(echo "$input" | grep -o '"hit_ratio": *[0-9.]*' | head -1 | sed 's/.*: *//')
+  cache_warm=$(echo "$input" | grep -o '"warm": *\(true\|false\)' | head -1 | sed 's/.*: *//')
+  miss_cause=$(echo "$input" | grep -o '"causes": *\["[a-z0-9_]*"' | head -1 | sed 's/.*\["//;s/"$//')
+  last_miss_at=$(echo "$input" | grep -o '"last_miss_at": *[0-9]*' | head -1 | sed 's/.*: *//')
+
+  if [ -n "$hit_ratio" ]; then
+    cache_pct=$(awk "BEGIN { print int($hit_ratio * 100 + 0.5) }")
+    if [ "$cache_warm" = "false" ]; then
+      cache_color="$GRAY"
+    elif [ "$cache_pct" -ge 90 ]; then
+      cache_color="$LEVEL_3"
+    elif [ "$cache_pct" -ge 70 ]; then
+      cache_color="$LEVEL_6"
+    else
+      cache_color="$LEVEL_9"
+    fi
+    cache_text="${cache_color}⚡ ${cache_pct}%${RESET}"
+
+    # A miss inside the last ten minutes is annotated with its likely cause
+    if [ -n "$miss_cause" ] && [ -n "$last_miss_at" ]; then
+      miss_age=$(( $(date +%s) - last_miss_at ))
+      if [ "$miss_age" -ge 0 ] && [ "$miss_age" -lt 600 ]; then
+        case "$miss_cause" in
+          system_prompt_changed) miss_label="system" ;;
+          tools_changed) miss_label="tools" ;;
+          model_changed) miss_label="model" ;;
+          messages_rewritten) miss_label="history" ;;
+          ttl_expired_5m|ttl_expired_1h) miss_label="ttl" ;;
+          likely_server_side) miss_label="server" ;;
+          *) miss_label="$miss_cause" ;;
+        esac
+        cache_text="${cache_text}${LEVEL_9} ✗ ${miss_label}${RESET}"
+      fi
+    fi
+  fi
+fi
+
 output=""
 separator="${GRAY} │ ${RESET}"
 
@@ -793,10 +843,22 @@ if [ -n "$weekly_text" ]; then
   output="${output}${weekly_text}"
 fi
 
+# Then Fable weekly
+if [ -n "$fable_text" ]; then
+  [ -n "$output" ] && output="${output}${separator}"
+  output="${output}${fable_text}"
+fi
+
 # Then extra usage
 if [ -n "$extra_usage_text" ]; then
   [ -n "$output" ] && output="${output}${separator}"
   output="${output}${extra_usage_text}"
+fi
+
+# Then prompt cache
+if [ -n "$cache_text" ]; then
+  [ -n "$output" ] && output="${output}${separator}"
+  output="${output}${cache_text}"
 fi
 
 printf "%s\n" "$output"
