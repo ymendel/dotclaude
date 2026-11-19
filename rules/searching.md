@@ -81,6 +81,8 @@ Two caveats on trafilatura:
 - **It drops block code on some sites, silently** — no error, and the prose that comes back reads as the whole page. That's what makes the choice above an intent question rather than a fetch-then-verify one. Same shape as `RTK.md`'s empty-`rtk grep` trap.
 - **No JavaScript rendering, no authenticated pages.** Content that exists only after a client-side render is invisible to it, the same as to curl.
 
+When trafilatura drops a code block and the raw HTML is too tag-split to grep, run `textutil -convert txt -stdout <page.html>` on the curl'd file. Tested on one site only. It passes through rtk, so grant it bare as `Bash(textutil -convert txt -stdout:*)`. `textutil *` would also grant file writes.
+
 **Most sub-agents can't run trafilatura** — it goes through Bash, which several of them don't carry. When delegating a fetch, pass the constraint or expect WebFetch (`agents.md`).
 
 `rules/references/searching/page-fetching.md` holds the measurements behind the code-drop caveat, a count-based check for when intent wasn't clear up front, and the per-agent fetch table. Load it before concluding a fetched page was complete, or before delegating a fetch that has to be verbatim.
