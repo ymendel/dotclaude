@@ -120,6 +120,10 @@ returned the 6 non-merges, and a plain `--oneline` over a 141-commit range retur
 merges in them. An explicit `--max-count=N` switches both off (rtk 1.1.0; observed, not read from
 rtk's source). Use `rtk proxy git log` wherever merges or completeness matter.
 
+**`rtk git show <rev>:<path>` truncates the file, even when redirected, and ends it on a
+`[see remaining: …]` hint.** Use `rtk proxy git show <rev>:<path>` whenever the content goes into a
+file, a diff, or a count.
+
 This is the inverse of the empty-result traps below. Those produce a suspicious nothing. A capped
 count produces a confident figure, and 50 is a plausible number of commits. Re-running the same
 filtered command reproduces it exactly, so agreement between two runs reads as corroboration rather
