@@ -142,7 +142,13 @@ PROJECTS_DIR=...   # transcripts; default $HOME/.claude/projects
 HISTORY_FILE=...   # snapshot log; default $REPO/usage-data/usage-history.tsv
 ```
 
-Requires bash 4+ (associative arrays, `mapfile`, namerefs).
+Requires bash 4+ (associative arrays, `mapfile`, namerefs) and `jq`.
+
+Snapshots before 2026-11-19 counted every occurrence of the invocation marker,
+and a transcript repeats each invocation in the request blob that follows it.
+The 2026-11-12 row ran about 2.6 times the real figure (483 skill matches
+against 187 Skill calls). When the duplication began is unknown, so don't read
+a trend across that date.
 
 ### Exit status
 

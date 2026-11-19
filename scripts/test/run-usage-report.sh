@@ -56,6 +56,16 @@ transcript() {
     TRANSCRIPT="$PROJECTS/$name.jsonl"
 }
 
+# skill_call <name> / agent_call <type> — the assistant record a real invocation writes. Transcripts
+# also carry api-request-blob records repeating the same tool_use, which is why the fixtures use the
+# real shape rather than a bare marker.
+skill_call() {
+    printf '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"toolu_%s","name":"Skill","input":{"skill":"%s"}}]}}' "$1" "$1"
+}
+agent_call() {
+    printf '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"toolu_%s","name":"Agent","input":{"description":"look","subagent_type":"%s"}}]}}' "$1" "$1"
+}
+
 # age_out — push the last-written transcript outside any plausible window.
 age_out() { touch -t 202001010000 "$TRANSCRIPT"; }
 
@@ -91,7 +101,7 @@ fresh
 skill adr
 skill orientation-doc
 agent debugger
-transcript session-a '{"skill":"adr"}' '{"skill":"adr"}' '{"subagent_type":"debugger"}'
+transcript session-a "$(skill_call adr)" "$(skill_call adr)" "$(agent_call debugger)"
 run --no-snapshot
 expect_eq "$(count_for adr)" 2 'a skill invoked twice counts twice'
 expect_eq "$(count_for orientation-doc)" 0 'a skill never invoked counts zero'
@@ -106,7 +116,7 @@ saw '1 used, 1 unused' 'the used and unused tallies are reported'
 # every transcript and a skill invoked once must not look alike.
 fresh
 skill adr
-transcript session-a '{"skill":"adr"}'
+transcript session-a "$(skill_call adr)"
 run --no-snapshot
 expect_eq "$(count_for adr)" 1 'one invocation counts once'
 
@@ -119,18 +129,46 @@ expect_eq "$(count_for adr)" 0 'a transcript with no invocations leaves the coun
 # Counts aggregate across transcripts rather than reporting the last one.
 fresh
 skill adr
-transcript session-a '{"skill":"adr"}'
-transcript session-b '{"skill":"adr"}' '{"skill":"adr"}'
+transcript session-a "$(skill_call adr)"
+transcript session-b "$(skill_call adr)" "$(skill_call adr)"
 run --no-snapshot
 expect_eq "$(count_for adr)" 3 'counts are summed across transcripts'
+
+# A transcript repeats each invocation in the api-request-blob record holding the next request's
+# payload. Counting every occurrence of the marker counted one invocation two or three times.
+fresh
+skill adr
+agent debugger
+transcript session-a "$(skill_call adr)" "$(agent_call debugger)" \
+    "{\"type\":\"api-request-blob\",\"blob\":{\"messages\":[{\"content\":[$(skill_call adr | sed 's/.*"content":\[//; s/\]}}$//'),$(agent_call debugger | sed 's/.*"content":\[//; s/\]}}$//')]}]}}"
+run --no-snapshot
+expect_eq "$(count_for adr)" 1 'a skill invocation repeated in a request blob counts once'
+expect_eq "$(count_for debugger)" 1 'an agent invocation repeated in a request blob counts once'
+
+# Only a tool call is an invocation. A record carrying the same key for another reason — an
+# attachment, a tool result's structured payload — is not.
+fresh
+skill adr
+transcript session-a '{"type":"attachment","attachment":{"type":"skill_listing","skill":"adr"}}' \
+    '{"type":"user","toolUseResult":{"skill":"adr"},"message":{"content":[{"type":"tool_result","content":"ok"}]}}'
+run --no-snapshot
+expect_eq "$(count_for adr)" 0 'a marker outside a tool call does not count'
+
+# A line that is not JSON — a truncated write at rotation time — must not stop the count.
+fresh
+skill adr
+transcript session-a '{"type":"assistant","message":{"content":[' "$(skill_call adr)"
+run --no-snapshot
+expect_eq "$(count_for adr)" 1 'a malformed line is skipped rather than ending the scan'
+expect_eq "$STATUS" 0 'a malformed line does not fail the run'
 
 # --- The window, which is what makes two runs comparable --------------------
 
 fresh
 skill adr
-transcript old-session '{"skill":"adr"}'
+transcript old-session "$(skill_call adr)"
 age_out
-transcript recent-session '{"skill":"adr"}'
+transcript recent-session "$(skill_call adr)"
 run --no-snapshot
 expect_eq "$(count_for adr)" 1 'an out-of-window transcript is not counted'
 saw 'Transcripts in window: 1 (of 2 present)' 'the report distinguishes in-window from present'
@@ -139,7 +177,7 @@ saw 'Transcripts in window: 1 (of 2 present)' 'the report distinguishes in-windo
 # against comparing raw counts across runs.
 fresh
 skill adr
-transcript old-session '{"skill":"adr"}'
+transcript old-session "$(skill_call adr)"
 age_out
 run --no-snapshot
 expect_eq "$(count_for adr)" 0 'a skill whose invocations all aged out reads as unused'
@@ -151,7 +189,7 @@ saw 'unused: adr' 'the aged-out skill is listed as unused'
 # report would inflate the used count with things this repo does not own.
 fresh
 skill adr
-transcript session-a '{"skill":"adr"}' '{"skill":"some-builtin"}'
+transcript session-a "$(skill_call adr)" "$(skill_call some-builtin)"
 run --no-snapshot
 saw 'invoked but not in inventory' 'an invoked non-inventory skill is reported separately'
 saw 'some-builtin (1)' 'the external skill is named with its count'
@@ -159,7 +197,7 @@ saw '1 used, 0 unused' 'the external skill does not inflate the inventory tally'
 
 fresh
 skill adr
-transcript session-a '{"skill":"adr"}'
+transcript session-a "$(skill_call adr)"
 run --no-snapshot
 did_not_see 'invoked but not in inventory' 'the external section is omitted when there is nothing in it'
 
@@ -168,7 +206,7 @@ did_not_see 'invoked but not in inventory' 'the external section is omitted when
 fresh
 agent debugger
 printf 'not an agent\n' > "$FIX/agents/README.md"
-transcript session-a '{"subagent_type":"debugger"}'
+transcript session-a "$(agent_call debugger)"
 run --no-snapshot
 did_not_see 'README' 'agents/README.md is not treated as an agent'
 saw 'AGENTS (1)' 'the agent inventory counts only real agents'
@@ -179,7 +217,7 @@ saw 'AGENTS (1)' 'the agent inventory counts only real agents'
 fresh
 skill adr
 mkdir -p "$FIX/skills/synced/some-uuid/docs"
-transcript session-a '{"skill":"adr"}'
+transcript session-a "$(skill_call adr)"
 run --no-snapshot
 did_not_see 'synced' 'a skills/ directory without SKILL.md is not treated as a skill'
 saw 'SKILLS (1)' 'the skill inventory counts only directories with a SKILL.md'
@@ -190,7 +228,7 @@ fresh
 skill adr
 skill orientation-doc
 agent debugger
-transcript session-a '{"skill":"adr"}'
+transcript session-a "$(skill_call adr)"
 run
 if [ -f "$HISTORY" ]; then
     report true 'a snapshot run creates the history file'
@@ -211,7 +249,7 @@ expect_eq "$(grep -c '	skill	adr	' "$HISTORY")" 2 'a second run appends rather t
 
 fresh
 skill adr
-transcript session-a '{"skill":"adr"}'
+transcript session-a "$(skill_call adr)"
 run --no-snapshot
 if [ -f "$HISTORY" ]; then
     report false '--no-snapshot writes nothing' 'the history file was created'
@@ -259,7 +297,7 @@ expect_eq "$STATUS" 2 'a zero WINDOW_DAYS exits 2'
 
 fresh
 skill adr
-transcript session-a '{"skill":"adr"}'
+transcript session-a "$(skill_call adr)"
 WINDOW=7 run --no-snapshot
 saw 'last 7d' 'the window label reflects WINDOW_DAYS'
 

@@ -121,19 +121,27 @@ mapfile -t skills < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -name SKILL.md 
 mapfile -t agents < <(find "$AGENTS_DIR" -maxdepth 1 -mindepth 1 -name '*.md' ! -name 'README.md' -exec basename {} .md \; | sort)
 
 # --- Gather invocation counts from in-window transcripts -------------------
-# Skills appear as "skill":"<name>"; agents as "subagent_type":"<name>".
+# An invocation is a Skill or Agent tool_use in an assistant record. Counting the bare
+# "skill":"<name>" marker instead counted each one two or three times, because the
+# api-request-blob record holding the next request repeats the whole conversation.
+# grep narrows the lines before jq parses them; `fromjson?` skips any line that isn't JSON.
 declare -A skill_counts agent_counts
 if [[ "$n_files" -gt 0 ]]; then
-  while read -r cnt name; do
-    [[ -n "${name:-}" ]] && skill_counts["$name"]=$cnt
+  while read -r cnt kind name; do
+    [[ -z "${name:-}" ]] && continue
+    if [[ "$kind" == "skill" ]]; then
+      skill_counts["$name"]=$cnt
+    else
+      agent_counts["$name"]=$cnt
+    fi
   done < <(printf '%s\0' "${window_files[@]}" \
-             | xargs -0 grep -ohI '"skill":"[a-z0-9_-]\+"' 2>/dev/null \
-             | sed 's/.*"skill":"//; s/"$//' | sort | uniq -c)
-  while read -r cnt name; do
-    [[ -n "${name:-}" ]] && agent_counts["$name"]=$cnt
-  done < <(printf '%s\0' "${window_files[@]}" \
-             | xargs -0 grep -ohI '"subagent_type":"[a-z0-9_-]\+"' 2>/dev/null \
-             | sed 's/.*"subagent_type":"//; s/"$//' | sort | uniq -c)
+             | xargs -0 grep -hI '"name":"\(Skill\|Agent\)"' 2>/dev/null \
+             | jq -rR 'fromjson? | select(.type == "assistant") | .message.content[]?
+                       | select(.type == "tool_use")
+                       | if .name == "Skill" then "skill \(.input.skill // empty)"
+                         elif .name == "Agent" then "agent \(.input.subagent_type // empty)"
+                         else empty end' \
+             | sort | uniq -c)
 fi
 
 # --- Report a section ------------------------------------------------------
