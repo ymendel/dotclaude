@@ -53,6 +53,12 @@ Failure mode this prevents: a session describes a teammate's workflow to the use
 and plans work around a convention the user hasn't adopted. Nothing in the file marks whose it is,
 so it surfaces only when the user corrects it.
 
+## Generated data follows the domain's real boundaries
+
+Demo feeds, seed data and test fixtures stand in for real data, so give them its shape: trading days and closed sessions, weekends, sampling gaps, business hours. A sine wave or step function runs straight through all of them. Before generating, name the boundaries the real data has and build them in.
+
+Failure mode this prevents: the data itself looks fine, so nothing flags it, and the defect surfaces in whatever is drawn on top of it — day dividers and period bands land in the wrong places, and a test passes against a continuity the real feed never has.
+
 ## Size a version bump by its releases, not its numbers
 
 A version number is the maintainer's claim, and only as reliable as the maintainer. Even honest

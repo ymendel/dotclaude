@@ -127,6 +127,8 @@ Common cases where this trap shows up:
 - ENV vars / platform config vars — most platforms apply changes on process or dyno restart, not immediately to running processes.
 - Feature flag stores or configuration that snapshots at boot rather than re-reading at runtime.
 
+A rendered page is the same split: the test suite checks the code that produces it and never sees the result. Screenshot a visual change before calling it done. Where headless capture can't reproduce the behavior — animation timing, dropped frames, a drag gesture — say the change went unseen rather than calling it verified.
+
 ## Pasted terminal output may be redacted — a placeholder credential inverts the apparent result
 
 When the user pastes command output, secrets are often edited out before sharing — a real token replaced with a joke or placeholder value (`adtk_nicetry`, `adtk_nope`, `xxx`, `<token>`, `REDACTED`). Read a transparently-fake credential as a *redaction signal*, not as the literal value that ran. The trap is when the redacted credential flips what the output means: an obviously-fake token sitting next to a `200 OK` reads as "invalid token got through" (alarming) when the truth is "valid token was swapped out for the paste" (nothing wrong).
