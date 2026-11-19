@@ -162,7 +162,7 @@ Aggregate the per-session JSON that `/insights` leaves in
 whole-range totals the HTML report carries.
 
 ```
-python3 scripts/session-meta-report.py [session-meta-dir]
+./scripts/session-meta-report.py [session-meta-dir]
 ```
 
 Buckets sessions by ISO week and by project and prints counts and straight
